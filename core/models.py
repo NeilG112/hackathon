@@ -18,14 +18,21 @@ def normalize_oz(raw: str) -> str:
     The join between the two input formats and the priced reference data runs
     through this function, so there is exactly one canonical form:
 
-        digits only, internal padding removed, hierarchy levels concatenated.
+        alphanumerics only, uppercased, padding and separators removed,
+        hierarchy levels concatenated.
 
     D83 fixed-width gives `'0101   1'`; X83 gives the parts `('01', '01', '1')`.
-    Both must collapse to the same key. Whitespace is dropped, not zero-padded —
-    see PLAN.md "The three OZ layouts" for why per-file field widths make
-    zero-padding unsafe as a global rule.
+    Both collapse to `'01011'`. Whitespace is dropped, not zero-padded — see
+    PLAN.md "The three OZ layouts" for why per-file field widths make
+    zero-padding unsafe as a global rule. Separators (`.`, `-`, `/`) are dropped
+    for the same reason: only one of the two formats writes them.
+
+    **Letters are kept.** `StBALV23040.D86` contains a real item with the OZ
+    `TEL00009` (confirmed by its matching type-23 price record `23TEL00009`).
+    A digits-only key silently turned that into `'00009'`, which both loses the
+    prefix and risks colliding with a numeric OZ in the same file.
     """
-    return "".join(ch for ch in raw if ch.isdigit())
+    return "".join(ch for ch in raw.upper() if ch.isalnum())
 
 
 @dataclass
@@ -35,6 +42,13 @@ class NormalizedItem:
     oz: str
     quantity: float
     unit: str
+
+    # The OZ hierarchy levels, outermost -> innermost, as stored. Populated by
+    # the X83 parser (from the RNoPart chain); empty for GAEB 90, where the OZ
+    # is one flat field with no recoverable level boundaries. Needed because
+    # the two formats pad levels differently — see `padded_key`.
+    oz_parts: tuple[str, ...] = ()
+
     short_text: str = ""
     long_text: str = ""
     is_lump_sum: bool = False
@@ -51,6 +65,36 @@ class NormalizedItem:
     def key(self) -> str:
         """Join key. Use this, never the list index (the 248/249 gap)."""
         return normalize_oz(self.oz)
+
+    def padded_key(self, widths: tuple[int, ...]) -> str:
+        """Join key with each OZ level zero-padded to `widths`.
+
+        **Read this before writing the 248/249 join (task 005).** PLAN.md states
+        the join is `'01'+'01'+'0001'` matching the D86 key `01010001`. That
+        holds for the 8209 twin pair, but **not** for the demo file:
+
+            [NUMMER_001]_leer.X83   RNoPart chain ('1','1','1')  -> '111'
+            StBALV23040.D86         flat OZ field               -> '01010001'
+
+        Same bill of quantities — the quantity and unit sequences agree item for
+        item — but `key()` overlap between them is **zero**, because the blank
+        stores levels unpadded and the priced file pads them to 2/2/4. A naive
+        key join silently matches nothing and makes the reveal look like a
+        pricing failure.
+
+        So: pad to the level widths of whatever you are joining *to*.
+        `padded_key((2, 2, 4))` turns `('1','1','1')` into `'01010001'`.
+
+        Falls back to `key()` when levels are unknown (GAEB 90 side), which is
+        correct — that side is already in padded form.
+        """
+        if not self.oz_parts:
+            return self.key()
+        out = []
+        for i, part in enumerate(self.oz_parts):
+            width = widths[i] if i < len(widths) else len(part)
+            out.append(normalize_oz(part).rjust(width, "0"))
+        return "".join(out)
 
     def comparable(self) -> tuple:
         """The tuple the twin-pair gate asserts on. Text is deliberately out."""

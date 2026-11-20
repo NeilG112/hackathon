@@ -82,7 +82,10 @@ Parallelism: 003/005 and 006 can run alongside 004 once 002 lands. 007 last.
 
 - **Never hardcode an XML namespace URI.** Two namespaces appear in the dataset; match on
   `local-name()`. A 3.2-keyed XPath silently returns zero nodes on the 296-item file.
-- **Join on composed OZ, never on list index.** That's what absorbs the 248/249 gap.
+- **Join on OZ, never on list index** — and use `NormalizedItem.padded_key((2,2,4))`, not
+  `key()`. The blank BoQ stores hierarchy levels unpadded (`1,1,1`) while the priced files
+  pad them (`01,01,0001`), so a naive key join matches **zero** of 248 items and looks like
+  a pricing failure. Padded, it matches 247. (PLAN.md's stated join is wrong on this file.)
 - **No comparable → print `kein Vergleichswert`.** An honest blank beats an invented euro.
 - **No live LLM in the demo path.** Pre-generate, cache to disk, ship the JSON.
 - **Don't loosen the gate to make it pass.** A real failure is useful; a gate that passes
