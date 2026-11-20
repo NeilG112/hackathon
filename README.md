@@ -58,6 +58,9 @@ data/golden/                pre-parsed fixtures (fallback if a live parse dies)
 
 ## Splitting the work
 
+> **Picking something up? Read [TASKS.md](TASKS.md)** — it has the open work written out
+> per person, with the traps and the facts each task needs.
+
 Tasks are numbered and dependency-ordered. Each module is stubbed with the facts it needs
 in its docstring. Task briefs go in `.orch/tasks/NNN-*.md` — see `_TEMPLATE.md`.
 
@@ -92,8 +95,10 @@ Two things to understand before you quote those numbers:
 
 - **The benchmark holds the answer key out.** `StBALV23040.D86` is both one of the three
   bids in `reference_prices.json` *and* the bid we measure against. Pricing with it
-  included is circular and worth €251k of flattery. `pricer.without_source()` exists for
-  this; `validate.py` always uses it. **Never show a judge the leaky number.**
+  included is circular. `pricer.without_source()` exists for this; `validate.py` always
+  uses it. It is worth €6.2k on the current pricer (it was €251k before the text-matching
+  tier landed) — the size moves, the principle doesn't. **Never show a judge the leaky
+  number.**
 - **Absolute level vs. position accuracy are different claims.** A benchmark from other
   projects gets the *shape* of a price list right and its *level* roughly — site
   conditions and competitive pressure move every rate at once. That is why the demo's
@@ -113,7 +118,8 @@ Two things to understand before you quote those numbers:
   comparable anywhere in the benchmark. The contractor charged €10,336 for them. Say so;
   don't fill the hole.
 - **Never measure against a bid that is in the benchmark.** Use
-  `pricer.without_source(ref, answer_key)`. Leakage was worth €251k here.
+  `pricer.without_source(ref, answer_key)`. Worth €6.2k here today, €251k before the
+  pricer improved — the magnitude is not the point, the circularity is.
 - **No live LLM in the demo path.** Pre-generate, cache to disk, ship the JSON.
 - **Don't loosen the gate to make it pass.** A real failure is useful; a gate that passes
   by weakened comparison is worse than no gate.
