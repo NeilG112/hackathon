@@ -69,10 +69,13 @@ in its docstring. Task briefs go in `.orch/tasks/NNN-*.md` — see `_TEMPLATE.md
 | 004 | Three detectors | `core/detectors.py` | 003 | **open** — `run_all` returns findings ranked by € leverage |
 | 005 | **The reveal** | `validate.py` | 003 | **done** — see numbers below |
 | 006 | RFI export | `export_rfi.py` | 004 | **open** — .docx Bieterfragen-Katalog in VOB German, no live LLM |
-| 007 | Streamlit UI | `app.py` | 004, 005 | **open** — upload → table → sliders → top 20 → reveal → export |
+| 007a | UI spine | `app.py` | 003 | **done** — upload → table → sliders → totals → reveal |
+| 007b | Findings panel + polish | `app.py` | 004 | **open** — panel is stubbed and guarded, fills in when 004 lands |
+| 007c | Reveal view | `views/reveal.py` | 007a | **working draft** — extend, don't rewrite |
 
-The critical path (001 → 002 → 003 → 005) is finished, so **004, 006 and 007 are now
-independent** — three people can take one each without touching the same files.
+The critical path (001 → 002 → 003 → 005 → 007a) is finished. `streamlit run app.py`
+now parses, prices and compares end to end against the real bid. What's left is **004,
+006 and the two UI pieces above** — four independent pickups, no shared files.
 
 ### Where the reveal currently stands
 
