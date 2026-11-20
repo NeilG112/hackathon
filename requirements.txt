@@ -1,0 +1,7 @@
+# Keep this short. core/ and utils/ are STDLIB ONLY — the parsers must not
+# grow dependencies, because validate_gate.py has to run anywhere.
+#
+# Everything below is for the UI and the export only.
+streamlit>=1.40
+pandas>=2.2
+python-docx>=1.1

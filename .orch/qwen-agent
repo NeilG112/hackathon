@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Thin wrapper: picks the project venv's python if there is one, else python3.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root="$(dirname "$here")"
+
+for candidate in "$root/.venv/bin/python" "$root/venv/bin/python"; do
+  if [[ -x "$candidate" ]]; then
+    exec "$candidate" "$here/qwen_agent.py" "$@"
+  fi
+done
+exec python3 "$here/qwen_agent.py" "$@"

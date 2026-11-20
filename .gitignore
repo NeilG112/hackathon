@@ -34,3 +34,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Orchestrator run logs (transcripts, results) - local only
+.orch/runs/
