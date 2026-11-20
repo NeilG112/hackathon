@@ -69,16 +69,16 @@ in its docstring. Task briefs go in `.orch/tasks/NNN-*.md` — see `_TEMPLATE.md
 | 001 | **The gate** — both parsers | `core/models.py`, `core/parser_x83.py`, `core/parser_gaeb90.py`, `utils/text_cleaning.py`, `validate_gate.py` | — | **done** — `GATE GREEN`, 159/159 |
 | 002 | Reference prices + golden fixtures | `scripts/*` | 001 | **done** — 720 priced items, 9 fixtures |
 | 003 | Pricer | `core/pricer.py` | 002 | **done** — +6.3% vs. the real bid |
-| 004 | Three detectors | `core/detectors.py` | 003 | **open** — `run_all` returns findings ranked by € leverage |
+| 004 | Three detectors | `core/detectors.py` | 003 | **done** — 59 findings, two-mode outlier test |
 | 005 | **The reveal** | `validate.py` | 003 | **done** — see numbers below |
 | 006 | RFI export | `export_rfi.py` | 004 | **open** — .docx Bieterfragen-Katalog in VOB German, no live LLM |
 | 007a | UI spine | `app.py` | 003 | **done** — upload → table → sliders → totals → reveal |
-| 007b | Findings panel + polish | `app.py` | 004 | **open** — panel is stubbed and guarded, fills in when 004 lands |
+| 007b | Findings panel + polish | `app.py` | 004 | **open** — panel now renders 23 findings; needs severity styling + layout |
 | 007c | Reveal view | `views/reveal.py` | 007a | **working draft** — extend, don't rewrite |
 
 The critical path (001 → 002 → 003 → 005 → 007a) is finished. `streamlit run app.py`
 now parses, prices and compares end to end against the real bid. What's left is **004,
-006 and the two UI pieces above** — four independent pickups, no shared files.
+006 and the two UI pieces above** — three independent pickups, no shared files.
 
 ### Where the reveal currently stands
 

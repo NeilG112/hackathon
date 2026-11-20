@@ -122,8 +122,24 @@ PRICING_MODEL = {
 }
 
 # --- Detector 1: unit-price outlier ----------------------------------------
+# Two modes, because the input decides what is detectable:
+#
+#   priced file (a bid)   -> observed EP vs. the market -> speculative pricing
+#   blank tender          -> no EP exists to test. Comparing our own estimate
+#                            against the distribution it was drawn from is
+#                            circular: 228 of the demo file's 248 estimates
+#                            ARE their benchmark median. So on a blank tender
+#                            the detectable risk is market *dispersion* — the
+#                            positions where comparable contractors disagree
+#                            wildly, so our single number is least trustworthy.
 OUTLIER_HIGH_FACTOR = 1.6   # observed EP above median x this -> flag
 OUTLIER_LOW_FACTOR = 0.6
+DISPERSION_WARN_RATIO = 1.0   # (p75-p25)/median above this = wide market spread
+
+# Severity bands, in euro at stake. Shared by all three detectors so "high"
+# means the same thing everywhere in the UI.
+SEVERITY_HIGH_EUR = 10_000.0
+SEVERITY_MEDIUM_EUR = 2_000.0
 MIN_COMPARABLES = 3         # below this, print kein Vergleichswert instead
 
 # Nearest-comparable matching (pricer tier 1). Jaccard overlap on item-text
@@ -158,16 +174,25 @@ VAGUE_SCOPE_TERMS: dict[str, str] = {
 # --- Detector 3: quantity / unit sanity -----------------------------------
 SUSPICIOUS_ROUND_QUANTITIES = (100.0, 500.0, 1000.0, 5000.0, 10000.0)
 PROVISIONAL_SHARE_WARN_PCT = 15.0   # Eventualpositionen share of total value
+# Only rules the data actually supports. Each was measured against the 720
+# real priced items: the share is how often that keyword really is measured in
+# that unit. A rule below ~70% fires on correctly-priced work more often than
+# on errors, which is worse than having no rule.
+#
+# Kept (measured):      boden 82% of 17   verfüllen 100% of 3
+# Dropped (measured):   rohr      38% of 42    leitung 31% of 26
+#                       asphalt   33% of 3     schacht 100% but n=2
+#                       pflaster 100% but n=2  aushub  100% but n=1
+#
+# `rohr -> m` is the instructive one. It looks obvious and it is wrong: in
+# "Kies-Sand-Gemisch Einbettung Rohr DN300-400 verdichten" the pipe is what the
+# gravel surrounds, and m3 is the correct basis. The keyword names the subject
+# of the position, not how it is measured — only the verb would tell you that.
 UNIT_EXPECTED_BY_KEYWORD = {
-    "rohr": "m",
-    "leitung": "m",
-    "schacht": "st",
-    "asphalt": "m2",
-    "pflaster": "m2",
     "boden": "m3",
-    "aushub": "m3",
     "verfüllen": "m3",
 }
+UNIT_RULE_MIN_SUPPORT = 0.70   # the bar a rule must clear to be worth keeping
 
 # --- Ranking / display ----------------------------------------------------
 TOP_N_FINDINGS = 20         # PLAN.md: top 15-25 by euro leverage

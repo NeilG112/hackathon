@@ -25,7 +25,7 @@ streamlit run app.py         # upload → table → sliders → totals → the r
 | Pricer (benchmark-first, labelled fallback) | done — `core/pricer.py` |
 | Measured error vs. a real bid | done — +6.3%, median 7% per position |
 | UI spine | done — parses, prices, compares |
-| **Detectors** | **open — task 004** |
+| Detectors | done — 59 findings on the demo tender |
 | **RFI export** | **open — task 006** |
 | **Findings panel + polish** | **open — task 007b** |
 | **Reveal view** | **working draft — task 007c** |
@@ -34,45 +34,34 @@ Everything open is independent. Nothing below is blocked by anything else below.
 
 ---
 
-## Task 004 — The three detectors
+## Task 004 — The three detectors — **DONE**
 
-**File you own:** `core/detectors.py` (plus your own section of `core/constants.py`)
+`core/detectors.py` is implemented. 59 findings on the demo tender (31 price, 17 scope,
+11 quantity), rendering in `app.py` with no UI changes — the guard did its job.
 
-Three pure functions, already stubbed with signatures and docstrings. No I/O, no
-Streamlit, no printing — `app.py` calls `run_all()` and renders whatever comes back.
+Two design decisions worth knowing if you touch it:
 
-1. **Unit-price outlier.** Compare each position against the spread of its comparables.
-2. **Vague scope.** Trigger words over item text *and* `<Remark>` text.
-3. **Quantity / unit sanity.** Unit mismatches, suspicious round numbers, provisional share.
+**Detector 1 has two modes, because the input decides what is detectable.** A priced file
+(a submitted bid) has observed rates, so a rate outside the comparable band is a real
+speculative-price finding. A *blank tender* has no rates at all — the only number is our
+own estimate, which was drawn from the benchmark, so testing it against that benchmark is
+circular. On the demo file **228 of 248 estimates are exactly their benchmark median**; a
+naive implementation returns zero findings and looks like it works. So on a blank tender
+detector 1 reports market **dispersion**: where real contractors disagree most, our single
+number is least trustworthy.
 
-Rank by **€ leverage** (quantity × price exposure), return the top ~20.
+**The outlier test uses quartiles, not a ratio to the median.** Some comparable groups are
+enormously wide — the catch-all "St" group spans €0.50 to €39,186 — and against a median
+alone an ordinary rate in a wide group reads as "0.1x the market". Testing against the
+band the comparables actually occupy cut false positives from 24 findings to 15.
 
-### What's already there for you
+### Still open here
 
-- `PricedItem.distribution` carries `median / p25 / p75 / n` for every position, and
-  `.comparables` tells you how many real priced lines backed it. You do not need to
-  recompute any statistics.
-- `parser_x83.parse_remarks(path)` returns the `<Remark>` blocks — **46 of them** in the
-  demo file. They are deliberately excluded from the item list (they aren't positions),
-  and PLAN.md calls them the highest-value detector target for the least work. Contract
-  risk hides in the Vorbemerkungen.
-- `constants.VAGUE_SCOPE_TERMS` is 13 German trigger phrases mapped to plain-English
-  reasons. Extend it — it's yours.
-- `data/reference_prices.json` has a `provisional` flag on every item, for detector 3's
-  provisional-share check.
-
-### The trap
-
-`validate.py` already prints *"50 positions disagree by more than 30%"*. **That is not
-detector 1.** It is a one-off comparison against a known answer key, which exists for
-exactly one file in the dataset. Detector 1 has to produce findings of that quality for a
-tender with **no** answer key, using only the comparable spread. If you port the
-`validate.py` logic across, the tool works on the demo file and nothing else.
-
-### Done when
-
-`run_all(priced, remarks)` returns ranked `Finding` objects and the panel in `app.py`
-lights up by itself — it's already wired and guarded, you don't need to touch the UI.
+- `constants.VAGUE_SCOPE_TERMS` is 13 German phrases. It is the cheapest quality win in the
+  repo: every term you add is a finding the tool can make. Needs a German speaker more than
+  a programmer.
+- The provisional-share check fires on `quantity == 0 or is_lump_sum`. Worth sanity-checking
+  against what an estimator actually counts as an Eventualposition.
 
 ---
 
