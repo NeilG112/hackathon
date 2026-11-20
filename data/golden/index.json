@@ -1,0 +1,76 @@
+{
+ "fixtures": [
+  {
+   "source": "Dataset/8209.003_Leistungsverzeichnis_leer.D83",
+   "fixture": "data/golden/8209.003_Leistungsverzeichnis_leer.D83.json",
+   "items": 159,
+   "priced": 0,
+   "remarks": 0,
+   "bid_total": 0.0
+  },
+  {
+   "source": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "fixture": "data/golden/8209.003_Leistungsverzeichnis_leer.X83.json",
+   "items": 159,
+   "priced": 0,
+   "remarks": 13,
+   "bid_total": 0.0
+  },
+  {
+   "source": "Dataset/[NUMMER_001]_leer.X83",
+   "fixture": "data/golden/[NUMMER_001]_leer.X83.json",
+   "items": 248,
+   "priced": 0,
+   "remarks": 46,
+   "bid_total": 0.0
+  },
+  {
+   "source": "Dataset/501-24-01_GAEB-XML_sas.x83",
+   "fixture": "data/golden/501-24-01_GAEB-XML_sas.x83.json",
+   "items": 296,
+   "priced": 0,
+   "remarks": 58,
+   "bid_total": 0.0
+  },
+  {
+   "source": "Dataset/GAEB-[PROJEKT_004].X83",
+   "fixture": "data/golden/GAEB-[PROJEKT_004].X83.json",
+   "items": 50,
+   "priced": 0,
+   "remarks": 4,
+   "bid_total": 0.0
+  },
+  {
+   "source": "Dataset/Angebot AN24-0305.D84",
+   "fixture": "data/golden/Angebot_AN24-0305.D84.json",
+   "items": 274,
+   "priced": 274,
+   "remarks": 0,
+   "bid_total": 988913.89
+  },
+  {
+   "source": "Dataset/StBALV23040.D84",
+   "fixture": "data/golden/StBALV23040.D84.json",
+   "items": 0,
+   "priced": 0,
+   "remarks": 0,
+   "bid_total": 0
+  },
+  {
+   "source": "Dataset/StBALV23040.D86",
+   "fixture": "data/golden/StBALV23040.D86.json",
+   "items": 249,
+   "priced": 249,
+   "remarks": 0,
+   "bid_total": 897305.45
+  },
+  {
+   "source": "Dataset/[ORT_024] LV24069.D86",
+   "fixture": "data/golden/[ORT_024]_LV24069.D86.json",
+   "items": 197,
+   "priced": 197,
+   "remarks": 0,
+   "bid_total": 536991.65
+  }
+ ]
+}

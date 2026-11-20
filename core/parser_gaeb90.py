@@ -37,6 +37,7 @@ PRICE_SCALE = 100.0
 
 SEQ_NUMBER_WIDTH = 6      # trailing running sequence number, not data
 ITEM_RECORD = "21"        # quantity + unit
+PRICE_RECORD = "23"       # unit price (EP) + total (GB) + quantity
 SHORT_TEXT_RECORD = "25"  # Kurztext
 LONG_TEXT_RECORD = "26"   # Langtext continuation lines
 HIERARCHY_RECORD = "11"   # Titel / Bereich — resets the current item
@@ -58,9 +59,16 @@ class Layout:
     unit_price: Optional[tuple[int, int]] = None
     total_price: Optional[tuple[int, int]] = None
 
+    # The unit-price field's decimal scale is NOT constant across the dataset
+    # (10-digit EP is /100, 11-digit EP is /1000), so it is calibrated too.
+    ep_scale: float = PRICE_SCALE
+
     def describe(self) -> str:
         fields = [f"{n}={getattr(self, n)}" for n in
-                  ("oz", "quantity", "unit") if getattr(self, n)]
+                  ("oz", "quantity", "unit", "unit_price", "total_price")
+                  if getattr(self, n)]
+        if self.unit_price:
+            fields.append(f"ep_scale={self.ep_scale:g}")
         return "Layout(" + ", ".join(fields) + ")"
 
 
@@ -161,6 +169,90 @@ def calibrate_layout(
     )
 
 
+MIN_VALUE_FIELD_WIDTH = 9   # EP/GB/qty fields are 10-12 wide; OZ runs are shorter
+
+
+def _digit_runs(rows: List[str], tolerance: float = 0.9) -> List[tuple[int, int]]:
+    """Maximal column runs that hold a digit in at least `tolerance` of rows."""
+    width = max(len(r) for r in rows)
+    runs: List[tuple[int, int]] = []
+    col = 2
+    while col < width:
+        if _frac(rows, col, lambda c: c in _DIGITS) >= tolerance:
+            start = col
+            while (col < width
+                   and _frac(rows, col, lambda c: c in _DIGITS) >= tolerance):
+                col += 1
+            runs.append((start, col))
+        else:
+            col += 1
+    return runs
+
+
+def calibrate_price_layout(rows: List[str], tolerance: float = 0.9) -> Layout:
+    """Infer the type-23 (price) column offsets and the EP decimal scale.
+
+    Field *columns* are consistent across the dataset but field *widths* and
+    the OZ's internal spacing are not, so the three value fields are found as
+    maximal digit-runs at least `MIN_VALUE_FIELD_WIDTH` wide. That width floor
+    is what stops a fully-numeric OZ from being mistaken for the unit price:
+
+        2301010001  0001600000  000001600000 00000001000   OZ run is 8 wide
+        23 1 1  10  00072000000 000007200000 00000001000   OZ is split by spaces
+        230101   1  0000570000  000000570000 00000001000
+
+    Runs are then assigned in order: unit price, total, quantity. A `.D84` bid
+    submission has only the first two — that is spec-normal, not corruption.
+
+    The EP scale is **derived, not assumed**, by testing candidates against the
+    `EP x qty = GB` identity across all rows and keeping the best. Where there
+    is no quantity field to check against, it falls back to the field width
+    (10 digits -> /100, 11 -> /1000), which matches every observed file.
+    """
+    if not rows:
+        raise ValueError("no type-23 records to calibrate against")
+
+    runs = [r for r in _digit_runs(rows, tolerance)
+            if r[1] - r[0] >= MIN_VALUE_FIELD_WIDTH]
+    if len(runs) < 2:
+        raise ValueError(
+            f"type-23: expected >=2 value fields, found {len(runs)} {runs}"
+        )
+
+    ep, gb = runs[0], runs[1]
+    qty = runs[2] if len(runs) > 2 else None
+    oz_end = min(ep[0], max(2, ep[0] - 2))
+
+    layout = Layout(
+        oz=(2, oz_end),
+        quantity=qty,
+        unit_price=ep,
+        total_price=gb,
+        ep_scale=10 ** (ep[1] - ep[0] - 8),
+    )
+
+    if qty:
+        layout.ep_scale = _best_ep_scale(rows, layout)
+    return layout
+
+
+def _best_ep_scale(rows: List[str], layout: Layout) -> float:
+    """Pick the EP scale that best satisfies `EP x qty = GB` across rows."""
+    candidates = (100.0, 1000.0, 10000.0, 10.0)
+    best, best_hits = candidates[0], -1
+    for scale in candidates:
+        hits = 0
+        for row in rows:
+            qty = _scaled_int(_slice(row, layout.quantity), QTY_SCALE)
+            gb = _scaled_int(_slice(row, layout.total_price), PRICE_SCALE)
+            ep = _scaled_int(_slice(row, layout.unit_price), scale)
+            if qty and abs(ep * qty - gb) <= max(0.02, abs(gb) * 0.001):
+                hits += 1
+        if hits > best_hits:
+            best, best_hits = scale, hits
+    return best
+
+
 def _slice(line: str, span: Optional[tuple[int, int]]) -> str:
     if not span:
         return ""
@@ -173,6 +265,53 @@ def _scaled_int(raw: str, scale: float) -> float:
     if not digits or not digits.isdigit():
         return 0.0
     return int(digits) / scale
+
+
+@dataclass
+class PriceRecord:
+    """One type-23 record: what the contractor actually charged."""
+
+    oz: str
+    unit_price: float
+    total_price: float
+    quantity: Optional[float] = None
+
+    def key(self) -> str:
+        from core.models import normalize_oz
+        return normalize_oz(self.oz)
+
+    def consistent(self) -> bool:
+        """Does `EP x qty = GB` hold? The per-row scaling oracle."""
+        if not self.quantity:
+            return True
+        return abs(self.unit_price * self.quantity - self.total_price) <= max(
+            0.02, abs(self.total_price) * 0.001
+        )
+
+
+def parse_prices(path: str) -> List[PriceRecord]:
+    """Parse the type-23 price records of a priced GAEB 90 file.
+
+    Separate from `parse` because `StBALV23040.D84` carries 249 price records
+    and **zero** quantity records — a bid submission that references its
+    sibling `.D86`. That is spec-normal; join the two on OZ key.
+    """
+    rows = _records(read_lines(path), PRICE_RECORD)
+    if not rows:
+        return []
+    layout = calibrate_price_layout(rows)
+    out = []
+    for row in rows:
+        out.append(
+            PriceRecord(
+                oz=_slice(row, layout.oz),
+                unit_price=_scaled_int(_slice(row, layout.unit_price), layout.ep_scale),
+                total_price=_scaled_int(_slice(row, layout.total_price), PRICE_SCALE),
+                quantity=(_scaled_int(_slice(row, layout.quantity), QTY_SCALE)
+                          if layout.quantity else None),
+            )
+        )
+    return out
 
 
 def parse(path: str) -> List[NormalizedItem]:
@@ -225,4 +364,14 @@ def parse(path: str) -> List[NormalizedItem]:
             long_text = []
 
     flush()
+
+    # Attach prices if this file carries them (.D84 / .D86), joined on OZ key.
+    prices = {p.key(): p for p in parse_prices(path)}
+    if prices:
+        for item in items:
+            price = prices.get(item.key())
+            if price:
+                item.unit_price = price.unit_price
+                item.total_price = price.total_price
+
     return items

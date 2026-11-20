@@ -48,12 +48,92 @@ UNIT_ALIASES = {
     "m²": "m2", "qm": "m2", "m³": "m3", "cbm": "m3",
     "stck": "st", "stk": "st", "stück": "st",
     "std": "h", "to": "t", "pausch": "psch",
+    # Mixed-encoding repair. These files are cp850 (the umlauts decode
+    # correctly) but whatever wrote them emitted the superscripts as latin-1:
+    # byte 0xB2 is '²' in latin-1 and '▓' in cp850, 0xB3 is '³' vs '│'. So 50
+    # of the 720 priced items arrive as "m▓"/"m│" and would otherwise form
+    # their own bogus unit buckets, splitting every area/volume benchmark.
+    "m▓": "m2", "m│": "m3",
+}
+
+# Units that measure *time-on-site* rather than work done (vorhalten / hire).
+# Their unit prices are per-week or per-day and are not comparable with the
+# same nominal unit used for installation work.
+TIME_RENTAL_UNITS = {"wo", "stwo", "mwo", "m2d", "md", "d", "mt", "jahr"}
+
+
+def normalize_unit(raw: str) -> str:
+    """Canonical unit key: trimmed, lowercased, aliases and encoding repaired."""
+    unit = (raw or "").strip().lower()
+    return UNIT_ALIASES.get(unit, unit)
+
+
+# --- Keyword buckets ------------------------------------------------------
+# The join dimension for benchmarking, alongside unit. Crude and legible on
+# purpose — this gets read out loud in the demo. First match wins, so order
+# matters: more specific terms before generic ones. Derived from the actual
+# vocabulary of the 720 priced items, not invented.
+BUCKET_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("armatur",      ("absperrschieber", "schieber", "kugelhahn", "flansch",
+                      "blindflansch", "hydrant", "armatur")),
+    ("formteil",     ("bogen", "muffe", "abgang", "reduzierung", "übergang",
+                      "formteil", "anschweiss")),
+    ("rohr",         ("rohr", "leitung", "ltg", "dn/od", "verlegen")),
+    ("schacht",      ("schacht", "sohle", "sohlen", "abdeckung")),
+    ("verbau",       ("verbau", "grabenverbau", "spundwand", "aussteifung")),
+    ("erdarbeiten",  ("graben", "boden", "aushub", "verfüllen", "verdichten",
+                      "erde", "fördern", "lösen", "planum")),
+    ("strasse",      ("asphalt", "pflaster", "fahrbahn", "bordstein", "decke",
+                      "tragschicht", "strasse", "straße")),
+    ("absicherung",  ("bauzaun", "warnleuchte", "schutzwand", "laufsteg",
+                      "absperrung", "sichern", "beschilderung", "absicherung")),
+    ("baustelle",    ("baustelleneinrichtung", "standplatz", "vorhalten",
+                      "umsetzen", "aufbauen", "abbauen", "räumen")),
+    ("dokumentation", ("dokumentation", "foto", "bestandsplan", "aufmass",
+                       "aufmaß", "nachweis")),
+    ("stundenlohn",  ("stundenlohn", "facharbeiter", "helfer", "vorarbeiter")),
+)
+BUCKET_FALLBACK = "sonstiges"
+
+
+def bucket_for_text(text: str) -> str:
+    """First matching keyword bucket. Order in BUCKET_KEYWORDS decides ties.
+
+    Lives here, not in the builder script, because the benchmark builder and
+    the pricer MUST bucket identically — if they drift, every lookup misses and
+    the pricer silently falls through to its fallback rates.
+    """
+    low = (text or "").lower()
+    for bucket, keywords in BUCKET_KEYWORDS:
+        if any(k in low for k in keywords):
+            return bucket
+    return BUCKET_FALLBACK
+
+
+# --- Company -> price model ------------------------------------------------
+# How the sliders move an observed market price. A benchmark median already
+# embeds *that* contractor's wage, overhead and margin, so the sliders express
+# a ratio against DEFAULT_COMPANY, not an absolute build-up. At
+# DEFAULT_COMPANY the multiplier is exactly 1.0 — the baseline estimate is the
+# raw benchmark, which is what makes the reveal's error number meaningful.
+PRICING_MODEL = {
+    "labour_share": 0.35,   # share of a typical Tiefbau rate that is wage
+    "risk_span": 0.10,      # +/- swing from the pricing-aggression slider
 }
 
 # --- Detector 1: unit-price outlier ----------------------------------------
 OUTLIER_HIGH_FACTOR = 1.6   # observed EP above median x this -> flag
 OUTLIER_LOW_FACTOR = 0.6
 MIN_COMPARABLES = 3         # below this, print kein Vergleichswert instead
+
+# Nearest-comparable matching (pricer tier 1). Jaccard overlap on item-text
+# content tokens. Measured against validate.py's leave-one-out error, not
+# guessed. Swept 0.20-0.50: median absolute error stays 7-9% and 70-78% of
+# positions land within 30% across the whole range, so this is a plateau rather
+# than a tuned point. Requiring 2+ matches is much worse (median error 25-38%)
+# because it pushes items back onto the coarse keyword buckets.
+MIN_TEXT_SIMILARITY = 0.30
+MIN_TEXT_MATCHES = 1        # how many similar lines before we trust the match
 NO_COMPARABLE_LABEL = "kein Vergleichswert"
 
 # --- Detector 2: vague scope ----------------------------------------------

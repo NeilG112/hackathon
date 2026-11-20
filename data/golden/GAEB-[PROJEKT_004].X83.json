@@ -1,0 +1,817 @@
+{
+ "source": "Dataset/GAEB-[PROJEKT_004].X83",
+ "items": [
+  {
+   "oz": "010001",
+   "oz_parts": [
+    "01",
+    "0001"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Baustelleneinrichtung und -räumung",
+   "long_text": "Einrichten und Räumen der Baustelle für sämtlichein der Leistungsbeschreibung aufgeführten Leistungen.An- und Abtransport der erforderlichen Baumaschinen,Geräte, Werkzeuge, Baubüros und Lagerräume. Strom-, Wasseranschluss, sowie Entsorgungseinrichtungenund dgl. für die Baustelle, soweit erforderlich, herstellen. Beschaffen und Anlegen von Lager- und Arbeitsflächen. Flächen nach Beendigung der Baumaßnahme wieder in den ursprünglichen Zustand versetzen.Baustelleneinrichtung und -räumung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id1852"
+  },
+  {
+   "oz": "010002",
+   "oz_parts": [
+    "01",
+    "0002"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Verkehrsregelung und -sicherung",
+   "long_text": "Verkehrszeichen und Beschilderungennach den Vorgaben der verkehrsrechtlichenAnordnung liefern, aufstellen, vorhaltenund abbauen,verkehrsrechtliche Genehmigung beantragen,Baustelle den Vorschriften entsprechendfortwährend sichern.Gefahrenquellen nachts, nach sicherheitstechnischenVorgaben, beleuchten.Abrechnung einmalig für die Dauer dergesamten Bauzeit.Verkehrsregelung und -sicherung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id1854"
+  },
+  {
+   "oz": "010003",
+   "oz_parts": [
+    "01",
+    "0003"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Verkehrssicherung",
+   "long_text": "Verkehrssicherung(1) Durch Baustellenverkehr verschmutzteZufahrtsstraßen und -wege nach Bedarf, evt. mehrmalstäglich mit Kehrmaschine (Unimog) ordnungsgemäßnass reinigen.(2) Offene Rohrgräben bzw. sonstige Gefahrenquellenmittels mobilem Bauzaun aus Stahlgitterelementen sichern.Bauzaun aufbauen, vorhalten, versetzen und abbauen.Verkehrssicherung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id1855"
+  },
+  {
+   "oz": "010004",
+   "oz_parts": [
+    "01",
+    "0004"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Abrechnungsunterlagen erstellen",
+   "long_text": "Abrechnungsunterlagen, prüffähig erstellen,Abrechnungslageplan,unter Verwendung der Ausführungsunterlagen auf Grundlage der Landeskoordinaten (UTM 32), UTM-Koordinaten ermitteln. Die UTM-Koordinaten sind möglichst am offenen Grabenzu bestimmen oder anhand von Sicherungen und Markierungen durch den Polier. Abgabe der Pläne als Dateiim Format DWG bzw. DXF und 2-fach als Farb-Plot. Ausführungsunterlagen werden dem ANin digitaler Form kostenfrei zur Verfügung gestellt.Abrechnungsunterlagen erstellen",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2055"
+  },
+  {
+   "oz": "020001",
+   "oz_parts": [
+    "02",
+    "0001"
+   ],
+   "quantity": 70.0,
+   "unit": "m",
+   "short_text": "Asphalt schneiden, bis 15 cm",
+   "long_text": "Asphalt schneiden, mit Fugenschneidgerät,senkrechter Schnitt, Restdicke trennennach [PERSON_125] des AN. 01) Asphaltstärke bis 15 cmAsphalt schneiden, bis 15 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2165"
+  },
+  {
+   "oz": "020002",
+   "oz_parts": [
+    "02",
+    "0002"
+   ],
+   "quantity": 12.0,
+   "unit": "m3",
+   "short_text": "Asphaltaufbruch bis 15 cm",
+   "long_text": "Asphaltaufbruch,Aufbruchverfahren mittels Baggeroder sonstigem geeigneten Gerät, Asphaltbruch in Eigentum des AN übernehmen und von der Baustelleentfernen. 01) Asphaltstärke bis 15 cmAsphaltaufbruch bis 15 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2166"
+  },
+  {
+   "oz": "020003",
+   "oz_parts": [
+    "02",
+    "0003"
+   ],
+   "quantity": 260.0,
+   "unit": "m3",
+   "short_text": "Oberbodenabtrag- und auftrag",
+   "long_text": "Oberboden,Homogenbereich B 0, DIN 18300,abtragen, mit geeignetem Gerät, Abtragstärke bis 25 cm,Abtragbreite in Abstimmung mit Bauleitung. 01) Oberboden seitlich fachgerecht in Mieten lagern,wieder auftragen und planierenOberbodenabtrag- und auftrag",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2211"
+  },
+  {
+   "oz": "020004",
+   "oz_parts": [
+    "02",
+    "0004"
+   ],
+   "quantity": 1300.0,
+   "unit": "m2",
+   "short_text": "Begrünungsarbeiten",
+   "long_text": "Benutzte Wiesenflächen(Humusierte Flächen und Lagerflächen)fachgerecht auflockern, abrechen undentsteinen,mit Wiesen-Saatgutmischung in Abstimmungmit Grundstückseigentümer ansäen,Ansaatbreite in Abstimmung mit Bauleitung.Begrünungsarbeiten",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2212"
+  },
+  {
+   "oz": "020005",
+   "oz_parts": [
+    "02",
+    "0005"
+   ],
+   "quantity": 270.0,
+   "unit": "m3",
+   "short_text": "Rohrgrabenaushub, bis 2m, seitlich lagern, wieder einbauen",
+   "long_text": "Rohrgrabenaushub für Kanäle und Schächte, Homogenbereich B1 und B2,(vormals Bodenklasse 3-5, DIN 18300)ausheben, seitlich lagern, wieder verfüllenund verdichten,Abrechnung ab UK Humus bzw. Asphalt. Mehraushub für Schächte, über Regelbreite hinaus,wird nicht gesondert vergütet und ist einzurechnen. Rohrgrabensohle fachgerecht verdichten,Aushub mit Verbau oder geböscht, nach [PERSON_125] des AN,Abrechnung in jedem Fall senkrecht, nach Regelbreite,Mehraushub für Böschungen ist einzurechnen. Regelbreite :RB DN 800/900 mm = 2,00 mAushubtiefe bis 2,00 m 01) Aushub seitlich lagern,sofern geotechnisch geeignet,wiederverfüllen und verdichten.Rohrgrabenaushub, bis 2m, seitlich lagern, wieder einbauen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2213"
+  },
+  {
+   "oz": "020006",
+   "oz_parts": [
+    "02",
+    "0006"
+   ],
+   "quantity": 130.0,
+   "unit": "m3",
+   "short_text": "Rohrgrabenaushub, Abfuhr auf AG-Zwischenlager",
+   "long_text": "wie vor, jedoch02) Aushub verfahrenund auf AG-Lagerplatz in Haufwerken,zur Beprobung zwischenlagern. Transportentfernung bis 2 km.Rohrgrabenaushub, Abfuhr auf AG-Zwischenlager",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2214"
+  },
+  {
+   "oz": "020007",
+   "oz_parts": [
+    "02",
+    "0007"
+   ],
+   "quantity": 100.0,
+   "unit": "m3",
+   "short_text": "Rohrgrabenaushub, Z0, auf AN-Kippe abfahren",
+   "long_text": "wie vor, jedoch03) [PERSON_093], unbelastet, Z 0,direkt auf AN-Kippe abfahren,einschließlich Kippgebühr.Rohrgrabenaushub, Z0, auf AN-Kippe abfahren",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2215"
+  },
+  {
+   "oz": "020008",
+   "oz_parts": [
+    "02",
+    "0008"
+   ],
+   "quantity": 130.0,
+   "unit": "m3",
+   "short_text": "Aushub von Lager aufnehmen, Abfuhr Z 0 auf AN-Kippe",
+   "long_text": "Aushub von AG-Zwischenlageraufnehmen, verladen auf LKW 01) Abfuhr Aushub, unbelastet, Z 0auf AN-Kippe, einschl. Kippgebühr. Anmerkung :Die Haufwerke werden bauseits beprobtund auf Schadstoffbelastung hin, analysiert.Die Entsorgungskosten für belastete Bödenobliegen dem AG.Aushub von Lager aufnehmen, Abfuhr Z 0 auf AN-Kippe",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2216"
+  },
+  {
+   "oz": "020009",
+   "oz_parts": [
+    "02",
+    "0009"
+   ],
+   "quantity": 230.0,
+   "unit": "m3",
+   "short_text": "Rohrauflager und -einbettung, Feinkies 0/32 mm, bis DN 900 mm",
+   "long_text": "Rohrauflager (Bettung),Auflagerwinkel 120°,Schichtdicke : 15 cmund Seitenverfüllung und Abdeckung,Schichtdicke : 20 cm über Rohrscheitelherstellen, nach DIN EN 1610, Einbau innerhalb der Regelbreite,Verdrängung durch Schächte undRohre werden abgezogen. Verwendung vonFeinkies (Planiekies) 0/32 mm. 01) Kanäle DN 800/900 mmRohrauflager und -einbettung, Feinkies 0/32 mm, bis DN 900 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2220"
+  },
+  {
+   "oz": "020010",
+   "oz_parts": [
+    "02",
+    "0010"
+   ],
+   "quantity": 3.0,
+   "unit": "m3",
+   "short_text": "Betonauflager für Einlaufbauwerk, Stärke 20 cm",
+   "long_text": "Rohrauflager für Einlauf-Bauwerk,mit Beton (Betonauflager) herstellen, Stärke 20 cm, Beton C 12/15 liefern und höhengerechteinbauen und verdichten.Betonauflager für Einlaufbauwerk, Stärke 20 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2234"
+  },
+  {
+   "oz": "020011",
+   "oz_parts": [
+    "02",
+    "0011"
+   ],
+   "quantity": 35.0,
+   "unit": "m3",
+   "short_text": "Bodenaustausch Rohrgraben - Rollkies 16/32 mm",
+   "long_text": "Bodenaustausch innerhalb Rohrgrabenherstellen, Austauschmaterial liefern,höhengerecht einbauen und verdichten,Abrechnung senkrecht,nach Regelbreite (RB) : RB DN 800/900 mm = 2,00 mMehrbreiten durch Böschungen sindeinzurechnen.01) Rollkies 16/32 mmBodenaustausch Rohrgraben - Rollkies 16/32 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2217"
+  },
+  {
+   "oz": "020012",
+   "oz_parts": [
+    "02",
+    "0012"
+   ],
+   "quantity": 50.0,
+   "unit": "m3",
+   "short_text": "Bodenaustausch Rohrgraben - Grubenkies",
+   "long_text": "wie vor, jedoch02) Grubenkies (bindiges Wandkies),Körnung 0/X, nicht frostsicherBodenaustausch Rohrgraben - Grubenkies",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2218"
+  },
+  {
+   "oz": "020013",
+   "oz_parts": [
+    "02",
+    "0013"
+   ],
+   "quantity": 10.0,
+   "unit": "m",
+   "short_text": "Zuschlag für [PERSON_121]",
+   "long_text": "Zuschlag auf [ORT_030] für [PERSON_121],Tiefe bis 1,25 m, zu querende Leitungen, Kabel und Kanälein maschinenunterstütztem Handaushub nach Vorschrift des jeweiligen Versorgungsträgerssorgfältig freilegen. Freilegen bis Oberkante der jeweiligen Sparte. Die vollständige Freilegung der Sparte inHandarbeit (Handaushub) wird in der Position \"Unterfahren\" vergütet.Zuschlag für [PERSON_121]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2194"
+  },
+  {
+   "oz": "020014",
+   "oz_parts": [
+    "02",
+    "0014"
+   ],
+   "quantity": 10.0,
+   "unit": "m",
+   "short_text": "Unterfahren von Leitungen, Kabel und Kanälen, quer",
+   "long_text": "Unterfahren von freigelegten Leitungen,Kabel und Kanälen (freigelegt bis OK), Leitungen, Kabel und Kanäle (Hindernisse)vollständig in maschinenunterstützter Handarbeit freilegen, Hindernisse fachgerecht, nach denVorschriften des jeweiligen Versorgungsträgersichern, Wiederherstellung der Auflager und [PERSON_072],[PERSON_072] liefern. 01) Unterfahren quer, innerhalb RohrgrabenbreiteUnterfahren von Leitungen, Kabel und Kanälen, quer",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2195"
+  },
+  {
+   "oz": "020015",
+   "oz_parts": [
+    "02",
+    "0015"
+   ],
+   "quantity": 20.0,
+   "unit": "m",
+   "short_text": "Unterfahren von Leitungen, Kabel und Kanälen, längs",
+   "long_text": "wie vor, jedoch 02) Unterfahren längs, innerhalb BaugrubeAbrechnung nach lfdm.Unterfahren von Leitungen, Kabel und Kanälen, längs",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2196"
+  },
+  {
+   "oz": "020016",
+   "oz_parts": [
+    "02",
+    "0016"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Wasserhaltung Bach bis 150 l/s",
+   "long_text": "Wasserhaltung Bach,nach [PERSON_125] AN durchführen,Wasserhaltung durch [PERSON_139] oder Umleitungmittels Ableitungskanal,Länge Ableitungskanal bis 10 m. Ableitungskanal erstellen, vorhaltenund abbauen,sämtliches Material bleibt im Eigentumdes AN. Förder- bzw. Umleitungsmengebis 150 l/s.Wasserhaltung Bach bis 150 l/s",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2177"
+  },
+  {
+   "oz": "020017",
+   "oz_parts": [
+    "02",
+    "0017"
+   ],
+   "quantity": 100.0,
+   "unit": "m",
+   "short_text": "Bestehende Bachverrohrung DN 600 Beton ausbauen, entsorgen",
+   "long_text": "Bauteile, welche im Zuge Aushubarbeitenfreigelegt werden, ausbauen,Material in Eigentum des ANübernehmen und von der Baustelle entfernen. 01) Betonrohre DN 600 mmBestehende Bachverrohrung DN 600 Beton ausbauen, entsorgen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2180"
+  },
+  {
+   "oz": "020018",
+   "oz_parts": [
+    "02",
+    "0018"
+   ],
+   "quantity": 4.0,
+   "unit": "m3",
+   "short_text": "Bauwerk abbrechen, Schutt zwischenlagern",
+   "long_text": "Bestehendes Bauwerk (Zwischenschacht)abbrechen,Boden, Wände und Deckeaus Stahlbeton, Abbruch mit geeignetem Gerätnach [PERSON_125] des AN, maschinell und von Hand. [PERSON_047] (Beton und Armierungseisen) laden,verfahren innerhalb Baustelleund in Haufwerken (Chargen) in Abstimmung mit Bauleitung lagern.Bauwerk abbrechen, Schutt zwischenlagern",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2192"
+  },
+  {
+   "oz": "020019",
+   "oz_parts": [
+    "02",
+    "0019"
+   ],
+   "quantity": 10.0,
+   "unit": "to",
+   "short_text": "[PERSON_047] aufnehmen und entsorgen - Einstufung : RW 1",
+   "long_text": "[PERSON_047] (Beton und Armierungseisen)in Haufwerken gelagert, nach Deklarationaufnehmen, in Eigentum des AN übernehmenund einer ordnungsgemäßen Entsorgung,gemäß RC-Leitfaden zuführen. Deklaration wird bauseits durchgeführt. 01) Material unbelastet, gemäß RC-Leitfaden Anmerkung :Die Haufwerke werden bauseits beprobtund auf Schadstoffbelastung hin, analysiert.Die Entsorgungskosten für belastetes Materialobliegen dem AG.[PERSON_047] aufnehmen und entsorgen - Einstufung : RW 1",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2193"
+  },
+  {
+   "oz": "020020",
+   "oz_parts": [
+    "02",
+    "0020"
+   ],
+   "quantity": 25.0,
+   "unit": "to",
+   "short_text": "Wasserbausteine C 200/400 liefern und versetzen",
+   "long_text": "Wasserbausteineliefern und fachgerecht versetzen,zur Sicherung Böschung Happacher Bach, Hohlräume zwischen denaufgeschichteten Wasserbausteinenmit Feinkies/Sand verfüllen, Feinkies/Sand liefern. 01) Wasserbausteine C 200/400Wasserbausteine C 200/400 liefern und versetzen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2182"
+  },
+  {
+   "oz": "020021",
+   "oz_parts": [
+    "02",
+    "0021"
+   ],
+   "quantity": 50.0,
+   "unit": "m3",
+   "short_text": "Frostschutzschicht herstellen, Stärke bis 52 cm",
+   "long_text": "Frostschutzschicht (FSS) herstellen,Frostschutzkies, Körnung 0/56 mm liefern,höhen- und profilgerecht nach Regelprofil einbauenund verdichten,herstellen einer Feinplanie mit zu lieferndemPlaniekies 16/32 mm.Verformungsmodul Ev2 min. 120 MN/m2Verhältniswert der Verformungsmoduln Ev2/Ev1 max 2,2Gesamtstärke der ungebundenen Tragschicht bis 52 cm. Abrechnung nach tatsächlicher Einbaustärke.Einschl. Nachweis des geforderten Verformungs-module mittels dynamischer Lastplattenversuche.Anzahl der Lastplattenversuche in Abstimmung mitBauleitung.Frostschutzschicht herstellen, Stärke bis 52 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2201"
+  },
+  {
+   "oz": "020022",
+   "oz_parts": [
+    "02",
+    "0022"
+   ],
+   "quantity": 70.0,
+   "unit": "m2",
+   "short_text": "Bitukies AC 32 TN - Stärke 10 cm",
+   "long_text": "Asphalttragschicht aus [PERSON_173] 70/100,in wechselnden Breiten auf Frostschutzschichtenmaschinell (Fertiger) und von Hand,einbauen,Unebenheiten der Oberfläche max. 6 mm Einbau zwischen Randeinfassungen. 01) AC 32 TN, Einbaustärke 10 cm (250 kg/m2)Bitukies AC 32 TN - Stärke 10 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2203"
+  },
+  {
+   "oz": "020023",
+   "oz_parts": [
+    "02",
+    "0023"
+   ],
+   "quantity": 3.0,
+   "unit": "m3",
+   "short_text": "Asphalt fräsen, 4 cm - Fräsgut auf AG-Lagerplatz",
+   "long_text": "Bestehende Asphaltdeckeabfräsen, mit Fräse,auf gesamte Fahrbahnbreite,Frässtärke mind. 4 cm 01) Fräsgut bleibt Eigentum des AG. Abrechnung nach m3 Fräsgut auf LKW laden,auf AG-Kippe abfahren und abladen,Transportentfernung einfach bis 3 km.Asphalt fräsen, 4 cm - Fräsgut auf AG-Lagerplatz",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2205"
+  },
+  {
+   "oz": "020024",
+   "oz_parts": [
+    "02",
+    "0024"
+   ],
+   "quantity": 90.0,
+   "unit": "m2",
+   "short_text": "Asphaltbeton 0/11 mm, Stärke 4 cm",
+   "long_text": "Asphaltdeckschicht AC 11 DNaus [PERSON_173] 50/70, nach ZTV Asphalt-StB,Unebenheiten der Oberfläche max. 6 mm liefern, höhengerecht einbauen und verdichten. Einbaustärke 4 cm (100 kg/m2) Einbau mit Fertiger und von HandAsphaltbeton 0/11 mm, Stärke 4 cm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2207"
+  },
+  {
+   "oz": "020025",
+   "oz_parts": [
+    "02",
+    "0025"
+   ],
+   "quantity": 30.0,
+   "unit": "m",
+   "short_text": "TOK-Band 40 mm",
+   "long_text": "Anschluss an bestehende Decken in derDicke der Asphaltdeckschicht mit anschmelzbaremFugenband (TOK-Band) herstellen,Längs- und Querfuge, Breite mind. 10 mm01) Dicke der Deckschicht 40 mmTOK-Band 40 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2208"
+  },
+  {
+   "oz": "020026",
+   "oz_parts": [
+    "02",
+    "0026"
+   ],
+   "quantity": 3.0,
+   "unit": "m3",
+   "short_text": "Kiesbankette herstellen",
+   "long_text": "Kiesbankette herstellen,liefern, einbauen und verdichten vonBankettkies 0/22 mm,Einbaubreite bis 50 cm, Stärke 5-8 cm,Einbau mit Querneigung 6%,gemäß Regelprofil.Kiesbankette herstellen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2202"
+  },
+  {
+   "oz": "030001",
+   "oz_parts": [
+    "03",
+    "0001"
+   ],
+   "quantity": 10.0,
+   "unit": "m",
+   "short_text": "UHPC-Stahlbetonrohre DN 800 mm liefern und verlegen",
+   "long_text": "UHPC-Stahlbetonrohre,nach EN 1916 und DIN V 1201 [PERSON_129] 2,mit FBS-Zulassung und statischem Nachweis, liefern und fachgerecht verlegen. Herstellungslänge : 3,00 m Mit in der Muffe fest eingebauter Kompressions-Gleitringdichtung aus Elastomeren mit dichterStruktur, Betongüte C 80/95 Betonfestigkeit bsi 120 N/mm2Betonbiegezugfestigkeit > 16 N/mm2 Lastklasse über LC 250, E-Modul (38 kN/mm2), duktiles Verhalten Expositionsklassen : XC4, XD3, XF4, XA2, XM2 Hersteller :[FIRMA_084] & Co. KGBetonwarenfabrikenStolzenseeweg 988353 KissleggTel. [TELEFON_077] oder gleichwertiger Hersteller 01) DN 800 mmUHPC-Stahlbetonrohre DN 800 mm liefern und verlegen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2221"
+  },
+  {
+   "oz": "030002",
+   "oz_parts": [
+    "03",
+    "0002"
+   ],
+   "quantity": 110.0,
+   "unit": "m",
+   "short_text": "UHPC-Stahlbetonrohre DN 900 mm liefern und verlegen",
+   "long_text": "wie vor, jedoch 02) DN 900 mmUHPC-Stahlbetonrohre DN 900 mm liefern und verlegen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2222"
+  },
+  {
+   "oz": "030003",
+   "oz_parts": [
+    "03",
+    "0003"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "FBS - Pass- und Gelenkstück DN 800 mm",
+   "long_text": "Zuschlag für FBS - Pass- und Gelenkstückfür UHPC-Stahlbetonrohreliefern und versetzen. 01) DN 800 mmFBS - Pass- und Gelenkstück DN 800 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2223"
+  },
+  {
+   "oz": "030004",
+   "oz_parts": [
+    "03",
+    "0004"
+   ],
+   "quantity": 2.0,
+   "unit": "Stk.",
+   "short_text": "FBS - Pass- und Gelenkstück DN 900 mm",
+   "long_text": "wie vor, jedoch 02) DN 900 mmFBS - Pass- und Gelenkstück DN 900 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2224"
+  },
+  {
+   "oz": "030005",
+   "oz_parts": [
+    "03",
+    "0005"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "FBS - Böschungsstück DN 900 mm",
+   "long_text": "Zuschlag für FBS - Böschungsstück, Neigung 1 :1 (45°),für UHPC-Stahlbetonrohreliefern und versetzen. 01) DN 900 mmFBS - Böschungsstück DN 900 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2225"
+  },
+  {
+   "oz": "030006",
+   "oz_parts": [
+    "03",
+    "0006"
+   ],
+   "quantity": 2.0,
+   "unit": "Stk.",
+   "short_text": "Bestehende Betonrohre DN 800 schneiden",
+   "long_text": "Bestehende Betonrohreschneiden, mit Schneidgerät, [PERSON_047] in Eigentum des AN übernehmenund von der Baustelle entfernen. 01) DN 800 mmBestehende Betonrohre DN 800 schneiden",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2233"
+  },
+  {
+   "oz": "030007",
+   "oz_parts": [
+    "03",
+    "0007"
+   ],
+   "quantity": 2.0,
+   "unit": "Stk.",
+   "short_text": "VPC-Kupplung 995",
+   "long_text": "VPC-Kupplung 995liefern und fachgerecht montieren, Spannbereich von 925 bis 995 mm Hersteller :Funkeoder gleichwertiger HerstellerVPC-Kupplung 995",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2228"
+  },
+  {
+   "oz": "030008",
+   "oz_parts": [
+    "03",
+    "0008"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "Tangentialschacht 1, Tiefe bis 1,50 m",
+   "long_text": "Tangentialschacht,seitlich angeformt an Stahlbetonrohre, Einstieg DN 1000 mm,mit Abdeckplatte DN 1000 mm undMannloch DN 625 mm, Auftrittsfläche an Einstiegsseitemind. 300 mm, Neigung der Auftrittsflächen max. 1:20 Hersteller :[PERSON_158], [ORT_013] oder gleichwertiger Hersteller 01) Schacht 1, nach beiliegendem Lageplanmit Übergang DN 800 auf DN 900 mm,Gefällewechsel und Krümmer 135° Tiefe von Rohrsohle bis OK Gelände = 1,50 mTangentialschacht 1, Tiefe bis 1,50 m",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2226"
+  },
+  {
+   "oz": "030009",
+   "oz_parts": [
+    "03",
+    "0009"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "Tangentialschacht 2, Tiefe bis 1,65 m",
+   "long_text": "wie vor, jedoch 02) Schacht 2, nach beiliegendem Lageplanmit geradem Gerinne, Tiefe von Rohrsohle bis OK Gelände = 1,65 mTangentialschacht 2, Tiefe bis 1,65 m",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2227"
+  },
+  {
+   "oz": "030010",
+   "oz_parts": [
+    "03",
+    "0010"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "Schachtabdeckung Klasse B 125 liefern und versetzen",
+   "long_text": "SchachtabdeckungDIN EN 124 / DIN 1229,Deckel rund aus Gußeisenmit werkseitiger Betonfüllung,Rahmen rund aus Gußeisen mit Beton,liefern und fachgerecht versetzenund vermörtel, Mörtel liefern. Deckel mit [PERSON_163] DIN 1221-F. 01) Schachtabdeckung Klasse B 125Schachtabdeckung Klasse B 125 liefern und versetzen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2229"
+  },
+  {
+   "oz": "030011",
+   "oz_parts": [
+    "03",
+    "0011"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "Schachtabdeckung Klasse D 400 liefern und versetzen",
+   "long_text": "wie vor, jedoch02) Schachtabdeckung Klasse D 400Schachtabdeckung Klasse D 400 liefern und versetzen",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2230"
+  },
+  {
+   "oz": "030012",
+   "oz_parts": [
+    "03",
+    "0012"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Statische Berechnung",
+   "long_text": "Prüfbare statische Berechnung fürEinlaufbauwerk durchführen, Festlegung der Betongüten, Wandstärkenund Bewehrung, Erstellen der Ausführungszeichnungen Übergabe digital und in [PERSON_097] (3-fach).Statische Berechnung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2231"
+  },
+  {
+   "oz": "030013",
+   "oz_parts": [
+    "03",
+    "0013"
+   ],
+   "quantity": 1.0,
+   "unit": "Stk.",
+   "short_text": "Einlaufbauwerk, Fertigteil",
+   "long_text": "Einlaufbauwerk aus Stahlbeton,nach beiliegender Zeichnung,einschl. statisch erforderlicher Bewehrung liefern und fachgerecht versetzen Wandstärke mind. 20 cm Bauwerk bestehend aus : Bodenplatte 3,00 x 1,20 mRückwand 1,00 x 2,00 mSeitenwände 2 x 0,80 x 2,00 mSeitenwände schräg 2 x 2,00 / 0,00 m einschl. Muffe für Stahlbetonrohr DN 800 mm Hersteller :[FIRMA_084] & Co. KGBetonwarenfabrikenStolzenseeweg 988353 KissleggTel. [TELEFON_077] oder gleichwertiger Hersteller Anmerkung :Verzinktes Stahlgitter ist nicht Bestandteilder Ausschreibung und wird bauseits montiertEinlaufbauwerk, Fertigteil",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2232"
+  },
+  {
+   "oz": "040001",
+   "oz_parts": [
+    "04",
+    "0001"
+   ],
+   "quantity": 10.0,
+   "unit": "Std.",
+   "short_text": "Vorarbeiter (Polier)",
+   "long_text": "Vorarbeiter (Polier)Vorarbeiter (Polier)",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2046"
+  },
+  {
+   "oz": "040002",
+   "oz_parts": [
+    "04",
+    "0002"
+   ],
+   "quantity": 20.0,
+   "unit": "Std.",
+   "short_text": "Gehobener [PERSON_020]",
+   "long_text": "Gehobener FacharbeiterGehobener [PERSON_020]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2047"
+  },
+  {
+   "oz": "040003",
+   "oz_parts": [
+    "04",
+    "0003"
+   ],
+   "quantity": 20.0,
+   "unit": "Std.",
+   "short_text": "Facharbeiter",
+   "long_text": "FacharbeiterFacharbeiter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2048"
+  },
+  {
+   "oz": "040004",
+   "oz_parts": [
+    "04",
+    "0004"
+   ],
+   "quantity": 5.0,
+   "unit": "Std.",
+   "short_text": "Transporter",
+   "long_text": "TransporterTransporter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2050"
+  },
+  {
+   "oz": "040005",
+   "oz_parts": [
+    "04",
+    "0005"
+   ],
+   "quantity": 10.0,
+   "unit": "Std.",
+   "short_text": "Minibagger",
+   "long_text": "Mini-Bagger bis 0,4 m3Minibagger",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2051"
+  },
+  {
+   "oz": "040006",
+   "oz_parts": [
+    "04",
+    "0006"
+   ],
+   "quantity": 10.0,
+   "unit": "Std.",
+   "short_text": "Bagger bis 1 m3",
+   "long_text": "Bagger bis 1 m3Bagger bis 1 m3",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2052"
+  },
+  {
+   "oz": "040007",
+   "oz_parts": [
+    "04",
+    "0007"
+   ],
+   "quantity": 5.0,
+   "unit": "Std.",
+   "short_text": "LKW bis 12 to Nutzlast",
+   "long_text": "LKW bis 12 to NutzlastLKW bis 12 to Nutzlast",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/GAEB-[PROJEKT_004].X83",
+   "source_ref": "id2053"
+  }
+ ],
+ "remarks": [
+  "Vorbemerkung SiGeKo : Aktivitäten nach der Baustellenverordnung (SiGeKo) :Der Auftraggeber (AG) geht davon aus, dass der Auftragnehmer (AN) alle Bauleistungen im eigenen Betrieb ausführt.Damit sind keine (weiteren) Aktivitäten gemäß Baustellenverordnung erforderlich.Falls der Auftragnehmer Bauleistungen an Nachunternehmer überträgt, werden Aktivitäten gemäß Baustellenverordnung erforderlich. Die Beauftragung eines, dann erforderlichen, SiGe-Koordinator erfolgt durch den AN. Die Kosten hierfür werden nicht seperat vergütet undsind in die Einheitspreise einzurechnen.Vorbemerkung SiGeKo",
+  "VerkehrsregelungenVerkehrsregelungen",
+  "Vorbemerkung Arbeitskräfte:Der Verrechnungssatz enthält sämtlicheAufwendungen, den tatsächlichen Lohnund etwaige vermögenswirksamen Leis-tungen mit den Zulagen für Gemeinkosten,Sozialkassenbeiträge und dergleichen,sowie Lohn- und Gehaltsnebenkosten.Zulagen für Nacht-, Sonn- und Feiertags-arbeit sind jedoch nicht eingerechnet.Vorbemerkung",
+  "Vorbemerkung Geräte und Fahrzeuge:Der Verrechnungssatz enthält sämtlicheAufwendungen für den Einsatz,Vorhalte- und Betriebsstoffkosten,sowie sämtliche Zulagen, einschließlichder Kosten für das Bedienungspersonal.Vorbemerkung"
+ ],
+ "stats": {
+  "items": 50,
+  "priced": 0,
+  "remarks": 4,
+  "bid_total": 0.0
+ }
+}

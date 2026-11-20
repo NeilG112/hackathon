@@ -1,0 +1,2729 @@
+{
+ "source": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+ "items": [
+  {
+   "oz": "01011",
+   "oz_parts": [
+    "01",
+    "01",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Baustelleneinrichtung und -räumung",
+   "long_text": "Vollständige Einrichtung der Baustelle, vorhalten und nach Ende der Baumaßnahme räumen,nach Massgabe aller angegebenen Leistungen, mit allen für den Baubetrieb und die maschinentechnische Montage erforderlichen Anlagen, Geräten und Maschinen, sowie Räumung derselben nach Beendigung der Baumaßnahme.Die Kosten für das Vorhalten und den Betrieb o. g. Anlagen, Geräte und Maschinen sind in die betreffenden Einheitspreise einzurechnen.Sicherung der Baustelle.Gestellung von Bau- und Montagebeleuchtung und aller erforderlichen Hebezeuge, Montage- und Schutzgerüstemit einer Arbeitsbühnenhöhe entsprechend den Erfordernissen sind einzukalkulieren. Der Auftragnehmer kann nicht davon ausgehen, dass Gerüste, Hebezeuge etc. von anderen auf der Baustelle tätigen Gewerken zur Verfügung stehen.Alle Transport- und Krankosten für Lieferung und Einbau aller Bauteile im Umfang dieses Leistungsverzeichnisses.Schützen von Behältern, Rohrleitungen, Aggregaten während der Bauzeit bis zur Inbetriebnahme, soweit nicht in anderen Positionen enthalten.Stromanschluss und Baustellen-WC werden vom Gewerk Baumeisterarbeiten eingerichtet und zur Verwendung durch Folgegewerke bereitgestellt.Das Vorhandensein eines Wasseranschlusses für den Montagezeitraum kann zum jetzigen Zeitpunkt nicht garantiert werden.Einschl. Nebenkosten für Übernachtung,Verpflegung, Reisekosten, Wegegelder.Einschl. Zwischentransport der Materialien auf der Baustelle zu den einzelnen Einbaustellen.Abrechnungsmodus:Prozentual nach Baufortschritt (also im Verhältnis der Summe der weiteren ausgeführten Leistungen zum Gesamtumfang der Leistungen).Baustelleneinrichtung und -räumung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id187"
+  },
+  {
+   "oz": "01012",
+   "oz_parts": [
+    "01",
+    "01",
+    "2"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Rohrleitungs- und Instrumentierungsfließbild",
+   "long_text": "Rohrleitungs- und Instrumentenfließbild in der Anlagen- und Verfahrenstechnik (RI-Fließbild) auf Grundlage des Fließbildes Stand \"Ausführungsplanung\", das vom AG im pdf-Format und bei Bedarf im dwg-Format zur Verfügung gestellt wird.Durch den Auftragnehmer muss spätestens 4 Wochen nach Auftragserteilung ein Schemaplan in Einstrichdarstellung über die Technische Ausrüstung des Wasserwerks im Umfang dieser Leistungsbeschreibung vorgelegt werden.Das Schema enthält folgende Informationen sämtlicher Anlagenteile:Art und Bezeichnung der Apparate, Maschinen, Antriebe, und Behälter als Symbol,Rohrleitungen, Armaturen mit Nennweiten, Druckstufen, WerkstoffenAufgaben der Einrichtungen zum Messen, Steuern, RegelnZusatzinformationen, wie z. B. Höhenlagen der Apparate, weitere Werkstoffe, sind anzugeben.Aus dem Schema muss die Funktionsweise der maschinellen, hydraulischen und lufttechnischen Ausrüstung der Anlage klar und übersichtlich erkennbar sein.Allen im Schemaplan enthaltenen Betriebsmitteln (Symbolen) muss ein klarer Schlüssel (Kennzahl) zugeordnet werden, mit dessen Hilfe jedes Betriebsmittel eindeutig bestimmt und erkannt werden kann.Der Schemaplan ist im dwg-Format zu erstellen. Der Plan muss sowohl in [PERSON_097] als auch als CAD-Datei (dwg-Format) und als pdf-Datei vorgelegt werden.Vorlage in einfacher Ausfertigung.Rohrleitungs- und Instrumentierungsfließbild",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id188"
+  },
+  {
+   "oz": "01013",
+   "oz_parts": [
+    "01",
+    "01",
+    "3"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Übersichts-Fließbild für Wandaufhängung",
+   "long_text": "Zur Übersicht über die gesamte Aufbereitungsanlage mit angeschlossenen Funktionseinheiten (wie Druckpumpwerk) ist nach Fertigstellung ein komplettes Fliessbild zu liefern, das alle Anlagenteile (Apparate, Rohrleitungen, Armaturen, Messgeräte etc.) unter Angabe von Nennweite, Druckstufe, [PERSON_094] und weiterer wichtiger technischer Daten sowie mit Angabe sämtlicher Kurzbezeichnungen enthält.Der Plan ist auf Grundlage der Position \"Rohrleitungs- und Instrumentierungsfließbild\" in optisch hochwertiger Form mit \"Präsentationscharakter\" auf eine stabile Kunststoffplatte auflaminiert oder in einem optisch hochwertigen Glasbilderrahmen jeweils mit zwei Aufhängern für Wandaufhängung zu liefern. Werbung ist auf diesem Plan nur in Form der Logos von Auftraggeber, Planungsbüro und Auftragnehmer (ausführende Firma) erlaubt.Übersichts-Fließbild für Wandaufhängung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id189"
+  },
+  {
+   "oz": "01014",
+   "oz_parts": [
+    "01",
+    "01",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Zeit-, Montage- und [PERSON_118]",
+   "long_text": "Der Auftragnehmer hat verbindlich zu den vertraglichen Einzelfristen sowie rechtzeitig vor Materialbestellung nachfolgend aufgeführte Unterlagen bei der Bauleitung zur Prüfung und Freigabe vorzulegen:Anfertigen von Bau- und Montageplänen, Aussparungs-, Fundament- und Einbauzeichnungen und kompletten Installationsplänen, welche auch die größten Maße der Maschinen mit Zubehör enthalten müssen.Nach diesen Plänen werden die erforderlichen Aussparungen etc. - soweit nicht im Umfang dieses Leistungsverzeichnisses enthalten - bauseitig hergestellt. Übersichtliche Darstellung in Ansichten, Schnitten und Detailzeichnungen.Einschließlich Fertigungszeichnungen für Behälter und Sonderbauteile für den gesamten Leistungsumfang, hier insbesondere:Filterkessel, Reinwassertanks, Druckstosskessel, lüftungstechnische Bauteile.Einzukalkulieren ist das mehrmalige Ausmessen der relevanten Bauwerks- und Anschlussmaße vor Ort.Einschl. Fortschreibung zu Bestandsplänen mit allen wichtigen, festgestellten Maßen.Der Auftragnehmer haftet für die Richtigkeit seiner Zeichnungen sowie für die richtigen Angaben über Fundamente, Aussparungen, Durchbrüche, Schächte, Kanäle sowie Leerrohre für Kleinleitungen von Maschinen- und Elektroanlagen, für Meßeinrichtungen, usw.Pläne von allen Einbauteilen und maschinentechnischen Einrichtungenanfertigen im Maßstab 1:50 oder größer, als CAD-Farbplottund auf CD-ROM oder USB-Stick im DWG/DXF-Format sowie im pdf-Format.Rechtzeitiges Vorlegen der Montage-/Fertigungspläne Zug um Zug entsprechend dem geplanten Baufortschritt bzw. zu den vertraglich festgelegten Einzelfristen. Sie sind erst nach Genehmigung durch den Auftraggeber verbindlich.Einschießlich Fertigung und Vorlage eines Bauzeitenplans mit detailliertem Bauablaufplan mit Angabe der wesentlichen Vorraussetzungen für die einzelnen Teilschritte. Regelmäßige Überarbeitung und Aktualisierung entsprechend dem Baufortschritt. Als Grundlage wird der Bauzeitenplan Stand Ausführungsplanung zur Verfügung gestellt.Übergabe in einfacher Ausfertigung.Abrechnung pauschal.Zeit-, Montage- und [PERSON_118]",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id190"
+  },
+  {
+   "oz": "01015",
+   "oz_parts": [
+    "01",
+    "01",
+    "5"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Pflichtenheft und Übergabe elektrotechnische Unterlagen",
+   "long_text": "Die elektrische Schaltanlage wird als seperates Gewerk ausgeschrieben, so dass eine Kooperation mit dem Auftragnehmer E-Technik zwingend erforderlich ist.Dies umfasst folgenden Mindestumfang:1. Technische Unterlagen:Übergabe der technischen Unterlagen aller Aggregate / Messungen /Signalgeber / etc. mit Schnittstellen zur E-Technik und beinhaltet folgende Informationen:Energieanschluss (Anschlusswerte, wie Nennleistung, Anlaufart, Nennstrom sowie Vorgaben für Schutzeinrichtungen, z. B. Drehmomente, max. Ströme etc.)SteuerkontakteMesssignale, MessbereicheAnschlussbilderalle sonstigen, die E-Technik betreffende Informationen.Die Unterlagen müssen für jede(s) Aggregat / Messung als eigenständiges Papierdokument / pdf-Datei übergeben werden, und eine eindeutige Klartextbezeichnung, sowie einen Querverweis zur Position-Nr. im Maschinentechnik-LV und dem R&I-Schema haben.Zusätzlich sind die Aggregate, Messungen, etc. übersichtlich in einer Betriebsmittelliste zusammengestellt.Sofern erforderlich, wird hierfür auch das Vefahrensschema für das Gewerk Elektrotechnik zur Verfügung gestellt.2. Funktonsbeschreibung Einzel-Aggregte / MessungenÜbergabe einer detaillierten Funktionsbeschreibung aller Einzelaggregate / -Messungen / Signalgeber, etc. als \"Pflichtenheft\" für die Programmerstellung (SPS-Programmierung).3. Funktionsbeschreibung Gesamt-AnlageÜbergabe einer detaillierten Funktionsbeschreibung der Gesamtanlage unter Zusammenwirken aller Aggregate / Messungen / Signalgeber / etc. als \"Pflichtenheft\" für die Programmerstellung (SPS-Programmierung) sowie als [ORT_016] der Betriebsanleitung.Die Betriebsmittelliste ist nach Auftragserteilung zeitnah vorzulegen, um Bauteile mit langer Lieferfrist anhand der wesentlichen technischen Daten für die Bestellung freigeben zu können.Pflichtenheft und Übergabe elektrotechnische Unterlagen",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id191"
+  },
+  {
+   "oz": "01016",
+   "oz_parts": [
+    "01",
+    "01",
+    "6"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Dokumentation mit Funktions- und Betriebsbeschreibung",
+   "long_text": "Überarbeitung und Ergänzung der im Rahmen der Maßnahme erstellten Fließbilder, Pläne, Anlagenbeschreibungen etc. in eine ausführliche und detailliert beschriebene und gezeichnete Bestandsdokumentation, Funktions- und Betriebsbeschreibung der gesamten maschinentechnischen Ausrüstung,soweit nicht bereits in Pos. \"Zeit-, Montage- und [PERSON_118]\" enthalten.Lieferung in dreifacher Ausfertigung als Loseblattsammlung, geheftet in Ordnern. Zusätzlich auf Datenträger in Windows-lesbaren Formaten (vorzugsweise \"pdf-Dateien\").Die Beschreibung muss die Anlage in ihrer Funktion, deren korrekte Bedienung und Wartung für den normalen Betrieb beschreiben. Für den Störungsfall sind Maßnahmen zur Beseitigung unmittelbarer Gefahr anzugeben, sowie die Wege zu zielbewusster Suche der Störungsursache und die Behebung einfacher Störungen zu erläutern. Die Funktionsbeschreibung ist spätestens zur Einweisung des Bedienpersonals in die Anlagenfunktion vorzulegen.Umfang und Ausführung wird nach Auftragsvergabe mit dem AG abgestimmt, auf Grundlage der Montageplanung und deren Fortschreibung zu Bestandsplänen sowie den im Zuge der Montageplanung erfolgten Abstimmungen, einschl. aller erforderlichen Pläne und Listen, zu liefern und bei Einweisung des Betriebspersonals vor Abnahme der Anlage übergeben.Einschl. der technischen Unterlagen aller Nebenaggregate, Armaturen, etc., TÜV-Protokolle, bakteriologische Nachweise.Einzurechnen sind:Diesbezügliche Vorgespräche mit dem AG über Inhalt, Form und Zahl der zu liefernden Dokumente,die eventuell erforderliche Vereinheitlichung der zu liefernden Dokumentationsunterlagen bei Arbeitsgemeinschaften oder Subunternehmerleistungen,die Einweisung des Personals des AG in die DokumentationAbrechnung pauschal.Dokumentation mit Funktions- und Betriebsbeschreibung",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id192"
+  },
+  {
+   "oz": "01017",
+   "oz_parts": [
+    "01",
+    "01",
+    "7"
+   ],
+   "quantity": 200.0,
+   "unit": "St",
+   "short_text": "Anlagenkennzeichnung",
+   "long_text": "Alle verfahrenstechnischen Komponenten wie Apparate, Maschinen, Geräte, Armaturen und Rohrleitungen sind mit Kennzeichnungsschildern auszustatten.Bezeichnungen der Apparate, Maschinen, Geräte, Armaturen und Rohrleitungen im Klartext (Art bzw. [PERSON_129], Baugröße und Funktion) und mit Kennzeichnungen gemäß R&I-Fließbild nach DIN EN ISO 10628.Die Schilder müssen gut sichtbar angebracht werden und weitestgehend UV-stabil, unempfindlich gegen Hitze und Kälte, beständig gegen Chemikalien und kratztest sein.Schilder einschließlich Halterung, Material Kunststoff, mit Nuten zum Einschieben der Beschriftung, schwarze Schrift auf weißem Grund, transparente Abdeckung.Schildergröße: nicht kleiner als 10 x 5 cm.Schriftgröße nicht kleiner als 7 mm.Abrechnung nach StückAnlagenkennzeichnung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id193"
+  },
+  {
+   "oz": "01018",
+   "oz_parts": [
+    "01",
+    "01",
+    "8"
+   ],
+   "quantity": 10.0,
+   "unit": "h",
+   "short_text": "Änderungen Fertigungszeichnungen, etc.",
+   "long_text": "Änderungen von Montageplänen, Funktionsbeschreibungen, sonstige Dokumentation auf Grund AG-seitiger Veranlassung.Folgende Leistungen können nur abgerechnet werden, wenn der AG nach seiner Genehmigung der jeweiligen vom AN zu erbringenden Montageplanung, Dokumentation etc. Änderungen bzw. Ergänzungen derselben anordnet.Sind Änderungen / Ergänzungen der Montageplanungsleistungen notwendig, weil erst nach deren Genehmigung (im Zuge der Ausführung) eine vom Auftragnehmer verschuldete fehlerhafte oder unvollständige Ausführung der Montagepläne zu Tage tritt, so gehen die Kosten für die Neuvorlage der Montageplanungsleistungen zu Lasten des Auftragnehmers.Die Arbeiten zur turnusmäßigen Aktualisierung des vom AN zu erstellenden Bauzeitenplanes werden nicht separat vergütet.Änderungen Fertigungszeichnungen, etc.",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id194"
+  },
+  {
+   "oz": "01021",
+   "oz_parts": [
+    "01",
+    "02",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Desinfektion der Gesamtanlage",
+   "long_text": "Fachgerechtes Desinfizieren und Nachspülen aller trinkwasserberührten Anlagenteile im Lieferumfang, einschl. Pumpen, Druckstosskessel, Filterbehälter und Reinwassertanks und sonstiger Aggregate und Armaturen, zur Inbetriebnahme mit Nachweisführung über Keimfreiheit durch ein zertifiziertes Labor.Erforderlich sind mindestens 3 Proben hintereinander mit negativen biologischen Befunden (Untersuchungsumfang Pseudomonas aeruginosa, [PERSON_160] Bakterien, Escherichia coli, Enterokokken, kultivierbare Mikroorganismen als Koloniezahl bei 22 °C und 36 °C).Die Nachweisproben sind am Rohwasserzulauf und am Reinwasserausgang des Wasserwerks zu nehmen (also 3 Probennahmen an jeweils 2 Probenahmestellen).Durchführung in mehreren Abschnitten entsprechend den Erfordernissen der Anlagenkonfiguration.Die Abrechnung ggf. erforderlicher weiterer Desinfektionen erfolgt nach tatsächlichem Aufwand gegen Nachweis, jedoch nur soweit der Auftragnehmer die erneute Desinfektion nicht zu verantworten hat.Hinweis zur Behälterdesinfektion (Filter):Die Desinfektion des Filterbettes der Entarsenierungsfilter ist in einer eigenen Position im Abschnitt \"Ausrüstung Arsenierungsfilter\" behandelt.Für die schadlose Beseitigung des Abwassers einschließlich ggf. erforderlicher Neutralisation ist ausschließlich der AN verantwortlich.Zu berücksichtigen ist, dass die Grundstücksentwässerung (Schmutzwasser) mittels Hebeanlage erfolgt, welche auf eine Fördermenge von ca. 8 m3/h ausgelegt ist. Die Entsorgung größerer Abwassermengen ist deshalb ggf. mit einem höheren Zeitaufwand verbunden, sofern keine Pufferbehälter zum Zwischenlagern von Abwasser vorgehalten werden.Für den Zeitraum der Desinfektion ist für die Kalkulation davon auszugehen, dass noch keine Armaturen elektrisch angeschlossen sind, d. h. entsprechender Zeitaufwand für Hand-Vor-Ort-Bedienung ist einzurechnen und wird nicht separat vergütet.Desinfektionsmittel z. B. [PERSON_065] od. gleichwertig.Desinfektion der Gesamtanlage",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id196"
+  },
+  {
+   "oz": "01022",
+   "oz_parts": [
+    "01",
+    "02",
+    "2"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Inbetriebnahme und Probebetrieb",
+   "long_text": "Inbetriebnahme und Probebetrieb aller Aggregate (z. B. Aufbereitungsanlage, Druckerhöhungspumpen), Armaturen und sonstigen Funktionseinheiten dieses Leistungsverzeichnisses.Nach der Beendigung der Montage (hydraulisch/elektrisch) findet eine Begehung statt.Das Montageende ist schriftlich bei der Bauleitung anzuzeigen. Die Feststellung des Montageendes bezieht sich nur auf die optische Beurteilung. Dabei wird die Vollständigkeit des Lieferumfanges und der Ausführung geprüft.Nach erfolgreicher Feststellung, dass die Montage beendet ist, erfolgt die Inbetriebnahme, die schriftlich bei der Bauleitung anzuzeigen ist.Inbetriebnahme und Montage liegen zeitlich getrennt voneinander. Die Inbetriebnahme kann erst nach Fertigstellung der elektrotechnischen Ausrüstung erfolgen. Die daraus entstehenden Kosten für die erneute Anreise des erf. Personals sind einschl. aller Nebenkosten, Auslösungen, Fahrtkosten etc. in die EP einzukalkulieren.Dabei werden folgende Prüfungen durchgeführt:Druckprüfung der Gesamtanlage. DIN EN 805 / DIN 4279,Prüfdruck entsprechend Anforderung PN 10 für alle Anlagenteile im Zulauf der Reinwassertanks / Prüfdruck PN 16 für alle Anlagenteile ab dem Reinwasser-Pumpwerk. Der Nachweis ist schriftlich zu dokumentieren.Überprüfung der Geräteaufstellung, Optimierung des AufstellungsortesProbelauf bis der bestimmungsgemäße Betrieb aller Anlagenteile nachgewiesen ist.Die Inbetriebnahme erfolgt zeitgleich mit dem AN-Elektrotechnik und gliedert sich in:Einzelinbetriebnahme für alle Aggregate / Messungen inkl. Einstellung und Justierung aller erforderlichen mechanischen und elektrischen Parameter.Inbetriebnahme der gesamten Anlage in Verbindung des Zusammenwirkens aller Aggregate / Messungen / Signalgeber etc., inkl. Einstellung und Justierung aller erforderlichen mechanischen und elektrischen Parameter. Während der Inbetriebnahme ist das SPS-Programm zu optimieren.Dazu eigenständige Terminkoordination mit dem AN-Elektrotechnik.Nach erfolgter Inbetriebnahme wird ein Probebetrieb durchgeführt.Mit dem Probebetrieb ist eine intensive Betreuung des Betreiberpersonals (mindestens 1d/Woche) für die Dauer von 4 Wochen vorzusehen.Einzukalkulieren sind alle erforderlichen Messgeräte, Personal, Hilfsmittel und Reisekosten.Es wird darauf hingewiesen, dass Unterbrechungen des Probebetriebs, die der AN zu vertreten hat, eine entsprechende Verlängerung dieses Probebetriebes zur Folge haben. Bei größeren Unterbrechungen wird der Probebetrieb abgebrochen und ist nach der Behebung der Probleme von vorne neu zu starten.Im Einfahr-/Optimierungsbetrieb veränderte Grundeinstellungen sind in einem Inbetriebnahmeprotokoll zu dokumentieren.Ziel während dieses Zeitraumes ist, den Personal- und Energieaufwand zu optimieren. Ferner ist die Automatisierung mit der Fernwirkanlage abzustimmen (Fehlermeldungen etc.).Inbetriebnahme und Probebetrieb",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id197"
+  },
+  {
+   "oz": "01023",
+   "oz_parts": [
+    "01",
+    "02",
+    "3"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Analytischer Nachweis Garantiewerte",
+   "long_text": "Die Funktionsfähigkeit der Aufbereitungsanlage ist durch Probennahme nachzuweisen. Dazu sind folgende Analysen eines unabhängigen und zertifizierten Labors vorzulegen:Insgesamt 3 mal im Abstand von zwei Wochen bis zum Ende des Probebetriebs eine kleine chemisch-technische Analyse mit Mikrobiologie Rohwasser und Reinwasser (nach Aufbereitung)Folgende Werte sind jeweils mindestens zu bestimmen:Temperatur und pH vor OrtCalcitlösekapazitätArsenTrübungCO2SauerstoffGeruchKeimfreiheit ([PERSON_160] Bakterien, Escherichia coli, Enterokokken, kultivierbare Mikroorganismen als Koloniezahl bei 22 °C und 36 °C).Analytischer Nachweis Garantiewerte",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id198"
+  },
+  {
+   "oz": "01024",
+   "oz_parts": [
+    "01",
+    "02",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Einweisung des Betriebspersonals",
+   "long_text": "Übergabe der fertiggestellten Gesamtanlage an das Betriebspersonal mit Einweisung in Betrieb und Wartung aller Aggregate, wie Pumpen, Armaturen, Messgeräte, etc.,das letztendliche Ablaufschema,die Schaltanlage mit Stromlaufplänen, soweit diese Gegenstand dieses LV sind,die Störungsbehebung.Die Einweisung erfolgt zeitlich getrennt von Inbetriebnahme und Montage. Die daraus entstehenden Kosten für die erneute Anreise des erf. Personals sind einschl. aller Nebenkosten, Auslösungen, Fahrtkosten etc. in die EP einzukalkulieren.Einweisung des Betriebspersonals",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id199"
+  },
+  {
+   "oz": "01025",
+   "oz_parts": [
+    "01",
+    "02",
+    "5"
+   ],
+   "quantity": 4.0,
+   "unit": "Jahr",
+   "short_text": "Wartungsvertrag",
+   "long_text": "Wartungsvertrag für alle wartungsrelevanten Anlagenteile dieses Leistungsverzeichnisses für die Dauer der Gewährleistungszeit.Mit Abschluss des Wartungsvertrages verlängert sich der Zeitraum der Gewährleistung auf 4 Jahre.Der Wartungsvertrag beinhaltet folgende jährlich durchzuführende Leistungen:1. Inspizieren der Anlage.2. Warten der Anlage.3. Liefern und Auswechseln der für die einwandfreie Funktion und Betriebssicherheit erforderlichen Verschleißteile der Anlage, deren Standzeit unter üblichen Betriebsbedingungen die Gewährleistungsfrist unterschreitet; einschl. ordnungsgemäße Entsorgung der Altteile und -materialien.4. Liefern bzw. Bereitstellen aller benötigten Hilfsmittel (z.B. Messgeräte, Werkzeuge) und Hilfsstoffe (z.B. Schmier- und Reinigungsmittel), inklusive Leitern und Fahrzeuge.Rechtzeitig vor Abnahme ist dem AG ein detaillierter Wartungsvertrag in [PERSON_097] vorzulegen.Der angebotene EP umfasst den Zeitraum zwischen Abnahme und Fristende Gewährleistung, also vier Jahre.Abrechnung außerhalb der Schlussrechnung, jeweils nach Ablauf eines Jahres.Der Wartungsvertrag wird nach der Abnahme gemäß dem hier angebotenen Einheitspreis separat beauftragt.Wartungsvertrag",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id200"
+  },
+  {
+   "oz": "01031",
+   "oz_parts": [
+    "01",
+    "03",
+    "1"
+   ],
+   "quantity": 5.0,
+   "unit": "h",
+   "short_text": "Ingenieur, Projektleiter",
+   "long_text": "Ingenieur, ProjektleiterVergütung erfolgt nur nach besonderer Anordnung der Bau-leitung. Angefallene Regiestunden müssen von der Bau-leitung täglich bestätigt werden, sonst erfolgt keineVergütung.Sonst wie in den Zusätzlichen TechnischenVertragsbedingungen beschrieben.Ingenieur, Projektleiter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id203"
+  },
+  {
+   "oz": "01032",
+   "oz_parts": [
+    "01",
+    "03",
+    "2"
+   ],
+   "quantity": 10.0,
+   "unit": "h",
+   "short_text": "Polier- oder Obermonteur",
+   "long_text": "Polier oder Obermonteur in Regie,sonst wie vorPolier- oder Obermonteur",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id204"
+  },
+  {
+   "oz": "01033",
+   "oz_parts": [
+    "01",
+    "03",
+    "3"
+   ],
+   "quantity": 10.0,
+   "unit": "h",
+   "short_text": "Facharbeiterstunde",
+   "long_text": "[PERSON_020] in Regie,sonst wie vorFacharbeiterstunde",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id205"
+  },
+  {
+   "oz": "01034",
+   "oz_parts": [
+    "01",
+    "03",
+    "4"
+   ],
+   "quantity": 5.0,
+   "unit": "h",
+   "short_text": "Bauhelfer bzw. Hilfsarbeiterstunden",
+   "long_text": "Bauhelfer in Regie,sonst wie vorBauhelfer bzw. Hilfsarbeiterstunden",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id206"
+  },
+  {
+   "oz": "01035",
+   "oz_parts": [
+    "01",
+    "03",
+    "5"
+   ],
+   "quantity": 2.0,
+   "unit": "h",
+   "short_text": "Kleintransporter Nutzlast 1,0 to mit Bedienung",
+   "long_text": "Kleintransporter in Regie,mit Fahrer,sonst wie vorKleintransporter Nutzlast 1,0 to mit Bedienung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id207"
+  },
+  {
+   "oz": "01036",
+   "oz_parts": [
+    "01",
+    "03",
+    "6"
+   ],
+   "quantity": 2.0,
+   "unit": "h",
+   "short_text": "Schweißgerät Elektro mit Bedienung",
+   "long_text": "Schweißgerät in Regie,mit Bedienung,sonst wie vorSchweißgerät Elektro mit Bedienung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id208"
+  },
+  {
+   "oz": "01037",
+   "oz_parts": [
+    "01",
+    "03",
+    "7"
+   ],
+   "quantity": 2.0,
+   "unit": "h",
+   "short_text": "Schlagbohrer 1500 Watt mit Bedienung",
+   "long_text": "Schlagbohrer in Regie,mit Bedienung,sonst wie vorSchlagbohrer 1500 Watt mit Bedienung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id209"
+  },
+  {
+   "oz": "01038",
+   "oz_parts": [
+    "01",
+    "03",
+    "8"
+   ],
+   "quantity": 2.0,
+   "unit": "h",
+   "short_text": "Flex 2000 Watt mit Bedienung",
+   "long_text": "Flex in Regie,mit Bedienung,sonst wie vorFlex 2000 Watt mit Bedienung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id210"
+  },
+  {
+   "oz": "01039",
+   "oz_parts": [
+    "01",
+    "03",
+    "9"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "An- un Abreise des Montagepersonals",
+   "long_text": "An- un Abreise des MontagepersonalsAn- un Abreise des Montagepersonals",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id211"
+  },
+  {
+   "oz": "010310",
+   "oz_parts": [
+    "01",
+    "03",
+    "10"
+   ],
+   "quantity": 100.0,
+   "unit": "kg",
+   "short_text": "Formstahl",
+   "long_text": "Formstahl in [PERSON_115] V2A,in verschiedenen Profilen, Größen und Abmessungen.Verarbeitung nach vorgegebenen Konstruktionsplänen bzw. Erfordernis, einschl. aller zugelassenen BefestigungenFormstahl",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id212"
+  },
+  {
+   "oz": "02011",
+   "oz_parts": [
+    "02",
+    "01",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Demontage, Ausbringen und Entsorgung der bestehenden Rohrleitungen",
+   "long_text": "Demontage, Ausbringen und Entsorgung der bestehenden Rohrleitungen, Armaturen und Formstücke inkl. Befestigungen und notwendiger Trennschnitte im Rohrkeller und Erdgeschoss der bestehenden Aufbereitungsanlage.Die demontierten Armaturen werden nach Möglichkeit wiederverwendet. Die Demontage und Wiedermontage dieser Armaturen ist im Abschnitt \"Absperr- und Sicherheitseinrichtungen\" separat berücksichtigt.Der Ausbau nicht mehr benötigter Wanddurchführungen von Rohrleitungen erfolgt im Gewerk Baumeisterarbeiten.Länge Rohrleitungen: DN 100 und kleiner ca. 10 m DN 125 ca. 15 m DN 150 ca. 35 m DN 200 ca. 50 mRohrleitungen aus Stahlguss. Flanschverbindungen durchschnittlich alle 2 m.Rohrleitungsbefestigungen/-stützen aus Beton.werden bausseits nach der Rohrleitungsdemontage abgebrochen.Ausbringung über Treppe (siehe Pläne). Bezüglich Umgang und Zugänglichkeit ist die Baubeschreibung einschließlich der dort enthaltenen Fotos vom Altbestand zu beachten. Eine Vor-Ort-Besichtigung im Zuge der Angebotserstellung wird empfohlen. Hebezeuge und Montageöffnungen sind im Bestand nicht vorhanden.Einschließlich Gestellung der erforderlichen Container und Entsorgung.Die saugseitige Edelstahlverrohrung von Reinwasserpumpwerk und Rückspülpumpe sowie die druckseitige Edelstahlverrohrung des Reinwasserpumpwerks bleiben erhalten.Demontage, Ausbringen und Entsorgung der bestehenden Rohrleitungen",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id215"
+  },
+  {
+   "oz": "02021",
+   "oz_parts": [
+    "02",
+    "02",
+    "1"
+   ],
+   "quantity": 30.0,
+   "unit": "m³",
+   "short_text": "Ausbau und Entsorgung Filterfüllung",
+   "long_text": "Die beiden offenen Dolomitfilter werden zu Entarsenierungsfiltern umgenutzt.Das bisher eingebaute Filtermatierial aus halbgebranntem Dolomit ist auszubauen und zu entsorgen.Material mit Saugwagen absaugen und entsorgen.Ausbau und Entsorgung Filterfüllung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id217"
+  },
+  {
+   "oz": "02022",
+   "oz_parts": [
+    "02",
+    "02",
+    "2"
+   ],
+   "quantity": 4.0,
+   "unit": "m³",
+   "short_text": "Ausbau und Entsorgung Stützschichten in Dolomitfilter",
+   "long_text": "Ausbau und Entsorgung der Stützschichten - vermutlich Quarzkies - aus den vorgenannten offenen Dolomitfiltern.Material mit Saugwagen absaugen und entsorgen.Ausbau und Entsorgung Stützschichten in Dolomitfilter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id218"
+  },
+  {
+   "oz": "02023",
+   "oz_parts": [
+    "02",
+    "02",
+    "3"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Entwässerungscontainer und Beprobung nach DepV",
+   "long_text": "Bereitstellung der Container für die Entsorgung des abgesaugten Filtermaterials einschließlich Stützschichten,Analyse jeder Charge nach Deponieversordnung / Deklarationsanalyse.Entwässerungscontainer und Beprobung nach DepV",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id219"
+  },
+  {
+   "oz": "03011",
+   "oz_parts": [
+    "03",
+    "01",
+    "1"
+   ],
+   "quantity": 4.0,
+   "unit": "St",
+   "short_text": "[PERSON_090] / [PERSON_066]",
+   "long_text": "YesTrockenläufer-BlockpumpeEinstufige [PERSON_054] in [PERSON_185]-Bauform fürFundamentaufstellung inklusive Fuß am Pumpengehäuse.Schwingungs- und geräuscharme Blockbauart mit Laterne undstarr verbundenem Standardmotor (Norm-Motor).Mit zwangsumfluteter, drehrichtungsunabhängiger Faltenbalg-Gleitringdichtung (ab 37 kW/4-polig optional mit einer Cartridge-Gleitringdichtung in Back-Pull-Out-System zumGleitringdichtungsaustausch ohne Demontage des Motors) undkavitationsreduzierendem Laufrad.Flansche mit Druckmessanschlüssen R 1/8. AlleGraugusskomponenten sind kataphoresebeschichtet.Pumpen mit Motoren > 5,5 kW verfügen serienmäßig überKaltleiterfühler als Motorschutz.Der Motorklemmkasten < 7,5 kW kann aus Metall oder Kunststoff sein.Die Motorklemmkästen > 7,5 kW sind immer aus Metall.- Gleitringdichtung für die Wasserförderung bis Tmax. = +140°C.Pumpe geeignet für Betrieb an bauseitigem Frequenzumformer.BetriebsdatenFördermedium: TrinkwasserMedientemperatur: 10 bis 30,00 °CAngefragter [PERSON_094]: 60,00 m3 /hAngefragte Förderhöhe: 6,30 mMin. Medientemperatur: 5 °CMax. Medientemperatur: 40 °CMin. Umgebungstemperatur: 0 °CMax. Umgebungstemperatur: 40 °CMaximaler Betriebsdruck: 16 barMindesteffizienzindex (MEI): > 0.4MotordatenMotor-Effizienzklasse: mind. IE3Netzanschluss: 3~400V/50 HzSpannungstoleranz: +-10 %Motornennleistung: 1,5 kWNenndrehzahl: 1450 1/minNennstrom: 3,6 ALeistungsfaktor: 0,71Motorwirkungsgrad 50 %: 81,3 %Motorwirkungsgrad 75 %: 83,4 %Motorwirkungsgrad 100 %: 84,6 %Isolationsklasse: FSchutzart: IP55Motorschutz: neinWerkstoffeBeschichtungen: für Trinkwasser geeignetLaufrad: EN-GJL-200Welle: 1.4122Wellendichtung: AQ1EGGLaterne: 5.1301/EN-GJL-250EinbaumaßeSaugseitiger Rohranschluss: DN 80 , PN 16Druckseitiger Rohranschluss: DN 65 , PN 16Hersteller Pumpe: '.........................................................' (Wilo oder gleichwertig)[PERSON_129] Pumpe: '.........................................................................' (z. B. Atmos GIGA-B 65/150-1,5/4 oder gleichwertig)Dem Angebot ist ein aussagekräftiges Datenblatt der angebotenen Pumpe mit allen relevanten Angaben zu Betriebsdaten, Pumpenhydraulik, Antrieb, Wirkungsgrad und Werkstoffen beizulegen!Pumpe liefern und betriebsfertig montieren.[PERSON_090] / [PERSON_066]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id223"
+  },
+  {
+   "oz": "03012",
+   "oz_parts": [
+    "03",
+    "01",
+    "2"
+   ],
+   "quantity": 4.0,
+   "unit": "St",
+   "short_text": "[PERSON_092]",
+   "long_text": "Die Pumpe gemäß vorstehender Position (Zwischendruckerhöhung Entarsenierungsfilter und [PERSON_066]) ist vor Herstellung des Betonfundaments für die Pumpe zu installieren.Anzubieten ist ein stabiles Untergestell aus Stahlprofilen / Gewindestangen nach [PERSON_125] des Bieters für die Montage der Pumpe 30 cm über Fussboden, geeignet zum nachträglichen Ausgießen mit Beton.Lagesicherung durch Andübeln am Betonboden.[PERSON_092]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id385"
+  },
+  {
+   "oz": "03013",
+   "oz_parts": [
+    "03",
+    "01",
+    "3"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Treibpumpe [PERSON_110]",
+   "long_text": "YesTrockenläufer-BlockpumpeEinstufige [PERSON_054] in [PERSON_185]-Bauform fürFundamentaufstellung inklusive Fuß am Pumpengehäuse.Schwingungs- und geräuscharme Blockbauart mit Laterne undstarr verbundenem Standardmotor (Norm-Motor).Mit zwangsumfluteter, drehrichtungsunabhängiger Faltenbalg-Gleitringdichtung (ab 37 kW/4-polig optional mit einer Cartridge-Gleitringdichtung in Back-Pull-Out-System zumGleitringdichtungsaustausch ohne Demontage des Motors) undkavitationsreduzierendem Laufrad.Flansche mit Druckmessanschlüssen R 1/8. AlleGraugusskomponenten sind kataphoresebeschichtet.Pumpen mit Motoren > 5,5 kW verfügen serienmäßig überKaltleiterfühler als Motorschutz.Der Motorklemmkasten < 7,5 kW kann aus Metall oder Kunststoff sein. Die Motorklemmkästen > 7,5 kW sind immer aus Metall.- Gleitringdichtung für die Wasserförderung bis Tmax. = + 140°C.BetriebsdatenFördermedium: Trinkwasser 100 %Medientemperatur: 10 - 20,00 °CAngefragter [PERSON_094]: 21,00 m 3 /hAngefragte Förderhöhe: 38,00 mMin. Medientemperatur: 0 °CMax. Medientemperatur: 40 °CMin. Umgebungstemperatur: 0 °CMax. Umgebungstemperatur: 40 °CMaximaler Betriebsdruck: 16 barMindesteffizienzindex (MEI): > 0.4MotordatenMotor-Effizienzklasse: mind. IE3Netzanschluss: 3~400V/50 HzSpannungstoleranz: +-10 %Motornennleistung: 5,5 kWNenndrehzahl: 2900 1/minNennstrom: 9,9 ALeistungsfaktor: 0,9Motorwirkungsgrad (50 %): 86,7 %Motorwirkungsgrad (75 %): 88,9 %Motorwirkungsgrad (100 %): 89,2 %Isolationsklasse: FSchutzart: IP55Motorschutz: KLF integriertWerkstoffeBeschichtungen: für Trinkwasser zugelassenLaufrad: EN-GJL-200Welle: 1.4122Wellendichtung: AQ1EGGLaterne: 5.1301/EN-GJL-250EinbaumaßeSaugseitiger Rohranschluss: DN 50, PN 16Druckseitiger Rohranschluss: DN 32, PN 16Hersteller Pumpe: '.........................................................' (Wilo oder gleichwertig)[PERSON_129] Pumpe: '.........................................................................' (z. B. Atmos GIGA-B 32/230.1-5,5/2 oder gleichwertig)Dem Angebot ist ein aussagekräftiges Datenblatt der angebotenen Pumpe mit allen relevanten Angaben zu Betriebsdaten, Pumpenhydraulik, Antrieb, Wirkungsgrad und Werkstoffen beizulegen!Pumpe liefern und betriebsfertig montieren.Treibpumpe [PERSON_110]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id225"
+  },
+  {
+   "oz": "03014",
+   "oz_parts": [
+    "03",
+    "01",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_110]",
+   "long_text": "Die Pumpe gemäß vorstehender Position (Treibpumpe [PERSON_110]) ist vor Herstellung des Betonfundaments für die Pumpe zu installieren.Anzubieten ist ein stabiles Untergestell aus Stahlprofilen / Gewindestangen nach [PERSON_125] des Bieters für die Montage der Pumpe ca. 50 cm über Fussboden, geeignet zum nachträglichen Ausgießen mit Beton.Lagesicherung durch Andübeln am Betonboden.[PERSON_110]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id388"
+  },
+  {
+   "oz": "03015",
+   "oz_parts": [
+    "03",
+    "01",
+    "5"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Kellerentwässerungspumpe",
+   "long_text": "YesEntwässerungspumpe für SchmutzwasserTauchpumpe mit offenem LaufradEinphasen-WechselstrommotorSchutzart IP 68mit [PERSON_078] 10 m für bauseitigen FestanschlussAnsteuerung über bauseitige NiveaumessungWerkstoffe:Pumpengehäuse: PolypropylenLaufrad: Polypropylen/PolyamidMotorgehäuse: 1.4301Abdichtung: SIC/SiCLaufradseitig: WellendichtringeGleitringdichtung Motorseitig: WellendichtringFördergut: Schmutzwasser (fäkalienfrei, freier Durchgang Pumpe mind. 10 mm)Förderstrom Q: 11 m3/hFörderhöhe H: 7,0 mAnschlussleistung: '............' kWEinschaltart: direktDruckstutzen: '.............' Zollangebotenes Fabrikat: '.................................................' (z. B. Wilo od. glw.)angebotener [PERSON_129]: '.................................................'inkl. allem Befestigungs- und MontagezubehörEinbauort: Untergeschoss Maschinenhaus, Pumpensumpfkomplett liefern und montieren, einschließlich passendem Übergang auf weiterführende Druckleitung aus [PERSON_115]-Pressfittingrohr, DN 50Kellerentwässerungspumpe",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id226"
+  },
+  {
+   "oz": "03021",
+   "oz_parts": [
+    "03",
+    "02",
+    "1"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "[PERSON_066] inkl. Verdichtereinheit",
+   "long_text": "YesHochleistung- Kreuzstrombelüftungsanlage in einstöckiger Bauweise gemäß [PERSON_128] inklusive Versichtereinheit und Untergestellkomplett gefertigt, geliefert und funktionsfähig montiert Alle nachstehend genannten Abmessungen sind Mindestabmessungen (siehe [PERSON_128]).Auslegungsdaten: Wasservolumenstrom:Betriebsfall Max: 11 l/s (40 m³/h)gelöste Kohlenstoffdioxid-Konzentrationenim Zulauf: 22 mg/lim Ablauf: 7 mg/leinzustellender pH-Wertim Ablauf: >= 7,70Abmessung (ca.): Breite 2300 mm; Tiefe: 1350 mm Höhe: 650 mm bestehend aus:1 Stück Einlaufteil:wie beschrieben, jedoch mit folgenden weiteren Eigenschaften:Bauteilmaße: Breite: 320 mm; Tiefe: 1350 mm Höhe: 650 mmzusätzliche Einbauten:1x Flanschanschluss für Rohwasser DN150Muffe R=2\" im oberen Teil1x Gewindemuffe 1\" im unteren Bodenblech1x Muffe 1/2\" zur Probenahme1x sämtliche erforderlichen Dichtungen, Schraub- undVerbindungsmittel 1 Stück Auslaufmodulwie beschrieben jedoch mit folgenden weiteren Eigenschaften:Bauteilmaße: Breite: 320 mm; Tiefe: 1350 mm Höhe: 650 mmzusätzliche Einbauten:1x Muffe R=2\" im oberen Teil1x Flanschanschluss für belüftetes [PERSON_029] DN1501x Gewindemuffe 1\" für Restentleerung im unteren Bodenblechsämtliche erforderlichen Dichtungen, Schraub- und Verbindungsmittel 1 Stück Reaktionsmodul (Mittelmodul)wie beschrieben jedoch mit folgenden weiteren Eigenschaften:1x Flanschanschluss für Abluft DN1502x Flanschanschluss für Zuluftzusätzliche Einbauten je Reaktionsmodul:frontseitige Wartungsöffnung: 1456 mm x 526 mmInspektionsöffnung im oberen Blech: 290 mm x 290 mm1x vierteiliges Luftverteilsystem wie vor beschrieben; max. zulässiger Druckverlust von 1,9 mBar bei 400 m³/hfür das gesamte System;2x Hochleistung-Belüftereinheit wie vor beschrieben mit je8 Belüfterkerzen a 1000 mm1x Gewindemuffe 2\" für Restentleerung im unterenBodenblech2x Prozessluftanschluss DN100sämtliche erforderlichen Dichtungen, Schraub- und VerbindungsmittelUm einen ungehinderten Abluftstrom zu gewährleisten werden für das Reaktionsmodul folgende verbindliche Mindestbauteilmaße festgelegt: Breite: 1580 mm; Tiefe: 1350 mm;Höhe: 650 mm Hochleistungs-LuftverdichtereinheitSchallgedämmte, hoch effiziente, regelbare Verdichtereinheit als anschlussfertiges Kompaktgerät, für den Betrieb in geschlossenen Luftkanalsystemen zur Versorgung der Hochleistungs-Kreuzstrombelüftungsanlage mit Prozessluft im KompressorbetriebHinweis: Die berufsgenossenschaftlichen Unfallverhütungsvorschrift \"Lärm\" BGV B 3, (früher VBG 121) sind in jedem Falle einzuhaltenmit folgenden weiteren Eigenschaften/AusrüstungenBiegesteife [PERSON_069] aus [PERSON_115] Mat.: 1.4301 mit sämtlichen Versteifungen und Zentrierbolzen zur Arretierung einer Schallbox; sowie zwei auf Schwingungsdämpfer gelagerte Luftverdichter; Schallbox fünfteilig, durch Spannverschlüsse leicht montierbar, Rahmen und Seitenteile aus Edelstahlblech Mat.: 1.4301; Innenauskleidung aus Polyätherschaumstoff schwer entflammbar nach DIN 4102-A2; Komplettes automatisiertes Kühlsystem zum Schutz der Verdichtermotortemperatur mit integriertem Motorventilator, gekoppelt mit dem Verdichterbetrieb, sowie mit in Schallhaube integriertes Manometer; Je Verdichter in Schallhaube integrierter Ansaug- und Abluftschalldämpfer; Kühlsystem so ausgelegt, dass bei einer Umgebungstemperatur von +15° C, die innere Schallbox-temperatur von +30 °C bei Volllastbetrieb beider Verdichter nicht überschritten wird; In die Schallbox eingearbeitete passgenaue, schallhemmende Rohrdurchführungen zur Aufnahme der Saug und [ORT_031]; Luftverdichter betriebsfertig montiert; Saug- und Druckluftleitungen an den Verdichtern montiert und mittels Kompensator kraftschlüssig entkoppelt, endend mit außen liegenden Anschlussflanschen; Luftverdichter mit Antriebsmotor als drehzahlregelbarer Kurzschluss-Drehstrom-Motor eines europäischen Markenfabrikates; Schutzart min. IP54; Korrosionsgeschützte Welldichtring auf Edelstahlbuchse;Weitere technische Angaben:(Angaben in Klammern gelten für Leitfabrikat)LuftverdichtereinheitAnzahl der Verdichter: 1 StückVersorgungsspannung: 400 VNennleistung: '................' kW (2,2 kW)je VerdichterStromaufnahme in Betriebspunkt 1:Ansaugvolumen: 400 Nm³/hDruckdifferenz (dynamisch) 50 mbarStromaufnahme gesamt: '..............' ASchallpegel max. '..............' dB(A) (max. 65 dB(A)Stromaufnahme in Betriebspunkt 2:Ansaugvolumen: 300 Nm³/hDruckdifferenz (dynamisch) 50 mbarStromaufnahme gesamt: '..............' ASchallpegel max. '..............' dB(A) (max. 65 dB(A)Gewicht: '................' kgAbmessung: (LxBxH) '.....................................................'mmUntergestell für Hochleistungs-KreuzstrombelüftungsanlageStabile Profilstahlkonstruktion zur Aufnahme bzw. exakten Lagerung einer einstöckigen Kreuzstrombelüftungsanlage;Konzeptionell so auszuführen, dass die Bedienung, Handhabung sowie die Revisionsarbeiten der Anlage nicht beeinträchtigt werden.Weiteren Spezifikationen:Sämtliche Stahlteile in nichtrostenden [PERSON_089] mit der Werkstoffnr. 1.4301, in ferritfreien Räumen gefertigt und nach der Bearbeitung im Vollbad gebeizt und passiviert; Werkseitig in Folie verpackt und mit Folie montiert;Untergestell entsprechend für das max. Störfallgewicht von 22 kN statisch dimensioniert; die aus dem Betrieb resultierende dynamische Belastung ist dabei zu berücksichtigen;Die zulässige maximale Durchbiegung liegt bei 1/600 der Spannweite;Das Untergestell muss auch hinsichtlich auftretender Querkräfte ausreichend dimensioniert sein, als Querkraft wird ein 1/20 des Störfallgewichtes angesetzt;Untergestell mit Längs-, Quer- und Diagonalprofilen so gestaltet, dass eine möglichst großflächige satte Auflage der Blechflächen der Module erreicht wird, d.h. jedes Reaktionsmodul ist mit mind. drei Auflagern zu unterbauen; Seitliche Anschlagbleche zur Zentrierung und zur Verhinderung einer horizontalen Verschiebung der Module auf dem Untergestell; Ausreichende Anzahl an höhenverstellbaren stabilen Füßen zur exakten waagrechten Ausrichtung der Module; Die komplette Profilstahlkonstruktion ist schraubbar in montagfreundlichen Einzelteilen anzuliefern, Schweißungen vor Ort sind unzulässig;Hersteller / [PERSON_129]: '.........................................................................' (z.B. GfW Gesellschaft für [FIRMA_068], [ORT_028], oder gleichwertig)[PERSON_066] inkl. Verdichtereinheit",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id229"
+  },
+  {
+   "oz": "03022",
+   "oz_parts": [
+    "03",
+    "02",
+    "2"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Luftfiltereinheit [PERSON_066]",
+   "long_text": "YesLuftfilteranlage aus [PERSON_115] WSt.-Nr. 1.4571,beidseitig rnit Rohranschlüssen und ggf. Reduzierung derselben auf DN 200 (siehe Hinweis weiter unten!), Spitzende,Luftdurchsatz inkl. Reserve mindestens 900 m3 pro Stunde (passend zu den Verdichtern für die Luftversorgung der vorstehend angebotenen [PERSON_066]),Mit abnehmbarem Deckel als Wartungsöffnung der Filter,alle Filterelemente leicht kontrollierbar und auswechselbar,Berstdruck der Filter 800 Pa,Kondenswasserablauf für Frisch- und Reinluftseite mit 1/2-Zoll AG, für den bauseitigen Anschluss an eine Entleerungsleitung,einschl.Differenzdruckmesser mit örtlicher LCD-Anzeige und potentialfreiem Anschlusskontakt zum bauseitigen Anschluss an die Prozessleittechnik (Übertragung von aktuellem Differenzdruck), einschließlich der erforderlcihen Anschlüsse vor/nach der Filtereinheit im FiltergehäuseLuftfilter:1 St. Feinstaubfilter F7 nach EN 779, Abscheidegrad > 90 %1 St. Schwebstofffilter H13 nach EN 779, Abscheidegrad > 99,95 %einschl. Dokumentation für Luftfilteranlageeinschl.Wandkonsolen zu angebotener [PERSON_162]:Winkel 50/50, Länge 450/400 mm,lichter Wandabstand 50 bis 100 mm,mit BefestigungsmaterialDie beidseits anzuschließende Luftleitung wird in Nennweite DN 200 ausgeführt. Wenn die Anschlüsse der [PERSON_162] eine davon abweichende Nennweite haben, ist die beidseitige Reduzierung der Rohrleitung auf DN 200 in die Position einzurechnen!Angebotenes Fabrikat: '...........................................................' (Elementbau Glogger, [FIRMA_062] oder gleichwertig)angebotener [PERSON_129]: '...........................................................'Kastenaußenmaße Gehäuse: '..................................................' B x H x T in mmEinbauort: [PERSON_066].komplett inkl. allem Montagezubehör liefern und montieren.Luftfiltereinheit [PERSON_066]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id230"
+  },
+  {
+   "oz": "03023",
+   "oz_parts": [
+    "03",
+    "02",
+    "3"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Lüftungsjalousie aus [PERSON_115] Zuluft/Abluft [PERSON_066]",
+   "long_text": "YesLüftungsjalousie aus [PERSON_115] WSt. 1.4571mit starren Lamellen für die Wandaußenseite,Einbaurahmen als Z-Profil 40 / 45 / 25 / 2 mm,Lamellen Z-förmig gekantet, Materialstärke mind. 2 mm, völlig überlappend, starr eingeschweißt, regenabweisend und stochersicher.lnsektenschutzgitter aus [PERSON_115] Maschung 1 x 1 mm,auf den Einbaurahmen aufgeklebt, demontierbar,mit verlängertem [PERSON_007] entsprechend der Wandstärke.Befestigung mittels Dübellaschen in der Mauerlaibung,von außen nicht demontierbar,Einschließlich Adapterplatte mit eingeschweißtem Rohrstutzen DN 200 als Übergang zu weiterführenden Luftleitungen.Durchsatz entsprechend der Leistung der zu den Flachbettbelüftern gehörigen Verdichter inkl. Reserven: mind. 900 m3/h.mit allem erforderlichen BefestigungsmaterialMaße:[PERSON_007]: passend für Holzrahmenkonstruktion, Gesamtstärke ca. 20 cm.Abmessungen einschließlich Abdeckrahmen: umlaufend mind. 100 mm größer als \"[PERSON_007]\"Querschnitt weiterführende Luftleitung: DN 200 mmAngebotenes Fabrikat: '....................................................' (Glogger, [FIRMA_062] oder gleichwertig)Erforderliche Abmessungen Maueröffnung, sofern die oben genannte geplante Rohbaulichte für den maximal geforderten Luftdurchsatz nicht ausreichend ist:B x H = '...........................................' mmEinbauort: Abluft Flachbettbelüfterliefern und montierenLüftungsjalousie aus [PERSON_115] Zuluft/Abluft [PERSON_066]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id231"
+  },
+  {
+   "oz": "03024",
+   "oz_parts": [
+    "03",
+    "02",
+    "4"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Über-/Unterdrucksicherung Gebäude",
+   "long_text": "YesSicherheitsventilzur Überdruck-/Unterdrucksicherung des Gebäudes (Aufstellraum [PERSON_066])Gehäuse kompl. aus [PERSON_115] mind. WSt. 1.4301,Gesamtkonstruktion wartungsfrei.Durchflussleistung inkl. Reserve: mind. 900 m3/hAnsprechdruck: 650 Pa Unterdruck/Überdruck (6,5 mbar),Anschlussflansch: entsprechend angebotenem Fabrikat/[PERSON_129],einschließlich Herstellung des für den Einbau des Sicherheitsventils erforderlichen passenden Abzweigs/Abgangs in Edelstahlrohrleitung DN 200 und Flanschverbindung oder zugfester Rohrkupplung, inkl. allem erfordelichen Schrauben-, Dichtungs- sonst. Verbindungsmaterial.Angebotenes Fabrikat/[PERSON_129] Über-/Unterdruckventil:'.........................................................'(z. B. Glogger oder gleichwertig)liefern und montieren.Über-/Unterdrucksicherung Gebäude",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id232"
+  },
+  {
+   "oz": "03025",
+   "oz_parts": [
+    "03",
+    "02",
+    "5"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Thermische Luftmengenmessung",
+   "long_text": "YesMessgerät für Durchfluss - LuftThermisches Massedurchflussmessgerätzum Einbau in luftführende Rohrleitungen; zur direkten Massedurchflussmessung ohne zusätzliche Druck- und Temperaturkompensation; robuste KompaktausführungMessmedium LuftMessbereich: '......................' (0 bis 10000) Nm³/h (geplanter Nennvolumenstrom 800 Nm3/h)Druckabfall bei MBE '.......................' mbarverschmutzungshemmend gekapselter Sensor, Ansprechzeit 0,5 sZentrierstift und Anschlussflansch zum definierten Rohrleitungseinbau des SensorsMesswertabweichung: 0,9% v. MW +- 0,05% v. MBE bei LuftReproduzierbarkeit: 0,25 % v. MesswertUmgebungstemperatur: 5 bis 25 °CTemperatur Messmedium: 10 bis 25 °CBetriebsdruck an der Messstelle: 40 bis 70 mbar(ü)Schutzart: IP 65Stromausgang: 4 bis 20 mAHilfsenergie: 24 V DC (+-25%)Präzisionsmesstrecke zur Aufrechterhaltung des laminaren Strömungsprofils; als Präzisionsformstück ohne Kanten und Übergänge (keine Wirbelgefahr);Aufnahmeadapter für vor genanntes Messgerät radial eingeschweißt für gewünschte Messgenauigkeit mit folgenden Toleranzen:radiale Lage des Messpunktes der Sonde +-0,5 mmWinkelstellung des Aufnahmeadapters +-0,2 Gradmit beidseitigen Flanschanschluss DIN EN1092-1 Form A (passend zu den Flanschen der weiterführenden Luftrohre)Kalibrierung Messgerät mit PräzisionsmesstreckeSpezialdichtungen zur Minimierung des RingspaltesNennweite: DN200Baulänge: 350 mmHersteller/Lieferant: '............................................................' (z. B. GfW Gesellschaft für [FIRMA_068] oder gleichwertig)[PERSON_129]: '....................................................................' (z. B. Airmaster DN 200 oder gleichwertig)Bei abweichendem Hersteller/[PERSON_129]/Nennweite ist dem Angebot ein Datenblatt mit allen relevanten Angaben (Messbereich, Messgenauigkeit, Anschlussnennweiten, Baulänge, Beruhigungsstrecken etc.) beizulegen.Thermische Luftmengenmessung",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id233"
+  },
+  {
+   "oz": "03031",
+   "oz_parts": [
+    "03",
+    "03",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_070]",
+   "long_text": "YesBig Bag [PERSON_070] [PERSON_129] BBE-2.1Material [PERSON_115] Z.-Nr. 58.00.00.00-R3,für frei fließende Schüttgüter, insbesondere auch zum Einsatz in niedrigen Räumen,bestehend aus einem robusten Stahlgestell, einschl. Hubvorrichtung. Die Hubvorrichtung ist rollengelagert und mit einem verstellbaren Kettenskonus ausgestattet, der den Big Bag konisch ausformt.Auslösung der Hubvorrichtung durch Gasfedern bei Gewichtsabnahme im Big Bag. Passend für nahezu alle Big Bag Größen.Für Big Bags Abmessung: bis ca. 120 cm x 100 cm (B x L), Gesamthöhe: ca. 1190 mm Gasfederhub: ca. 350 mm Gestellmaterial: [PERSON_115] 1.4301Oberfläche: Glasperlen gestrahltEinschließlich wartungsfreier Seiliris-Dosierarmatur, [PERSON_129] BIDV-7.1-S-S, Langversion, mit Handbetätigung und Nachverriegelung.(Die Nachverriegelung dreht die Armatur mittels integrierter Gasfedern bei Materialsetzung im Big Bag Auslauf selbsttätig weiter zu). Die Armaturendreheinheit besteht aus einem Rollengeführten Drehkranz mit glasfaserstabilisierten Edelstahlseilbögen, kunststoffarmiert, die Irisförmig angeordnet sind. Der Handhebel dreht um 180° und ist in den Endstellungen im Rahmenprofil versenkt.Armaturengrundgehäuse: Material 1.4301Armaturenmechanik: Material 1.4301 ausgenommen LagerArmaturendreheinheit: Material 1.4301Die Mechanik der Armatur ist wartungsfrei. Funktionen direkt am Big Bag Auslauf: verschließen Produktkörnung kleiner 5 µm, dosieren, wiederzubinden (teilentleerte Big Bags sind dadurch wieder herausnehmbar).Einschließlich 1 Stück Unterpodest für [PERSON_070],ausgeführt als robustes Edelstahlgestell, Fußausführung Stahlplatten mit Befestigungsbohrungen. Der [PERSON_070] ist U-förmig zur Frontseite hin offen.Material: [PERSON_115] 1.4301Oberfläche: Glasperlen gestrahltAufstellhöhe: ca. 1200 mm - an örtliche Gegebenheiten anzupassen: vor Bestellung Abstimmung auf bauseits zu lieferndes Hebezeug erforderlich!.Lieferant/Hersteller: '......................................................' (z. B. BIG BAG SYSTEMS, [ORT_015] oder gleichwertig)[PERSON_129]: '......................................................' (z. B. [PERSON_129] BBE-2.1 od. gleichwertig)Liefern und betriebsfertig montieren.[PERSON_070]",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id235"
+  },
+  {
+   "oz": "03032",
+   "oz_parts": [
+    "03",
+    "03",
+    "2"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Flüssigkeitsstrahl-Feststoffpumpe",
+   "long_text": "YesFlüssigkeitsstrahl-Feststoffpumpeaus CrNi-[PERSON_089], stationär,Lieferant/Hersteller: [FIRMA_022] oder gleichwertigTyp: FFeP aus CrNi-[PERSON_089] (stationär), Bestellnummer 181001 473195 oder gleichwertigAngebotenes Fabrikat: '.....................................................'Angebotener [PERSON_129]: '.....................................................'Liefern und betriebsfertig installieren.Flüssigkeitsstrahl-Feststoffpumpe",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id236"
+  },
+  {
+   "oz": "03041",
+   "oz_parts": [
+    "03",
+    "04",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "psch",
+   "short_text": "Wasserstrahlventilator 60 m3/h",
+   "long_text": "YesWasserstrahlventilator zur Entsäuerung und Sauerstoffanreicherung von Brunnenrohwasser,Bemessungsdurchsatz: 60 m³/h Flüssigkeitsstrahl-Ventilator DN 150, mit folgenden Anschlüssen: Saugseite [PERSON_060]: DN 80, PN 16 (seitlich)Treibwasserseite: DN 100, PN 16 (axial)Gemischsaustritt: DN 150, PN 10 (Losflansch aus 1.4541)Abmessungen: Gesamtlänge: ca. 1.680 mmZwischen Treibseite undGemischaustritt: ca. 1.500 mmGewicht: ca. 50 kgAusführung: Kopf, Mischstrecke und Diffusor komplett geschweißt aus CrNi-[PERSON_089] 1.4571. Auswechselbares Treibdüsensystem ebenfalls aus CrNi-[PERSON_089] 1.4571/81.Einschließlich Ringdrosselklappe DN 80 aus CrNi-[PERSON_089], die zwischen Saugseite und dem Gegenflansch der weiterführenden Rohrleitung montiert wird.Leistungsdaten im Auslegungspunkt (in Bezug auf die Anschlüsse):Saugstrom: 120 Nm³/h [PERSON_060] Saugstromtemperatur: 20 °CSaugdruck: 995 mbar abs. = minus 50 mmWs (Druckverlust für Luftfilter und Drosselklappe)Treibstrom: 60 m³/h WasserTreibwasserdruck: 1,8 bar abs. = 8 mWS Gemischaustritt: 1,030 bar abs. = +300 mmWS Erreichbarer Entsäuerungsgrad: 60 % Einbaulage: Senkrecht mit Wasserströmung von oben nach unten. Ein nachgeschaltetes Fallrohr darf max. 300 mm lang sein und muss in der Anschlussnennweite der Strahlpumpe verlegt werden. Es kann max. 300mm unterhalb des Wasserspiegels abgetaucht werden.Auslegung: Die druckführenden Bauteile des Flüssigkeitsstrahl-Ventilators werden ausgelegt für:Gehäuse: min./max. zulässiger Druck PS: -0,5/+0,5 bar min./max. zulässige Temperatur TS: 5/30 °C Treibdüse: max. zulässiger Druck PS: 2 bar min./max. zulässige Temperatur TS: 5/30 °C Berechnungscode: AD-2000Einstufung nach Richtlinie 2014/68/EU: Bei Einstufung gemäß Richtlinie 2014/68/EU, Fluidgruppe 2, Mediumzustand flüssig oder gasförmig, ergibt sich nach Artikel 4, Absatz (3), dass lediglich gute Ingenieurpraxis angewendet werden muss. Ein CE-Zeichen darf nicht angebracht werden.Einschließlich Dokumentation, vorzulegen im pdf-Format (siehe auch eigene Position im Abschnitt \"Baustelleneinrichtung und Dokumentation\"):verbindliche Zeichnung,Einbau- und Betriebsanweisungen Zertifikate in der nachstehend beschriebenen FormEinschließlich Werksabnahme, bestehend aus interner Bauprüfung sowie einer Wasserdruckprüfung, einschl. Werksprüfzeugnis mit Bestätigung von:Vorgeschriebener Werkstoff Einhaltung relevanter Maße Sichtprüfung WasserdruckprüfungHersteller/Lieferantund Baugröße: '..................................................................' (z. [FIRMA_090], DN 150 / 60 m3/h oder gleichwertig)Liefern und betriebsfertig montieren, inkl. allem erforderlichen Befestigungsmaterial und Inbetriebnahme im Rahmen der Gesamtinbetriebnahme.Wasserstrahlventilator 60 m3/h",
+   "is_lump_sum": true,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id238"
+  },
+  {
+   "oz": "03051",
+   "oz_parts": [
+    "03",
+    "05",
+    "1"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Erneuerung Filterdüsen (inkl. Ausbau vorh. Düsen)",
+   "long_text": "YesFilterdüsen in vorhandenem offenen Filterbecken ausbauen und entsorgen - Fläche je Filterboden 5,9 m2, Anzahl Düsen ca. 410 Stück.Neue Filterdüsen in folgender Ausführung einbauen:Polsterrohrdüsen, Luftschlitz im Polsterrohr gratfrei und mindestens 2 mm breit; über dem Schlitz angeordnete gratfreie \"Arbeitsbohrung\" mit mindestens 2 mm Durchmesser; mit der Möglichkeit eines Höhenausgleiches von mindestens 5 mm;Düsenanzahl ca 410 Stück / Filter(70 Stück pro m2)Düsenfabrikat: '........................' (z.B. KSH)Düsentyp: '........................' (z.B. [PERSON_129] S3 o. glw.)Achtung: Düsen dürfen erst nach Freigabe durch Bauleitung montiert werden! Die endgültige Festlegung der Filterdüsen kann erst nach Ausbau des Filtermaterials in den offenen Filtern und Feststellung des Bestands erfolgen.Preis liefern und montieren pro FilterErneuerung Filterdüsen (inkl. Ausbau vorh. Düsen)",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id240"
+  },
+  {
+   "oz": "03052",
+   "oz_parts": [
+    "03",
+    "05",
+    "2"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Filterfüllung Entarsenierungsfilter",
+   "long_text": "YesStütz- und Filterschichten für offenen Entarsenierungsfilter liefern und einbauen:Die Entarsenierungsfilter haben eine Grundfläche von jeweils rund 6,0 m2.Stützschicht:[PERSON_005] aus gewaschenem und feuergetrocknetem Quarzkies nach DIN 12904,Körnung 2,00-3,15 mmHöhe der [PERSON_005] 30 cm (1,8 m3 Schüttvolumen eingebaut)Lieferfirma: '.................................................' (z.B. Amberger Kaolinwerke)Filterschicht:[PERSON_058] GEH 102Hersteller: [FIRMA_032] 49090 OsnabrückEinbaumenge je Filter: 8.300 kgentspricht einer Schichthöhe von: 1,20 mDie Materialmenge je Entarsenierungsfilter entspricht einer Liefermenge von 10 Big Bags von je 830 kg.Die Schichten sind unbedingt getrennt nacheinander einzubringen!Bei der Einbringung von Stütz- und Filterschichten sind die Herstellervorschriften für Befüllung, Einbauspülung und Desinfektion zu beachten:Teilbefüllung des Filterbeckens mit [PERSON_029] zur Vermeidung von Beschädigungen an den FilterdüsenQuarzkies nach DIN 12904 als [PERSON_005] nach Vorgaben des Herstellers einbringen, einebnen und spülenHydraulische Einbringung des GEH® mittels Injektorsystem und TreibwasserEinbauspülung im Aufstrom zur Entfernung des Feinkorns aus dem Adsorberbett, Rückspülgeschwindigkeit 26 m/h; Spülung bis zur Trübungsfreiheit des Ablaufwassers (ca. 15 Minuten)Die Anlieferung erfolgt in Big Bags. Der Einbau erfolgt unter Verwendung des ebenfalls im Umfang dieses Leistungsverzeichnisses enthaltenen Beschickungssystems aus Treibpumpe und Big-Bag-Entleerungssystem.Für den Zeitraum der Einbringung der Filterfüllungen ist für die Kalkulation davon auszugehen, dass noch keine Armaturen elektrisch angeschlossen sind, d.h. entsprechender Zeitaufwand für Hand-Vor-Ort-Bedienung der Anlage ist einzurechnen und wird nicht separat vergütet.Stütz- und Filterschichten komplett liefern und fachgerecht einbauen für 1 FilterFilterfüllung Entarsenierungsfilter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id241"
+  },
+  {
+   "oz": "03053",
+   "oz_parts": [
+    "03",
+    "05",
+    "3"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Desinfektion Entarsenierungsfilter",
+   "long_text": "Nach Abschluss der Einbauspülung ist eine separate Desinfektion der offenen Entarsenierungsfilter mit Wasserstoffperoxid gemäß Herstellerempfehlung GEH® durchzuführen.Das Desinfektionsmittel, z. B. 1 Gebinde Veolia Hydrex 9561 je Filter, ist in den Filter einzubringen.Nach einer Einwirkzeit von mind. 2 Stunden wird eine Desinfektionsspülung im Aufstrom zur Entfernung des mit Desinfektionsmittel beaufschlagten [PERSON_029]s aus dem Adsorberbett, Rückspülgeschwindigkeit 26 m/h, durchzuführen; Spülung bis zur Trübungsfreiheit des Ablaufwassers und für Mehrfachen Wasseraustausch im Filterbett, Dauer mindestens 10 Minuten.Desinfektion Entarsenierungsfilter",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id242"
+  },
+  {
+   "oz": "03054",
+   "oz_parts": [
+    "03",
+    "05",
+    "4"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Demontage und Wiedermontage Überlaufrinne Filterbecken",
+   "long_text": "In den offenen Filterbecken sind Überlaufrinnen aus [PERSON_115] verbaut.Länge der Rinne: rund 3,0 mFoto der Rinne siehe Baubeschreibung (Abb. 5 und 7).Die Rinne ist im Zuge der Demontagearbeiten zu demontieren, sorgfältig in Folie zu verpacken und für die Wiedermontage zu lagern.Nach Abschluss der baulichen Sanierung / vor Einbringung des neuen Filtermaterials ist die Rinne wieder in das Filterbecken zu montieren.Demontage, Schutz, Zwischentransport auf der Baustelle, Wiedermontage der Überlaufrinne inkl. neuem Befestigungsmaterial. Abrechnung je Filterbecken.Demontage und Wiedermontage Überlaufrinne Filterbecken",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id243"
+  },
+  {
+   "oz": "03055",
+   "oz_parts": [
+    "03",
+    "05",
+    "5"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Demontage und Wiedermontage Filterbodenentlüftung Filterbecken",
+   "long_text": "In den offenen Filterbecken sind Pressfitting-Rohrleitungen DN 50 für die Filterbodenentlüftung eingebaut.Länge der Leitungen rund 5 mFoto der Leitung (soweit sichtbar) siehe Baubeschreibung (Abb. 5 und 7).Die Rohrleitung einschließlich Magnetventil ist zu demontieren und in Folie einzupacken.Nach Abschluss der baulichen Sanierung / vor Einbringung des neuen Filtermaterials ist die Rohrleitung zu desinfizieren und wieder in das Filterbecken zu montieren.Demontage, Schutz, Zwischentransport auf der Baustelle, Wiedermontage der Filterbodenentlüftungsleitung mit eingebautem Magnetventil, inkl. neuem Befestigungsmaterial/Rohrhalterungen, Abrechnung je Filterbecken.Demontage und Wiedermontage Filterbodenentlüftung Filterbecken",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id244"
+  },
+  {
+   "oz": "04011",
+   "oz_parts": [
+    "04",
+    "01",
+    "1"
+   ],
+   "quantity": 6.0,
+   "unit": "St",
+   "short_text": "Magnetisch-Induktive Durchflussmessung DN 100",
+   "long_text": "YesMagnetisch-induktiver Durchflussmesser als Flanschversion:geeignet für den Einsatz mit TrinkwasserNennweite DN 100Druckstufe PN 16Auskleidung PPProzessanschluss: Flansch nach EN 1092-1, PN16Ausführung: KompaktbauformMessgenauigkeit: Abweichung max. +/- 0,5 % des Messwertsmit BedienungsdisplayZertifikat: Trinkwasserzulassungen KTW, DVGWMessbereich frei EinstellbarFeldgehäuse StahlblechEMSR-technische Merkmale:Spannung 230 V, 50 HzAusgänge: Strom- /Impuls- und SchaltausgängeSchutzart IP 67Fabrikat / [PERSON_129]: [FIRMA_059] OPTIFLUX 2050 oder gleichwertigVom Bieter anzugeben, sofern von oben stehenden Vorgaben bzw. der Qualitäten des Leitfabrikats abweichend:Auskleidung: '................' Elektroden: Werkstoff-Nr.: '................ ' Kalibrierung: '................ ' Fabrikat/ [PERSON_129]: '......................................................'liefern und betriebsfertig montierenMagnetisch-Induktive Durchflussmessung DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id247"
+  },
+  {
+   "oz": "04021",
+   "oz_parts": [
+    "04",
+    "02",
+    "1"
+   ],
+   "quantity": 6.0,
+   "unit": "St",
+   "short_text": "Manometer bis 1 bar",
+   "long_text": "YesRohrfeder-Glyzerin-Manometerzum Einbau in [PERSON_060] oder Trinkwasser führende Rohrleitungen.Gehäuse, Bajonettring, Druckzapfen und Zeigerwerk, komplett aus CrNi-[PERSON_089] ([PERSON_176]), Ziffernblatt Aluminium weiß, Skalierung [PERSON_031], Zeiger in Aluminium, schwarzAnzeigendurchmesser: 100 mmFüllflüssigkeit: GlyzerinMessgenauigkeit: mind. Klasse 1,0Messbereich: 0 - 1,0 barFabrikat: '........................................' (Wika oder gleichwertig)[PERSON_129]: '.......................................'Manometerventil mit Prüfflansch 1/2 Zoll siehe eigene Position.liefern und montieren.Manometer bis 1 bar",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id249"
+  },
+  {
+   "oz": "04022",
+   "oz_parts": [
+    "04",
+    "02",
+    "2"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Manometer bis 3 bar",
+   "long_text": "Rohrfeder-Glyzerin-Manometerzum Einbau in [PERSON_060] oder Trinkwasser führende Rohrleitungen.Messbereich: 0 - 3 bar,sonst wie vorManometerventil mit Prüfflansch 1/2 Zoll siehe eigene Position.liefern und montieren.Manometer bis 3 bar",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id250"
+  },
+  {
+   "oz": "05011",
+   "oz_parts": [
+    "05",
+    "01",
+    "1"
+   ],
+   "quantity": 20.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 65",
+   "long_text": "Edelstahlrohr DN 65, bis PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,76,1 x 2,0 mmEdelstahl-Rohr DN 65",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id254"
+  },
+  {
+   "oz": "05012",
+   "oz_parts": [
+    "05",
+    "01",
+    "2"
+   ],
+   "quantity": 5.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 80",
+   "long_text": "Edelstahlrohr DN 80, bis PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,88,9 x 2,0 mmEdelstahl-Rohr DN 80",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id255"
+  },
+  {
+   "oz": "05013",
+   "oz_parts": [
+    "05",
+    "01",
+    "3"
+   ],
+   "quantity": 25.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 100",
+   "long_text": "Edelstahlrohr DN 100, bis PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,114,3 x 2,6 mmEdelstahl-Rohr DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id256"
+  },
+  {
+   "oz": "05014",
+   "oz_parts": [
+    "05",
+    "01",
+    "4"
+   ],
+   "quantity": 5.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 125",
+   "long_text": "Edelstahlrohr DN 100, bis PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,139,7 x 2,6 mmEdelstahl-Rohr DN 125",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id257"
+  },
+  {
+   "oz": "05015",
+   "oz_parts": [
+    "05",
+    "01",
+    "5"
+   ],
+   "quantity": 100.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 150",
+   "long_text": "Edelstahlrohr DN 150, PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,168,3 x 2,6 mmEdelstahl-Rohr DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id258"
+  },
+  {
+   "oz": "05016",
+   "oz_parts": [
+    "05",
+    "01",
+    "6"
+   ],
+   "quantity": 100.0,
+   "unit": "m",
+   "short_text": "Edelstahl-Rohr DN 200",
+   "long_text": "Edelstahlrohr DN 200, bis PN 16Druckrohr gemäß Vorbemerkung Rohrleitungen,219,1 x 2,9 mmEdelstahl-Rohr DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id259"
+  },
+  {
+   "oz": "05017",
+   "oz_parts": [
+    "05",
+    "01",
+    "7"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 65, 45 - 90 Grad",
+   "long_text": "Bogen DN 65 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 76,1 x 2,0 mm, 45 - 90 Grad,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 65, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id260"
+  },
+  {
+   "oz": "05018",
+   "oz_parts": [
+    "05",
+    "01",
+    "8"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 80, 45 - 90 Grad",
+   "long_text": "Bogen DN 80 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 88,9 x 2,0 mm, 45 - 90 Grad,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 80, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id261"
+  },
+  {
+   "oz": "05019",
+   "oz_parts": [
+    "05",
+    "01",
+    "9"
+   ],
+   "quantity": 25.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 100, 45 - 90 Grad",
+   "long_text": "Bogen DN 100 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 114,3 x 2,6 mm, 45 - 90 Gradals Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 100, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id262"
+  },
+  {
+   "oz": "050110",
+   "oz_parts": [
+    "05",
+    "01",
+    "10"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 125, 45 - 90 Grad",
+   "long_text": "Bogen DN 125 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 139,7 x 2,6 mm, 45 - 90 Gradals Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 125, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id263"
+  },
+  {
+   "oz": "050111",
+   "oz_parts": [
+    "05",
+    "01",
+    "11"
+   ],
+   "quantity": 60.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 150, 45 - 90 Grad",
+   "long_text": "Bogen DN 150 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 168,3 x 2,6 mm, 45 - 90 Gradals Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 150, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id264"
+  },
+  {
+   "oz": "050112",
+   "oz_parts": [
+    "05",
+    "01",
+    "12"
+   ],
+   "quantity": 35.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Bogen DN 200, 45 - 90 Grad",
+   "long_text": "Bogen DN 200 PN 10gemäß Vorbemerkung Rohrleitungen,Abmessung 219,1 x 2,9 mm, 45 - 90 Grad,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Bogen DN 200, 45 - 90 Grad",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id265"
+  },
+  {
+   "oz": "050113",
+   "oz_parts": [
+    "05",
+    "01",
+    "13"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 65",
+   "long_text": "Abzweig DN 65 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 65, 76,1 x 2,0 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 65",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id266"
+  },
+  {
+   "oz": "050114",
+   "oz_parts": [
+    "05",
+    "01",
+    "14"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 80",
+   "long_text": "Abzweig DN 80 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 80, 88,9 x 2,3 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 80",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id267"
+  },
+  {
+   "oz": "050115",
+   "oz_parts": [
+    "05",
+    "01",
+    "15"
+   ],
+   "quantity": 6.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 100",
+   "long_text": "Abzweig DN 100 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 100, 114,3 x 2,6 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id268"
+  },
+  {
+   "oz": "050116",
+   "oz_parts": [
+    "05",
+    "01",
+    "16"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 125",
+   "long_text": "Abzweig DN 125 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 125, 139,7 x 2,6 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 125",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id269"
+  },
+  {
+   "oz": "050117",
+   "oz_parts": [
+    "05",
+    "01",
+    "17"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 45 Grad DN 100",
+   "long_text": "Abzweig DN 100 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 100, 114,3 x 2,6 mm,Anschlusswinkel 45 Gradliefern und montierenEdelstahl-Abgang 45 Grad DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id270"
+  },
+  {
+   "oz": "050118",
+   "oz_parts": [
+    "05",
+    "01",
+    "18"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 150",
+   "long_text": "Abzweig DN 150 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 150, 168,3 x 2,6 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id271"
+  },
+  {
+   "oz": "050119",
+   "oz_parts": [
+    "05",
+    "01",
+    "19"
+   ],
+   "quantity": 12.0,
+   "unit": "St",
+   "short_text": "Edelstahl-Abgang 90 Grad DN 200",
+   "long_text": "Abzweig DN 200 herstellenaus Druckrohr gemäß Vorbemerkung Rohrleitungen,abzweigendes Rohr DN 200, 219,1 x 2,9 mm,liefern und montierenEdelstahl-Abgang 90 Grad DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id272"
+  },
+  {
+   "oz": "050120",
+   "oz_parts": [
+    "05",
+    "01",
+    "20"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 65 / DN 50",
+   "long_text": "Reduzierung DN 65 / 50 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 65 / DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id273"
+  },
+  {
+   "oz": "050121",
+   "oz_parts": [
+    "05",
+    "01",
+    "21"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 100 / DN 50",
+   "long_text": "Reduzierung DN 100 / 50 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 100 / DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id382"
+  },
+  {
+   "oz": "050122",
+   "oz_parts": [
+    "05",
+    "01",
+    "22"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 100 / DN 65",
+   "long_text": "Reduzierung DN 100 / 65 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 100 / DN 65",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id274"
+  },
+  {
+   "oz": "050123",
+   "oz_parts": [
+    "05",
+    "01",
+    "23"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 100 / DN 50 exzentrisch",
+   "long_text": "Reduzierung DN 100 / 50 bis PN 16gemäß Vorbemerkung Rohrleitungen,exzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 100 / DN 50 exzentrisch",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id383"
+  },
+  {
+   "oz": "050124",
+   "oz_parts": [
+    "05",
+    "01",
+    "24"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 100 / DN 65, exzentrisch",
+   "long_text": "Reduzierung DN 100 / 65 bis PN 16gemäß Vorbemerkung Rohrleitungen,exzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 100 / DN 65, exzentrisch",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id384"
+  },
+  {
+   "oz": "050125",
+   "oz_parts": [
+    "05",
+    "01",
+    "25"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 100 / DN 80",
+   "long_text": "Reduzierung DN 100 / 80 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 100 / DN 80",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id275"
+  },
+  {
+   "oz": "050126",
+   "oz_parts": [
+    "05",
+    "01",
+    "26"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 150 / DN 100",
+   "long_text": "Reduzierung DN 150 / 100 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 150 / DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id276"
+  },
+  {
+   "oz": "050127",
+   "oz_parts": [
+    "05",
+    "01",
+    "27"
+   ],
+   "quantity": 12.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 200 / DN 150",
+   "long_text": "Reduzierung DN 200 / 150 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 200 / DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id277"
+  },
+  {
+   "oz": "050128",
+   "oz_parts": [
+    "05",
+    "01",
+    "28"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 250 / DN 150",
+   "long_text": "Reduzierung DN 250 / 150 bis PN 16gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 250 / DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id278"
+  },
+  {
+   "oz": "050129",
+   "oz_parts": [
+    "05",
+    "01",
+    "29"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Reduzierung DN 300 / DN 200",
+   "long_text": "Reduzierung DN 300 / 200 PN 10gemäß Vorbemerkung Rohrleitungen,konzentrisch,als Zulage zu vorbeschriebener Rohrleitung.Reduzierung DN 300 / DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id279"
+  },
+  {
+   "oz": "050130",
+   "oz_parts": [
+    "05",
+    "01",
+    "30"
+   ],
+   "quantity": 3.0,
+   "unit": "St",
+   "short_text": "Glasrohranzeiger Siphon",
+   "long_text": "Zulage zu Siphon für das Herstellen eines Abgangs für den Glasrohranzeiger,Glasrohranzeiger zur Kontrolle der Sperrwasserhöhe in Siphon DN 250 (Ablauf Schlammwasser) und DN 100 (Überlauf Reinwassertanks).Absperrventile zum Befüllen und Entleeren des Siphons, Einschweißmuffen für die Anbindung an die Rohrleitung und Kleinleitungen siehe eigene Positionen (Kugelhähne, Einschweißmuffen etc.).Der Siphon wird aus Rohrbögen erstellt und über die entsprechenden Rohrleitungsformstücke abgerechnet, einschließlich allem erforderlichen Montagematerial,komplett liefern und montierenGlasrohranzeiger Siphon",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id280"
+  },
+  {
+   "oz": "050131",
+   "oz_parts": [
+    "05",
+    "01",
+    "31"
+   ],
+   "quantity": 6.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 50, PN 10/16",
+   "long_text": "Glatter Flansch, DN 50, PN 10/16gemäß Vorbemerkung Rohrleitungen,einschließlich Schweißnaht, gebeizt und passiviert, als Zulage zu vorbeschriebener Rohrleitung.Schrauben, Beilagscheiben, Muttern und sonstige Verbindungsmittel sind in Werkstoff 1.4401, Muttern in Werkstoff 1.4571 einzubauen und einschließlich Dichtungen mit Stahleinlage und mit KTW-Zulassung in die Einheitspreise anteilig einzurechnen.[PERSON_115]-Flansch DN 50, PN 10/16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id281"
+  },
+  {
+   "oz": "050132",
+   "oz_parts": [
+    "05",
+    "01",
+    "32"
+   ],
+   "quantity": 32.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 65, PN 10/16",
+   "long_text": "Glatter Flansch, DN 65, PN 10/16gemäß Vorbemerkung Rohrleitungen,einschließlich Schweißnaht, gebeizt und passiviert, als Zulage zu vorbeschriebener Rohrleitung.Schrauben, Beilagscheiben, Muttern und sonstige Verbindungsmittel sind in Werkstoff 1.4401, Muttern in Werkstoff 1.4571 einzubauen und einschließlich Dichtungen mit Stahleinlage und mit KTW-Zulassung in die Einheitspreise anteilig einzurechnen.[PERSON_115]-Flansch DN 65, PN 10/16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id282"
+  },
+  {
+   "oz": "050133",
+   "oz_parts": [
+    "05",
+    "01",
+    "33"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 80, PN 10",
+   "long_text": "Glatter Flansch, DN 80, PN 10gemäß Vorbemerkung Rohrleitungen,einschließlich Schweißnaht, gebeizt und passiviert, als Zulage zu vorbeschriebener Rohrleitung.Schrauben, Beilagscheiben, Muttern und sonstige Verbindungsmittel sind in Werkstoff 1.4401, Muttern in Werkstoff 1.4571 einzubauen und einschließlich Dichtungen mit Stahleinlage und mit KTW-Zulassung in die Einheitspreise anteilig einzurechnen.[PERSON_115]-Flansch DN 80, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id283"
+  },
+  {
+   "oz": "050134",
+   "oz_parts": [
+    "05",
+    "01",
+    "34"
+   ],
+   "quantity": 60.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 100, PN 10",
+   "long_text": "Glatter Flansch, DN 100, PN 10gemäß Vorbemerkung Rohrleitungen,einschließlich Schweißnaht, gebeizt und passiviert, als Zulage zu vorbeschriebener Rohrleitung.Schrauben, Beilagscheiben, Muttern und sonstige Verbindungsmittel sind in Werkstoff 1.4401, Muttern in Werkstoff 1.4571 einzubauen und einschließlich Dichtungen mit Stahleinlage und mit KTW-Zulassung in die Einheitspreise anteilig einzurechnen.[PERSON_115]-Flansch DN 100, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id284"
+  },
+  {
+   "oz": "050135",
+   "oz_parts": [
+    "05",
+    "01",
+    "35"
+   ],
+   "quantity": 15.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 125, PN 10",
+   "long_text": "Glatter Flansch, DN 125, PN 10gemäß Vorbemerkung Rohrleitungen,einschließlich Schweißnaht, gebeizt und passiviert, als Zulage zu vorbeschriebener Rohrleitung.Schrauben, Beilagscheiben, Muttern und sonstige Verbindungsmittel sind in Werkstoff 1.4401, Muttern in Werkstoff 1.4571 einzubauen und einschließlich Dichtungen mit Stahleinlage und mit KTW-Zulassung in die Einheitspreise anteilig einzurechnen.[PERSON_115]-Flansch DN 125, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id285"
+  },
+  {
+   "oz": "050136",
+   "oz_parts": [
+    "05",
+    "01",
+    "36"
+   ],
+   "quantity": 175.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 150, PN 10",
+   "long_text": "Glatter Flansch, DN 150, PN 10sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Flansch DN 150, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id286"
+  },
+  {
+   "oz": "050137",
+   "oz_parts": [
+    "05",
+    "01",
+    "37"
+   ],
+   "quantity": 130.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Flansch DN 200, PN 10",
+   "long_text": "Glatter Flansch, DN 200, PN 10sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Flansch DN 200, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id287"
+  },
+  {
+   "oz": "050138",
+   "oz_parts": [
+    "05",
+    "01",
+    "38"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 50",
+   "long_text": "Blindflansch, DN 50, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id288"
+  },
+  {
+   "oz": "050139",
+   "oz_parts": [
+    "05",
+    "01",
+    "39"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 65",
+   "long_text": "Blindflansch, DN 65, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 65",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id289"
+  },
+  {
+   "oz": "050140",
+   "oz_parts": [
+    "05",
+    "01",
+    "40"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 80",
+   "long_text": "Blindflansch, DN 80, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 80",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id290"
+  },
+  {
+   "oz": "050141",
+   "oz_parts": [
+    "05",
+    "01",
+    "41"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 100",
+   "long_text": "Blindflansch, DN 100, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id291"
+  },
+  {
+   "oz": "050142",
+   "oz_parts": [
+    "05",
+    "01",
+    "42"
+   ],
+   "quantity": 15.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 150, PN 10",
+   "long_text": "Blindflansch, DN 150, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 150, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id292"
+  },
+  {
+   "oz": "050143",
+   "oz_parts": [
+    "05",
+    "01",
+    "43"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Blindflansch DN 200, PN 10",
+   "long_text": "Blindflansch, DN 200, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Blindflansch DN 200, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id293"
+  },
+  {
+   "oz": "050144",
+   "oz_parts": [
+    "05",
+    "01",
+    "44"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Losflansch DN 80, PN 10",
+   "long_text": "Losflansch, DN 80, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Losflansch DN 80, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id294"
+  },
+  {
+   "oz": "050145",
+   "oz_parts": [
+    "05",
+    "01",
+    "45"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Losflansch DN 100, PN 10",
+   "long_text": "Losflansch, DN 100, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Losflansch DN 100, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id295"
+  },
+  {
+   "oz": "050146",
+   "oz_parts": [
+    "05",
+    "01",
+    "46"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Losflansch DN 125, PN 10",
+   "long_text": "Losflansch, DN 100, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Losflansch DN 125, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id296"
+  },
+  {
+   "oz": "050147",
+   "oz_parts": [
+    "05",
+    "01",
+    "47"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Losflansch DN 150, PN 10",
+   "long_text": "Losflansch, DN 150, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Losflansch DN 150, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id297"
+  },
+  {
+   "oz": "050148",
+   "oz_parts": [
+    "05",
+    "01",
+    "48"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "[PERSON_115]-Losflansch DN 200, PN 10",
+   "long_text": "Losflansch, DN 200, PN 10gemäß Vorbemerkung Rohrleitungen,sonst wie vor,als Zulage zu vorbeschriebener Rohrleitung.[PERSON_115]-Losflansch DN 200, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id298"
+  },
+  {
+   "oz": "050149",
+   "oz_parts": [
+    "05",
+    "01",
+    "49"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Flexible Rohrkupplung, zugfest, DN 100",
+   "long_text": "YesFlexible Rohrkupplung, zugfestNennweite DN 100, PN 10in [PERSON_115] 1.4435 V4A gebeizt und passiviert,Rohrkupplung - Metall Grip,trinkwassergeeignet,zum kraftschlüssigen Verbinden von Metallrohren mit gleichem Außendurchmesser.Kompensation von Längenausdehnungen, Winkelabweichungen und Vibrationen.Übertragung von axialen Kräften möglich.Dichtmanschette aus EPDM,Hersteller: '..................................................' (Elementbau Glogger od. gleichwertig)liefern und montierenFlexible Rohrkupplung, zugfest, DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id299"
+  },
+  {
+   "oz": "050150",
+   "oz_parts": [
+    "05",
+    "01",
+    "50"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Flexible Rohrkupplung, zugfest, DN 150",
+   "long_text": "Flexible Rohrkupplung, zugfestNennweite DN 150, PN 10sonst wie vor,liefern und montierenFlexible Rohrkupplung, zugfest, DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id300"
+  },
+  {
+   "oz": "050151",
+   "oz_parts": [
+    "05",
+    "01",
+    "51"
+   ],
+   "quantity": 3.0,
+   "unit": "St",
+   "short_text": "Flexible Rohrkupplung, zugfest, DN 200",
+   "long_text": "Flexible Rohrkupplung, zugfestNennweite DN 200, PN 10sonst wie vor,liefern und montierenFlexible Rohrkupplung, zugfest, DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id301"
+  },
+  {
+   "oz": "050152",
+   "oz_parts": [
+    "05",
+    "01",
+    "52"
+   ],
+   "quantity": 700.0,
+   "unit": "kg",
+   "short_text": "Rohrhalter (Ständer/Wandkonsolen) DN 65 - 250",
+   "long_text": "Rohrunterstützungen für Rohre DN 65 bis DN 250ausgeführt als Rohrunterstützung, Mat: 1.4571,höhenverstellbar,zum Andübeln auf dem Boden oder als Konsole für Wandbefestigung,mit geschlossener Rohrschelle entsprechend der Rohr-Nennweite und EPDM-Einlagen um die Rohre.Die Rohrhalterung muss alle Belastungen aus der Rohrleitung sicher aufnehmen können,gefertigt in [PERSON_115], im Vollbad gebeizt und passiviert entsprechend Spezifikation Rohrleitung,einschließlich allem erforderlichen Befestigungsmaterial,liefern und montierenRohrhalter (Ständer/Wandkonsolen) DN 65 - 250",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id302"
+  },
+  {
+   "oz": "050153",
+   "oz_parts": [
+    "05",
+    "01",
+    "53"
+   ],
+   "quantity": 200.0,
+   "unit": "kg",
+   "short_text": "Rohrhalter (Abhängung) DN 65 - 250",
+   "long_text": "Rohrabhängung für Rohre DN 65 bis DN 250ausgeführt als Abhängung zum Beispiel von Dachkonstruktion, Mat: 1.4571,höhenverstellbar,als Befestigung an der Dachkonstruktion, Bediensteg etc. sind nur Klemmverbindungen zulässig,mit geschlossener Rohrschelle entsprechend der Rohr-Nennweite und EPDM-Einlagen um die Rohre.Die Rohrhalterung muss alle Belastungen aus der Rohrleitung sicher aufnehmen können,gefertigt in [PERSON_115], im Vollbad gebeizt und passiviert entsprechend Spezifikation Rohrleitung,einschließlich allem erforderlichen Befestigungsmaterial,liefern und montierenRohrhalter (Abhängung) DN 65 - 250",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id303"
+  },
+  {
+   "oz": "050154",
+   "oz_parts": [
+    "05",
+    "01",
+    "54"
+   ],
+   "quantity": 30.0,
+   "unit": "St",
+   "short_text": "Anschweissmuffe 1/2\"",
+   "long_text": "Anschweißmuffe 1/2\"Mat: 1.4571, als Zulage, einschließlich Bohrung und Schweißnaht,gebeizt und passiviert.liefern und montierenAnschweissmuffe 1/2\"",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id304"
+  },
+  {
+   "oz": "050155",
+   "oz_parts": [
+    "05",
+    "01",
+    "55"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Halbe Anschweissmuffe 1/2\"",
+   "long_text": "Halbe Anschweißmuffe 1/2\"Mat: 1.4571, als Zulage, einschließlich Bohrung und Schweißnaht,gebeizt und passiviert.liefern und montierenHalbe Anschweissmuffe 1/2\"",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id305"
+  },
+  {
+   "oz": "050156",
+   "oz_parts": [
+    "05",
+    "01",
+    "56"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Anschweissmuffe 3/4\"",
+   "long_text": "Anschweißmuffe 3/4\"Mat: 1.4571, als Zulage, einschließlich Bohrung und Schweißnaht,gebeizt und passiviert.liefern und montierenAnschweissmuffe 3/4\"",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id306"
+  },
+  {
+   "oz": "050157",
+   "oz_parts": [
+    "05",
+    "01",
+    "57"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Anschweissmuffe 1 Zoll",
+   "long_text": "Anschweißmuffe 1 ZollMat: 1.4571, als Zulage, einschließlich Bohrung und Schweißnaht,gebeizt und passiviert.liefern und montierenAnschweissmuffe 1 Zoll",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id307"
+  },
+  {
+   "oz": "050158",
+   "oz_parts": [
+    "05",
+    "01",
+    "58"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Anschweissmuffe 2 Zoll",
+   "long_text": "Anschweißmuffe 2 ZollMat: 1.4571, als Zulage, einschließlich Bohrung und Schweißnaht,gebeizt und passiviert.liefern und montierenAnschweissmuffe 2 Zoll",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id308"
+  },
+  {
+   "oz": "050159",
+   "oz_parts": [
+    "05",
+    "01",
+    "59"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Anschweissmuffe 2 Zoll, Einbau in Blindflansch PN 10",
+   "long_text": "Anschweißmuffe 2 Zollfür Entleerungen an Rohrleitungsenden mit Blindflansch,Mat: 1.4571,einschließlich Bohrung in Blindflansch DN 100 - 200, PN 10und Schweißnaht,sohlgleich zur Rohrleitung eingebaut,gebeizt und passiviert.Als Zulage zur Flansch-Position DN 100 - DN 200.liefern und montierenAnschweissmuffe 2 Zoll, Einbau in Blindflansch PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id309"
+  },
+  {
+   "oz": "050160",
+   "oz_parts": [
+    "05",
+    "01",
+    "60"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Wandblende für Wanddurchführungen bis D 200 mm",
+   "long_text": "Wandblende für Kernbohrungen / RohrleitungswanddurchführungenDurchmesser Kernbohrung/Futterrohr: 150 bis 200 mmAußendurchmesser Medienrohr: 63 bis 80 mmzum optisch ansprechenden Verblenden von Mauerdurchführungen (Stahlbeton-[PERSON_074])Zweiteilig, als Halbkreis, ausgeführt,mit Befestigungsbohrungen zur Wandbefestigung,Überdeckung der Kernbohrung/des Futterrohres umlaufend ca. 40 mm,Abstand zum Medienrohr umlaufend max. 3 mm,inkl. allem erforderlichen Montagematerial,Werkstoff: 1.4301liefern und montierenWandblende für Wanddurchführungen bis D 200 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id311"
+  },
+  {
+   "oz": "050161",
+   "oz_parts": [
+    "05",
+    "01",
+    "61"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Wandblende für Wanddurchführungen bis D 300 mm",
+   "long_text": "Wandblende für Kernbohrungen / Rohrleitungswanddurchführungen wie vor, jedochDurchmesser Kernbohrung/Futterrohr: 250 bis 300 mmAußendurchmesser Medienrohr: 168 bis 200 mmliefern und montierenWandblende für Wanddurchführungen bis D 300 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id312"
+  },
+  {
+   "oz": "050162",
+   "oz_parts": [
+    "05",
+    "01",
+    "62"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Wandblende für Wanddurchführungen bis D 400 mm",
+   "long_text": "Wandblende für Kernbohrungen / Rohrleitungswanddurchführungen wie vor, jedochDurchmesser Kernbohrung/Futterrohr: 350 bis 400 mmAußendurchmesser Medienrohr: 250 bis 300 mmliefern und montierenWandblende für Wanddurchführungen bis D 400 mm",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id313"
+  },
+  {
+   "oz": "050163",
+   "oz_parts": [
+    "05",
+    "01",
+    "63"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Siphon DN 200 in vertikaler Bauart",
+   "long_text": "YesSiphon DN 200 in [PERSON_115] 1.4571,mit Sperrwasservorlage, als geruchs- und gasdichter, flüssigkeitsdurchlässiger Verschluss zum Beispiel von Übereichleitungen,zum vertikalen Einbau,Ausführung als FF-Stück PN 10 mit zwischengebautem Siphon,Gesamthöhe 1000 mm,mit seitlich angebrachtem PVC-Rohranzeiger zur Kontrolle der Sperrwasserhöhe,mit Absperrventilen zum Befüllen und Enleeren des Siphons.Herstellter: '.................................................................' (z. B. Glogger, Augsburg oder gleichwertig)Siphon DN 200 in vertikaler Bauart",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id314"
+  },
+  {
+   "oz": "05021",
+   "oz_parts": [
+    "05",
+    "02",
+    "1"
+   ],
+   "quantity": 100.0,
+   "unit": "m",
+   "short_text": "Kleinleitungen DN 15",
+   "long_text": "Pressfitting-Rohrleitung DN 15 PN 10/1618 x 1 mm, Werkstoff 1.4401,einschließlich aller zur Montage nötigen Verbindungs-, Formteile, Verschraubungen etc. und Halterungen aus mind. 1.4301 mit Gummieinlage.liefern und montierenKleinleitungen DN 15",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id317"
+  },
+  {
+   "oz": "05022",
+   "oz_parts": [
+    "05",
+    "02",
+    "2"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Siphon aus Kleinleitung DN 15 mit Schauglas",
+   "long_text": "Zulage zu vorgenannter Pressfitting-Rohrleitung DN 15für die Ausbildung eines Siphon (4 mal Bogen 90 Grad + ca. 50 cm Rohr) für Kondensatabläufe von Luftfiltern,Sperrwasserhöhe in Siphon mindestens 8 cm,einschließlich in das Siphon integriertes Schauglas zur Sichtkontrolle der Wasserfüllung,z. B. Fergo Schauglas [PERSON_129] GD100-SSTXI-1/2\"Gewinde nach ISO 7-1 (EN 10226-1), F-FGehäuse: 1.4408 (CF8M), kugelgestrahltGlas: Kalknatron-HartglasDichtung: PTFEBetriebstemperatur: max. 240°C bei 10 barMax. Betriebsdruck: 10 baroder gleichwertig.Absperr-Kugelhähne sind in separater Position enthalten.Siphon aus Kleinleitung DN 15 mit Schauglas",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id318"
+  },
+  {
+   "oz": "05023",
+   "oz_parts": [
+    "05",
+    "02",
+    "3"
+   ],
+   "quantity": 10.0,
+   "unit": "m",
+   "short_text": "Kleinleitungen DN 20",
+   "long_text": "Pressfitting-Rohrleitung DN 20 PN 10/1622 x 1,2 mm, Werkstoff 1.4401,einschließlich aller zur Montage nötigen, Verbindungs-, Formteile, Verschraubungen etc. und Halterungen aus mind. 1.4301 mit Gummieinlage.liefern und montierenKleinleitungen DN 20",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id319"
+  },
+  {
+   "oz": "05024",
+   "oz_parts": [
+    "05",
+    "02",
+    "4"
+   ],
+   "quantity": 30.0,
+   "unit": "m",
+   "short_text": "Kleinleitungen DN 25",
+   "long_text": "Pressfitting-Rohrleitung DN 25 PN 10/1628 x 1,2 mm, Werkstoff 1.4401,einschließlich aller zur Montage nötigen Verbindungs-, Formteile, Verschraubungen etc. und Halterungen aus mind. 1.4301 mit Gummieinlage.liefern und montierenKleinleitungen DN 25",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id320"
+  },
+  {
+   "oz": "05025",
+   "oz_parts": [
+    "05",
+    "02",
+    "5"
+   ],
+   "quantity": 5.0,
+   "unit": "m",
+   "short_text": "Kleinleitungen DN 32",
+   "long_text": "Pressfitting-Rohrleitung DN 32 PN 10/1635 x 1,5 mm, Werkstoff 1.4401,einschließlich aller zur Montage nötigen Verbindungs-, Formteile, Verschraubungen etc. und Halterungen aus mind. 1.4301 mit Gummieinlage.liefern und montierenKleinleitungen DN 32",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id321"
+  },
+  {
+   "oz": "05026",
+   "oz_parts": [
+    "05",
+    "02",
+    "6"
+   ],
+   "quantity": 30.0,
+   "unit": "m",
+   "short_text": "Kleinleitungen DN 50",
+   "long_text": "Pressfitting-Rohrleitung DN 5054 x 1,5 mm, Werkstoff 1.4401,einschließlich aller zur Montage nötigen Verbindungs-,Formteile, Verschraubungen etc. und Halterungen aus mind.1.4301 mit Gummieinlage.liefern und montierenKleinleitungen DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id322"
+  },
+  {
+   "oz": "05027",
+   "oz_parts": [
+    "05",
+    "02",
+    "7"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Übergangsflansch PN 10/16, DN 15",
+   "long_text": "Übergangsflansch PN 10/16, DN 15zum Übergang von Pressfittingsystem auf Flanschanschluss DN 15, Mat: 1.4401,einschließlich Flanschverbindung gem. Hinweistext zur Rohrleitung,Dichtung mit Stahleinlage, mit KTW-Zulassung,mit galvanischer Trennung (bei Bedarf)liefern und montierenÜbergangsflansch PN 10/16, DN 15",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id323"
+  },
+  {
+   "oz": "05028",
+   "oz_parts": [
+    "05",
+    "02",
+    "8"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Übergangsflansch PN 10/16, DN 20",
+   "long_text": "Übergangsflansch PN 10/16, DN 20zum Übergang von Pressfittingsystem aufFlanschanschluss DN 20, Mat: 1.4401,einschließlich Flanschverbindung gem. Hinweistext zurRohrleitung,Dichtung mit Stahleinlage, mit KTW-Zulassung,mit galvanischer Trennung (bei Bedarf)liefern und montierenÜbergangsflansch PN 10/16, DN 20",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id324"
+  },
+  {
+   "oz": "05029",
+   "oz_parts": [
+    "05",
+    "02",
+    "9"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Übergangsflansch PN 10/16, DN 25",
+   "long_text": "Übergangsflansch PN 10/16, DN 25zum Übergang von Pressfittingsystem aufFlanschanschluss DN 25, Mat: 1.4401,einschließlich Flanschverbindung gem. Hinweistext zurRohrleitung,Dichtung mit Stahleinlage, mit KTW-Zulassung,mit galvanischer Trennung (bei Bedarf)liefern und montierenÜbergangsflansch PN 10/16, DN 25",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id325"
+  },
+  {
+   "oz": "050210",
+   "oz_parts": [
+    "05",
+    "02",
+    "10"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Übergangsflansch PN 10/16, DN 32",
+   "long_text": "Übergangsflansch PN 10/16, DN 32zum Übergang von Pressfittingsystem aufFlanschanschluss DN 32, Mat: 1.4401,einschließlich Flanschverbindung gem. Hinweistext zurRohrleitung,Dichtung mit Stahleinlage, mit KTW-Zulassung,mit galvanischer Trennung (bei Bedarf)liefern und montierenÜbergangsflansch PN 10/16, DN 32",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id326"
+  },
+  {
+   "oz": "050211",
+   "oz_parts": [
+    "05",
+    "02",
+    "11"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Übergangsflansch PN 10/16, DN 50",
+   "long_text": "Übergangsflansch PN 10/16, DN 50zum Übergang von Pressfittingsystem aufFlanschanschluss DN 50, Mat: 1.4401,einschließlich Flanschverbindung gem. Hinweistext zurRohrleitung,Dichtung mit Stahleinlage, mit KTW-Zulassung,mit galvanischer Trennung (bei Bedarf)liefern und montierenÜbergangsflansch PN 10/16, DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id327"
+  },
+  {
+   "oz": "05031",
+   "oz_parts": [
+    "05",
+    "03",
+    "1"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Pass- und Ausbaustück DN 65 PN 10",
+   "long_text": "YesAusbaustück DN 65 PN 10feststellbar mit einseitig durchgehenden Gewindestangen,Flanschbohrung DIN EN 1052; Verstellbereich +/- 25 mm,Gewindeanker A2; Muttern A4,DN 100; Material: 1.4571Fabrikat: '.............................................'[PERSON_129]: '.............................................'liefern und montierenPass- und Ausbaustück DN 65 PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id329"
+  },
+  {
+   "oz": "05032",
+   "oz_parts": [
+    "05",
+    "03",
+    "2"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Pass- und Ausbaustück DN 100 PN 10",
+   "long_text": "YesAusbaustück DN 100 PN 10feststellbar mit einseitig durchgehenden Gewindestangen,Flanschbohrung DIN EN 1052; Verstellbereich +/- 25 mm,Gewindeanker A2; Muttern A4,DN 100; Material: 1.4571Fabrikat: '.............................................'[PERSON_129]: '.............................................'liefern und montierenPass- und Ausbaustück DN 100 PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id330"
+  },
+  {
+   "oz": "05033",
+   "oz_parts": [
+    "05",
+    "03",
+    "3"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Pass- und Ausbaustück DN 150 PN 16",
+   "long_text": "Ausbaustück DN 150 PN 16sonst wie vor,liefern und montierenPass- und Ausbaustück DN 150 PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id331"
+  },
+  {
+   "oz": "05034",
+   "oz_parts": [
+    "05",
+    "03",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Pass- und Ausbaustück DN 200 PN 10",
+   "long_text": "Ausbaustück DN 200 PN 10sonst wie vor,liefern und montierenPass- und Ausbaustück DN 200 PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id332"
+  },
+  {
+   "oz": "06011",
+   "oz_parts": [
+    "06",
+    "01",
+    "1"
+   ],
+   "quantity": 4.0,
+   "unit": "St",
+   "short_text": "Absperrschieber DN 65, PN 16",
+   "long_text": "Absperrschieber DN 65 mit Handradgemäß Spezifikation Absperrschieber Handbetrieb,Nennweite: DN 65Druckstufe: PN 16liefern und montierenAbsperrschieber DN 65, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id336"
+  },
+  {
+   "oz": "06012",
+   "oz_parts": [
+    "06",
+    "01",
+    "2"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Absperrschieber DN 80, PN 16",
+   "long_text": "Absperrschieber DN 80 mit Handradgemäß Spezifikation Absperrschieber Handbetrieb,Nennweite: DN 80Druckstufe: PN 16liefern und montierenAbsperrschieber DN 80, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id337"
+  },
+  {
+   "oz": "06013",
+   "oz_parts": [
+    "06",
+    "01",
+    "3"
+   ],
+   "quantity": 3.0,
+   "unit": "St",
+   "short_text": "Absperrschieber DN 150, PN 16",
+   "long_text": "Absperrschieber DN 150 mit Handradgemäß Spezifikation Absperrschieber Handbetrieb,Nennweite: DN 150Druckstufe: PN 16liefern und montierenAbsperrschieber DN 150, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id338"
+  },
+  {
+   "oz": "06014",
+   "oz_parts": [
+    "06",
+    "01",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Absperrschieber DN 200, PN 10",
+   "long_text": "Absperrschieber DN 200 mit Handradgemäß Spezifikation Absperrschieber Handbetrieb,Nennweite: DN 200Druckstufe: PN 10liefern und montierenAbsperrschieber DN 200, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id339"
+  },
+  {
+   "oz": "06015",
+   "oz_parts": [
+    "06",
+    "01",
+    "5"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Absperrschieber handbetätigt versetzen, DN 150",
+   "long_text": "Absperrschieber DN 150 demontieren, zwischenlagern, montieren,gemäß \"Spezifikation Absperrschieber Handbetrieb versetzen\"Gewicht ca. 35 kgAbsperrschieber handbetätigt versetzen, DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id341"
+  },
+  {
+   "oz": "06016",
+   "oz_parts": [
+    "06",
+    "01",
+    "6"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Absperrschieber handbetätigt versetzen, DN 200",
+   "long_text": "Absperrschieber DN 200 demontieren, zwischenlagern, montieren,gemäß \"Spezifikation Absperrschieber Handbetrieb versetzen\"Gewicht ca. 55 kgAbsperrschieber handbetätigt versetzen, DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id342"
+  },
+  {
+   "oz": "06017",
+   "oz_parts": [
+    "06",
+    "01",
+    "7"
+   ],
+   "quantity": 8.0,
+   "unit": "St",
+   "short_text": "Absperrklappe Zwischenflanschausführung DN 100 PN 10/16",
+   "long_text": "Absperrklappe DN 100 handbetätigt,gemäß Spezifikation \"Absperrklappe Zwischenflanschausführung handbetätigt\",Nennweite: DN 100Druckstufe: PN 10/16liefern und montierenAbsperrklappe Zwischenflanschausführung DN 100 PN 10/16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id344"
+  },
+  {
+   "oz": "06018",
+   "oz_parts": [
+    "06",
+    "01",
+    "8"
+   ],
+   "quantity": 8.0,
+   "unit": "St",
+   "short_text": "Absperrklappe Zwischenflanschausführung DN 150 PN 10/16",
+   "long_text": "Absperrklappe DN 150 handbetätigt,gemäß Spezifikation \"Absperrklappe Zwischenflanschausführung handbetätigt\",Nennweite: DN 150Druckstufe: PN 10/16liefern und montierenAbsperrklappe Zwischenflanschausführung DN 150 PN 10/16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id345"
+  },
+  {
+   "oz": "06021",
+   "oz_parts": [
+    "06",
+    "02",
+    "1"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Absperrschieber DN 200, PN 10, mit E-Antrieb",
+   "long_text": "Absperrschieber DN 200 mit E-Antriebgemäß Spezifikation Absperrschieber ElektroantriebNennweite: DN 200Druckstufe: PN 10liefern und montierenAbsperrschieber DN 200, PN 10, mit E-Antrieb",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id348"
+  },
+  {
+   "oz": "06022",
+   "oz_parts": [
+    "06",
+    "02",
+    "2"
+   ],
+   "quantity": 3.0,
+   "unit": "St",
+   "short_text": "Absperrschieber mit Elektroantrieb versetzen, DN 150",
+   "long_text": "Absperrschieber mit anbebautem Elektroantrieb DN 150 demontieren, zwischenlagern, montieren,gemäß \"Spezifikation Absperrschieber mit Elektroantrieb versetzen\"Gewicht ca. 60 kgAbsperrschieber mit Elektroantrieb versetzen, DN 150",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id350"
+  },
+  {
+   "oz": "06023",
+   "oz_parts": [
+    "06",
+    "02",
+    "3"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Absperrschieber mit Elektroantrieb versetzen, DN 200",
+   "long_text": "Absperrschieber mit anbebautem Elektroantrieb DN 200, PN 10 demontieren, zwischenlagern, montieren,gemäß \"Spezifikation Absperrschieber mit Elektroantrieb versetzen\"Gewicht ca. 75 kgAbsperrschieber mit Elektroantrieb versetzen, DN 200",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id351"
+  },
+  {
+   "oz": "06024",
+   "oz_parts": [
+    "06",
+    "02",
+    "4"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Regelklappe DN 100",
+   "long_text": "YesAbsperrklappe, elektromotorisch betätigt,Körper mit C5-M Beschichtung (mind. 250µm) und integrierter Leckagenut, ausblassichere Welle mit Staubschutz,mehrfach durch PTFE-Buchse gelagert,mehrfach-Dichtsystem mit Einführschräge,Material in eingebautem Zustand ablesbarNennweite: DN 100Zwischenflansch-Ausführung (Wafer),Baulänge FTF EN 558 Reihe 20Betriebsdruck: bis 16 barAnschlussart: Flansch EN 1092, PN 16, Baulänge FTF EN 558 Reihe 20Gehäusewerkstoff: EN-GJS-400-15 (GGG-40), Epoxy beschichtet 250 µmWerkstoff [PERSON_164]: 1.4408 / ASTM A351 CF8MWerkstoff Welle: 1.4021 / AISI 420Werkstoff Absperrdichtung: EPDMManschetten-Fixierung: Manschette loseSpannung/Frequenz: 400V 50HzRegelmodul: Regelantrieb, Stellungsregler AUMATIC (AC 01.2), Feldbusschnittstelle Profibus DP, Basis AUMA NORM SQR (S4 ED 25%, Antrieb Klasse C), nur bei 400V 50Hz und 230V 50/60Hz, TPC AA000-1A1-A000, TPA xxR100-0I1-000Antriebsausführung: elektromotorisch, Stellzeit 16 s, Drehmoment 150Nm, AUMA, [PERSON_129] SQ Class A (EN15714-2), AUF/ZU Steuerung, 75° bis 105°, stufenlos einstellbar, Blinkgeber zur Laufanzeige, Heizung, mechanische Stellungsanzeige, KS, Schichtdicke 0,140mm, RAL7037, manuelle Notbetätigung, IP68Hersteller/Lieferant: '........................................................' (z. B. GEMÜ, [ORT_004] oder gleichwertig)[PERSON_129]: '........................................................' (z. B. R488100W332A1ELN2EDPAQ05H oder gleichwertig)Regelklappe DN 100",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id352"
+  },
+  {
+   "oz": "06031",
+   "oz_parts": [
+    "06",
+    "03",
+    "1"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 15, PN 16",
+   "long_text": "Kugelhahn DN 15, PN16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 15, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id355"
+  },
+  {
+   "oz": "06032",
+   "oz_parts": [
+    "06",
+    "03",
+    "2"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 20, PN 16",
+   "long_text": "Kugelhahn DN 20, PN 16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 20, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id356"
+  },
+  {
+   "oz": "06033",
+   "oz_parts": [
+    "06",
+    "03",
+    "3"
+   ],
+   "quantity": 5.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 25, PN 16",
+   "long_text": "Kugelhahn DN 25, PN 16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 25, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id357"
+  },
+  {
+   "oz": "06034",
+   "oz_parts": [
+    "06",
+    "03",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 32, PN 16",
+   "long_text": "Kugelhahn DN 32, PN 16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 32, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id358"
+  },
+  {
+   "oz": "06035",
+   "oz_parts": [
+    "06",
+    "03",
+    "5"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 50, PN 16",
+   "long_text": "Kugelhahn DN 50, PN 16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 50, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id359"
+  },
+  {
+   "oz": "06036",
+   "oz_parts": [
+    "06",
+    "03",
+    "6"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Kugelhahn DN 65, PN 16",
+   "long_text": "Kugelhahn DN 65, PN 16gemäß Spezifikation Kugelhahnliefern und montierenKugelhahn DN 65, PN 16",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id360"
+  },
+  {
+   "oz": "06037",
+   "oz_parts": [
+    "06",
+    "03",
+    "7"
+   ],
+   "quantity": 20.0,
+   "unit": "St",
+   "short_text": "Manometerventil DN 15",
+   "long_text": "Manometerventil mit Prüfflansch 1/2 Zoll,Zapfen-Spannmuffe, Material 1.4571liefern und montieren.Hinweis Einbauort: Absperrung für Manometer oder für bauseits zu liefernde Druckaufnehmer.Manometerventil DN 15",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id361"
+  },
+  {
+   "oz": "06038",
+   "oz_parts": [
+    "06",
+    "03",
+    "8"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Storz-C-Kupplung (Niro)",
+   "long_text": "C-Storzkupplung 2 ZollMat: Niro, mit Außengewinde, Blinddeckel und Ketteliefern und montierenStorz-C-Kupplung (Niro)",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id362"
+  },
+  {
+   "oz": "06039",
+   "oz_parts": [
+    "06",
+    "03",
+    "9"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Storz-B-Kupplung (Niro)",
+   "long_text": "B-Storzkupplung 3 ZollMat: Niro, mit Außengewinde, Blinddeckel und Ketteliefern und montierenStorz-B-Kupplung (Niro)",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id363"
+  },
+  {
+   "oz": "060310",
+   "oz_parts": [
+    "06",
+    "03",
+    "10"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Magnetventil DN 50",
+   "long_text": "YesMagnetventil 2\" servogesteuert mit 230 Volt SpuleFür den Einsatz im Trinkwasserbereich,Stromlos geschlossen.Der angegebene Mindestdruck muss als Differenzdruck für eine einwandfreie Funktion der Servosteuerung immer vorhanden seinEinbaulage: beliebigDichtung: mit TrinkwasserzulassungMedientemperatur: -10°C bis +80°CMit Magnetspule und GerätesteckerSpannung: 230 Volt, 50 HzSchutzart: IP65Schnell schließendZulässiger Druck: 0,3 - 20 barMit min. 0,3 bar Druckdifferenz arbeitendVentil in Ruhestellung geschlossen (NC). Bei Bestromung öffnet die Magnetspule die Vorsteuerbohrung und es baut sich der Druck auf der Oberseite der Membrane ab. Der nun höhere Druck unter der Membrane hebt diese vom Ventilsitz ab. Der angegebene Mindestdruck muss als Druckdifferenz immer vorhanden sein.Größe:DN 50 (2\")Hersteller: '...........................................' (z. B. GSR oder gleichwertig)[PERSON_129]: '...........................................' Anschluss R innen:DN 50 (2\")Magnetventil DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id364"
+  },
+  {
+   "oz": "060311",
+   "oz_parts": [
+    "06",
+    "03",
+    "11"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Probennahmestation",
+   "long_text": "YesProbenahmebecken aus nichtrostendem [PERSON_089] (1.4571)mit leicht schräg ausgebildetem Boden;mit 6 Stück Probenahmeventilen DN 15, abflammbar, mitAnschlussnippel G 1/2 Zoll, Ausführung in [PERSON_115],Fabrikat / [PERSON_129]: Elomat PROHA 1 oder gleichwertigBeschriftung je Probenahme mit graviertem [PERSON_013] (z. B. Resopalschild),mit rückseitigem Blech zur Montage der Probenahmeventile; als Spritzschutz: Abdecksieb für Beckenfläche und seitliche Schutzbleche;inkl. Leitungsanschluß DN 50 im Boden aus Niro für Anschluss an Ablaufleitung DN 50 (Pressfittingrohrleitung)Vorbereitet für Montage an Stahlbetonwand oder verputzter Ziegelwand inkl. Wandkonsolen.Beckentiefe: '..............................' mm (mind. 200 mm)Beckenbreite: '..............................' mm (mind. 900 mm)Eine Detailkonstruktionszeichnung des [PERSON_046]s ist der Bauleitung rechtzeitig vor Fertigung zur Prüfung und Freigabe vorzulegen.liefern und montieren.Probennahmestation",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id365"
+  },
+  {
+   "oz": "060312",
+   "oz_parts": [
+    "06",
+    "03",
+    "12"
+   ],
+   "quantity": 10.0,
+   "unit": "St",
+   "short_text": "Probennahmeventil DN 15",
+   "long_text": "YesProbeentnahmeventil aus [PERSON_115],für Probenahmestellen, die nicht zur zentralen Probenahmestation geführt werden können,für die einfache und professionelle Probeentnahme. Nadelventiltechnik metallisch dichtend verhindert Verkeimung und gewährleistet hohe Durchströmung bei der Probeentnahme.Auslauf mit angeschweißtem 90° Bogen, 15mm Durchmesser.Das Ventil ist abflammbar bis 200°C.Totraumfreie Ventiltechnik.Technische Daten:Werkstoff Gehäuse: 1.4408 [PERSON_115] (V4A)Werkstoff Kopfstück: 1.4301 EdelstahlWerkstoff Spindel: 1.4408 EdelstahlWerkstoff [PERSON_001]: PTFEWerkstoff Handhebel: 1.4301 EdelstahlNennweite: DN 15Gewindegröße: G 1/2 ZollAnschlussnippel: G 1/2 ZollNenndruck: mind. PN 10Fabrikat: '............................................' (Elomat oder gleichwertig)[PERSON_129]: '............................................' (PROHA1 oder gleichwertig)liefern und montieren.Probennahmeventil DN 15",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id366"
+  },
+  {
+   "oz": "06041",
+   "oz_parts": [
+    "06",
+    "04",
+    "1"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Kugelrückschlagventil DN 50",
+   "long_text": "YesKugelrückschlagventilWasser- und Abwasser bis 50°CDN 50 - 200, PN 10 - 16Baulänge DIN EN 558-1, Grundreihe 48 (DIN 3202, F6)Keine mechanisch bewegten Teile;[PERSON_184], geringes VerstopfungsrisikoMit sinkender Kugel;Austausch der Kugel ohne Ausbau der Armatur;Flanschanschlussmaße nach EN 1092-2;Gehäuse und Deckel aus duktilem Gusseisen EN-GJS-400-15 (GGG-40);Deckelschrauben aus [PERSON_115] A2;Kugel NBR gummiert;Korrosionsschutz:innen und außen mit Epoxid-Beschichtung in GSK-Ausführung \"Schwerer Korrosionsschutz\" nach DIN 30 677-2, Schichtdicke >250 µm, Farbton blau, RAL 5005Fabrikat: '................................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '....................................................................' (VAG KRV Kugelrückschlagventil oder gleichwertig)inkl. allem erforderlichen Befestigungsmaterial liefern u. betriebsfertig montieren.Kugelrückschlagventil DN 50",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id368"
+  },
+  {
+   "oz": "06042",
+   "oz_parts": [
+    "06",
+    "04",
+    "2"
+   ],
+   "quantity": 4.0,
+   "unit": "St",
+   "short_text": "Rückschlagklappe DN 100 PN10 ohne Gewichtshebel",
+   "long_text": "Rückschlagklappegemäß Spezifikation Rückschlagklappe ohne GewichtshebelNennweite: DN 100Druckstufe: PN 10liefern und montierenRückschlagklappe DN 100 PN10 ohne Gewichtshebel",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id387"
+  },
+  {
+   "oz": "06043",
+   "oz_parts": [
+    "06",
+    "04",
+    "3"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Rückschlagklappe DN 150 PN10 ohne Gewichtshebel",
+   "long_text": "Rückschlagklappegemäß Spezifikation Rückschlagklappe ohne GewichtshebelNennweite: DN 150Druckstufe: PN 10liefern und montierenRückschlagklappe DN 150 PN10 ohne Gewichtshebel",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id370"
+  },
+  {
+   "oz": "06044",
+   "oz_parts": [
+    "06",
+    "04",
+    "4"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Rückschlagklappe DN 200 PN10 ohne Gewichtshebel",
+   "long_text": "Rückschlagklappegemäß Spezifikation Rückschlagklappe ohne GewichtshebelNennweite: DN 200Druckstufe: PN 10liefern und montierenRückschlagklappe DN 200 PN10 ohne Gewichtshebel",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id371"
+  },
+  {
+   "oz": "06045",
+   "oz_parts": [
+    "06",
+    "04",
+    "5"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Rückschlagklappe DN 65 PN10 mit Gewichtshebel",
+   "long_text": "Rückschlagklappegemäß Spezifikation Rückschlagklappe mit Hebel und GewichtNennweite: DN 65Druckstufe: PN 10liefern und montierenRückschlagklappe DN 65 PN10 mit Gewichtshebel",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id373"
+  },
+  {
+   "oz": "06051",
+   "oz_parts": [
+    "06",
+    "05",
+    "1"
+   ],
+   "quantity": 3.0,
+   "unit": "St",
+   "short_text": "Be-/Entlüfter G 3/4 x 1/2, PN 10",
+   "long_text": "YesKompakter Standardentlüfterfür die Entlüftung von trinkwasserführenden Druckleitungen,Ausführung StandardNennweite: G 3/4Temperatur: 130 °CGehäuse: CrNiMo-StahlGehäusedichtung: EPDMInnenteile: CrNiMo-StahlSchwimmer: CrNiMo-StahllVentildichtung: FPMProfilschelle: CrNiMo-StahlEingangsmuffe: G 3/4Ausgangszapfen: G 1/2 AArbeitsdruck: 0 - 2 barmit BelüftungssperreFabrikat: '...............................................' (Mankenberg oder gleichwertig)[PERSON_129]: '.......................................................' (EB 1.12 3/4 x 1/2 oder gleichwertig)liefern und betriebsfertig montierenBe-/Entlüfter G 3/4 x 1/2, PN 10",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id376"
+  },
+  {
+   "oz": "07011",
+   "oz_parts": [
+    "07",
+    "01",
+    "1"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Luftfiltereinheit Zuluft/Abluft Reinwasserkammern",
+   "long_text": "YesLuftfilteranlage aus [PERSON_115] WSt.-Nr. 1.4571,beidseitig rnit Rohranschlüssen und ggf. Reduzierung derselben auf DN 150 (siehe Hinweis weiter unten!), Spitzende,Luftdurchsatz inkl. Reserve mindestens 250 m3 pro Stunde.Mit abnehmbarem Deckel als Wartungsöffnung der Filter,alle Filterelemente leicht kontrollierbar und auswechselbar,Berstdruck der Filter 800 Pa,Kondenswasserablauf für Frisch- und Reinluftseite mit 1/2-Zoll AG, für den bauseitigen Anschluss an eine Entleerungsleitung,einschl.Differenzdruckmesser mit örtlicher LCD-Anzeige und potentialfreiem Anschlusskontakt zum bauseitigen Anschluss an die Prozessleittechnik (Übertragung von aktuellem Differenzdruck), einschließlich der erforderlcihen Anschlüsse vor/nach der Filtereinheit im FiltergehäuseLuftfilter:1 St. Feinstaubfilter F7 nach EN 779, Abscheidegrad > 90 %1 St. Schwebstofffilter H13 nach EN 779, Abscheidegrad > 99,95 %einschl. Dokumentation für Luftfilteranlageeinschl.Wandkonsolen zu angebotener [PERSON_162]:Winkel 50/50, Länge 450/400 mm,lichter Wandabstand 50 bis 100 mm,mit BefestigungsmaterialDie beidseits anzuschließende Luftleitung wird in Nennweite DN 150 ausgeführt. Wenn die Anschlüsse der [PERSON_162] eine davon abweichende Nennweite haben, ist die beidseitige Reduzierung der Rohrleitung auf DN 150 in die Position einzurechnen!Angebotenes Fabrikat: '...........................................................' (Elementbau Glogger, [FIRMA_062] oder gleichwertig)angebotener [PERSON_129]: '...........................................................'Kastenaußenmaße Gehäuse: '..................................................' B x H x T in mmEinbauort: Zuluft(Abluft Reinwasserkammern.komplett inkl. allem Montagezubehör liefern und montieren.Luftfiltereinheit Zuluft/Abluft Reinwasserkammern",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id379"
+  },
+  {
+   "oz": "07012",
+   "oz_parts": [
+    "07",
+    "01",
+    "2"
+   ],
+   "quantity": 1.0,
+   "unit": "St",
+   "short_text": "Lüftungsjalousie aus [PERSON_115] Zuluft/Abluft Reinwasserkammern",
+   "long_text": "YesLüftungsjalousie aus [PERSON_115] WSt. 1.4571mit starren Lamellen für die Wandaußenseite,Einbaurahmen als Z-Profil 40 / 45 / 25 / 2 mm,Lamellen Z-förmig gekantet, Materialstärke mind. 2 mm, völlig überlappend, starr eingeschweißt, regenabweisend und stochersicher.lnsektenschutzgitter aus [PERSON_115] Maschung 1 x 1 mm,auf den Einbaurahmen aufgeklebt, demontierbar,mit verlängertem [PERSON_007] entsprechend der Wandstärke.Befestigung mittels Dübellaschen in der Mauerlaibung,von außen nicht demontierbar,Einschließlich Adapterplatte mit eingeschweißtem Rohrstutzen DN 150 als Übergang zu weiterführenden Luftleitungen.Be- und Entlüftung Reinwasserkammern inkl. Reserven: mind. 250 m3/h.mit allem erforderlichen BefestigungsmaterialMaße:[PERSON_007]: passend für Holzrahmenkonstruktion, Gesamtstärke ca. 20 cm.Abmessungen einschließlich Abdeckrahmen: umlaufend mind. 100 mm größer als \"[PERSON_007]\"Querschnitt weiterführende Luftleitung: DN 150 mmAngebotenes Fabrikat: '....................................................' (Elementbau Glogger, [FIRMA_062] oder gleichwertig)Erforderliche Abmessungen Maueröffnung, sofern die oben genannte geplante Rohbaulichte für den maximal geforderten Luftdurchsatz nicht ausreichend ist:B x H = '...........................................' mmEinbauort: Zu-/Abluft Reinwasserkammernliefern und montierenLüftungsjalousie aus [PERSON_115] Zuluft/Abluft Reinwasserkammern",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id380"
+  },
+  {
+   "oz": "07013",
+   "oz_parts": [
+    "07",
+    "01",
+    "3"
+   ],
+   "quantity": 2.0,
+   "unit": "St",
+   "short_text": "Über-/Unterdrucksicherung Gebäude",
+   "long_text": "YesSicherheitsventilzur Überdruck-/Unterdrucksicherung des Gebäudes (Aufstellraum [PERSON_066])Gehäuse kompl. aus [PERSON_115] mind. WSt. 1.4301,Gesamtkonstruktion wartungsfrei.Durchflussleistung inkl. Reserve: mind. 300 m3/hAnsprechdruck: 650 Pa Unterdruck/Überdruck (6,5 mbar),Anschlussflansch: entsprechend angebotenem Fabrikat/[PERSON_129],einschließlich Herstellung des für den Einbau des Sicherheitsventils erforderlichen passenden Abzweigs/Abgangs in Edelstahlrohrleitung DN 150 und Flanschverbindung oder zugfester Rohrkupplung, inkl. allem erfordelichen Schrauben-, Dichtungs- sonst. Verbindungsmaterial.Angebotenes Fabrikat/[PERSON_129] Über-/Unterdruckventil:'.........................................................'(z. B. Elementbau Glogger oder gleichwertig)liefern und montieren.Über-/Unterdrucksicherung Gebäude",
+   "is_lump_sum": false,
+   "unit_price": null,
+   "total_price": null,
+   "source_file": "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+   "source_ref": "id381"
+  }
+ ],
+ "remarks": [
+  "ZUSÄTZLICHE TECHNISCHE VERTRAGSBEDINGUNGEN1) Stundenlohnarbeiten dürfen nur nach schriftlicher oder mündlicher Beauftragung durch die Bauleitung zur Ausführung kommen. Diese Vereinbarung hat vor der Ausführung der Arbeiten zu erfolgen. Die angefallenen Stunden müssen arbeitstäglich auf gesonderten Rapport- und Regieberichten zur Gegenzeichnung vorgelegt werden. Nicht unterzeichnete und nachgeschobene Regiestunden werden nachträglich nicht anerkannt und somit nicht vergütet.2) In den Stundenlohnverrechnungssätze sind alle lohngebundenen Unkosten, Zuschläge, Auslösen, Fahrgelder sowie die Beaufsichtigung und die Kosten für das gewerkeübliche Grundwerkzeug einzurechnen.3) In den Verrechnungssätzen für Materialien, Maschinen und Abfallcontainer sind alle Unkosten für Transport, Lagerung und Aufschläge für Gemeinkosten usw. einzurechnen.4) Die im Rahmen von Regierarbeiten anfallenden Stoffe und Geräteeinsätze sind auf den Rapportzetteln arbeitstäglich, zusammen mit den anfallenden Stunden der örtlichen Bauleitung zur Genehmigung und Gegenzeichnung vorzulegen. Nicht in dieser Form genehmigte Materialien und Geräteeinsätze werden nicht vergütet.5) Die Abrechnung erfolgt im Rahmen der monatlichen Abschlagsrechnungen.Zusätzliche Technischen Vertragsbedingungen",
+  "Die Darstellung der Pumpen in den beiliegenden Plänen ist nur beispielhaft und kann von den nachstehenden Positionstexten abweichen. Mit dem Angebot sind in jedem Fall aussagekräftige Datenblätter (Kennlinie, Gesamt-Wirkungsgrad Pumpe im Betriebspunkt, Motordaten etc.) und Maßzeichnungen abzugeben. Gleiches gilt für Nebenangebote.Der Bieter muss überprüfen und sicherstellen, dass die angebotenen Pumpen auf dem zur Verfügung stehenden Platz installiert werden können und dabei die Zugänglichkeit für Wartungsarbeiten gewährleistet ist sowie die notwendigen Beruhigungsstrecken vor/nach Armaturen und Messgeräten eingehalten werden. Die Leitungsführung darf insofern von der in den Planbeilagen dargestellten Leitungsführung abweichen. Nennweiten von Saug- und Druckleitungen und der darin installierten Armaturen dürfen jedoch nicht reduziert werden.Angebotsbedingungen Pumpen",
+  "YesAusführungsbeschreibung Hochleistungs - Kreuzstrombelüftungsanlage zur physikalischen EntsäuerungFür Ausführungsformen, die von der nachfolgenden Beschreibung abweichen, ist die Gleichwertigkeit durch aussagekräftige Unterlagen (Konstruktionsbeschreibung, Datenblätter) nachzuweisen.Kreuzstrombelüftungsanlage bzw. [PERSON_066] zur physikalischen Entsäuerung von Trinkwasser in energetisch optimierter Bauweise.Durch feinblasigen Lufteintrag über Keramikelemente aus glasgebundenem Sinterwerkstoff wird die Kohlensäure ausgetragen; Einfacher Belüfterkassettenwechsel mittels Seitenauszug und seitlichen Öffnungselementen.Je nach Positionstext in ein oder zweistöckige Bauweise; Gesamte Apparatur ([PERSON_066]) gasdicht in Druckstufe 3/6 nach DIN 24190 (+6500/-500 Pa) ausgeführt; Dichtigkeitsklasse IV nach DIN EN 1507 mit höchster Anforderung, Grenzwert der Luftleckrate Klasse gemäß D DIN E1507 < 0,006 cm³/min; Die Gasdichtigkeit ist dem Auftraggeber auf Verlangen nachzuweisen;Komplette nachfolgend beschriebene Apparatur als Blechkonstruktion gefertigt, in überwiegend gekanteter und geschraubter Ausführung, Schweißspannungen sind zu minimieren, von daher sind sämtliche Gehäuseversteifungen ohne Schweißung kraftschlüssig mit der Blechkonstruktion zu verbinden; Mindest-Materialstärke für die gesamte Konstruktion 3 mm; Sämtliche Stahlteile in nichtrostenden [PERSON_089] mit der Werkstoffnr. 1.4571, in ferritfreien Räumen gefertigt und nach der Bearbeitung im Vollbad gebeizt und passiviert; Werkseitig in Folie verpackt und mit Folie montiert;Sämtliche Schraubverbindungen (z.B. Deckelverschraubungen), die nicht als Durchgangsverschraubung ausgeführt werden können, sind mit leicht austauschbaren Gewindeeinsätzen herzustellen d.h. Gewindebohrungen in Blechteilen sind nicht zulässig; Der Aufbau der Belüftungsanlage erfolgt Modular; Die in Reihe geschalteten Module (Straße) werden mittels Rechteckflansch horizontal verbunden; Um eine dauerhafte Dichtigkeit zwischen den Modulen zu gewährleisten, wird ein Dichtsystem verwendet, das in der Lage ist, die zu übertragenen Gewichtskräfte von den benötigten Dichtungskräften zu entkoppeln, d.h. es wird eine kraftschlüssige Verbindung zwischen den Metallen hergestellt; Dieses Dichtungssystem (im nachfolgenden Anschlussadapter mit Abdichtungseinrichtung genannt) wird jeweils zwischen die zu verbindenden Module geklemmt und besteht aus je einem massiven Rechteckflansch mit entsprechenden Anschlussgewinden sowie umlaufend eingearbeiteten O-Ringdichtungen mit einer Härte von 40 Shore; Die Belüftungselemente müssen die Anforderungen der KTW erfüllen und die Prüfungen zum mikrobiologischen Aufwuchs (DVGW Arbeitsblatt W270) bestehen; Gehäuse- und Deckelabdichtungen mittels Profildichtung mit KTW- und DVGW W270-Zulassung mit einer mindest Shore-Härte von 40°, entsprechend DIN53505 und DIN7868 (Verwendung von Dichtmassen ausgeschlossen); Eine Detailkonstruktionszeichnung des kompletten [PERSON_066]s ist in die Preise einzukalkulieren und der Bauleitung rechtzeitig vor Bestellung zur Prüfung und Freigabe vorzulegen; Auf Grund der hohen geforderten Energieeffizienz, sind sämtliche Bauteile in höchst strömungsgünstiger optimierter Form auszuführen; Das Einhalten sämtlicher geforderten max. Druckverluste sowie aufgeführte Maßangaben sind zwingend einzuhalten und der Bauleitung auf Verlangen rechtzeitig vor Auslieferung nachzuweisen; Der Lieferant muss Referenzen von Anlagen ähnlicher Größenordnung und vergleichbarer Energiebilanz, die erfolgreich in Betrieb genommen wurden, nachweisen können.Angaben zum KTW Prüfzeugnis der verwendeten Profildichtung für sämtliche GehäuseabdichtungenErstellungsinstitut: '................................................'Prüfbericht-Nr.: '................................................'mit folgenden weiteren Eigenschaften/AusrüstungenWasser-Ein-/Auslaufteil (Endmodul)Für die Sammlung und zum Beruhigen des gleichmäßigen Einlaufes des zuströmenden [PERSON_029]s in das nachfolgende Reaktionsteil (Einlaufteil); bzw. zum gleichmäßigen Auslauf des belüfteten [PERSON_029]s aus voran gegangenem Reaktionsteil; als Blechkonstruktion, Ausführung und Dichtigkeitsklasse wie oben beschrieben; Zum Anschluss an das Reaktionsmodul einseitig offen, mit passend eingearbeitetem, umlaufend doppelt gekantetem stabilen Rechteckflansch inkl. Anschlussadapter mit Abdichtungseinrichtung zum Reaktionsmodul; Zur Steuerung der optimalen Überdeckung der Belüftereinheiten, integrierte zum Reaktionsteil hin angebrachte lineare Führungseinrichtung mit montierter, höhenverstellbarer Überlaufschwelle, ausgelegt für einen Verstellbereich von +- 40 mm, Positioniergenauigkeit über den gesamten Verstellbereich +- 1 mm; Auslegung und Positionierung der Überlaufschwelle entsprechend dem vorhandenen hydraulischen Rückstau; Sämtliche Anschlüsse außen liegende Flanschstutzen PN10 DIN2576 gebohrt; Erforderliche Flanschanschlüsse sowie weitere Einbauten entsprechend Positionstext; Reaktionsmodul (Mittelmodul)Reaktionsmodul zur Aufnahme von je zwei Hochleistungs--Belüftereinheiten mit zugehörigem Luftverteilsystem; Quaderförmige Blechkonstruktion mit innen liegenden und ausschließlich in Fließrichtung angebrachten Gehäuseversteifungen, Ausführung und Dichtigkeitsklasse wie oben beschrieben; Zum Anschluss an weitere Reaktionsmodule bzw. Endmodule an zwei Seiten offen, mit jeweils umlaufend doppelt gekantetem stabilen Rechteckflansch inkl. Anschlussadapter mit Abdichtungseinrichtungen zur Aufnahme der nächsten Module; Mit zwei am unteren Bodenblech angebrachten Vierpunkt-Schnellspanneinrichtungen zur Positionierung der Belüftereinheiten; Frontseitige Öffnung zum leichten seitlichen Auszug der Belüftereinheiten; Öffnung mit umlaufend doppelt gekantetem C-Profil Rechteckflansch zur Aufnahme eines wartungsgerechten, gasdicht verschraubten Öffnungsdeckels; Dazu stabiler Öffnungsdeckel mit umlaufender Abkantung, eingearbeiteter Dichtung sowie zwei Haltegriffen; Mit am oberen Blech eingearbeiteter Inspektionsöffnung, Ausschnitt im Gehäuseblech aus Stabilitäts-, Optik- und Verletzungsschutzgründen mit zusätzlich aufgeschraubtem entgrateten Versteifungsrahmen; Dazu stabiler Inspektionsdeckel mit umlaufender Abkantung, eingearbeiteter Dichtung und Knebelschrauben; im oberen Blech eingearbeitete Anschlussadapter zur Aufnahme der Klemmeinrichtung für das Luftverteilsystem;Um einen ungehinderten Abluftstrom zu gewährleisten, sind die in der Detailspezifizierung der Reaktionsmodule angegebenen, Mindestbauteilmaße zu beachten; mit Restentleerung durch außenliegenden Anschluss Einbausatz für ReaktionsmodulVierteiliges Luftverteilsystem zum Anschluss der Prozessluft an zwei Hochleistung-Belüftereinheiten im Reaktionsmodul; Verteilsystem aus Rundrohr gefertigt, komplett in optimierter strömungsgünstiger Ausführung; Schraubbare gasdichte Klemmeinrichtung zur Aufnahme des Luftverteilsystems, passend zum Anschlussadapter im Reaktionsmodul, endend mit außen am Reaktionsmodul liegenden Flanschstutzen;Hochleistungs-Belüftereinheit, energetisch optimiertes Kompaktsystem zum optimalen Gasaustausch im Reaktionsmodul; Belüftereinheit mit zylindrischen alumosilikatischen Belüfterkerzen; Symmetrisch an ein strömungsoptimiertes Verteilerrohr gasdicht angepresst; Verteilerrohr mit Anschlussstück mit integrierter Schnellkupplung zum Anschluss an das Luftverteilsystem; Verteilerrohr mit seitlichen Zentriereinrichtungen zur Aufnahme der strömungsoptimierten Anströmeinrichtungen; Anströmeinrichtungen zur laminaren Anströmung der Belüfterkerzen mit trompetenförmigem Anschluss (Rmin=7) in das Verteilrohr mit einem max. Versatz von + -0,5mm versenkt; gasdichte Anpresseinrichtung mit schwimmender Belüfterkerzenlagerung, so ausgeführt, dass der Anpressdruck jeder Belüfterkerze einzeln bestimmt werden kann sowie Fertigungstoleranzen der Belüfterkerzen ausgeglichen werden können; Die ganze Konstruktion ist so auszuführen, dass eine ungehinderte Anströmung der Belüfterkerzen ohne innere Querschnittsverengung durch Einbauten stattfindet; Ein innerer freier Querschnitt der Belüfterkerzen von D=40 mm ist durchgängig zu gewährleisten; Hinweis! Die Befestigung der Belüfterkerzen mittels Zuganker durch die Belüfterkerzen, ist aus energetischen Gründen unzulässig; Ebenfalls unzulässig sind Zentriereinrichtungen, die einen lichten Querschnitt von D=40 unterschreiten;Angaben zu den BelüfterkerzenWerkstoff: KeramikAußendurchmesser: 70 mmInnendurchmesser: 40 mmSpezifische Permeabilität: 10 hoch -13 pro m²Filterfeinheit für Gase: 5 µmPorosität 40%[PERSON_129]: '...............................................' (z.B. Aerolith AE S30 od. gleichwertig)Fabrikat: '...............................................' (z.B. Pall od. gleichwertig)Angaben zur Anströmeinrichtungen:Innendurchmesser: 40 mmEinlaufradius: R=7Werkstoff: '...............................................' (z.B. 1.4571 od. gleichwertig)Oberflächenrauhigkeit: '................................................' (max. Rz 6,3)Widerstandsbeiwert: '................................................' (Zeta max. 0,03)[PERSON_128] [PERSON_066]",
+  "Rohrleitungen aus nichtrostendem StahlAllgemeine Vorschriften zur Ausführung:Nachfolgend aufgeführte Anforderungen und Ausführungsformen sind einzuhalten und in die jeweiligen Rohrleitungspositionen einzukalkulieren.Anschlusspunkte:Sämtliche Anschlusspunkte (Lage, Dimension) sind vor Ort genau aufzunehmen. Die Angaben in den Ausschreibungsunterlagen befreien den Bieter nicht von dieser Pflicht. Nachforderungen, die auf Unterlassung der Aufnahme beruhen, werden nicht anerkannt.Be-/Entlüftungen und EntleerungenSofern nicht anders gefordert ist, sind an nicht zu vermeidenden Hochpunkten von Flüssigkeit führenden Rohrleitungen Be-/ Entlüftungsmöglichkeiten und an Tiefpunkten Entleerungsmöglichkeiten vorzusehen.RohrverbindungenAlle Rohrleitungen müssen mit leicht lösbaren Schraub-, Klemm- oder Quetschverbindungen bzw. bei Nennweiten > DN 50 ausschließlich mit Flanschverbindungen untereinander sowie mit den Behältern, Mauerdurchführungen, Armaturen, Messgeräten usw. verbunden werden. Bei Verbindungen von unterschiedlichen metallischen Werkstoffen (z.B. Filterbehälter - Niro-Leitung, aber auch Bauteile mit nichtleitendem Aussenkorrosionsschutz, z.B. EKB) einschließlich Halterungen, Schellen usw. ist zur Verhinderung von Kontaktkorrosion eine elektrische Trennung \"Isolierflansch\" vorzusehen.Zulagen zu den üblichen Flanschverbindungen der in diesem LV anzubietenden Nennweiten zur Herstellung einer elektrischen Trennstelle an Flanschverbindung zur Vermeidung von Korrosion bestehend aus:in Stück Isolier-Flanschdichtung,Isolierhülsen, je Loch ein StückIsolier-Unterlegscheiben, je Loch zwei StückStahlunterlegscheiben, je Loch zwei Stückesind in die Einheitspreise der einzubauenden Armaturen einzurechnen.Bei in Niro-Rohrleitungen eingebauten Elektroverbrauchern (Armaturen,Messgeräte etc.) müssen darüber hinaus an den anschliessenden Niro-Rohrleitungsteilen Erdungslaschen zum bauseitigen Anschließen einer Erdungskabelverbindung angeschweißt werden.Trinkwasserführende Rohrleitungen ab DN 65 und größer, in flanschsparender Bauweise, einschl. aller notwendigen Bauteile (z.B. Anschweißflansche etc.) Schweißzusätze und Hilfsstoffe,insbesondere unter Beachtung folgender Spezifikation:zulässige Bauteilgröße max. Formstückslänge 5.000 mmmax. Formstücksbreite für Abgänge und Bögen 1.500 mmWerkstoff: sämtliche Rohre, Bögen, Reduzierungen und Flansche in Werkstoffnummer 1.4571Rohre: längsnahtgeschweißte und gebeizte Rundrohre v = 1,0, DIN EN 10216-5.Die Mindestwandstärke der Rohre ist entsprechend den max. auftretenden Betriebsdrücken nach AD-Merkblatt B0 und B1 und den statischen Erfordernissen auszulegen, wobei die max. Durchbiegung der Rohrleitung im betriebsfertigen Zustand auf ein Vierhundertstel der Spannweite festgelegt wird. Ein statischer Nachweis ist auf Anforderung der BL zu erbringen.Sofern die Erfordernisse aus Statik oder Schweißverbindungen kleinere Wandstärken ergeben, sind trotzdem mindestens folgende Wandstärken einzuhalten:DN 10 - 32: 2,0 mmDN 40 - 80: 2,0 mmDN 100 - 150: 2,6 mmDN 200: 2,9 mmDN 250: 3,0 mmDN 300 - 350: 3,2 mmDN 400 - 500: 4,0 mmDN 600 - 1000: 5,0 mmBögen: längsnahtgeschweißte und gebeizte Bögen Bauart 3; ab DN 400 R = d + 100Reduzierungen: längsnahtgeschweißte und gebeizte Reduzierungen; Baulänge entsprechend DIN EN 10253; Mindestwandstärke entsprechend RohrwandstärkeFlansche: nach DIN EN 1092-1Anforderungen an den Herstellungsbetrieb der Rohrleitungen:Sämtliche Formstücke sind im Werk montagefertig in ferritfreien Räumen zu fertigen. Eine Fertigung in Räumen, in denen auch ferritische Stähle verarbeitet werden ist unzulässig.Darüber hinaus dürfen zur Verarbeitung der Formstücke nur ferritfreie Werkzeuge und Hebezeuge verwendet werden. Die ferritfreie Fertigung wird nicht als Nebenleistung, sondern als Hauptleistung vereinbart.Baustellennähte sind nur in Ausnahmefällen und nur mit ausdrücklicher Genehmigung der BL zulässig. Mit dem Angebot ist die Rohrleitungsfachfirma zu benennen und ein Nachweis über deren ferritfreie Fertigung vorzulegen.SchmelzschweißverfahrenFür Schweißprozesse für vorgenannte Formstücke sind ausschließlich die Einzelprozesse nach ISO 4063 13 Metallschutzgasschweißen 14 Wolfram-Schutzgasschweißen zulässig. Als Schweißzusatzwerkstoff ist der Werkstoff mit der Nummer 1.4576 zu verwenden.SchweißnahtqualitätAls Mindestanforderungen gilt die Bewertungsgruppe für Unregelmäßigkeiten EN DIN 5817 Gruppe D mit Ausnahme der Ordnungs-Nr. 2017 (nach ISO 6520-1). Für diese Ordnungsnummer gilt EN DIN 5817 Gruppe B als Mindestanforderung.QualitätssicherungZur Qualitätssicherung der Schweißnähte wird eine zerstörungsfreie Prüfung gemäß ISO 17637 durchgeführt. Diese Prüfung kann von der BL oder von einem vom Bauherrn separat beauftragten unabhängigen Sachverständigen während und nach der Formstücksfertigung durchgeführt werden. Sollte zwischen dem AN und der BL bzw. dem Sachverständigen Uneinigkeit über die Qualitätsbewertung bestehen, kann vom AG zusätzlich eine Durchstrahlungsprüfung angeordnet werden.Nachbehandlung der FormstückeAlle Rohrformstücke sind nach dem Schweißen im Vollbad zu beizen und zu passivieren. Für den Transport auf die Baustelle sind alle Öffnungen der Formstücke mit Deckeln zu verschließen und in geeigneter gewebeverstärkter mind. 0,5 mm dicker Folie zu verpacken.Montage der FormstückeDie Formstücke sind frei von Beschädigungen auf der Baustelle anzuliefern.Zum Bewegen und Montieren der Formstücke dürfen auf der Baustelle keine ferritischen Werkzeuge benutzt werden. Es sind lediglich nichtrostende Stähle, Kunststoffe oder Gewebegurte zulässig. Werden nach der Montage ferritische Verunreinigungen festgestellt, so sind die entsprechenden Rohre und Formstücke auszubauen und im Werk auf Kosten des Verursachers im Vollbad zu beizen und zu passivieren. Um eine nahezu spannungsfreie Montage zu gewährleisten sind sämtliche Rohrhalterungen höhenverstellbar auszuführen.Vor der Abnahme sind in Abstimmung mit der Bauleitung sämtliche Folien zu entfernen, die Rohrleitungen endzureinigen und mit einem trinkwassergeeigneten Mittel einzuölen.Allgemeine Hinweise zur Berohrung sind ebenfalls zu beachten.Flansche: Die Verwendung von Flanschen PN 10 (nach EN 1092-1:2018-1) mit reduzierter Blattstärke ist generell zulässig, wenn für die ausgeschriebenen Nennweiten die Dichtigkeit der Rohrverbindung mittels Berechnung nach AD-Merkblatt nachgewiesen wird (Berechnung ist dem Angebot beizulegen)Flanschenschrauben / Muttern:Schrauben und Scheiben: mind. 1.4401; Muttern: mind. 1.4571Reduzierungen:Exzentrische oder konzentrische Bauform entsprechend den technischen Anforderungen im Rohrsystem, Wanddicken und sonstige Anforderungen wie oben.Sattelstutzen:[PERSON_129]: aus Rohrbogen gefertigt. Wanddicken und sonstige Anforderungen wie oben.Paß- und Ausbaustücke:Alle Spindeln und Muttern aus 1.4571. Alle Dichtelemente aus KTW- und DVGW W270 zugelassenem Material. Wanddicken und sonstige Anforderungen wie oben.Rohrunterstützung und Rohrhalter:Höhenverstellbare Profilstahlkonstruktionen für Stütz-, [PERSON_074]-, Hänge- und Sonderbefestigungen einschließlich Befestigungsmaterial wie Dübel oder Edelstahlschrauben. Die Unterstützungen / Aufhängungen müssen so ausgelegt sein, dass alle im Betrieb auftretenden Lasten sicher aufgenommen werden.Die Rohre sind mittels 2-teiligen Flachstahlrohrschellen mit PVC-Einlage einzubauen.Die Unterstützungen sind bis zur Abnahme der Anlage mit geeigneter Schutzfolie zu schützen.ALLE ARMATUREN UND SONSTIGE MASCHINEN UND GERÄTE SIND SPANNUNGSFREI UNTER BEACHTUNG VON HERSTELLERVORSCHRIFTEN (zum Beispiel bezüglich Beruhigungsstrecken) ZU MONTIEREN!Abrechnungshinweise:Sofern im Positionstext nicht ausdrücklich anders angegeben, ist in die Einheitspreise für die Rohrleitungs-, Formstück- und Rohrleitungszubehör-Positionen die LIEFERUNG UND BETRIEBSFERTIGE MONTAGE EINZUKALKULIEREN.Die Abrechnungslänge der Edelstahlrohrleitungen wird einschl. der Flansche und Formstücke, etc. ermittelt, Maschinen (z. B. Pumpen, Gebläse), Armaturen und Filtergehäuse (Luftfiltration) werden jedoch nicht übermessen. Insofern sind die Flansche und Formstücke als ZULAGE ZUR JEWEILIGEN ROHRLEITUNG mit entsprechender Nennweite zu kalkulieren.SCHWEISSNÄHTE werden nicht gesondert vergütet. Sie sind in die Positionen der Formstücke und Flansche EINZUKALKULIEREN.Flanschverbindungssätze (Schrauben, Unterlegscheiben, Dichtungen und - wo erforderlich - galvanische Trennung) sind in die Positionen der Flansche bzw. Armaturen EINZUKALKULIEREN.Spezifikation Rohrleitungen",
+  "YesKleinleitungen aus nichtrostendem StahlSämtliche erforderlichen Kleinleitungen kleiner/gleichDN 65;komplett aus nichtrostendem [PERSON_089] mit Schraub- bzw.Preßfittingverbindungen;Einschließlichaller Verbindungs- und Formstücke und erforderlichen Anschluss-/Ausbaustücke für Einbauten, Zubehör etc. aus nichtrostendem [PERSON_089] (alle Einbauten müssen leicht demontierbar sein/Verschraubung oder Gewindeflansch);chloridfreier/-armer ozonbeständiger Dichtungsmaterialien;Wandbefestigungen.Allgemeine Hinweise zur Berohrung:Das Biegen der Rohre ist unzulässig. Übergangsstücke aus nichtrostendem [PERSON_089]. Bei Übergang auf Messingarmaturen bzw. sonstige Ausrüstungsteile aus [PERSON_176] oder unlegierten oder niedriglegierten [PERSON_089] können auch Rotgussverbindungsstücke verwendet werden.Fabrikat: '.....................................................' (z.B. mapress oder gleichwertig)Druckstufe: PN 16Kleinleitungen aus nichtrostendem [PERSON_089]",
+  "YesWeichdichtender Absperrschieber nach EN 1074mit ElektroantriebAbsperrarmatur für Trinkwasser bis 50°CDN 40 - 600, PN 10 - 16Weichdichtend nach EN 1074 (DIN 3352-4B),Baulänge DIN EN 558-1, Grundreihe 14 (DIN 3202, F4).Beiderseits Flanschanschluss nach EN 1092-1, PN 16, sofern in nachstehenden Positionstexten nicht anders angegeben.Wartungsfreie und korrosionssichere verlängerte Spindelabdichtung mit dreifacher O-Ring Abdichtung;Keilführung im Gehäuse und langer SpindellagerungGehäuse: Duktiles Gusseisen EN-GJS-400-15 (GGG-40)Deckel: Duktiles Gusseisen EN-GJS-400-15 (GGG-40)Absperrkeil: Duktiles Gusseisen EN-GJS-400-15 (GGG-40) allseitig mit EPDM vulkanisiertDeckelschrauben: [PERSON_115] A2 (DIN EN ISO 3506)Spindel: [PERSON_115] 1.4057Spindelmutter: MessingKorrosionsschutz: Innen und außen Epoxid-Beschichtung nach GSK-RichtlinienDichtheit nach DIN EN 12 266-1, Leckrate A;alle mediumberührten Teile nach KTW und DVGW Arbeitsblatt W270 (bakteriologisch unbedenklich)Ausführung mit angebautemHandradFabrikat: '.........................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '..........................................................' (VAG BETA® 300 Absperrschieber mit Handrad oder gleichwertig)Bei gleichwertigen Armaturen anderer Hersteller ist dem Angebot ein Datenblatt beizulegen!inkl. allem erforderlichen Befestigungsmaterial (anteiliger Flanschverbindungssatz) liefern und betriebsfertig montieren.Spezifikation Absperrschieber Handbetrieb",
+  "Soweit möglich, werden im Bestand verbaute Armaturen wiederverwendet. In den nachstehden Positionen ist entsprechend zu kalkulieren:Demontage Absperrschieber handbetätigt im Zuge der Demontage der bestehenden Anlagenverrohrung aus GrussrohrenSchutz vor [PERSON_010] durch Spülung, Sprühdesinfektion und Umhüllung mit SchutzfolieZwischentransport und -lagerung auf der BaustelleMontage in neue Anlagenverrohrung aus Edelstahlrohren mit Erneuerung der Dichtungen und anteiligem FlanschbefestigungssatzSpezifikation Absperrschieber Handbetrieb versetzen",
+  "YesWeichdichtende zentrische Absperrklappe nach DIN EN 593 Lug-Type mit DIN-DVGW-Baumusterprüfzertifikat für TrinkwasserAbsperrarmatur für Trink- und Brauchwasser bis 100°CDN 50 - 600, PN 10 - 16 Baulänge DIN EN 558-1, Grundreihe 20 (DIN 3202, Reihe K1)Klappenscheibe im Gehäuse zentrisch in wartungsfreien Buchsen dreifach gelagert;Austauschbare Gummimanschette mit integrierter Dichtung für funktionssicheren Einsatz bei Bördelflanschen, Schweißflanschen, losen Flanschen mit V-Bund und PE-Flanschen;[PERSON_134] durch Manschette mit vulkanisiertem Trägerring; Als Endarmatur für vollen Differenzdruck einsetzbar;In beiden Durchflussrichtungen dicht;Wellen ausblasesicher;Dichtheit nach DIN EN 12 266-1, Leckrate A;Flanschanschlussmaße nach EN 1092;Alle mediumberührten Teile nach KTW und DVGW Arbeitsblatt W270 (bakteriologisch unbedenklich);Gehäuse aus Gusseisen EN-JS 1030 (GGG-40);Klappenscheibe aus [PERSON_115] 1.4408 (CF8M);Manschette aus EPDM;Klappenwelle aus nichtrostendem [PERSON_089], Werkstoff 1.4021;Wartungsfreie WellenlagerKorrosionsschutz:innen und außen mit Epoxid-Beschichtung, Schichtdicke >250 µm, Farbton blau, RAL 5005Varianten:Betätigung:mit Handhebel bis einschließlich DN 80mit Getriebe und Handrad ab DN 100Fabrikat: '................................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '....................................................................' (VAG CEREX® 300-L Absperrklappe oder gleichwertig)inkl. allem erforderlichen Befestigungsmaterial (anteiliger Flanschverbindungssatz bzw. Mehrpreis zu der anteilig in den Flanschpositionen enthaltenen Flanschverbindung für Dichtung und längere Schrauben) liefern u. betriebsfertig montieren.Spezifikation Absperrklappe Zwischenflanschausführung, handbetätigt",
+  "YesWeichdichtender Absperrschieber nach EN 1074mit ElektroantriebAbsperrarmatur für Trinkwasser bis 50°CDN 40 - 600, PN 10 - 16Weichdichtend nach EN 1074 (DIN 3352-4B),Baulänge DIN EN 558-1, Grundreihe 14 (DIN 3202, F4).Beiderseits Flanschanschluss nach EN 1092-1, PN 16, sofern in nachstehenden Positionstexten nicht anders angegeben.Wartungsfreie und korrosionssichere verlängerte Spindelabdichtung mit dreifacher O-Ring Abdichtung;Keilführung im Gehäuse und langer SpindellagerungGehäuse: Duktiles Gusseisen EN-GJS-400-15 (GGG-40)Deckel: Duktiles Gusseisen EN-GJS-400-15 (GGG-40)Absperrkeil: Duktiles Gusseisen EN-GJS-400-15 (GGG-40) allseitig mit EPDM vulkanisiertDeckelschrauben: [PERSON_115] A2 (DIN EN ISO 3506)Spindel: [PERSON_115] 1.4057Spindelmutter: MessingKorrosionsschutz: Innen und außen Epoxid-Beschichtung nach GSK-RichtlinienDVGW-geprüft und registriertAusführung mit angebautemElektroantrieb AUMA-Drehantrieb (Stellbetrieb) oder gleichwertigBetriebsart: S2 - 15 minNetzspannung: Drehstrom 400 V / 50 HzStellzeit / Antrieb (bei gleichwertigen Antrieben anderer Hersteller Datenblatt beilegen):DN 50: 34 Sekunden / Antriebsgröße SA 07.6DN 65: 48 Sekunden / Antriebsgröße SA 07.6DN 80: 55 Sekunden / Antriebsgröße SA 07.6DN 100: 55 Sekunden / Antriebsgröße SA 07.6DN 125: 68 Sekunden / Antriebsgröße SA 10.2DN 150: 82 Sekunden / Antriebsgröße SA 10.2DN 200: 93 Sekunden / Antriebsgröße SA 10.2Antrieb mitHeizung im Schaltwerkraum: 110 V bis 250 VElektroanschluss - Steckerdeckel: mit M-Gewinden (1 x M20x1 ,5 / 1 x M25x1 ,51 x M32x1 ,5)Temperatur-Ausführung: Standard -30°C bis +70°CSchutzklasse: IP68Korrosionsschutz: KSMechanische StellungsanzeigeBlinkgeberFabrikat: '.........................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '..........................................................' (VAG BETA® 300 Absperrschieber mit E-Antrieb oder gleichwertig)Bei gleichwertigen Antrieben anderer Hersteller ist dem Angebot ein Datenblatt beizulegen!inkl. allem erforderlichen Befestigungsmaterial (anteiliger Flanschverbindungssatz) liefern und betriebsfertig montieren.Spezifikation Absperrschieber Elektroantrieb",
+  "Soweit möglich, werden im Bestand verbaute Armaturen wiederverwendet. In den nachstehden Positionen ist entsprechend zu kalkulieren:Demontage Absperrschieber mit angebautem Elektroantrieb im Zuge der Demontage der bestehenden Anlagenverrohrung aus GrussrohrenSchutz vor [PERSON_010] durch Spülung, Sprühdesinfektion und Umhüllung mit SchutzfolieZwischentransport und -lagerung auf der BaustelleMontage in neue Anlagenverrohrung aus Edelstahlrohren mit Erneuerung der Dichtungen und anteiligem FlanschbefestigungssatzSpezifikation Absperrschieber mit Elektroantrieb versetzen",
+  "YesKugelhahnbis PN 162-Wege-Kugelhahn aus nichtrostendem [PERSON_089] zum Einbau in druckluft-/trinkwasserführende Rohrleitungen;Gehäuse 3-teilig mit vollem Durchgang und beidseitigen Innengewindestutzen.Gehäuse und Kugel aus nichtrostendem [PERSON_089] (mind. 1.4408)Kugeldichtung aus Material mit KTW-Zulassung (z.B. PTFE)abschließbarer Handhebel aus nichtrostendem [PERSON_089] mit KunststoffgriffFabrikat: '...............................................' (END oder gleichwertig)[PERSON_129]: '...............................................' (ZE oder gleichwertig)Spezifikation Kugelhahn",
+  "YesWeichdichtender Rückflussverhinderer nach EN 12334Trinkwasser bis 50°CDN 40 - 300, PN 10 - 16Baulänge DIN EN 558-1, Grundreihe 48 (DIN 3202, F6)Geringer Druckverlust durch 100 % freien Durchgang;Glatte einteilige Klappenscheibe mit integrierter Dichtung, beidseitig verwendbar; Keine Lagerreibung durch integrierte Aufhängung der Klappenscheibe;[PERSON_099] zur Reduzierung von Druckstößen;Austausch der Klappenscheibe ohne Ausbau der Armatur;Mit Verschlussschraube G 3/4\";Flanschanschlussmaße nach EN 1092;Alle medienberührten Teile nach KTW und DVGW Arbeitsblatt W270 (bakteriologisch unbedenklich);Gehäuse und Deckel aus duktilem Gusseisen EN-GJS-400-15 (GGG-40);Klappenscheibe allseitig mit EPDM vulkanisiert;Deckelschrauben aus [PERSON_115] A2;Verschlussschraube aus MessingKorrosionsschutz:innen und außen mit Epoxid-Beschichtung in GSK-Ausführung \"Schwerer Korrosionsschutz\" nach DIN 30 677-2, Schichtdicke >250 µm, Farbton blau, RAL 5005Fabrikat: '.................................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '.................................................................' (VAG RETO-STOP oder gleichwertig)liefern und betriebsfertig installieren, inkl. anteiligem Flanschberbindungssatz.Ein Diagramm mit Darstellung des Zeta-Wertes in Abhängigkeit vom Durchfluss ist mit dem Angebot abzugeben.Spezifikation Rückschlagklappe ohne Gewichtshebel",
+  "YesWeichdichtender Rückflussverhinderer nach EN 12334Trinkwasser bis 50°CDN 50 - 300, PN 10 - 16Baulänge DIN EN 558-1, Grundreihe 48 (DIN 3202, F6)Weichdichtend;mit aussenliegender Welle, mit Hebel und Gewicht in Durchflussrichtung rechts;vormontiert für vertikale Einbaulage;stabile leicht verstellbare Befestigung des Gewichtshebels mit Passfeder auf der Wellemit montiertem Schutzkorb;Öffnungsgrad 90%; molchbar in Durchflussrichtung;Schnelle und einfache Reinigung der Klappenscheibe durch Herausklappen ohne Ausbau; Einfacher Dichtungswechsel an der Klappenscheibe;Flexible und gedämpfte Doppelllagerung der Klappenscheibe mit Anschlagdämpfung im Gehäuse;Wellenlagerung in leichtgängigen Bronzebuchsen;Hängeösen zur Montageerleichterung;Flanschanschlussmaße nach EN 1092;Alle medienberührten Teile nach KTW und DVGW Arbeitsblatt W270 (bakteriologisch unbedenklich);Gehäuse und Deckel aus duktilem Gusseisen EN-JS 1030 (GGG-40);Klappenscheibe, Hebel aus [PERSON_115] CF8 (1.4308);Schrauben, Scheiben und Verbindungselemente aus A4;Welle aus [PERSON_115] A4 (1.4057);Lager aus zinkfreier Bronze CW306G;Schutzkorb aus [PERSON_115] (1.4541);Dichtungen aus NBR;Korrosionsschutz:Innen und außen mit Epoxid-Beschichtung in GSK-Ausführung \"Schwerer Korrosionsschutz\" nach DIN 30 677-2, Schichtdicke >250 µm, Farbton blau, RAL 5005Fabrikat: '.................................................................' ([FIRMA_023] oder gleichwertig)[PERSON_129]: '.................................................................' (VAG LIMU-STOP oder gleichwertig)liefern und betriebsfertig installieren, inkl. anteiligem Flanschberbindungssatz.Spezifikation Rückschlagklappe mit Hebel und Gewicht"
+ ],
+ "stats": {
+  "items": 159,
+  "priced": 0,
+  "remarks": 13,
+  "bid_total": 0.0
+ }
+}

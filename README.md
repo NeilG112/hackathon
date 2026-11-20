@@ -61,22 +61,41 @@ data/golden/                pre-parsed fixtures (fallback if a live parse dies)
 Tasks are numbered and dependency-ordered. Each module is stubbed with the facts it needs
 in its docstring. Task briefs go in `.orch/tasks/NNN-*.md` — see `_TEMPLATE.md`.
 
-| # | Task | Files | Depends on | Done when |
+| # | Task | Files | Depends on | Status |
 |---|---|---|---|---|
-| 001 | **The gate** — both parsers | `core/models.py`, `core/parser_x83.py`, `core/parser_gaeb90.py`, `utils/text_cleaning.py`, `validate_gate.py` | — | `python3 validate_gate.py` prints `GATE GREEN`, 159 items both sides |
-| 002 | Reference prices + golden fixtures | `scripts/*` | 001 | `data/reference_prices.json` has ~720 items; `data/golden/` has all 9 GAEB files |
-| 003 | Pricer | `core/pricer.py` | 002 | prices a BoQ, labels benchmark vs. fallback, returns `None` where no comparable |
-| 004 | Three detectors | `core/detectors.py` | 003 | `run_all` returns findings ranked by € leverage |
-| 005 | **The reveal** | `validate.py` | 003 | prints our total, the real €897,305.45, the % error, worst positions |
-| 006 | RFI export | `export_rfi.py` | 004 | a .docx Bieterfragen-Katalog in VOB German, no live LLM |
-| 007 | Streamlit UI | `app.py` | 004, 005 | upload → table → sliders → top 20 → reveal → export |
+| 001 | **The gate** — both parsers | `core/models.py`, `core/parser_x83.py`, `core/parser_gaeb90.py`, `utils/text_cleaning.py`, `validate_gate.py` | — | **done** — `GATE GREEN`, 159/159 |
+| 002 | Reference prices + golden fixtures | `scripts/*` | 001 | **done** — 720 priced items, 9 fixtures |
+| 003 | Pricer | `core/pricer.py` | 002 | **done** — +6.3% vs. the real bid |
+| 004 | Three detectors | `core/detectors.py` | 003 | **open** — `run_all` returns findings ranked by € leverage |
+| 005 | **The reveal** | `validate.py` | 003 | **done** — see numbers below |
+| 006 | RFI export | `export_rfi.py` | 004 | **open** — .docx Bieterfragen-Katalog in VOB German, no live LLM |
+| 007 | Streamlit UI | `app.py` | 004, 005 | **open** — upload → table → sliders → top 20 → reveal → export |
 
-**001 is a hard gate.** Nothing else is worth writing until it's green — it settles cp850
-decoding, decimal scaling, the fixed-width slicer and `NormalizedItem` against
-machine-checkable ground truth. 005 comes *before* the UI: if the pricing error is wild
-there's still time to tune `constants.py`; after the UI exists there isn't.
+The critical path (001 → 002 → 003 → 005) is finished, so **004, 006 and 007 are now
+independent** — three people can take one each without touching the same files.
 
-Parallelism: 003/005 and 006 can run alongside 004 once 002 lands. 007 last.
+### Where the reveal currently stands
+
+`python3 validate.py`, with the answer key **held out** of the benchmark:
+
+```
+our estimate, 248 positions    954,062.31
+real submitted bid             897,305.45      +6.3%
+after fitting one scalar       78% of positions within +/-30%, median error 7%
+50 positions still disagree by >30%  <- the actual findings
+```
+
+Two things to understand before you quote those numbers:
+
+- **The benchmark holds the answer key out.** `StBALV23040.D86` is both one of the three
+  bids in `reference_prices.json` *and* the bid we measure against. Pricing with it
+  included is circular and worth €251k of flattery. `pricer.without_source()` exists for
+  this; `validate.py` always uses it. **Never show a judge the leaky number.**
+- **Absolute level vs. position accuracy are different claims.** A benchmark from other
+  projects gets the *shape* of a price list right and its *level* roughly — site
+  conditions and competitive pressure move every rate at once. That is why the demo's
+  slider story works: the fitted scalar *is* the competitor's implied cost base
+  (`pricer.implied_cost_base`).
 
 ## Rules that are not negotiable
 
@@ -87,6 +106,11 @@ Parallelism: 003/005 and 006 can run alongside 004 once 002 lands. 007 last.
   pad them (`01,01,0001`), so a naive key join matches **zero** of 248 items and looks like
   a pricing failure. Padded, it matches 247. (PLAN.md's stated join is wrong on this file.)
 - **No comparable → print `kein Vergleichswert`.** An honest blank beats an invented euro.
+  20 of the 248 demo positions are rental/time units (`Wo`, `mWo`, `m2d`) with no
+  comparable anywhere in the benchmark. The contractor charged €10,336 for them. Say so;
+  don't fill the hole.
+- **Never measure against a bid that is in the benchmark.** Use
+  `pricer.without_source(ref, answer_key)`. Leakage was worth €251k here.
 - **No live LLM in the demo path.** Pre-generate, cache to disk, ship the JSON.
 - **Don't loosen the gate to make it pass.** A real failure is useful; a gate that passes
   by weakened comparison is worse than no gate.

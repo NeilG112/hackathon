@@ -100,6 +100,28 @@ class NormalizedItem:
         """The tuple the twin-pair gate asserts on. Text is deliberately out."""
         return (self.key(), round(self.quantity, 3), self.unit.strip().lower())
 
+    def as_dict(self) -> dict:
+        """JSON-safe form, used for the `data/golden/` fallback fixtures."""
+        return {
+            "oz": self.oz,
+            "oz_parts": list(self.oz_parts),
+            "quantity": self.quantity,
+            "unit": self.unit,
+            "short_text": self.short_text,
+            "long_text": self.long_text,
+            "is_lump_sum": self.is_lump_sum,
+            "unit_price": self.unit_price,
+            "total_price": self.total_price,
+            "source_file": self.source_file,
+            "source_ref": self.source_ref,
+        }
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "NormalizedItem":
+        data = dict(raw)
+        data["oz_parts"] = tuple(data.get("oz_parts") or ())
+        return cls(**data)
+
 
 @dataclass
 class Finding:
