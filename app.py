@@ -39,7 +39,7 @@ from views import reveal
 
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
-PAGES = ("Tender", "Groups", "Logic", "Das Angebot", "Heikle Positionen")
+PAGES = ("Tender", "Gruppen & Angebot", "Logic", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
@@ -400,9 +400,20 @@ def show_position_details(
     )
 
 
-def section_groups(items, assignments, data, filename: str, remarks: list[str]):
+def section_groups(items, assignments, data, filename: str, remarks: list[str],
+                   calculated=None):
     """List trade groups; opening one shows the positions in that trade."""
     rows = objects.by_trade(items, assignments, data)
+    if calculated:
+        stats = kalkulation.summarize(calculated)
+        a, b, c = st.columns(3)
+        a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
+                 help="Mittelwert der Spanne")
+        b.metric("Spanne", f"€{stats['total_low']:,.0f} – "
+                 f"{stats['total_high']:,.0f}")
+        c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
+                 help=f"{stats['unpriced']} Positionen ohne zugeordnete Leistung")
+
     selected_key = st.session_state.get("selected_group_key")
     selected = next((row for row in rows if row.key == selected_key), None)
 
@@ -459,6 +470,13 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str]):
         width="stretch",
         hide_index=True,
         height="stretch",
+        column_config={
+            "OZ": st.column_config.TextColumn("OZ", width="small"),
+            "Position": st.column_config.TextColumn("Position", width="large"),
+            "Menge": st.column_config.NumberColumn("Menge", width="small"),
+            "Einheit": st.column_config.TextColumn("Einheit", width="small"),
+            "Pauschal": st.column_config.TextColumn("Pauschal", width="small"),
+        },
         key="group_positions",
         on_select="rerun",
         selection_mode="single-row",
@@ -744,44 +762,136 @@ def main():
     st.markdown(
         """
         <style>
-        [data-testid="stMain"] { overflow: hidden !important; }
+        /* The page never scrolls: everything is pinned to the viewport. */
+        html, body,
+        [data-testid="stApp"],
+        [data-testid="stAppViewContainer"] {
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+            overflow: hidden !important;
+        }
+        [data-testid="stMain"] {
+            height: 100dvh !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+        }
+        /* Main area is a flex column exactly one viewport tall. The top
+           padding clears Streamlit's fixed header (Deploy / menu). */
         [data-testid="stMainBlockContainer"] {
             box-sizing: border-box;
-            height: 100% !important;
-            max-height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100dvh !important;
             min-height: 0 !important;
             overflow: hidden !important;
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
+            padding: 3.75rem clamp(0.75rem, 3vw, 3rem) 0.75rem !important;
         }
         [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
-            height: 100%;
-            min-height: 0;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            gap: clamp(0.35rem, 1.2dvh, 1rem) !important;
+            /* Last resort only: if the fixed header content cannot fit at
+               all (tiny window), scroll inside the panel, never the page. */
+            overflow-y: auto;
+            overflow-x: hidden;
         }
-        [data-testid="stMainBlockContainer"] [data-testid="stElementContainer"]:has(
-            [data-testid="stDataFrame"]
+        /* Fixed-size content keeps its natural height ... */
+        [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] > * {
+            flex-shrink: 0;
+        }
+        /* ... while the one list/table on each page takes all the space
+           that is left and scrolls inside itself. Every wrapper between the
+           top block and that element has to grow along with it. */
+        [data-testid="stMainBlockContainer"] div:has(
+            .st-key-group_list, [data-testid="stDataFrame"]
         ) {
-            flex: 1 1 0%;
-            min-height: 0;
-            overflow: hidden;
+            flex: 1 1 0% !important;
+            min-height: 8rem !important;
+            display: flex;
+            flex-direction: column;
         }
         [data-testid="stMainBlockContainer"] [data-testid="stDataFrame"] {
-            display: block;
+            flex: 1 1 0% !important;
+            width: 100% !important;
             height: 100% !important;
-            max-height: 100% !important;
-            min-height: 0 !important;
+            min-height: 8rem !important;
         }
         [data-testid="stMainBlockContainer"] .st-key-group_list {
-            height: calc(100dvh - 16rem);
-            max-height: calc(100dvh - 16rem);
-            min-height: 0;
-            overflow-y: auto;
+            flex: 1 1 0% !important;
+            min-height: 8rem !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding-right: 0.25rem;
+        }
+        [data-testid="stMainBlockContainer"] .st-key-group_list > * {
+            flex-shrink: 0 !important;
+        }
+
+        /* Fluid type and spacing so the fixed part stays compact. */
+        [data-testid="stMainBlockContainer"] h1 {
+            margin: 0 !important;
+            padding: 0 0 0.25rem !important;
+            font-size: clamp(1.4rem, 2.2vw + 1dvh, 2.4rem) !important;
+        }
+        [data-testid="stMainBlockContainer"] h3 {
+            padding: 0.25rem 0 !important;
+        }
+        [data-testid="stMetricValue"] {
+            font-size: clamp(1.2rem, 2.4vw, 2.25rem) !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        [data-testid="stMetric"] {
+            padding: 0 !important;
+            min-width: 0;
+        }
+
+        /* Columns wrap instead of overflowing on narrow screens. */
+        [data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap !important;
+        }
+        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+            min-width: min(100%, 11rem) !important;
+        }
+
+        /* Sidebar: its own scroll if the controls are taller than the window. */
+        [data-testid="stSidebar"] {
+            min-width: 15rem;
+            max-width: 22rem;
+        }
+        [data-testid="stSidebarContent"] {
+            overflow-y: auto !important;
         }
         [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="secondary"] {
             border: 0;
             background: transparent;
             text-align: left;
             justify-content: flex-start;
+        }
+
+        /* Source-document dialog fits the viewport too. */
+        [data-testid="stDialog"] iframe {
+            height: min(600px, 62dvh) !important;
+        }
+
+        @media (max-width: 640px) {
+            [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+                min-width: 100% !important;
+            }
+            .st-key-group_list [data-testid="stHorizontalBlock"] {
+                gap: 0.25rem !important;
+            }
+        }
+        @media (max-height: 700px) {
+            [data-testid="stMainBlockContainer"] {
+                padding-top: 3.25rem !important;
+                padding-bottom: 0.4rem !important;
+            }
+            [data-testid="stMetricLabel"] { font-size: 0.8rem !important; }
+            [data-testid="stCaptionContainer"] { margin: 0 !important; }
         }
         </style>
         """,
@@ -790,6 +900,9 @@ def main():
     st.sidebar.markdown("### Bid & Risk Assistant")
     st.sidebar.caption("Benutzermodus")
     active_page = st.session_state.get("active_page", PAGES[0])
+    if active_page in ("Groups", "Das Angebot"):
+        active_page = "Gruppen & Angebot"
+        st.session_state["active_page"] = active_page
     for candidate in PAGES:
         if st.sidebar.button(
             candidate,
@@ -809,10 +922,6 @@ def main():
 
     if page == "Tender":
         section_items(items)
-    elif page == "Groups":
-        data = stammdaten.load()
-        assignments = classify.classify(items, data, use_jev=False)
-        section_groups(items, assignments, data, label, remarks)
     elif page == "Logic":
         st.info("Die Logik-Prüfungen werden später ergänzt.")
     else:
@@ -820,9 +929,21 @@ def main():
         data = stammdaten.load()
         assignments = classify.classify(items, data, use_jev=False)
         calculated = kalkulation.calculate(items, assignments, company, data)
-        if page == "Das Angebot":
+        if page == "Gruppen & Angebot":
             cov = classify.coverage(assignments)
-            section_kalkulation(calculated, cov, data)
+            if cov["pct"] < 50:
+                st.warning(
+                    f"Nur {cov['pct']}% der Positionen konnten einer Leistung "
+                    "zugeordnet werden."
+                )
+            section_groups(
+                items,
+                assignments,
+                data,
+                label,
+                remarks,
+                calculated,
+            )
         else:
             section_tricky(calculated)
 
