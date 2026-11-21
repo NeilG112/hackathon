@@ -126,55 +126,168 @@ def jev_available() -> bool:
     return bool(os.getenv("JEV_KEY") or os.getenv("JEV_API_KEY"))
 
 
+JEV_URL = os.getenv("JEV_URL", "https://api.typesafe.ai/v1/systemone")
+JEV_MODEL = os.getenv("JEV_MODEL", "jev-latest")
+# The decision rule, measured against representative and negative cases.
+# Probed on real positions plus two deliberate negatives ("Teppichboden
+# verlegen", "Dachabdichtung aufschweißen" — trades absent from this
+# catalogue). Both negatives scored noul<=0.07 AND option probability <=0.35;
+# genuine matches scored 0.62-0.99 on the option. So:
+#
+#     accept if  p >= 0.60                      (the option is clearly right)
+#            or  p >= 0.45 and noul >= 0.60     (plausible and the catalogue
+#                                                does contain this kind of work)
+#
+# `confidence` is deliberately unused: it measures how peaked the distribution
+# is, not how likely the answer is to be correct.
+STRONG_OPTION_PROB = 0.60
+WEAK_OPTION_PROB = 0.45
+MIN_MATCH_NOUL = 0.60
+
+
+class JevError(RuntimeError):
+    """A failed call is an error, never an answer.
+
+    Treating an outage as "no match" would silently drop positions out of the
+    bid and look like a clean result. The caller decides whether to fall back
+    to the keyword backend; this layer does not decide for it.
+    """
+
+
+def _slug(text: str) -> str:
+    """Descriptive option name. Jev sees these, so they carry meaning.
+
+    Positional names (`option_1`) give the model nothing to reason about, and
+    the Leistung codes (`E01`) are equally meaningless to it. The activity
+    text is what a person would read.
+    """
+    base = re.sub(r"[^a-zäöüß0-9]+", "_", (text or "").lower()).strip("_")
+    return base[:60] or "unbenannt"
+
+
 def classify_jev(
     item: NormalizedItem,
     data: Stammdaten,
     unit: str,
-    timeout: float = 20.0,
+    timeout: float = 30.0,
 ) -> Assignment:
-    """Ask Jev to pick a Leistung code from the shortlist.
+    """Ask Jev which Leistung this position describes.
 
-    Jev returns a structured value plus a confidence, which is exactly the
-    shape this problem wants: a label we can join to the rate table, and a
-    number telling us when not to trust it. Any failure returns an empty
-    assignment so the caller falls through to the keyword backend — a
-    classifier outage must never take the estimate down.
+    Two questions in one request, sharing one state:
+
+      `passt`     a Noul — does the catalogue contain this work at all?
+      `leistung`  a Choice — which entry, given that it does
+
+    The Noul is not optional. A Choice *always* returns an option, even when
+    nothing fits, so without a companion Noul every unrelated position would
+    be confidently assigned a wrong Leistung and silently mis-priced. The
+    catalogue has 34 entries and a real tender contains work that is simply
+    not in it, so "none of these" is the common case, not the edge case.
+
+    Code, not the model, decides what to do with the two judgments.
     """
-    import urllib.error
     import urllib.request
 
     key = os.getenv("JEV_KEY") or os.getenv("JEV_API_KEY")
     if not key:
+        raise JevError("JEV_KEY is not set")
+
+    # The whole catalogue, not the unit shortlist. Measured: restricting by
+    # unit HIDES the right answer — "Sanitärcontainer aufstellen" is billed in
+    # St but belongs to Baustelleneinrichtung (psch), so the unit shortlist
+    # forced a wrong pick at p=0.71 while the full catalogue found it at 0.99.
+    # Worse, a unit with one candidate makes the Choice degenerate: it must
+    # return that option at p=1.00 regardless of the text.
+    shortlist = list(data.leistungen.values())
+    if not shortlist:
         return Assignment(None, 0.0, "none")
 
-    shortlist = candidates(unit, data)
-    menu = "\n".join(f"{l.code}: {l.taetigkeit} [{l.einheit}]" for l in shortlist)
+    criteria, back = {}, {}
+    for leistung in shortlist:
+        name = _slug(leistung.taetigkeit)
+        while name in back:                       # keep option names unique
+            name = f"{name}_{leistung.code.lower()}"
+        back[name] = leistung.code
+        criteria[name] = (
+            f"{leistung.taetigkeit}. Abgerechnet in {leistung.einheit}."
+            + (f" {leistung.bemerkung}" if leistung.bemerkung else "")
+        )
+
     payload = {
-        "input": (
-            "Ordne die folgende Position aus einem deutschen Leistungsverzeichnis "
-            "genau einer Leistung zu. Antworte nur mit dem Code.\n\n"
-            f"POSITION ({unit}): {item.short_text}\n{item.long_text[:400]}\n\n"
-            f"MÖGLICHE LEISTUNGEN:\n{menu}"
-        ),
-        "schema": {"leistung_code": "string", "score": "number"},
+        "model": JEV_MODEL,
+        # The catalogue goes in the state because questions are answered
+        # independently: the Noul cannot see the Choice's criteria, so without
+        # this it has no idea what "the list" is and returned ~0.78 for
+        # everything, including work from entirely different trades.
+        "state": {
+            "position": {
+                "kurztext": item.short_text,
+                "langtext": (item.long_text or "")[:1000],
+                "einheit": unit,
+                "menge": item.quantity,
+            },
+            "katalog": [f"{l.taetigkeit} [{l.einheit}]" for l in shortlist],
+        },
+        "questions": {
+            "passt": {
+                "type": "noul",
+                "instructions": (
+                    "Lässt sich die Arbeit in `position` mit einer Zeile aus "
+                    "`katalog` kalkulieren?"
+                ),
+                "criteria": {
+                    "true": "Eine Katalogzeile beschreibt dieselbe Art von "
+                            "Arbeit in derselben Abrechnungseinheit; Material, "
+                            "Dimension oder Fabrikat dürfen abweichen.",
+                    "false": "Der Katalog enthält keine Zeile für diese Art von "
+                             "Arbeit, etwa weil sie zu einem anderen Gewerk "
+                             "gehört.",
+                },
+            },
+            "leistung": {
+                "type": "choice",
+                "instructions": "Welche Leistung beschreibt `position`?",
+                "criteria": criteria,
+            },
+        },
     }
+
     request = urllib.request.Request(
-        os.getenv("JEV_URL", "https://api.jevai.net/v1/decide"),
-        data=json.dumps(payload).encode("utf-8"),
+        JEV_URL,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
         headers={"Content-Type": "application/json",
                  "Authorization": f"Bearer {key}"},
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             body = json.loads(response.read().decode("utf-8"))
-    except Exception:                                       # noqa: BLE001
-        return Assignment(None, 0.0, "none")
+    except Exception as exc:                                # noqa: BLE001
+        raise JevError(f"{type(exc).__name__}: {exc}") from exc
 
-    code = str(body.get("leistung_code") or "").strip().upper()
-    confidence = float(body.get("confidence") or body.get("score") or 0.0)
-    if code not in data.leistungen or confidence < MIN_JEV_CONFIDENCE:
-        return Assignment(None, confidence, "none")
-    return Assignment(code, round(confidence, 3), "jev")
+    answers = body.get("answers", {})
+    fits = float(answers.get("passt", {}).get("noul", 0.0))
+    choice = answers.get("leistung", {}) or {}
+    name = choice.get("choice")
+    probabilities = choice.get("probabilities", {}) or {}
+    probability = float(probabilities.get(name, 0.0))
+
+    # Code holds the logic. The Noul decides whether anything fits at all; the
+    # option's own probability decides whether we know which. `confidence` is
+    # deliberately unused — it measures how peaked the distribution is, not
+    # how likely the answer is to be right.
+    if name not in back:
+        return Assignment(None, round(probability, 3), "jev_unsure")
+    strong = probability >= STRONG_OPTION_PROB
+    plausible = probability >= WEAK_OPTION_PROB and fits >= MIN_MATCH_NOUL
+    if not (strong or plausible):
+        return Assignment(None, round(probability, 3),
+                          "jev_nomatch" if fits < MIN_MATCH_NOUL else "jev_unsure")
+
+    alternatives = sorted(probabilities.items(), key=lambda kv: -kv[1])[:3]
+    return Assignment(
+        back[name], round(probability, 3), "jev",
+        [f"{back.get(n, n)}:{p:.2f}" for n, p in alternatives],
+    )
 
 
 # --- cache -----------------------------------------------------------------

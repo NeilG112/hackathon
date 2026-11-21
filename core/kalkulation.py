@@ -157,6 +157,25 @@ def calculate_item(
             note="keine Leistung zugeordnet — nicht kalkulierbar",
         )
 
+    # The Aufwandswert is hours *per unit of the Leistung*. Multiplying a
+    # position's quantity by it only means anything when both sides measure
+    # the same thing. The classifier picks semantically from the whole
+    # catalogue — correctly, since the right work is often billed in another
+    # unit — so the units must be checked here instead.
+    #
+    # Without this guard the demo tender priced at EUR 2.9M against a real bid
+    # of EUR 897k, because positions measured in mWo (metre-weeks of standing
+    # time) were multiplied by per-m2 labour rates.
+    from core import constants
+    position_unit = constants.normalize_unit(item.unit)
+    leistung_unit = constants.normalize_unit(leistung.einheit)
+    if position_unit != leistung_unit:
+        return CalculatedItem(
+            item=item, leistung=leistung, confidence=confidence,
+            note=(f"{leistung.code} wird in {leistung.einheit} abgerechnet, "
+                  f"die Position in {item.unit} — nicht direkt kalkulierbar"),
+        )
+
     markup = 1.0 + company.zuschlag_pct / 100.0
     mid = unit_costs(leistung, company, data, leistung.h_mittel)
     low = unit_costs(leistung, company, data, leistung.h_min)
