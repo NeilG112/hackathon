@@ -146,16 +146,48 @@ def load() -> Stammdaten:
 
 
 def companies() -> list[Company]:
-    """Bidder profiles from the test database, for the UI's preset picker."""
+    """Cost-base presets from the test database, for the UI's picker.
+
+    The schema moved: parameters used to live on a `bieter` table and now sit
+    on each `angebote` row (with `materialfaktor` renamed `materialindex`).
+    Both layouts are tried, newest first, and a missing or unknown schema
+    falls back to one neutral profile rather than raising — a changed test
+    database must not take the app down.
+    """
     if not os.path.exists(SQLITE):
         return [Company()]
-    try:
-        con = sqlite3.connect(SQLITE)
-        rows = con.execute(
-            "SELECT firma, mittellohn_eur_h, zuschlag_pct, leistungsfaktor, "
-            "materialfaktor, profil FROM bieter ORDER BY id"
-        ).fetchall()
-        con.close()
-    except sqlite3.Error:
-        return [Company()]
-    return [Company(*row) for row in rows] or [Company()]
+
+    queries = (
+        # current: parameters per offer, company name via unternehmen
+        """SELECT u.firma, a.mittellohn_eur_h, a.zuschlag_pct, a.leistungsfaktor,
+                  a.materialindex, p.projekttyp
+           FROM angebote a
+           LEFT JOIN unternehmen u ON u.id = a.unternehmen_id
+           LEFT JOIN projekte p ON p.id = a.projekt_id
+           GROUP BY a.mittellohn_eur_h, a.zuschlag_pct
+           ORDER BY a.mittellohn_eur_h LIMIT 8""",
+        # previous: a dedicated bidder table
+        """SELECT firma, mittellohn_eur_h, zuschlag_pct, leistungsfaktor,
+                  materialfaktor, profil FROM bieter ORDER BY id""",
+    )
+    for sql in queries:
+        try:
+            con = sqlite3.connect(SQLITE)
+            rows = con.execute(sql).fetchall()
+            con.close()
+        except sqlite3.Error:
+            continue
+        built = [
+            Company(
+                name=row[0] or "Angebotsprofil",
+                mittellohn_eur_h=float(row[1] or 58.0),
+                zuschlag_pct=float(row[2] or 22.0),
+                leistungsfaktor=float(row[3] or 1.0),
+                materialfaktor=float(row[4] or 1.0),
+                profil=row[5] or "",
+            )
+            for row in rows
+        ]
+        if built:
+            return built
+    return [Company()]

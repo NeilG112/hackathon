@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthetische Test-Datenbank für den Bid & Risk Assistant.
+"""Synthetische Test-Datenbank für den Bid & Risk Assistant — Angebotshistorie EINES Unternehmens.
 
     python3 scripts/generate_testdata.py           # aus dem Repo-Root
     python3 scripts/generate_testdata.py --csv     # zusätzlich CSV zum Anschauen
@@ -20,6 +20,9 @@ Die Stunden je Einheit stehen in `arbeitszeitrichtwerte` — eigene, plausible
 Schätzwerte in der Größenordnung üblicher Arbeitszeit-Richtwerte (ARH) für
 Tiefbau/Leitungsbau. **Keine Originalwerte aus den ARH-Tabellen** (die liegen
 nicht vor); vor Verwendung als Referenz gegen das Tabellenwerk prüfen.
+
+Ein Unternehmen (fiktiv), 140 Ausschreibungen 2022–2026, je ein eigenes Angebot.
+Mittellohn, Zuschlag und Materialindex ändern sich über die Zeit.
 
 Die Mengen folgen aus der Geometrie jedes Projekts (Trassenlänge, Tiefe,
 Breite), damit sie untereinander stimmig sind. Fehler werden gezielt
@@ -158,31 +161,51 @@ LEISTUNG = {row[0]: row for row in LEISTUNGEN}
 SPREIZUNG = 0.25   # h_min / h_max = h_mittel × (1 ∓ 0,25)
 BE_ANTEIL = 0.045  # Baustelleneinrichtung als Anteil der übrigen Einzelkosten
 
-BIETER = [
-    # firma, mittellohn, zuschlag, leistungsfaktor, materialfaktor, streuung, profil
-    ("Musterbau Tiefbau GmbH", 58.0, 0.22, 1.00, 1.00, 0.07, "solide, mittleres Preisniveau"),
-    ("Beispiel Kanal- und Straßenbau KG", 54.0, 0.19, 0.92, 0.97, 0.06, "günstig, eingespielte Kolonne"),
-    ("Demo Erd- und Leitungsbau GmbH & Co. KG", 61.0, 0.27, 1.08, 1.03, 0.09, "teuer, hohe Gemeinkosten"),
-    ("Testfirma Straßenbau AG", 63.0, 0.30, 0.98, 1.05, 0.08, "Konzern, hohe Zuschläge"),
-    ("Fiktiv Bau GmbH", 56.0, 0.20, 0.95, 1.00, 0.08, "spekulativ: Eventualpositionen billig, Mengenmehrungen teuer"),
-]
-SPEKULANT = "Fiktiv Bau GmbH"
+UNTERNEHMEN = {
+    "id": 1, "firma": "Musterbau Tiefbau GmbH", "sitz": "Beispielstadt",
+    "profil": "Mittelständischer Tief- und Leitungsbauer, ca. 60 gewerbliche Mitarbeiter",
+}
 
-PROJEKTE = [
-    # bezeichnung, ort, auftraggeber, submission, L, tiefe, breite, optionen
-    ("Erschließung Baugebiet Am Mühlbach", "Beispielstadt", "Stadtwerke Beispielstadt",
-     "2026-03-12", 680, 2.4, 1.2, {"kanal": "K03", "wasser": "K05", "strasse": "neu", "pflaster": True}),
-    ("Kanalauswechslung Lindenstraße", "Musterhausen", "Abwasserzweckverband Musterhausen",
-     "2026-04-02", 310, 3.4, 1.4, {"kanal": "K04", "strasse": "aufbruch"}),
-    ("Regenwasserkanal Gewerbegebiet Süd", "Beispielstadt", "Stadt Beispielstadt",
-     "2026-05-20", 520, 2.8, 1.3, {"kanal": "K04", "kabel": True}),
-    ("Wasserleitungserneuerung Ortsdurchfahrt", "Beispieldorf", "Wasserversorgung Beispieldorf",
-     "2026-06-17", 900, 1.6, 0.9, {"wasser": "K06", "strasse": "aufbruch", "kabel": True}),
-    ("Leerrohrtrasse Kreisstraße K 12", "Landkreis Musterland", "Landkreis Musterland",
-     "2026-07-08", 1500, 1.0, 0.5, {"kabel": True}),
-    ("Parkplatz und Zufahrt Schulzentrum", "Musterhausen", "Gemeinde Musterhausen",
-     "2026-09-24", 0, 0.0, 0.0, {"flaeche": 2400}),
-]
+# Kalkulationsparameter des Unternehmens, die sich über die Zeit ändern.
+MITTELLOHN_2022 = 52.0          # €/h, steigt jährlich
+LOHNSTEIGERUNG = 0.035          # je Jahr
+MATERIALINDEX = {2022: 0.94, 2023: 0.98, 2024: 0.99, 2025: 1.00, 2026: 1.02}
+ZUSCHLAG = (0.18, 0.27)         # BGK + AGK + W&G, je nach Auslastung
+STREUUNG = 0.07                 # Rauschen je Position (Kalkulatoren-Handschrift)
+LEISTUNGSFAKTOR = (0.92, 1.12)  # projektabhängige Erschwernis
+ZUSCHLAGSQUOTE = 0.30           # Anteil beauftragter Angebote (Annahme, synthetisch)
+ANZAHL_PROJEKTE = 140
+
+# Wahrscheinlichkeiten je Projekt / Position für eingebaute Fehler
+P_VAGE_JE_POSITION = 0.04
+P_RUNDE_MENGE = 0.25
+P_EINHEITENFEHLER = 0.20
+P_MENGENRISIKO = 0.45           # nur bei beauftragten Projekten
+P_KOMMAFEHLER_JE_POSITION = 0.008
+
+PROJEKTTYPEN = {
+    "Erschließung Baugebiet": dict(L=(300, 900), d=(2.0, 3.0), b=(1.0, 1.3),
+                                   opt=lambda r: {"kanal": "K03", "wasser": "K05",
+                                                  "strasse": "neu", "pflaster": True}),
+    "Kanalauswechslung": dict(L=(150, 450), d=(2.8, 3.8), b=(1.2, 1.5),
+                              opt=lambda r: {"kanal": r.choice(["K03", "K04"]), "strasse": "aufbruch"}),
+    "Regenwasserkanal": dict(L=(250, 700), d=(2.2, 3.2), b=(1.1, 1.4),
+                             opt=lambda r: {"kanal": r.choice(["K03", "K04"]),
+                                            "kabel": r.random() < 0.4}),
+    "Wasserleitungserneuerung": dict(L=(300, 1200), d=(1.4, 1.8), b=(0.8, 1.0),
+                                     opt=lambda r: {"wasser": r.choice(["K05", "K06"]),
+                                                    "strasse": "aufbruch", "kabel": r.random() < 0.5}),
+    "Leerrohrtrasse": dict(L=(800, 2500), d=(0.8, 1.2), b=(0.4, 0.6),
+                           opt=lambda r: {"kabel": True}),
+    "Parkplatz und Zufahrt": dict(A=(800, 4000)),
+}
+ORTE = ["Beispielstadt", "Musterhausen", "Beispieldorf", "Musterau", "Testingen", "Demohausen",
+        "Exempelberg", "Probstadt"]
+LAGEN = ["Hauptstraße", "Bahnhofstraße", "Lindenweg", "Am Mühlbach", "Gartenstraße", "Schulstraße",
+         "Gewerbegebiet Süd", "Gewerbegebiet Nord", "Kirchplatz", "Am Sportplatz", "Feldweg",
+         "Kreisstraße K 12", "Ortsdurchfahrt", "Wiesengrund", "Schulzentrum", "Friedhof"]
+AUFTRAGGEBER = ["Stadt {o}", "Stadtwerke {o}", "Abwasserzweckverband {o}",
+                "Wasserversorgung {o}", "Gemeinde {o}"]
 
 VAGE_FORMULIERUNGEN = [
     "Ausführung nach Wahl des Auftraggebers.",
@@ -226,34 +249,39 @@ def graben_positionen(L: float, d: float, b: float, opt: dict) -> list[tuple]:
     if d > 3.0:
         out.append(("02", "V02", 2 * L * (d - 3.0), "Normal"))
     if opt.get("kanal"):
-        tiefe_zulage = schaechte * max(0, math.ceil((d - 3.0) / 0.5))
-        out += [("03", opt["kanal"], L, "Normal"), ("03", "K11", round(L / 12), "Normal"),
-                ("03", "S01", schaechte, "Normal"), ("03", "S03", schaechte, "Normal"),
-                ("03", "S04", schaechte, "Normal"), ("03", "K09", max(schaechte - 1, 1), "Normal"),
-                ("03", "K10", L, "Normal")]
-        if tiefe_zulage:
-            out.append(("03", "S02", tiefe_zulage, "Normal"))
+        out += kanal_positionen(L, d, opt["kanal"], schaechte)
     if opt.get("wasser"):
         out.append(("04", opt["wasser"], L * 1.05, "Normal"))
     if opt.get("kabel"):
         out += [("04", "K07", L * 1.02, "Normal"), ("04", "K08", L, "Normal")]
     if opt.get("strasse"):
         flaeche = L * (b + 0.6) if opt["strasse"] == "aufbruch" else L * 6.5
-        out += [("05", "E06", flaeche, "Normal"), ("05", "E07", flaeche, "Normal"),
-                ("05", "T03", flaeche, "Normal"), ("05", "T04", flaeche, "Normal")]
+        out += [("05", c, flaeche, "Normal") for c in ("E06", "E07", "T03", "T04")]
     if opt.get("pflaster"):
         out += [("05", "T05", L * 2.5, "Normal"), ("05", "T06", L * 2, "Normal")]
     return out
 
 
+def kanal_positionen(L: float, d: float, rohr: str, schaechte: int) -> list[tuple]:
+    out = [("03", rohr, L, "Normal"), ("03", "K11", round(L / 12), "Normal"),
+           ("03", "S01", schaechte, "Normal"), ("03", "S03", schaechte, "Normal"),
+           ("03", "S04", schaechte, "Normal"), ("03", "K09", max(schaechte - 1, 1), "Normal"),
+           ("03", "K10", L, "Normal")]
+    tiefe_zulage = schaechte * max(0, math.ceil((d - 3.0) / 0.5))
+    if tiefe_zulage:
+        out.append(("03", "S02", tiefe_zulage, "Normal"))
+    return out
+
+
 def flaechen_positionen(A: float) -> list[tuple]:
     umfang = 4 * math.sqrt(A)
-    return [("01", "B01", 1, "Normal"), ("01", "B02", 8, "Normal"), ("01", "B03", 24, "Eventual"),
-            ("02", "E01", A * 1.1, "Normal"), ("02", "E02", A * 0.45, "Normal"),
-            ("02", "E06", A, "Normal"), ("02", "E07", A, "Normal"),
-            ("03", "K01", 120, "Normal"), ("03", "S01", 2, "Normal"), ("03", "S03", 2, "Normal"),
-            ("05", "T05", A * 0.7, "Normal"), ("05", "T03", A * 0.3, "Normal"),
-            ("05", "T04", A * 0.3, "Normal"), ("05", "T06", umfang, "Normal")]
+    return [("01", "B01", 1, "Normal"), ("01", "B02", max(4, round(A / 400)), "Normal"),
+            ("01", "B03", 24, "Eventual"), ("02", "E01", A * 1.1, "Normal"),
+            ("02", "E02", A * 0.45, "Normal"), ("02", "E06", A, "Normal"), ("02", "E07", A, "Normal"),
+            ("03", "K01", round(A / 20), "Normal"), ("03", "S01", max(1, round(A / 1200)), "Normal"),
+            ("03", "S03", max(1, round(A / 1200)), "Normal"), ("05", "T05", A * 0.7, "Normal"),
+            ("05", "T03", A * 0.3, "Normal"), ("05", "T04", A * 0.3, "Normal"),
+            ("05", "T06", umfang, "Normal")]
 
 
 def menge_runden(menge: float, einheit: str) -> float:
@@ -262,47 +290,59 @@ def menge_runden(menge: float, einheit: str) -> float:
     return round(menge, 1 if menge >= 100 else 2)
 
 
+# --- Projekte erzeugen ------------------------------------------------------
+
+def projekt_spec(rng: random.Random, projekt_id: int) -> dict:
+    """Ein zufälliges, in sich stimmiges Projekt des Unternehmens."""
+    typ = rng.choice(list(PROJEKTTYPEN))
+    cfg = PROJEKTTYPEN[typ]
+    ort = rng.choice(ORTE)
+    jahr = rng.choice(list(MATERIALINDEX))
+    spec = {"id": projekt_id, "typ": typ, "ort": ort, "jahr": jahr,
+            "bezeichnung": f"{typ} {rng.choice(LAGEN)}",
+            "auftraggeber": rng.choice(AUFTRAGGEBER).format(o=ort),
+            "submission": f"{jahr}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
+            "L": 0.0, "d": 0.0, "b": 0.0, "A": None, "opt": {}}
+    if "A" in cfg:
+        spec["A"] = round(rng.uniform(*cfg["A"]), -1)
+    else:
+        spec.update(L=round(rng.uniform(*cfg["L"]), -1), d=round(rng.uniform(*cfg["d"]), 1),
+                    b=round(rng.uniform(*cfg["b"]), 1), opt=cfg["opt"](rng))
+    return spec
+
+
+def kalkulationsparameter(rng: random.Random, jahr: int) -> dict:
+    return {"mittellohn": round(MITTELLOHN_2022 * (1 + LOHNSTEIGERUNG) ** (jahr - 2022) * 2) / 2,
+            "zuschlag": round(rng.uniform(*ZUSCHLAG), 3),
+            "materialindex": MATERIALINDEX[jahr],
+            "leistungsfaktor": round(rng.uniform(*LEISTUNGSFAKTOR), 3)}
+
+
 # --- Kalkulation ------------------------------------------------------------
 
-def einzelkosten(code: str, bieter: tuple) -> tuple[float, float, float]:
-    """(Lohn, Material, Gerät) je Einheit für einen Bieter, ohne Zuschlag."""
-    _, mittellohn, _, leistung, material, *_ = bieter
+def einzelkosten(code: str, p: dict) -> tuple[float, float, float]:
+    """(Lohn, Material, Gerät) je Einheit, ohne Zuschlag."""
     row = LEISTUNG[code]
-    lohn = row[4] * leistung * mittellohn
-    mat = sum(q * MATERIALIEN[m][2] for m, q in row[5]) * material
-    ger = sum(h * GERAETE[g][1] for g, h in row[6]) * leistung
+    lohn = row[4] * p["leistungsfaktor"] * p["mittellohn"]
+    mat = sum(q * MATERIALIEN[m][2] for m, q in row[5]) * p["materialindex"]
+    ger = sum(h * GERAETE[g][1] for g, h in row[6]) * p["leistungsfaktor"]
     return lohn, mat, ger
 
 
-def kalkuliere(positionen: list[dict], bieter: tuple, rng: random.Random) -> list[dict]:
-    """Einheitspreise eines Bieters für alle Positionen eines Projekts."""
-    firma, _, zuschlag, *_rest = bieter
-    streuung = bieter[5]
+def kalkuliere(positionen: list[dict], p: dict, rng: random.Random) -> list[dict]:
     zeilen, summe_ek = [], 0.0
     for pos in positionen:
         if pos["leistung_code"] == "B01":
             continue
-        lohn, mat, ger = einzelkosten(pos["leistung_code"], bieter)
-        faktor = (1 + zuschlag) * math.exp(rng.gauss(0, streuung))
-        faktor *= spekulation(pos, firma)
+        lohn, mat, ger = einzelkosten(pos["leistung_code"], p)
+        faktor = (1 + p["zuschlag"]) * math.exp(rng.gauss(0, STREUUNG))
         summe_ek += (lohn + mat + ger) * pos["menge"]
         zeilen.append((pos, lohn * faktor, mat * faktor, ger * faktor))
-    be = next((p for p in positionen if p["leistung_code"] == "B01"), None)
+    be = next((x for x in positionen if x["leistung_code"] == "B01"), None)
     if be:
-        be_kosten = summe_ek * BE_ANTEIL * (1 + zuschlag) * math.exp(rng.gauss(0, streuung))
-        zeilen.append((be, be_kosten * 0.5, 0.0, be_kosten * 0.5))
+        kosten = summe_ek * BE_ANTEIL * (1 + p["zuschlag"]) * math.exp(rng.gauss(0, STREUUNG))
+        zeilen.append((be, kosten * 0.5, 0.0, kosten * 0.5))
     return [angebotszeile(pos, lohn, mat, ger) for pos, lohn, mat, ger in zeilen]
-
-
-def spekulation(pos: dict, firma: str) -> float:
-    """Der spekulative Bieter preist, wo er Mengenänderungen erwartet."""
-    if firma != SPEKULANT:
-        return 1.0
-    if pos["positionsart"] == "Eventual":
-        return 0.35
-    if pos["abrechnungsmenge"] > pos["menge"] * 1.25:
-        return 1.45
-    return 0.97
 
 
 def angebotszeile(pos: dict, lohn: float, mat: float, ger: float) -> dict:
@@ -314,42 +354,68 @@ def angebotszeile(pos: dict, lohn: float, mat: float, ger: float) -> dict:
 
 # --- Testfälle --------------------------------------------------------------
 
-def baue_fehler_ein(positionen: list[dict], projekt_id: int, rng: random.Random) -> list[dict]:
-    """Fehler und Risiken gezielt einbauen; Rückgabe = Soll-Erwartungen."""
-    erwartungen = []
-    normale = [p for p in positionen if p["positionsart"] == "Normal" and p["einheit"] != "psch"]
-
-    for pos in rng.sample(normale, k=min(2, len(normale))):
-        satz = rng.choice(VAGE_FORMULIERUNGEN)
-        pos["langtext"] += " " + satz
-        erwartungen.append(erwartung(projekt_id, pos, "vage_leistungsbeschreibung",
-                                     f"Langtext enthält: „{satz}“"))
-
-    gross = max(normale, key=lambda p: p["menge"])
-    gross["abrechnungsmenge"] = round(gross["menge"] * 1.6, 1)
-    erwartungen.append(erwartung(projekt_id, gross, "mengenrisiko",
-                                 "Abrechnungsmenge liegt 60 % über der Ausschreibungsmenge."))
-
-    # Nie dieselbe Position wie beim Mengenrisiko — sonst widersprechen sich die Soll-Werte.
-    rund = rng.choice([p for p in normale if p["einheit"] in ("m", "m2", "m3") and p is not gross])
-    rund["menge"] = 1000.0
-    rund["abrechnungsmenge"] = rund["menge"]
-    erwartungen.append(erwartung(projekt_id, rund, "mengenplausibilitaet",
-                                 "Auffällig runde Menge (1.000) — vermutlich geschätzt, nicht ermittelt."))
-
-    rohre = [p for p in normale if p["leistung_code"].startswith("K") and p["einheit"] == "m"]
-    if rohre:
-        falsch = rng.choice(rohre)
-        falsch["einheit"] = "m3"
-        erwartungen.append(erwartung(projekt_id, falsch, "einheitenfehler",
-                                     "Rohrverlegung in m³ ausgeschrieben, üblich ist m."))
-    return erwartungen
-
-
 def erwartung(projekt_id: int, pos: dict | None, kategorie: str, begruendung: str,
               angebot_id: int | None = None) -> dict:
     return {"projekt_id": projekt_id, "position_id": pos["id"] if pos else None,
             "angebot_id": angebot_id, "kategorie": kategorie, "begruendung": begruendung}
+
+
+def lv_fehler(positionen: list[dict], projekt_id: int, rng: random.Random) -> list[dict]:
+    """Fehler im LV des Auftraggebers: vage Texte, runde Mengen, falsche Einheiten."""
+    out = []
+    normale = [p for p in positionen if p["positionsart"] == "Normal" and p["einheit"] != "psch"]
+    for pos in normale:
+        if rng.random() < P_VAGE_JE_POSITION:
+            satz = rng.choice(VAGE_FORMULIERUNGEN)
+            pos["langtext"] += " " + satz
+            out.append(erwartung(projekt_id, pos, "vage_leistungsbeschreibung",
+                                 f"Langtext enthält: „{satz}“"))
+    flaechig = [p for p in normale if p["einheit"] in ("m", "m2", "m3")]
+    if flaechig and rng.random() < P_RUNDE_MENGE:
+        pos = rng.choice(flaechig)
+        pos["menge"] = 1000.0
+        out.append(erwartung(projekt_id, pos, "mengenplausibilitaet",
+                             "Auffällig runde Menge (1.000) — vermutlich geschätzt, nicht ermittelt."))
+    rohre = [p for p in normale if p["leistung_code"].startswith("K") and p["einheit"] == "m"]
+    if rohre and rng.random() < P_EINHEITENFEHLER:
+        pos = rng.choice(rohre)
+        pos["einheit"] = "m3"
+        out.append(erwartung(projekt_id, pos, "einheitenfehler",
+                             "Rohrverlegung in m³ ausgeschrieben, üblich ist m."))
+    return out
+
+
+def abrechnung(positionen: list[dict], projekt_id: int, rng: random.Random) -> list[dict]:
+    """Nur bei beauftragten Projekten kennt das Unternehmen die Abrechnungsmenge."""
+    for pos in positionen:
+        pos["abrechnungsmenge"] = menge_runden(pos["menge"] * math.exp(rng.gauss(0, 0.06)),
+                                               pos["einheit"])
+    if rng.random() >= P_MENGENRISIKO:
+        return []
+    kandidaten = [p for p in positionen if p["positionsart"] == "Normal"
+                  and p["einheit"] != "psch" and p["menge"] != 1000.0]
+    pos = max(kandidaten, key=lambda p: p["menge"])
+    pos["abrechnungsmenge"] = round(pos["menge"] * 1.6, 1)
+    return [erwartung(projekt_id, pos, "mengenrisiko",
+                      "Abrechnungsmenge liegt 60 % über der Ausschreibungsmenge.")]
+
+
+def kommafehler(zeilen: list[dict], projekt_id: int, angebot_id: int,
+                rng: random.Random) -> list[dict]:
+    """Eigene Kalkulationsfehler: Einheitspreis um eine Kommastelle verrutscht."""
+    out = []
+    for z in zeilen:
+        if rng.random() >= P_KOMMAFEHLER_JE_POSITION:
+            continue
+        faktor = rng.choice([10.0, 0.1])
+        for key in ("ep_eur", "lohnanteil_eur", "materialanteil_eur", "geraeteanteil_eur"):
+            z[key] = round(z[key] * faktor, 2)
+        z["gp_eur"] = round(z["gp_eur"] * faktor, 2)
+        richtung = "zehnfach zu hoch" if faktor > 1 else "ein Zehntel zu niedrig"
+        out.append({"projekt_id": projekt_id, "position_id": z["position_id"],
+                    "angebot_id": angebot_id, "kategorie": "kalkulationsfehler",
+                    "begruendung": f"Einheitspreis {richtung} (Kommafehler)."})
+    return out
 
 
 # --- Aufbau -----------------------------------------------------------------
@@ -364,18 +430,19 @@ CREATE TABLE leistung_material (leistung_code TEXT REFERENCES arbeitszeitrichtwe
   material_code TEXT REFERENCES materialien, menge_je_einheit REAL);
 CREATE TABLE leistung_geraet (leistung_code TEXT REFERENCES arbeitszeitrichtwerte,
   geraet_code TEXT REFERENCES geraete, stunden_je_einheit REAL);
-CREATE TABLE projekte (id INTEGER PRIMARY KEY, bezeichnung TEXT, ort TEXT, auftraggeber TEXT,
-  submission TEXT, trassenlaenge_m REAL, grabentiefe_m REAL, grabenbreite_m REAL, flaeche_m2 REAL);
+CREATE TABLE unternehmen (id INTEGER PRIMARY KEY, firma TEXT, sitz TEXT, profil TEXT);
+CREATE TABLE projekte (id INTEGER PRIMARY KEY, bezeichnung TEXT, projekttyp TEXT, ort TEXT,
+  auftraggeber TEXT, submission TEXT, trassenlaenge_m REAL, grabentiefe_m REAL,
+  grabenbreite_m REAL, flaeche_m2 REAL);
 CREATE TABLE lv_positionen (id INTEGER PRIMARY KEY, projekt_id INTEGER REFERENCES projekte,
   oz TEXT, titel TEXT, kurztext TEXT, langtext TEXT, einheit TEXT, menge REAL,
   positionsart TEXT, pauschal INTEGER, leistung_code TEXT REFERENCES arbeitszeitrichtwerte,
   abrechnungsmenge REAL);
 CREATE TABLE vorbemerkungen (id INTEGER PRIMARY KEY, projekt_id INTEGER REFERENCES projekte,
   nr INTEGER, text TEXT, risiko INTEGER, begruendung TEXT);
-CREATE TABLE bieter (id INTEGER PRIMARY KEY, firma TEXT, mittellohn_eur_h REAL, zuschlag_pct REAL,
-  leistungsfaktor REAL, materialfaktor REAL, profil TEXT);
 CREATE TABLE angebote (id INTEGER PRIMARY KEY, projekt_id INTEGER REFERENCES projekte,
-  bieter_id INTEGER REFERENCES bieter, angebotssumme_netto REAL, rang INTEGER);
+  unternehmen_id INTEGER REFERENCES unternehmen, angebotssumme_netto REAL,
+  mittellohn_eur_h REAL, zuschlag_pct REAL, materialindex REAL, leistungsfaktor REAL, status TEXT);
 CREATE TABLE angebotspositionen (angebot_id INTEGER REFERENCES angebote,
   position_id INTEGER REFERENCES lv_positionen, ep_eur REAL, gp_eur REAL,
   lohnanteil_eur REAL, materialanteil_eur REAL, geraeteanteil_eur REAL);
@@ -386,23 +453,20 @@ CREATE TABLE testfall_erwartungen (id INTEGER PRIMARY KEY, projekt_id INTEGER, p
 TITEL = {"01": "Baustelle und Verkehrssicherung", "02": "Erdarbeiten und Verbau",
          "03": "Kanal und Schächte", "04": "Leitungen", "05": "Oberbau"}
 
-TITEL_GEWERK = {"Baustelle": "01", "Erdbau": "02", "Verbau": "02", "Kanal": "03", "Schacht": "03",
-                "Wasser": "04", "Kabel": "04", "Oberbau": "05", "Straße": "05"}
 
-
-def projekt_positionen(projekt_id: int, spec: tuple, next_id: int) -> list[dict]:
-    *_, L, d, b, opt = spec
-    roh = flaechen_positionen(opt["flaeche"]) if opt.get("flaeche") else graben_positionen(L, d, b, opt)
+def projekt_positionen(spec: dict, next_id: int) -> list[dict]:
+    roh = (flaechen_positionen(spec["A"]) if spec["A"]
+           else graben_positionen(spec["L"], spec["d"], spec["b"], spec["opt"]))
     positionen, zaehler = [], {}
     for titel, code, menge, art in sorted(roh, key=lambda r: r[0]):
         row = LEISTUNG[code]
         zaehler[titel] = zaehler.get(titel, 0) + 10
-        menge = menge_runden(menge, row[3])
         positionen.append({
-            "id": next_id + len(positionen), "projekt_id": projekt_id,
+            "id": next_id + len(positionen), "projekt_id": spec["id"],
             "oz": f"{titel}.{zaehler[titel]:04d}", "titel": TITEL[titel], "kurztext": row[2],
-            "langtext": row[7], "einheit": row[3], "menge": menge, "positionsart": art,
-            "pauschal": int(row[3] == "psch"), "leistung_code": code, "abrechnungsmenge": menge,
+            "langtext": row[7], "einheit": row[3], "menge": menge_runden(menge, row[3]),
+            "positionsart": art, "pauschal": int(row[3] == "psch"), "leistung_code": code,
+            "abrechnungsmenge": None,
         })
     return positionen
 
@@ -423,66 +487,46 @@ def stammdaten(con: sqlite3.Connection) -> None:
     insert(con, "geraete", [{"code": c, "bezeichnung": n, "kosten_eur_h": k}
                             for c, (n, k) in GERAETE.items()])
     insert(con, "materialien", [{"code": c, "bezeichnung": n, "einheit": e, "preis_eur": p,
-                                 "preisstand": "2026, synthetisch"} for c, (n, e, p) in MATERIALIEN.items()])
+                                 "preisstand": "2025, synthetisch"} for c, (n, e, p) in MATERIALIEN.items()])
     insert(con, "leistung_material", [{"leistung_code": row[0], "material_code": m, "menge_je_einheit": q}
                                       for row in LEISTUNGEN for m, q in row[5]])
     insert(con, "leistung_geraet", [{"leistung_code": row[0], "geraet_code": g, "stunden_je_einheit": h}
                                     for row in LEISTUNGEN for g, h in row[6]])
-    insert(con, "bieter", [{"id": i, "firma": f, "mittellohn_eur_h": ml, "zuschlag_pct": round(z * 100, 1),
-                            "leistungsfaktor": lf, "materialfaktor": mf, "profil": pr}
-                           for i, (f, ml, z, lf, mf, _s, pr) in enumerate(BIETER, start=1)])
+    insert(con, "unternehmen", [UNTERNEHMEN])
 
 
-def projekt_anlegen(con, rng, projekt_id: int, spec: tuple, ids: dict) -> None:
-    name, ort, ag, sub, L, d, b, opt = spec
-    insert(con, "projekte", [{"id": projekt_id, "bezeichnung": name, "ort": ort, "auftraggeber": ag,
-                              "submission": sub, "trassenlaenge_m": L or None,
-                              "grabentiefe_m": d or None, "grabenbreite_m": b or None,
-                              "flaeche_m2": opt.get("flaeche")}])
-    positionen = projekt_positionen(projekt_id, spec, ids["position"])
+def projekt_anlegen(con, rng, spec: dict, ids: dict) -> None:
+    insert(con, "projekte", [{
+        "id": spec["id"], "bezeichnung": spec["bezeichnung"], "projekttyp": spec["typ"],
+        "ort": spec["ort"], "auftraggeber": spec["auftraggeber"], "submission": spec["submission"],
+        "trassenlaenge_m": spec["L"] or None, "grabentiefe_m": spec["d"] or None,
+        "grabenbreite_m": spec["b"] or None, "flaeche_m2": spec["A"]}])
+    positionen = projekt_positionen(spec, ids["position"])
     ids["position"] += len(positionen)
-    erwartungen = baue_fehler_ein(positionen, projekt_id, rng)
+    erwartungen = lv_fehler(positionen, spec["id"], rng)
+    beauftragt = rng.random() < ZUSCHLAGSQUOTE
+    if beauftragt:
+        erwartungen += abrechnung(positionen, spec["id"], rng)
     insert(con, "lv_positionen", positionen)
+    insert(con, "vorbemerkungen", [
+        {"projekt_id": spec["id"], "nr": n, "text": t, "risiko": r, "begruendung": g}
+        for n, (t, r, g) in enumerate(rng.sample(VORBEMERKUNGEN, k=5), start=1)])
 
-    vorb = [{"projekt_id": projekt_id, "nr": n, "text": t, "risiko": r, "begruendung": g}
-            for n, (t, r, g) in enumerate(rng.sample(VORBEMERKUNGEN, k=5), start=1)]
-    insert(con, "vorbemerkungen", vorb)
-
-    teilnehmer = rng.sample(range(1, len(BIETER) + 1), k=rng.randint(3, 5))
-    if projekt_id in (1, 2):                 # der Spekulant soll sicher vorkommen
-        teilnehmer = sorted(set(teilnehmer) | {len(BIETER)})
-    angebote = []
-    for bieter_id in teilnehmer:
-        zeilen = kalkuliere(positionen, BIETER[bieter_id - 1], rng)
-        angebot_id = ids["angebot"]
-        ids["angebot"] += 1
-        for z in zeilen:
-            z["angebot_id"] = angebot_id
-        insert(con, "angebotspositionen", zeilen)
-        angebote.append({"id": angebot_id, "projekt_id": projekt_id, "bieter_id": bieter_id,
-                         "angebotssumme_netto": round(sum(z["gp_eur"] for z in zeilen), 2), "rang": 0})
-        if BIETER[bieter_id - 1][0] == SPEKULANT:
-            erwartungen += spekulations_erwartungen(projekt_id, positionen, angebot_id)
-    for rang, a in enumerate(sorted(angebote, key=lambda a: a["angebotssumme_netto"]), start=1):
-        a["rang"] = rang
-    insert(con, "angebote", angebote)
-
-    eventual = sum(1 for p in positionen if p["positionsart"] == "Eventual")
-    erwartungen.append(erwartung(projekt_id, None, "hinweis_eventualpositionen",
-                                 f"{eventual} Eventualpositionen von {len(positionen)}."))
+    p = kalkulationsparameter(rng, spec["jahr"])
+    angebot_id = ids["angebot"]
+    ids["angebot"] += 1
+    zeilen = kalkuliere(positionen, p, rng)
+    erwartungen += kommafehler(zeilen, spec["id"], angebot_id, rng)
+    for z in zeilen:
+        z["angebot_id"] = angebot_id
+    insert(con, "angebotspositionen", zeilen)
+    insert(con, "angebote", [{
+        "id": angebot_id, "projekt_id": spec["id"], "unternehmen_id": UNTERNEHMEN["id"],
+        "angebotssumme_netto": round(sum(z["gp_eur"] for z in zeilen), 2),
+        "mittellohn_eur_h": p["mittellohn"], "zuschlag_pct": round(p["zuschlag"] * 100, 1),
+        "materialindex": p["materialindex"], "leistungsfaktor": p["leistungsfaktor"],
+        "status": "beauftragt" if beauftragt else "nicht beauftragt"}])
     insert(con, "testfall_erwartungen", erwartungen)
-
-
-def spekulations_erwartungen(projekt_id: int, positionen: list[dict], angebot_id: int) -> list[dict]:
-    out = []
-    for p in positionen:
-        if p["positionsart"] == "Eventual":
-            out.append(erwartung(projekt_id, p, "spekulationspreis",
-                                 "Eventualposition auffällig billig (ca. 35 % des Marktpreises).", angebot_id))
-        elif p["abrechnungsmenge"] > p["menge"] * 1.25:
-            out.append(erwartung(projekt_id, p, "spekulationspreis",
-                                 "Position mit erwarteter Mengenmehrung auffällig teuer (+45 %).", angebot_id))
-    return out
 
 
 def export_csv(con: sqlite3.Connection, csv_dir: str) -> None:
@@ -519,7 +563,7 @@ def export_runtime_json(data_dir: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description="Synthetische Testdaten erzeugen.")
     parser.add_argument("--root", default=REPO_ROOT, help="Repo-Root (Standard: über scripts/)")
     parser.add_argument("--csv", action="store_true", help="zusätzlich CSV je Tabelle")
     args = parser.parse_args()
@@ -534,8 +578,8 @@ def main() -> None:
     con.executescript(SCHEMA)
     stammdaten(con)
     ids = {"position": 1, "angebot": 1}
-    for projekt_id, spec in enumerate(PROJEKTE, start=1):
-        projekt_anlegen(con, rng, projekt_id, spec, ids)
+    for projekt_id in range(1, ANZAHL_PROJEKTE + 1):
+        projekt_anlegen(con, rng, projekt_spec(rng, projekt_id), ids)
     con.commit()
     export_runtime_json(os.path.join(args.root, "data"))
     if args.csv:
