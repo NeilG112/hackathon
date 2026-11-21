@@ -1,5 +1,25 @@
 # Was der Datenbank noch fehlt, um auf 100 % zu kommen
 
+> **STATUS: weitgehend erledigt.** Der Katalog wurde von 34 auf 124 Leistungen erweitert,
+> genau entlang dieser Liste (Formteile 12, Armaturen 7, Prüfung 7, Landschaftsbau/
+> Schutz/Wasserhaltung 9, Baustelle 4 → 42 inkl. der Vorhalte-Einheiten `StWo`, `mWo`,
+> `m2d`, `md`, `d`).
+>
+> | | vorher | jetzt |
+> |---|---|---|
+> | Leistungen | 34 | **124** |
+> | Klassifizierung | 64 % | **90 %** |
+> | Abdeckung | 37,5 % | **84,7 %** |
+> | ohne Zuordnung | 94 | **26** |
+> | Einheiten-Konflikte | 61 | **12** |
+>
+> Offen bleiben 26 + 12 Positionen — Details am Ende unter „Rest".
+> Die Analyse unten beschreibt den Stand **vor** der Erweiterung und bleibt als
+> Begründung stehen.
+
+---
+
+
 Stand: gemessen gegen das echte Ausschreibungs-LV `Dataset/[NUMMER_001]_leer.X83`
 (248 Positionen) mit dem aktuellen Katalog (34 Leistungen).
 

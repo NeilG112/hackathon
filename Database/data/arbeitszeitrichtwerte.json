@@ -2,32 +2,42 @@
  "meta": {
   "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
   "seed": 2026,
-  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."
+  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage.",
+  "leistungen": 134,
+  "katalog_hinweis": "status: abgeleitet = aus Basisleistung des Katalogs gerechnet; geschaetzt = eigene Schätzung; unsicher = breite reale Streuung. Annahme je Zeile in 'annahme'."
  },
  "leistungen": {
   "E01": {
    "gewerk": "Erdbau",
    "taetigkeit": "Oberboden abtragen und seitlich lagern",
    "einheit": "m2",
-   "h_min": 0.009,
-   "h_mittel": 0.012,
-   "h_max": 0.015,
+   "h_min": 0.0195,
+   "h_mittel": 0.0229,
+   "h_max": 0.0263,
    "material": [],
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.01
+     "stunden_je_einheit": 0.0191
     }
    ],
-   "bemerkung": "Oberboden d = 20 cm abtragen, im Baufeld lagern, gegen Vernässung schützen."
+   "bemerkung": "Oberboden d = 20 cm abtragen, im Baufeld lagern, gegen Vernässung schützen.",
+   "stichworte": [
+    "oberboden",
+    "bodendecke",
+    "abräumen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 3.20 €): E01-M3 × 0,20 m (Abtragsdicke laut Katalogtext E01)"
   },
   "E02": {
    "gewerk": "Erdbau",
    "taetigkeit": "Boden Homogenbereich B2 lösen, laden, abfahren",
    "einheit": "m3",
-   "h_min": 0.045,
-   "h_mittel": 0.06,
-   "h_max": 0.075,
+   "h_min": 0.1211,
+   "h_mittel": 0.1425,
+   "h_max": 0.1639,
    "material": [
     {
      "code": "DEP",
@@ -37,68 +47,104 @@
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.05
+     "stunden_je_einheit": 0.1188
     },
     {
      "code": "LKW",
-     "stunden_je_einheit": 0.05
+     "stunden_je_einheit": 0.1188
     }
    ],
-   "bemerkung": "Grabenaushub maschinell, Boden laden, zur Deponie fahren, Gebühr nach Wiegeschein."
+   "bemerkung": "Grabenaushub maschinell, Boden laden, zur Deponie fahren, Gebühr nach Wiegeschein.",
+   "stichworte": [
+    "boden",
+    "graben",
+    "gerät",
+    "laden",
+    "fördern",
+    "abfahren",
+    "aushub",
+    "transp",
+    "baugrube",
+    "-hand",
+    "-fels",
+    "-lagern"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 69.00 €): Kostenberechnung Biblis 04.06.2025: Leitungsgraben ausheben, laden 30–35 €/m³ (6.2.11, 5.2.11) + Boden entsorgen BM-0 34 €/m³ (3.12)"
   },
   "E03": {
    "gewerk": "Erdbau",
    "taetigkeit": "Boden von Hand lösen im Bereich vorhandener Leitungen",
    "einheit": "m3",
-   "h_min": 1.65,
-   "h_mittel": 2.2,
-   "h_max": 2.75,
+   "h_min": 0.5463,
+   "h_mittel": 0.8114,
+   "h_max": 1.0765,
    "material": [
     {
      "code": "DEP",
-     "menge_je_einheit": 1.8
+     "menge_je_einheit": 0.6639
     }
    ],
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 2.0
+     "stunden_je_einheit": 0.7376
     }
    ],
-   "bemerkung": "Handschachtung im Kreuzungsbereich von Fremdleitungen."
+   "bemerkung": "Handschachtung im Kreuzungsbereich von Fremdleitungen.",
+   "stichworte": [
+    "hand",
+    "handschachtung",
+    "aushubkontrolle",
+    "-fels"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 75.00 €): Kostenberechnung Biblis 04.06.2025: Handaushub an Bebauung 75 €/m³ (5.2.13); Zulage Handaushub 60 €/m³ (4.1.16)"
   },
   "E04": {
    "gewerk": "Erdbau",
    "taetigkeit": "Graben mit Fremdmaterial verfüllen und lagenweise verdichten",
    "einheit": "m3",
-   "h_min": 0.135,
-   "h_mittel": 0.18,
-   "h_max": 0.225,
+   "h_min": 0.1152,
+   "h_mittel": 0.1392,
+   "h_max": 0.1632,
    "material": [
     {
      "code": "SAND",
-     "menge_je_einheit": 1.9
+     "menge_je_einheit": 1.4691
     }
    ],
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.08
+     "stunden_je_einheit": 0.0619
     },
     {
      "code": "RUE",
-     "stunden_je_einheit": 0.15
+     "stunden_je_einheit": 0.116
     }
    ],
-   "bemerkung": "Einbau in Lagen ≤ 30 cm, Dpr ≥ 97 %."
+   "bemerkung": "Einbau in Lagen ≤ 30 cm, Dpr ≥ 97 %.",
+   "stichworte": [
+    "verfüllen",
+    "verdichten",
+    "gemisch",
+    "-gelagert",
+    "-lagern"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 55.00 €): Kostenberechnung Biblis 04.06.2025: Bodenaustausch Schotter 58, Kiessand 64, gelagert 45; Verfüllung Vorsiebmaterial 48 €/m³"
   },
   "E05": {
    "gewerk": "Erdbau",
    "taetigkeit": "Leitungszone mit Sand 0/2 herstellen",
    "einheit": "m3",
-   "h_min": 0.338,
-   "h_mittel": 0.45,
-   "h_max": 0.562,
+   "h_min": 0.213,
+   "h_mittel": 0.2506,
+   "h_max": 0.2882,
    "material": [
     {
      "code": "SAND",
@@ -108,34 +154,49 @@
    "geraet": [
     {
      "code": "RUE",
-     "stunden_je_einheit": 0.3
+     "stunden_je_einheit": 0.167
     }
    ],
-   "bemerkung": "Bettung und Abdeckung 30 cm über Rohrscheitel."
+   "bemerkung": "Bettung und Abdeckung 30 cm über Rohrscheitel.",
+   "stichworte": [
+    "leitungszone",
+    "sand",
+    "einbettung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 67.00 €): Kostenberechnung Biblis 04.06.2025: Leitungszone/Rohrauflager 64 €/m³ (4.1.26), Sand 70 €/m³ (6.2.18)"
   },
   "E06": {
    "gewerk": "Erdbau",
    "taetigkeit": "Planum herstellen und verdichten",
    "einheit": "m2",
-   "h_min": 0.015,
-   "h_mittel": 0.02,
-   "h_max": 0.025,
+   "h_min": 0.019,
+   "h_mittel": 0.0224,
+   "h_max": 0.0258,
    "material": [],
    "geraet": [
     {
      "code": "WAL",
-     "stunden_je_einheit": 0.01
+     "stunden_je_einheit": 0.0112
     }
    ],
-   "bemerkung": "Planum Ev2 ≥ 45 MN/m², Höhentoleranz ± 2 cm."
+   "bemerkung": "Planum Ev2 ≥ 45 MN/m², Höhentoleranz ± 2 cm.",
+   "stichworte": [
+    "planum",
+    "feinplanum"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2.00 €): Kostenberechnung Biblis 04.06.2025: Planum herstellen, Ev2 45 MN/m² 2 €/m² (4.1.32)"
   },
   "E07": {
    "gewerk": "Oberbau",
    "taetigkeit": "Frostschutzschicht 0/45 einbauen, d = 30 cm",
    "einheit": "m2",
-   "h_min": 0.038,
-   "h_mittel": 0.05,
-   "h_max": 0.062,
+   "h_min": 0.0213,
+   "h_mittel": 0.025,
+   "h_max": 0.0287,
    "material": [
     {
      "code": "FSS",
@@ -145,58 +206,81 @@
    "geraet": [
     {
      "code": "RLD",
-     "stunden_je_einheit": 0.02
+     "stunden_je_einheit": 0.01
     },
     {
      "code": "WAL",
-     "stunden_je_einheit": 0.02
+     "stunden_je_einheit": 0.01
     }
    ],
-   "bemerkung": "Ev2 ≥ 120 MN/m² auf der Oberfläche."
+   "bemerkung": "Ev2 ≥ 120 MN/m² auf der Oberfläche.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 17.40 €): E07-M3 × 0,30 m (Schichtdicke laut Katalogtext E07)"
   },
   "V01": {
    "gewerk": "Verbau",
    "taetigkeit": "Grabenverbau einbauen, vorhalten, rückbauen, Tiefe ≤ 3,0 m",
    "einheit": "m2",
-   "h_min": 0.262,
-   "h_mittel": 0.35,
-   "h_max": 0.438,
+   "h_min": 0.3107,
+   "h_mittel": 0.4143,
+   "h_max": 0.5179,
    "material": [],
    "geraet": [
     {
      "code": "VBG",
-     "stunden_je_einheit": 0.6
+     "stunden_je_einheit": 0.7103
     },
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.08
+     "stunden_je_einheit": 0.0947
     }
    ],
-   "bemerkung": "Abrechnung nach verbauter Grabenwandfläche."
+   "bemerkung": "Abrechnung nach verbauter Grabenwandfläche.",
+   "stichworte": [
+    "grabenverbau",
+    "grabenverbaugerät",
+    "verbau",
+    "stirnverbau"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
   },
   "V02": {
    "gewerk": "Verbau",
    "taetigkeit": "Zulage Grabenverbau für Tiefe > 3,0 bis 4,0 m",
    "einheit": "m2",
-   "h_min": 0.09,
-   "h_mittel": 0.12,
-   "h_max": 0.15,
+   "h_min": 0.1066,
+   "h_mittel": 0.1421,
+   "h_max": 0.1776,
    "material": [],
    "geraet": [
     {
      "code": "VBG",
-     "stunden_je_einheit": 0.3
+     "stunden_je_einheit": 0.3551
     }
    ],
-   "bemerkung": "Zulage zur Position Grabenverbau."
+   "bemerkung": "Zulage zur Position Grabenverbau.",
+   "stichworte": [
+    "grabenverbau",
+    "grabenverbaugerät",
+    "verbau",
+    "zulage",
+    "-herstellen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
   },
   "K01": {
    "gewerk": "Kanal",
    "taetigkeit": "PVC-KG-Rohr DN 150 verlegen",
    "einheit": "m",
-   "h_min": 0.165,
-   "h_mittel": 0.22,
-   "h_max": 0.275,
+   "h_min": 0.2275,
+   "h_mittel": 0.2677,
+   "h_max": 0.3079,
    "material": [
     {
      "code": "KG150",
@@ -210,18 +294,22 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.2
+     "stunden_je_einheit": 0.2434
     }
    ],
-   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan."
+   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: PVC-U-Rohre DN/OD 160 40 €/m (4.2.10, 5.3.10)"
   },
   "K02": {
    "gewerk": "Kanal",
    "taetigkeit": "PVC-KG-Rohr DN 200 verlegen",
    "einheit": "m",
-   "h_min": 0.21,
-   "h_mittel": 0.28,
-   "h_max": 0.35,
+   "h_min": 0.3188,
+   "h_mittel": 0.4251,
+   "h_max": 0.5314,
    "material": [
     {
      "code": "KG200",
@@ -235,18 +323,22 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.25
+     "stunden_je_einheit": 0.3795
     }
    ],
-   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan."
+   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
   },
   "K03": {
    "gewerk": "Kanal",
    "taetigkeit": "Stahlbetonrohr DN 300 verlegen",
    "einheit": "m",
-   "h_min": 0.413,
-   "h_mittel": 0.55,
-   "h_max": 0.688,
+   "h_min": 0.5833,
+   "h_mittel": 0.7777,
+   "h_max": 0.9721,
    "material": [
     {
      "code": "SB300",
@@ -256,18 +348,22 @@
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.25
+     "stunden_je_einheit": 0.3535
     }
    ],
-   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916."
+   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
   },
   "K04": {
    "gewerk": "Kanal",
    "taetigkeit": "Stahlbetonrohr DN 500 verlegen",
    "einheit": "m",
-   "h_min": 0.637,
-   "h_mittel": 0.85,
-   "h_max": 1.062,
+   "h_min": 0.9231,
+   "h_mittel": 1.2308,
+   "h_max": 1.5385,
    "material": [
     {
      "code": "SB500",
@@ -277,39 +373,54 @@
    "geraet": [
     {
      "code": "BAG25",
-     "stunden_je_einheit": 0.35
+     "stunden_je_einheit": 0.5068
     }
    ],
-   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916."
+   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
   },
   "K05": {
    "gewerk": "Wasser",
    "taetigkeit": "PE-HD-Rohr da 110 verlegen, einschl. Schweißverbindungen",
    "einheit": "m",
-   "h_min": 0.225,
-   "h_mittel": 0.3,
-   "h_max": 0.375,
+   "h_min": 0.0524,
+   "h_mittel": 0.131,
+   "h_max": 0.2096,
    "material": [
     {
      "code": "PE110",
-     "menge_je_einheit": 1.02
+     "menge_je_einheit": 0.4455
     }
    ],
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.3
+     "stunden_je_einheit": 0.131
     }
    ],
-   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert."
+   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert.",
+   "stichworte": [
+    "druckrohr",
+    "trinkwasser",
+    "wasserleitung",
+    "pe",
+    "-markieren",
+    "-spülen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 15.00 €): Kostenberechnung Biblis 04.06.2025: PE DA 40 10 €/m (6.3.11); Tarif Freiberg 2025 Hausanschluss bis DN 50 30,91 €/m"
   },
   "K06": {
    "gewerk": "Wasser",
    "taetigkeit": "PE-HD-Rohr da 160 verlegen, einschl. Schweißverbindungen",
    "einheit": "m",
-   "h_min": 0.315,
-   "h_mittel": 0.42,
-   "h_max": 0.525,
+   "h_min": 0.4182,
+   "h_mittel": 0.5576,
+   "h_max": 0.697,
    "material": [
     {
      "code": "PE160",
@@ -319,18 +430,22 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.35
+     "stunden_je_einheit": 0.4647
     }
    ],
-   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert."
+   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
   },
   "K07": {
    "gewerk": "Kabel",
    "taetigkeit": "Kabelschutzrohr DN 110 verlegen",
    "einheit": "m",
-   "h_min": 0.045,
-   "h_mittel": 0.06,
-   "h_max": 0.075,
+   "h_min": 0.118,
+   "h_mittel": 0.1646,
+   "h_max": 0.2112,
    "material": [
     {
      "code": "KSR",
@@ -338,14 +453,18 @@
     }
    ],
    "geraet": [],
-   "bemerkung": "In vorbereiteten Graben, Muffen gesteckt."
+   "bemerkung": "In vorbereiteten Graben, Muffen gesteckt.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 15.00 €): Kostenberechnung Biblis 04.06.2025: Kabelschutzrohr DN 110 15 €/m (6.3.13), DA 63 6,50 €/m"
   },
   "K08": {
    "gewerk": "Kabel",
    "taetigkeit": "Trassenwarnband verlegen",
    "einheit": "m",
-   "h_min": 0.007,
-   "h_mittel": 0.01,
+   "h_min": 0.0096,
+   "h_mittel": 0.0113,
    "h_max": 0.013,
    "material": [
     {
@@ -354,47 +473,70 @@
     }
    ],
    "geraet": [],
-   "bemerkung": "30 cm über Leitung."
+   "bemerkung": "30 cm über Leitung.",
+   "stichworte": [
+    "markieren",
+    "ortungsdraht",
+    "warnband",
+    "rohr"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 1.00 €): Kostenberechnung Biblis 04.06.2025: Trassenwarnband 1 €/m (6.3.16, 4.6.13)"
   },
   "K09": {
    "gewerk": "Kanal",
    "taetigkeit": "Dichtheitsprüfung je Haltung",
    "einheit": "St",
-   "h_min": 2.25,
-   "h_mittel": 3.0,
-   "h_max": 3.75,
+   "h_min": 1.696,
+   "h_mittel": 2.0352,
+   "h_max": 2.3744,
    "material": [],
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 2.0
+     "stunden_je_einheit": 1.3568
     }
    ],
-   "bemerkung": "Prüfung mit Luft nach DIN EN 1610, Protokoll."
+   "bemerkung": "Prüfung mit Luft nach DIN EN 1610, Protokoll.",
+   "stichworte": [
+    "dichtheitsprüfung",
+    "haltung",
+    "dichtheit"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 150.00 €): Kostenberechnung Biblis 04.06.2025: Dichtheitsprüfung Revisionsschächte 150 €/St (5.5.22)"
   },
   "K10": {
    "gewerk": "Kanal",
    "taetigkeit": "TV-Inspektion des neuen Kanals",
    "einheit": "m",
-   "h_min": 0.03,
-   "h_mittel": 0.04,
-   "h_max": 0.05,
+   "h_min": 0.0863,
+   "h_mittel": 0.1195,
+   "h_max": 0.1527,
    "material": [],
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.04
+     "stunden_je_einheit": 0.1195
     }
    ],
-   "bemerkung": "Befahrung, Video und Bericht."
+   "bemerkung": "Befahrung, Video und Bericht.",
+   "stichworte": [
+    "inspektion"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 9.00 €): Kostenberechnung Biblis 04.06.2025: TV-Untersuchung 4–9 €/m (5.5.15/16)"
   },
   "K11": {
    "gewerk": "Kanal",
    "taetigkeit": "Hausanschluss herstellen, einschl. Abzweig",
    "einheit": "St",
-   "h_min": 4.875,
-   "h_mittel": 6.5,
-   "h_max": 8.125,
+   "h_min": 6.4524,
+   "h_mittel": 8.6032,
+   "h_max": 10.754,
    "material": [
     {
      "code": "ANSCH",
@@ -408,18 +550,22 @@
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 1.5
+     "stunden_je_einheit": 1.9854
     }
    ],
-   "bemerkung": "Anschluss bis Grundstücksgrenze."
+   "bemerkung": "Anschluss bis Grundstücksgrenze.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
   },
   "S01": {
    "gewerk": "Schacht",
    "taetigkeit": "Schacht DN 1000 aus Fertigteilen setzen, Tiefe bis 3,0 m",
    "einheit": "St",
-   "h_min": 5.625,
-   "h_mittel": 7.5,
-   "h_max": 9.375,
+   "h_min": 9.2347,
+   "h_mittel": 11.2869,
+   "h_max": 13.3391,
    "material": [
     {
      "code": "SCH1000",
@@ -433,18 +579,26 @@
    "geraet": [
     {
      "code": "BAG25",
-     "stunden_je_einheit": 2.5
+     "stunden_je_einheit": 3.7623
     }
    ],
-   "bemerkung": "Fertigteile nach DIN 4034-1."
+   "bemerkung": "Fertigteile nach DIN 4034-1.",
+   "stichworte": [
+    "schacht",
+    "-garnitur",
+    "-pumpensumpf"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2750.00 €): Kostenberechnung Biblis 04.06.2025: Schacht DN 1000 2.750 €/St (5.4.14), DN 800 2.000 €/St"
   },
   "S02": {
    "gewerk": "Schacht",
    "taetigkeit": "Zulage Schachttiefe je angefangene 0,5 m über 3,0 m",
    "einheit": "St",
-   "h_min": 1.2,
-   "h_mittel": 1.6,
-   "h_max": 2.0,
+   "h_min": 1.4018,
+   "h_mittel": 1.869,
+   "h_max": 2.3363,
    "material": [
     {
      "code": "SCH1000",
@@ -454,18 +608,22 @@
    "geraet": [
     {
      "code": "BAG25",
-     "stunden_je_einheit": 0.4
+     "stunden_je_einheit": 0.4673
     }
    ],
-   "bemerkung": "Zulage zur Position Schacht."
+   "bemerkung": "Zulage zur Position Schacht.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Schacht Markt/Modell 2025 = 1.06 skaliert"
   },
   "S03": {
    "gewerk": "Schacht",
    "taetigkeit": "Schachtabdeckung D 400 setzen und regulieren",
    "einheit": "St",
-   "h_min": 1.65,
-   "h_mittel": 2.2,
-   "h_max": 2.75,
+   "h_min": 1.5244,
+   "h_mittel": 1.7934,
+   "h_max": 2.0624,
    "material": [
     {
      "code": "ABD",
@@ -479,18 +637,28 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 1.0
+     "stunden_je_einheit": 0.8152
     }
    ],
-   "bemerkung": "Auf Höhe der fertigen Oberfläche."
+   "bemerkung": "Auf Höhe der fertigen Oberfläche.",
+   "stichworte": [
+    "schachtabdeckung",
+    "abdeckung",
+    "-straßenkappe",
+    "-schieberkappe",
+    "-hahnkasten"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 550.00 €): Kostenberechnung Biblis 04.06.2025: Schachtabdeckung Kl. D 400 550 €/St (5.4.19)"
   },
   "S04": {
    "gewerk": "Schacht",
    "taetigkeit": "Gerinne herstellen",
    "einheit": "St",
-   "h_min": 2.625,
-   "h_mittel": 3.5,
-   "h_max": 4.375,
+   "h_min": 2.8119,
+   "h_mittel": 3.7492,
+   "h_max": 4.6865,
    "material": [
     {
      "code": "BET",
@@ -500,34 +668,45 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 2.0
+     "stunden_je_einheit": 2.1424
     }
    ],
-   "bemerkung": "Gerinne in Beton, Berme mit Gefälle."
+   "bemerkung": "Gerinne in Beton, Berme mit Gefälle.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Schacht Markt/Modell 2025 = 1.06 skaliert"
   },
   "T01": {
    "gewerk": "Straße",
    "taetigkeit": "Asphalt schneiden",
    "einheit": "m",
-   "h_min": 0.038,
-   "h_mittel": 0.05,
-   "h_max": 0.062,
+   "h_min": 0.0699,
+   "h_mittel": 0.0822,
+   "h_max": 0.0945,
    "material": [],
    "geraet": [
     {
      "code": "SAEG",
-     "stunden_je_einheit": 0.05
+     "stunden_je_einheit": 0.0822
     }
    ],
-   "bemerkung": "Schnitttiefe bis 20 cm."
+   "bemerkung": "Schnitttiefe bis 20 cm.",
+   "stichworte": [
+    "schneiden",
+    "fugenschneider"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 7.00 €): Kostenberechnung Biblis 04.06.2025: Asphaltbefestigung trennen 5–15 cm 7 €/m (4.4.10)"
   },
   "T02": {
    "gewerk": "Straße",
    "taetigkeit": "Asphalt aufbrechen, laden, entsorgen",
    "einheit": "m2",
-   "h_min": 0.045,
-   "h_mittel": 0.06,
-   "h_max": 0.075,
+   "h_min": 0.0538,
+   "h_mittel": 0.0861,
+   "h_max": 0.1184,
    "material": [
     {
      "code": "DEP",
@@ -537,22 +716,29 @@
    "geraet": [
     {
      "code": "BAG14",
-     "stunden_je_einheit": 0.04
+     "stunden_je_einheit": 0.0574
     },
     {
      "code": "LKW",
-     "stunden_je_einheit": 0.03
+     "stunden_je_einheit": 0.043
     }
    ],
-   "bemerkung": "Dicke bis 15 cm, teerfrei lt. Gutachten."
+   "bemerkung": "Dicke bis 15 cm, teerfrei lt. Gutachten.",
+   "stichworte": [
+    "asphalt",
+    "aufbrechen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 20.00 €): Kostenberechnung Biblis 04.06.2025: aufreißen/fräsen Kleinflächen 30 €/m² (4.4.11) — für Großflächen niedriger angesetzt"
   },
   "T03": {
    "gewerk": "Straße",
    "taetigkeit": "Asphalttragschicht AC 22 TS einbauen, d = 10 cm",
    "einheit": "m2",
-   "h_min": 0.022,
-   "h_mittel": 0.03,
-   "h_max": 0.037,
+   "h_min": 0.041,
+   "h_mittel": 0.0482,
+   "h_max": 0.0554,
    "material": [
     {
      "code": "ACT",
@@ -562,22 +748,29 @@
    "geraet": [
     {
      "code": "FER",
-     "stunden_je_einheit": 0.006
+     "stunden_je_einheit": 0.0096
     },
     {
      "code": "WAL",
-     "stunden_je_einheit": 0.01
+     "stunden_je_einheit": 0.0161
     }
    ],
-   "bemerkung": "Maschineller Einbau."
+   "bemerkung": "Maschineller Einbau.",
+   "stichworte": [
+    "asphalttragschicht",
+    "-vegetationstragschicht"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 27.50 €): Kostenberechnung Biblis 04.06.2025: Asphalttragschicht AC 32 TN 12 cm 30 €/m² (4.4.13) → 10 cm"
   },
   "T04": {
    "gewerk": "Straße",
    "taetigkeit": "Asphaltdeckschicht AC 11 DS einbauen, d = 4 cm",
    "einheit": "m2",
-   "h_min": 0.019,
-   "h_mittel": 0.025,
-   "h_max": 0.031,
+   "h_min": 0.0745,
+   "h_mittel": 0.0876,
+   "h_max": 0.1007,
    "material": [
     {
      "code": "ACD",
@@ -587,22 +780,26 @@
    "geraet": [
     {
      "code": "FER",
-     "stunden_je_einheit": 0.005
+     "stunden_je_einheit": 0.0175
     },
     {
      "code": "WAL",
-     "stunden_je_einheit": 0.01
+     "stunden_je_einheit": 0.035
     }
    ],
-   "bemerkung": "Maschineller Einbau."
+   "bemerkung": "Maschineller Einbau.",
+   "stichworte": [],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 22.00 €): Kostenberechnung Biblis 04.06.2025: Asphaltdeckschicht AC 8 DN 20 €/m² + Emulsion 2 €/m² (4.4.17/18)"
   },
   "T05": {
    "gewerk": "Straße",
    "taetigkeit": "Betonsteinpflaster 8 cm verlegen, einschl. Bettung",
    "einheit": "m2",
-   "h_min": 0.285,
-   "h_mittel": 0.38,
-   "h_max": 0.475,
+   "h_min": 0.6381,
+   "h_mittel": 0.7507,
+   "h_max": 0.8633,
    "material": [
     {
      "code": "PFL",
@@ -616,18 +813,27 @@
    "geraet": [
     {
      "code": "RUE",
-     "stunden_je_einheit": 0.05
+     "stunden_je_einheit": 0.0988
     }
    ],
-   "bemerkung": "Läuferverband, Fugen mit Sand."
+   "bemerkung": "Läuferverband, Fugen mit Sand.",
+   "stichworte": [
+    "pflaster",
+    "pflasterdecke",
+    "betonpflaster",
+    "-gebraucht"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 78.00 €): Kostenberechnung Biblis 04.06.2025: Betonpflaster liefern und verlegen 8 cm 78 €/m² (4.5.21)"
   },
   "T06": {
    "gewerk": "Straße",
    "taetigkeit": "Hochbordstein 15/30 in Beton setzen",
    "einheit": "m",
-   "h_min": 0.21,
-   "h_mittel": 0.28,
-   "h_max": 0.35,
+   "h_min": 0.2335,
+   "h_mittel": 0.2994,
+   "h_max": 0.3653,
    "material": [
     {
      "code": "BORD",
@@ -641,10 +847,21 @@
    "geraet": [
     {
      "code": "KLG",
-     "stunden_je_einheit": 0.3
+     "stunden_je_einheit": 0.3207
     }
    ],
-   "bemerkung": "Rückenstütze in Beton C20/25."
+   "bemerkung": "Rückenstütze in Beton C20/25.",
+   "stichworte": [
+    "bordstein",
+    "betonbord",
+    "rückenstütze",
+    "-abbrechen",
+    "-rückbau",
+    "-gebraucht"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 50.00 €): Kostenberechnung Biblis 04.06.2025: Tiefbord 8/25 38 €/m, 10/30 40 €/m, Rundbord 15/22 60 €/m — Hochbord 15/30 dazwischen"
   },
   "B01": {
    "gewerk": "Baustelle",
@@ -655,15 +872,22 @@
    "h_max": 0.0,
    "material": [],
    "geraet": [],
-   "bemerkung": "Kalkuliert als Anteil der Einzelkosten aller übrigen Positionen."
+   "bemerkung": "Kalkuliert als Anteil der Einzelkosten aller übrigen Positionen.",
+   "stichworte": [
+    "baustelleneinrichtung",
+    "baustelle"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog"
   },
   "B02": {
    "gewerk": "Baustelle",
    "taetigkeit": "Verkehrssicherung vorhalten",
    "einheit": "Wo",
-   "h_min": 0.75,
-   "h_mittel": 1.0,
-   "h_max": 1.25,
+   "h_min": 0.8939,
+   "h_mittel": 1.1918,
+   "h_max": 1.4897,
    "material": [
     {
      "code": "BAKE",
@@ -671,29 +895,2754 @@
     }
    ],
    "geraet": [],
-   "bemerkung": "Absperrung und Beschilderung nach RSA, je Woche."
+   "bemerkung": "Absperrung und Beschilderung nach RSA, je Woche.",
+   "stichworte": [
+    "verkehrssicherung",
+    "absperrung",
+    "beschilderung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
   },
   "B03": {
    "gewerk": "Baustelle",
    "taetigkeit": "Stundenlohnarbeiten Facharbeiter",
    "einheit": "h",
-   "h_min": 0.75,
-   "h_mittel": 1.0,
-   "h_max": 1.25,
+   "h_min": 0.8366,
+   "h_mittel": 1.1155,
+   "h_max": 1.3944,
    "material": [],
    "geraet": [],
-   "bemerkung": "Nur auf Anordnung der Bauleitung."
+   "bemerkung": "Nur auf Anordnung der Bauleitung.",
+   "stichworte": [
+    "stundenlohnarbeiten",
+    "stundenlohn",
+    "facharbeiter",
+    "bauwerker"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
   },
   "B04": {
    "gewerk": "Baustelle",
    "taetigkeit": "Bestandsdokumentation und Aufmaß",
    "einheit": "psch",
-   "h_min": 10.5,
-   "h_mittel": 14.0,
-   "h_max": 17.5,
+   "h_min": 10.2928,
+   "h_mittel": 15.6167,
+   "h_max": 20.9406,
    "material": [],
    "geraet": [],
-   "bemerkung": "Digitale Bestandspläne nach Vorgabe des Netzbetreibers."
+   "bemerkung": "Digitale Bestandspläne nach Vorgabe des Netzbetreibers.",
+   "stichworte": [
+    "bestandsdokumentation",
+    "aufmaß",
+    "dokumentation",
+    "einmessen",
+    "georeferenzierung",
+    "montageplanung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 1100.00 €): Kostenberechnung Biblis 04.06.2025: Bestandsaufnahme 750 €, Zustandserfassung+Doku 1.500 € psch (1.12, 1.17–1.19)"
+  },
+  "B04-ST": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Dokumentation erstellen bzw. liefern, je Stück",
+   "einheit": "St",
+   "h_min": 1.6732,
+   "h_mittel": 3.3464,
+   "h_max": 5.0196,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Foto-, Bestands- oder Anlagendokumentation, Revisionsunterlagen, je Exemplar.",
+   "stichworte": [
+    "dokumentation",
+    "fotodokumentation",
+    "bestandsdokumentation",
+    "anlagendokumentation",
+    "revisionsunterlagen",
+    "datenträger",
+    "verdrahtungsplan",
+    "foto",
+    "-knotenpunkt",
+    "-knotenpunkte"
+   ],
+   "basis": "B04",
+   "status": "geschaetzt",
+   "annahme": "B04 psch = 14 h je Projekt; ein einzelnes Dokument bzw. Exemplar angesetzt mit ca. 1,5–4,5 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B04-M2": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Leitungen orten, markieren und aufmessen, je m² Fläche",
+   "einheit": "m2",
+   "h_min": 0.0168,
+   "h_mittel": 0.0335,
+   "h_max": 0.0503,
+   "material": [],
+   "geraet": [
+    {
+     "code": "ORT",
+     "stunden_je_einheit": 0.0335
+    }
+   ],
+   "bemerkung": "Ortung von Kabeln und Leitungen mit Markierung.",
+   "stichworte": [
+    "kabelortung",
+    "ortung",
+    "orten",
+    "markierung",
+    "aufmaß",
+    "aufmessen"
+   ],
+   "basis": "B04",
+   "status": "geschaetzt",
+   "annahme": "Begehung mit Ortungsgerät, ca. 30–35 m² je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B02-STWO": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrssicherung vorhalten, je Stück und Woche",
+   "einheit": "StWo",
+   "h_min": 0.0304,
+   "h_mittel": 0.0608,
+   "h_max": 0.0912,
+   "material": [
+    {
+     "code": "VZ_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Absperrgerät vorhalten, Kontrolle nach RSA.",
+   "stichworte": [
+    "verkehrssicherung",
+    "absperrung",
+    "vorhalten",
+    "absperrgerät"
+   ],
+   "basis": "B02",
+   "status": "geschaetzt",
+   "annahme": "Kontrolle ca. 3 min je Stück und Woche; Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B02-ST": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrssicherung aufstellen und abbauen, je Stück",
+   "einheit": "St",
+   "h_min": 0.2677,
+   "h_mittel": 0.4462,
+   "h_max": 0.6247,
+   "material": [],
+   "geraet": [
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.0558
+    }
+   ],
+   "bemerkung": "Absperrgerät antransportieren, aufstellen, abbauen.",
+   "stichworte": [
+    "verkehrssicherung",
+    "absperrung",
+    "aufstellen",
+    "abbauen",
+    "absperrgerät"
+   ],
+   "basis": "B02",
+   "status": "geschaetzt",
+   "annahme": "Vergleichbar mit B02 (1 h je Woche für die ganze Absperrung); Einzelgerät 0,25–0,55 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "E03-ST": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden von Hand lösen an einer Leitungskreuzung, je Kreuzung",
+   "einheit": "St",
+   "h_min": 3.0553,
+   "h_mittel": 6.1107,
+   "h_max": 9.166,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 2.7
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 4.583
+    }
+   ],
+   "bemerkung": "Handschachtung zum Freilegen und Sichern einer kreuzenden Leitung.",
+   "stichworte": [
+    "kabelkreuzung",
+    "kreuzung",
+    "freilegen",
+    "handschachtung",
+    "spannung",
+    "sichern",
+    "-kreuzungsschale"
+   ],
+   "basis": "E03",
+   "status": "abgeleitet",
+   "annahme": "E03 = 2,2 h/m³; je Kreuzung ca. 1,5 m³ Handaushub plus Sicherungsarbeit, ergibt ca. 3–5 h. | Mit Gewerk-Median Erdbau Markt/Modell 2025 = 1.44 skaliert"
+  },
+  "K09-M": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Druck- bzw. Dichtheitsprüfung einer Leitung, je m",
+   "einheit": "m",
+   "h_min": 0.0265,
+   "h_mittel": 0.0398,
+   "h_max": 0.0531,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.0398
+    }
+   ],
+   "bemerkung": "Druckprobe in Teilabschnitten mit Protokoll.",
+   "stichworte": [
+    "druckprobe",
+    "druckprüfung",
+    "dichtheitsprüfung",
+    "prüfung",
+    "teilabschnitten"
+   ],
+   "basis": "K09",
+   "status": "abgeleitet",
+   "annahme": "K09 = 3 h je Haltung; Haltung ca. 45 m (Schachtabstand im Katalog) bzw. Prüfabschnitt 75–100 m, ergibt 0,03–0,07 h/m; untere Hälfte angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 3.00 €): Kostenberechnung Biblis 04.06.2025: Muffendruckprüfung 2–4 €/m (5.5.20/21)"
+  },
+  "E01-M3": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Oberboden abtragen und seitlich lagern, je m³",
+   "einheit": "m3",
+   "h_min": 0.0972,
+   "h_mittel": 0.1144,
+   "h_max": 0.1316,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.0953
+    }
+   ],
+   "bemerkung": "Abrechnung nach Volumen.",
+   "stichworte": [
+    "oberboden",
+    "abtragen",
+    "lagern",
+    "mutterboden"
+   ],
+   "basis": "E01",
+   "status": "abgeleitet",
+   "annahme": "E01 = 0,012 h/m² bei d = 20 cm (Katalogtext) → 0,06 h/m³. Die Schichtdicke stammt aus der Katalogzeile selbst, nicht aus dem LV. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 16.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden abtragen, fördern, lagern 16 €/m³ (4.1.11)"
+  },
+  "E08": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Oberboden auftragen bzw. andecken",
+   "einheit": "m3",
+   "h_min": 0.0539,
+   "h_mittel": 0.1232,
+   "h_max": 0.1925,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.0616
+    },
+    {
+     "code": "RLD",
+     "stunden_je_einheit": 0.0308
+    }
+   ],
+   "bemerkung": "Oberboden aus Lager auftragen und planieren.",
+   "stichworte": [
+    "oberboden",
+    "auftragen",
+    "andecken",
+    "mutterboden"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Etwas aufwendiger als E01-M3 (Planieren), 0,056–0,104 h/m³. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 16.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden gelagert andecken 16 €/m³; geliefert 32 €/m³ (4.1.12/13)"
+  },
+  "E07-M3": {
+   "gewerk": "Oberbau",
+   "taetigkeit": "Frostschutzschicht 0/45 einbauen, je m³",
+   "einheit": "m3",
+   "h_min": 0.0706,
+   "h_mittel": 0.0831,
+   "h_max": 0.0956,
+   "material": [
+    {
+     "code": "FSS",
+     "menge_je_einheit": 2.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RLD",
+     "stunden_je_einheit": 0.0333
+    },
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.0333
+    }
+   ],
+   "bemerkung": "Abrechnung nach Volumen.",
+   "stichworte": [
+    "frostschutzschicht",
+    "frostschutz",
+    "fss"
+   ],
+   "basis": "E07",
+   "status": "abgeleitet",
+   "annahme": "E07 = 0,05 h/m² bei d = 30 cm (Katalogtext) → 0,167 h/m³; Material und Gerät ebenso durch 0,30 m geteilt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 58.00 €): Kostenberechnung Biblis 04.06.2025: Schottertragschicht herstellen 58 €/m³ (4.3.10–12)"
+  },
+  "T07": {
+   "gewerk": "Oberbau",
+   "taetigkeit": "Schottertragschicht 0/32 einbauen",
+   "einheit": "m3",
+   "h_min": 0.1091,
+   "h_mittel": 0.1284,
+   "h_max": 0.1477,
+   "material": [
+    {
+     "code": "SCHO",
+     "menge_je_einheit": 1.5381
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RLD",
+     "stunden_je_einheit": 0.0515
+    },
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.0515
+    }
+   ],
+   "bemerkung": "Tragschicht ohne Bindemittel.",
+   "stichworte": [
+    "schottertragschicht",
+    "tragschicht",
+    "schotter",
+    "sts"
+   ],
+   "basis": "E07-M3",
+   "status": "geschaetzt",
+   "annahme": "Einbau wie Frostschutzschicht je m³ (E07-M3) angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 58.00 €): Kostenberechnung Biblis 04.06.2025: Schottertragschicht herstellen 58 €/m³"
+  },
+  "T02-M3": {
+   "gewerk": "Straße",
+   "taetigkeit": "Asphalt aufbrechen, laden, entsorgen, je m³",
+   "einheit": "m3",
+   "h_min": 0.6001,
+   "h_mittel": 0.8573,
+   "h_max": 1.1145,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 2.4
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.5715
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.4286
+    }
+   ],
+   "bemerkung": "Abrechnung nach Volumen.",
+   "stichworte": [
+    "asphalt",
+    "asphaltschicht",
+    "aufbrechen"
+   ],
+   "basis": "T02",
+   "status": "abgeleitet",
+   "annahme": "T02 = 0,06 h/m² bei ca. 10 cm → 0,6 h/m³; Entsorgung mit 2,4 t/m³ Rohdichte Asphalt (allgemeiner Wert, keine LV-Angabe). | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
+  },
+  "T08": {
+   "gewerk": "Straße",
+   "taetigkeit": "Ungebundene Befestigung aufnehmen, laden, entsorgen",
+   "einheit": "m3",
+   "h_min": 0.3697,
+   "h_mittel": 0.5282,
+   "h_max": 0.6867,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 2.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.3018
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.2264
+    }
+   ],
+   "bemerkung": "Schotter-, Splitt- oder Kiesbefestigung.",
+   "stichworte": [
+    "befestigung",
+    "schotter",
+    "splitt",
+    "brechsand",
+    "schotterrasen",
+    "aufnehmen",
+    "abbrechen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Leichter zu lösen als Asphalt (T02-M3), etwa 60 % davon. | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
+  },
+  "T09": {
+   "gewerk": "Straße",
+   "taetigkeit": "Pflaster aufnehmen zur Wiederverwendung, reinigen, seitlich lagern",
+   "einheit": "m2",
+   "h_min": 0.2935,
+   "h_mittel": 0.3453,
+   "h_max": 0.3971,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.1381
+    }
+   ],
+   "bemerkung": "Steine schonend ausbauen und stapeln.",
+   "stichworte": [
+    "pflaster",
+    "betonpflaster",
+    "pflasterdecke",
+    "ausbauen",
+    "aufnehmen",
+    "wiederverwendung",
+    "-gebraucht"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Etwa zwei Drittel des Verlegeaufwands T05 (0,38 h/m²). | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Pflaster ausbauen, säubern, seitlich lagern 25 €/m² (4.5.24/26)"
+  },
+  "T10": {
+   "gewerk": "Straße",
+   "taetigkeit": "Bordstein aufnehmen bzw. abbrechen, laden",
+   "einheit": "m",
+   "h_min": 0.1379,
+   "h_mittel": 0.1839,
+   "h_max": 0.2299,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 0.1
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.0589
+    }
+   ],
+   "bemerkung": "Rückbau mit oder ohne Wiederverwendung.",
+   "stichworte": [
+    "bordstein",
+    "betonbord",
+    "abbrechen",
+    "rückbau",
+    "aufnehmen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Gut die Hälfte des Setzaufwands T06 (0,28 h/m) plus Laden. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 20.00 €): Kostenberechnung Biblis 04.06.2025: Bordsteine aufnehmen und entsorgen 20 €/m (4.5.10)"
+  },
+  "T11": {
+   "gewerk": "Straße",
+   "taetigkeit": "Pflaster aus Bestand wieder verlegen, einschl. Bettung",
+   "einheit": "m2",
+   "h_min": 0.3885,
+   "h_mittel": 0.457,
+   "h_max": 0.5255,
+   "material": [
+    {
+     "code": "SAND",
+     "menge_je_einheit": 0.08
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.0601
+    }
+   ],
+   "bemerkung": "Gelagerte, gebrauchte Steine; kein Neumaterial.",
+   "stichworte": [
+    "pflaster",
+    "pflasterdecke",
+    "betonpflaster",
+    "gebraucht",
+    "lagernd"
+   ],
+   "basis": "T05",
+   "status": "abgeleitet",
+   "annahme": "Verlegeaufwand wie T05 (0,38 h/m²); Steinmaterial entfällt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 35.00 €): Kostenberechnung Biblis 04.06.2025: Pflaster gelagert verlegen 35 €/m² (4.5.25/27), Naturstein 45 €/m²"
+  },
+  "T12": {
+   "gewerk": "Straße",
+   "taetigkeit": "Bordstein aus Bestand wieder setzen, in Beton",
+   "einheit": "m",
+   "h_min": 0.2813,
+   "h_mittel": 0.4019,
+   "h_max": 0.5225,
+   "material": [
+    {
+     "code": "BET",
+     "menge_je_einheit": 0.06
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.4306
+    }
+   ],
+   "bemerkung": "Gelagerte, gebrauchte Bordsteine; kein Neumaterial.",
+   "stichworte": [
+    "bordstein",
+    "betonbord",
+    "rückenstütze",
+    "gebraucht",
+    "lagernd"
+   ],
+   "basis": "T06",
+   "status": "abgeleitet",
+   "annahme": "Setzaufwand wie T06 (0,28 h/m); Bordsteinmaterial entfällt. | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
+  },
+  "V01-M2D": {
+   "gewerk": "Verbau",
+   "taetigkeit": "Grabenverbaugerät vorhalten, Tiefe ≤ 3,0 m, je m² und Tag",
+   "einheit": "m2d",
+   "h_min": 0.0012,
+   "h_mittel": 0.0024,
+   "h_max": 0.0036,
+   "material": [],
+   "geraet": [
+    {
+     "code": "VBG",
+     "stunden_je_einheit": 0.0355
+    }
+   ],
+   "bemerkung": "Vorhaltung je Verbaufläche und Kalendertag.",
+   "stichworte": [
+    "grabenverbaugerät",
+    "verbau",
+    "stirnverbau",
+    "vorhalten"
+   ],
+   "basis": "V01",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle. Gerät: V01 enthält 0,6 h VBG je m² für die gesamte Standzeit; bei ca. 20 Tagen ergeben sich 0,03 h je m² und Tag. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "V02-M2D": {
+   "gewerk": "Verbau",
+   "taetigkeit": "Grabenverbaugerät vorhalten, Tiefe > 3,0 m, je m² und Tag",
+   "einheit": "m2d",
+   "h_min": 0.0018,
+   "h_mittel": 0.0036,
+   "h_max": 0.0054,
+   "material": [],
+   "geraet": [
+    {
+     "code": "VBG",
+     "stunden_je_einheit": 0.0474
+    }
+   ],
+   "bemerkung": "Vorhaltung je Verbaufläche und Kalendertag.",
+   "stichworte": [
+    "grabenverbaugerät",
+    "verbau",
+    "stirnverbau",
+    "vorhalten",
+    "tiefe"
+   ],
+   "basis": "V02",
+   "status": "geschaetzt",
+   "annahme": "Wie V01-M2D, schwereres Gerät: +33 % Gerätezeit. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "B05": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Sanitär- und Versorgungseinrichtungen warten, betreiben, reinigen",
+   "einheit": "Wo",
+   "h_min": 1.1155,
+   "h_mittel": 2.231,
+   "h_max": 3.3465,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Je Woche Standzeit.",
+   "stichworte": [
+    "warten",
+    "betreiben",
+    "reinigen",
+    "heizung",
+    "entsorgungseinr",
+    "versorgung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Reinigungen je Woche à ca. 1 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B06": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Container (Sanitär, Büro) aufstellen und räumen",
+   "einheit": "St",
+   "h_min": 2.2309,
+   "h_mittel": 4.4619,
+   "h_max": 6.6928,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KRAN",
+     "stunden_je_einheit": 1.1155
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 2.231
+    }
+   ],
+   "bemerkung": "Anlieferung, Aufstellen, Anschluss, Abholung.",
+   "stichworte": [
+    "container",
+    "sanitärcontainer",
+    "bürocontainer",
+    "aufstellen",
+    "räumen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Personen je 2 h; Kran-Einsatz 1 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B10": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauwasseranschluss einrichten und räumen",
+   "einheit": "St",
+   "h_min": 3.5114,
+   "h_mittel": 7.0228,
+   "h_max": 10.5342,
+   "material": [
+    {
+     "code": "ANSCH",
+     "menge_je_einheit": 2.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 3.5114
+    }
+   ],
+   "bemerkung": "Standrohr bzw. Anschluss an das Netz.",
+   "stichworte": [
+    "bauwasseranschluss",
+    "bauwasser",
+    "wasseranschluss",
+    "einrichten",
+    "räumen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Einrichten und Rückbau je ca. 3 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B11": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauwasseranschluss vorhalten, je Stück und Woche",
+   "einheit": "StWo",
+   "h_min": 0.1176,
+   "h_mittel": 0.2351,
+   "h_max": 0.3527,
+   "material": [
+    {
+     "code": "ZAEHL_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Miete Standrohr bzw. Zähler, Kontrolle.",
+   "stichworte": [
+    "bauwasseranschluss",
+    "bauwasser",
+    "vorhalten"
+   ],
+   "basis": "B10",
+   "status": "geschaetzt",
+   "annahme": "Kontrolle ca. 12 min je Woche. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B12": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Schlauch- bzw. Anschlussleitung einrichten und räumen",
+   "einheit": "m",
+   "h_min": 0.0279,
+   "h_mittel": 0.0558,
+   "h_max": 0.0837,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Bauwasser- oder Entwässerungsleitung provisorisch.",
+   "stichworte": [
+    "schlauchleitung",
+    "anschlussleitung",
+    "anschlussltg",
+    "schlauch",
+    "einrichten",
+    "räumen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Auslegen und Einholen ca. 20 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B13": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Schlauch- bzw. Anschlussleitung vorhalten, je m und Woche",
+   "einheit": "mWo",
+   "h_min": 0.0009,
+   "h_mittel": 0.0023,
+   "h_max": 0.0037,
+   "material": [
+    {
+     "code": "SCHL_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Provisorische Leitung für Wasser oder Entwässerung.",
+   "stichworte": [
+    "schlauchleitung",
+    "anschlussleitung",
+    "anschlussltg",
+    "entwässerung",
+    "vorhalten"
+   ],
+   "basis": "B12",
+   "status": "geschaetzt",
+   "annahme": "Kontrolle vernachlässigbar; Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B14": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Baustromkabel verlegen, einrichten und räumen",
+   "einheit": "m",
+   "h_min": 0.0223,
+   "h_mittel": 0.0446,
+   "h_max": 0.0669,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Provisorische Stromversorgung.",
+   "stichworte": [
+    "baustrom",
+    "stromkabel",
+    "kabel",
+    "einrichten",
+    "räumen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Auslegen und Einholen ca. 25 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B15": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Baustromkabel vorhalten, je m und Woche",
+   "einheit": "mWo",
+   "h_min": 0.0005,
+   "h_mittel": 0.0012,
+   "h_max": 0.0019,
+   "material": [
+    {
+     "code": "KAB_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Provisorische Stromversorgung.",
+   "stichworte": [
+    "baustrom",
+    "stromkabel",
+    "vorhalten"
+   ],
+   "basis": "B14",
+   "status": "geschaetzt",
+   "annahme": "Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "B16": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Baustromanschluss bzw. Verteiler einrichten und räumen",
+   "einheit": "St",
+   "h_min": 3.3464,
+   "h_mittel": 6.6929,
+   "h_max": 10.0393,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 2.231
+    }
+   ],
+   "bemerkung": "Anschluss an das Netz durch Elektrofachkraft.",
+   "stichworte": [
+    "baustrom",
+    "baustromanschluss",
+    "verteiler",
+    "stromanschluss"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Wie Bauwasseranschluss (B10) angesetzt. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A01-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauzaun H 2 m aufstellen bzw. herstellen und räumen",
+   "einheit": "m",
+   "h_min": 0.142,
+   "h_mittel": 0.1704,
+   "h_max": 0.1988,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Bauzaun H 2 m: Auf- und Abbau.",
+   "stichworte": [
+    "bauzaun",
+    "zaun",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Aufstellen und Räumen ca. 8 m je Stunde. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 12.00 €): Kostenberechnung Biblis 04.06.2025: Bauzaun aufstellen und entfernen 2,0 m 12 €/m (1.14)"
+  },
+  "A01-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauzaun H 2 m vorhalten",
+   "einheit": "mWo",
+   "h_min": 0.0016,
+   "h_mittel": 0.004,
+   "h_max": 0.0064,
+   "material": [
+    {
+     "code": "BZ_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Bauzaun H 2 m: Standzeit, Kontrolle.",
+   "stichworte": [
+    "bauzaun",
+    "zaun",
+    "vorhalten"
+   ],
+   "basis": "A01-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A01-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauzaun H 2 m umsetzen",
+   "einheit": "m",
+   "h_min": 0.0335,
+   "h_mittel": 0.0669,
+   "h_max": 0.1003,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Bauzaun H 2 m: an neuen Standort versetzen.",
+   "stichworte": [
+    "bauzaun",
+    "zaun",
+    "umsetzen"
+   ],
+   "basis": "A01-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A01-VD": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bauzaun H 2 m vorhalten, je m und Tag",
+   "einheit": "md",
+   "h_min": 0.0003,
+   "h_mittel": 0.0007,
+   "h_max": 0.0011,
+   "material": [
+    {
+     "code": "BZ_MIETE_TAG",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Standzeit je Kalendertag.",
+   "stichworte": [
+    "bauzaun",
+    "zaun",
+    "vorhalten"
+   ],
+   "basis": "A01-H",
+   "status": "geschaetzt",
+   "annahme": "Eigene Zeile für die LV-Einheit md, Miete je Tag als eigener Materialpreis — keine Umrechnung aus der Wochenmiete im Kalkulationspfad. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A02-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Laufsteg mit Schutzwand aufstellen bzw. herstellen und räumen",
+   "einheit": "St",
+   "h_min": 1.6732,
+   "h_mittel": 3.3464,
+   "h_max": 5.0196,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Laufsteg mit Schutzwand: Auf- und Abbau.",
+   "stichworte": [
+    "laufsteg",
+    "schutzwand",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Laufsteg 2–4 m: zwei Personen je ca. 1,5 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A02-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Laufsteg mit Schutzwand vorhalten",
+   "einheit": "StWo",
+   "h_min": 0.0542,
+   "h_mittel": 0.1356,
+   "h_max": 0.217,
+   "material": [
+    {
+     "code": "LS_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Laufsteg mit Schutzwand: Standzeit, Kontrolle.",
+   "stichworte": [
+    "laufsteg",
+    "schutzwand",
+    "vorhalten"
+   ],
+   "basis": "A02-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A02-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Laufsteg mit Schutzwand umsetzen",
+   "einheit": "St",
+   "h_min": 0.8366,
+   "h_mittel": 1.6732,
+   "h_max": 2.5098,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Laufsteg mit Schutzwand: an neuen Standort versetzen.",
+   "stichworte": [
+    "laufsteg",
+    "schutzwand",
+    "umsetzen"
+   ],
+   "basis": "A02-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A03-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Witterungsschutz-Zelt aufstellen bzw. herstellen und räumen",
+   "einheit": "St",
+   "h_min": 2.2309,
+   "h_mittel": 4.4619,
+   "h_max": 6.6928,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Witterungsschutz-Zelt: Auf- und Abbau.",
+   "stichworte": [
+    "witterungsschutz",
+    "zelt",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zelt über Schweißstelle: zwei Personen je ca. 2 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A03-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Witterungsschutz-Zelt vorhalten",
+   "einheit": "StWo",
+   "h_min": 0.2592,
+   "h_mittel": 0.6481,
+   "h_max": 1.037,
+   "material": [
+    {
+     "code": "ZELT_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Witterungsschutz-Zelt: Standzeit, Kontrolle.",
+   "stichworte": [
+    "witterungsschutz",
+    "zelt",
+    "vorhalten"
+   ],
+   "basis": "A03-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A03-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Witterungsschutz-Zelt umsetzen",
+   "einheit": "St",
+   "h_min": 1.1155,
+   "h_mittel": 2.231,
+   "h_max": 3.3465,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Witterungsschutz-Zelt: an neuen Standort versetzen.",
+   "stichworte": [
+    "witterungsschutz",
+    "zelt",
+    "umsetzen"
+   ],
+   "basis": "A03-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A04-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Behelfsüberfahrt Stahlbeton aufstellen bzw. herstellen und räumen",
+   "einheit": "St",
+   "h_min": 0.7078,
+   "h_mittel": 1.4156,
+   "h_max": 2.1234,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.3539
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.2359
+    }
+   ],
+   "bemerkung": "Behelfsüberfahrt Stahlbeton: Auf- und Abbau.",
+   "stichworte": [
+    "behelfsüberfahrt",
+    "überfahrt",
+    "stahlbeton",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Platten mit Bagger verlegen und aufnehmen. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 150.00 €): Kostenberechnung Biblis 04.06.2025: Notbrücke PKW/LKW herstellen 150 €/St (2.13)"
+  },
+  "A04-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Behelfsüberfahrt Stahlbeton vorhalten",
+   "einheit": "StWo",
+   "h_min": 0.1374,
+   "h_mittel": 0.3436,
+   "h_max": 0.5498,
+   "material": [
+    {
+     "code": "UEB_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Behelfsüberfahrt Stahlbeton: Standzeit, Kontrolle.",
+   "stichworte": [
+    "behelfsüberfahrt",
+    "überfahrt",
+    "stahlbeton",
+    "vorhalten"
+   ],
+   "basis": "A04-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A04-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Behelfsüberfahrt Stahlbeton umsetzen",
+   "einheit": "St",
+   "h_min": 1.6732,
+   "h_mittel": 3.3464,
+   "h_max": 5.0196,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 1.6732
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 1.1155
+    }
+   ],
+   "bemerkung": "Behelfsüberfahrt Stahlbeton: an neuen Standort versetzen.",
+   "stichworte": [
+    "behelfsüberfahrt",
+    "überfahrt",
+    "stahlbeton",
+    "umsetzen"
+   ],
+   "basis": "A04-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A05-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Leitungsbehelfsbrücke aufstellen bzw. herstellen und räumen",
+   "einheit": "m",
+   "h_min": 5.3543,
+   "h_mittel": 13.3857,
+   "h_max": 21.4171,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KRAN",
+     "stunden_je_einheit": 1.6732
+    }
+   ],
+   "bemerkung": "Leitungsbehelfsbrücke: Auf- und Abbau.",
+   "stichworte": [
+    "leitungsbehelfsbrücke",
+    "behelfsbrücke",
+    "brücke",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "UNSICHER: Brücke 10–15 m mit Kran; Aufwand je m stark von der Konstruktion abhängig, deshalb breite Spanne. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A05-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Leitungsbehelfsbrücke vorhalten",
+   "einheit": "mWo",
+   "h_min": 0.0234,
+   "h_mittel": 0.0585,
+   "h_max": 0.0936,
+   "material": [
+    {
+     "code": "BRU_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Leitungsbehelfsbrücke: Standzeit, Kontrolle.",
+   "stichworte": [
+    "leitungsbehelfsbrücke",
+    "behelfsbrücke",
+    "brücke",
+    "vorhalten"
+   ],
+   "basis": "A05-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A05-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Leitungsbehelfsbrücke umsetzen",
+   "einheit": "m",
+   "h_min": 2.6772,
+   "h_mittel": 6.6929,
+   "h_max": 10.7086,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KRAN",
+     "stunden_je_einheit": 1.6732
+    }
+   ],
+   "bemerkung": "Leitungsbehelfsbrücke: an neuen Standort versetzen.",
+   "stichworte": [
+    "leitungsbehelfsbrücke",
+    "behelfsbrücke",
+    "brücke",
+    "umsetzen"
+   ],
+   "basis": "A05-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A06-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrszeichen aufstellen bzw. herstellen und räumen",
+   "einheit": "St",
+   "h_min": 0.1816,
+   "h_mittel": 0.4541,
+   "h_max": 0.7266,
+   "material": [],
+   "geraet": [
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.0908
+    }
+   ],
+   "bemerkung": "Verkehrszeichen: Auf- und Abbau.",
+   "stichworte": [
+    "verkehrszeichen",
+    "vorschriftzeichen",
+    "richtzeichen",
+    "zusatzzeichen",
+    "zeichen",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Aufstellen mit Fußplatte ca. 30 min je Zeichen. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Verkehrszeichen aufstellen 40 €/St (2.11), Größe 2 100 €/St"
+  },
+  "A06-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrszeichen vorhalten",
+   "einheit": "StWo",
+   "h_min": 0.0154,
+   "h_mittel": 0.0385,
+   "h_max": 0.0616,
+   "material": [
+    {
+     "code": "VZ_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Verkehrszeichen: Standzeit, Kontrolle.",
+   "stichworte": [
+    "verkehrszeichen",
+    "vorschriftzeichen",
+    "richtzeichen",
+    "zusatzzeichen",
+    "zeichen",
+    "vorhalten"
+   ],
+   "basis": "A06-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A06-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrszeichen umsetzen",
+   "einheit": "St",
+   "h_min": 0.1673,
+   "h_mittel": 0.3346,
+   "h_max": 0.5019,
+   "material": [],
+   "geraet": [
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.1115
+    }
+   ],
+   "bemerkung": "Verkehrszeichen: an neuen Standort versetzen.",
+   "stichworte": [
+    "verkehrszeichen",
+    "vorschriftzeichen",
+    "richtzeichen",
+    "zusatzzeichen",
+    "zeichen",
+    "umsetzen"
+   ],
+   "basis": "A06-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A07-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Warnleuchte aufstellen bzw. herstellen und räumen",
+   "einheit": "St",
+   "h_min": 0.4827,
+   "h_mittel": 0.5679,
+   "h_max": 0.6531,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Warnleuchte: Auf- und Abbau.",
+   "stichworte": [
+    "warnleuchte",
+    "leuchte",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Anbringen an Absperrung ca. 15 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Absperr-/Warneinrichtung aufstellen 40 €/St (2.12)"
+  },
+  "A07-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Warnleuchte vorhalten",
+   "einheit": "StWo",
+   "h_min": 0.0099,
+   "h_mittel": 0.0247,
+   "h_max": 0.0395,
+   "material": [
+    {
+     "code": "WL_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Warnleuchte: Standzeit, Kontrolle.",
+   "stichworte": [
+    "warnleuchte",
+    "leuchte",
+    "vorhalten"
+   ],
+   "basis": "A07-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A07-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Warnleuchte umsetzen",
+   "einheit": "St",
+   "h_min": 0.0837,
+   "h_mittel": 0.1673,
+   "h_max": 0.251,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Warnleuchte: an neuen Standort versetzen.",
+   "stichworte": [
+    "warnleuchte",
+    "leuchte",
+    "umsetzen"
+   ],
+   "basis": "A07-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A08-H": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Schutzwand aufstellen bzw. herstellen und räumen",
+   "einheit": "m",
+   "h_min": 0.1673,
+   "h_mittel": 0.3346,
+   "h_max": 0.5019,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Schutzwand: Auf- und Abbau.",
+   "stichworte": [
+    "schutzwand",
+    "aufstellen",
+    "aufbauen",
+    "abbauen",
+    "herstellen",
+    "räumen",
+    "entfernen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Schutzwand aufstellen ca. 3 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A08-V": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Schutzwand vorhalten",
+   "einheit": "mWo",
+   "h_min": 0.0024,
+   "h_mittel": 0.0061,
+   "h_max": 0.0098,
+   "material": [
+    {
+     "code": "SW_MIETE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Schutzwand: Standzeit, Kontrolle.",
+   "stichworte": [
+    "schutzwand",
+    "vorhalten"
+   ],
+   "basis": "A08-H",
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "A08-U": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Schutzwand umsetzen",
+   "einheit": "m",
+   "h_min": 0.0837,
+   "h_mittel": 0.1673,
+   "h_max": 0.251,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Schutzwand: an neuen Standort versetzen.",
+   "stichworte": [
+    "schutzwand",
+    "umsetzen"
+   ],
+   "basis": "A08-H",
+   "status": "geschaetzt",
+   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
+  },
+  "K12": {
+   "gewerk": "Wasser",
+   "taetigkeit": "Kunststoffmantelrohr DN 250 verlegen und schweißen",
+   "einheit": "m",
+   "h_min": 1.1799,
+   "h_mittel": 1.8153,
+   "h_max": 2.4507,
+   "material": [
+    {
+     "code": "KMR250",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG25",
+     "stunden_je_einheit": 0.3026
+    },
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.9077
+    }
+   ],
+   "bemerkung": "Stahlmediumrohr, PUR, PE-Mantel.",
+   "stichworte": [
+    "kunststoffmantelrohr",
+    "mantelrohr",
+    "geschweißt",
+    "kmr"
+   ],
+   "basis": "K04",
+   "status": "geschaetzt",
+   "annahme": "Schwerer als Stahlbetonrohr DN 500 (K04 = 0,85 h/m) wegen Schweißnähten. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "F01": {
+   "gewerk": "Formteile",
+   "taetigkeit": "PE-Bogen bzw. -Winkel einbauen, bis da 160",
+   "einheit": "St",
+   "h_min": 0.132,
+   "h_mittel": 0.1886,
+   "h_max": 0.2452,
+   "material": [
+    {
+     "code": "FT_PE_BOGEN",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.0943
+    }
+   ],
+   "bemerkung": "Heizwendel- oder Stumpfschweißung.",
+   "stichworte": [
+    "bogen",
+    "winkel",
+    "pe",
+    "-ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Schweißverbindungen je ca. 15–20 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Formstücke DA 40 25 €/St (6.3.12); PVC-Bögen DN 160 40 €/St"
+  },
+  "F02": {
+   "gewerk": "Formteile",
+   "taetigkeit": "PE-T-Stück einbauen, bis da 160",
+   "einheit": "St",
+   "h_min": 0.2331,
+   "h_mittel": 0.3885,
+   "h_max": 0.5439,
+   "material": [
+    {
+     "code": "FT_PE_T",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.1942
+    }
+   ],
+   "bemerkung": "Drei Schweißverbindungen.",
+   "stichworte": [
+    "tstück",
+    "pe",
+    "-ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Wie F01, drei statt zwei Verbindungen. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F03": {
+   "gewerk": "Formteile",
+   "taetigkeit": "PE-Muffe (Verbindungs- bzw. Elektroschweißmuffe) einbauen",
+   "einheit": "St",
+   "h_min": 0.1436,
+   "h_mittel": 0.2051,
+   "h_max": 0.2666,
+   "material": [
+    {
+     "code": "FT_PE_MUFFE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.1025
+    }
+   ],
+   "bemerkung": "Bis da 160.",
+   "stichworte": [
+    "muffe",
+    "verbindungsmuffe",
+    "schweißmuffe",
+    "pe",
+    "-ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Schweißzonen in einem Formteil. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Formstücke/Klemmfittings DA 40 25 €/St (6.3.12)"
+  },
+  "F04": {
+   "gewerk": "Formteile",
+   "taetigkeit": "PE-Kappe bzw. Verschlussmuffe setzen",
+   "einheit": "St",
+   "h_min": 0.1884,
+   "h_mittel": 0.2216,
+   "h_max": 0.2548,
+   "material": [
+    {
+     "code": "FT_PE_KAPPE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.1108
+    }
+   ],
+   "bemerkung": "Rohrende verschließen, bis da 160.",
+   "stichworte": [
+    "kappe",
+    "verschlußmuffe",
+    "verschlußmuffen",
+    "verschlussmuffe",
+    "pe",
+    "-straßenkappe",
+    "-ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Eine Schweißverbindung. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Endkappen 25 €/St (6.3.14)"
+  },
+  "F11": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Stahl- bzw. KMR-Bogen DN 250 einschweißen",
+   "einheit": "St",
+   "h_min": 1.4792,
+   "h_mittel": 2.4654,
+   "h_max": 3.4516,
+   "material": [
+    {
+     "code": "FT_ST_BOGEN",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 1.6436
+    },
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.2739
+    }
+   ],
+   "bemerkung": "Zwei Rundnähte, Nachdämmung.",
+   "stichworte": [
+    "bogen",
+    "kohlenstoffstahl",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Stahlrundnähte DN 250 je ca. 1,5 h plus Muffenmontage. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F12": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Stahl- bzw. KMR-T-Stück DN 250 einschweißen",
+   "einheit": "St",
+   "h_min": 2.3011,
+   "h_mittel": 3.8351,
+   "h_max": 5.3691,
+   "material": [
+    {
+     "code": "FT_ST_T",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 2.4654
+    },
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.2739
+    }
+   ],
+   "bemerkung": "Drei Rundnähte, Nachdämmung.",
+   "stichworte": [
+    "tstück",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Wie F11, drei statt zwei Nähte. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F13": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Mantelrohr-Verbindungs- bzw. Reduziermuffe herstellen, bis AD 450",
+   "einheit": "St",
+   "h_min": 0.9862,
+   "h_mittel": 1.6436,
+   "h_max": 2.301,
+   "material": [
+    {
+     "code": "FT_MUFFE_AD400",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.8218
+    }
+   ],
+   "bemerkung": "Muffe schrumpfen bzw. schweißen, ausschäumen.",
+   "stichworte": [
+    "verbindungsmuffe",
+    "reduziermuffe",
+    "mantelrohr",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Muffenmontage KMR inkl. Ausschäumen ca. 2–4 h. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F14": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Abschluss-, Abschrumpf- bzw. Endmuffe herstellen",
+   "einheit": "St",
+   "h_min": 0.6575,
+   "h_mittel": 1.0958,
+   "h_max": 1.5341,
+   "material": [
+    {
+     "code": "FT_ENDMUFFE",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.4383
+    }
+   ],
+   "bemerkung": "Rohrende abdichten.",
+   "stichworte": [
+    "abschlussmuffe",
+    "abschrumpfmuffe",
+    "endmuffe",
+    "schrumpfmuffe",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Kleiner als Verbindungsmuffe (F13), ca. zwei Drittel. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F16": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Klöpperboden bzw. Rohrabschluss DN 250 einschweißen",
+   "einheit": "St",
+   "h_min": 0.9862,
+   "h_mittel": 1.6436,
+   "h_max": 2.301,
+   "material": [
+    {
+     "code": "FT_BODEN",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.8218
+    }
+   ],
+   "bemerkung": "Gewölbter Boden.",
+   "stichworte": [
+    "klöpperform",
+    "boden",
+    "gewölbter"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Eine Rundnaht DN 250. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F17": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Vorschweißflansch DN 250 einschweißen",
+   "einheit": "St",
+   "h_min": 0.4222,
+   "h_mittel": 0.7037,
+   "h_max": 0.9852,
+   "material": [
+    {
+     "code": "FT_FLANSCH",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.4222
+    }
+   ],
+   "bemerkung": "Bis PN 16.",
+   "stichworte": [
+    "vorschweißflansch",
+    "flansch"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Eine Rundnaht DN 250. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F18": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Mantelrohr ablängen bzw. Segmentschnitt, DN 250",
+   "einheit": "St",
+   "h_min": 0.4931,
+   "h_mittel": 0.8218,
+   "h_max": 1.1505,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.8218
+    }
+   ],
+   "bemerkung": "Maschineller Schnitt, Nahtvorbereitung.",
+   "stichworte": [
+    "segmentschnitte",
+    "segmentschnitt",
+    "ablängung",
+    "ablängen",
+    "schnitt"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Schnitt plus Nahtvorbereitung ca. 1–2 h. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F21": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Absperrarmatur DN 50–100 einbauen",
+   "einheit": "St",
+   "h_min": 1.0887,
+   "h_mittel": 1.8145,
+   "h_max": 2.5403,
+   "material": [
+    {
+     "code": "ARM_KLEIN",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.7258
+    }
+   ],
+   "bemerkung": "Schieber oder Klappe mit Rohrstutzen.",
+   "stichworte": [
+    "absperrschieber",
+    "absperrarmatur",
+    "schieber",
+    "armatur",
+    "pe",
+    "-straßenkappe"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Einbau mit zwei Verbindungen ca. 2–3 h. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
+  },
+  "F22": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Absperrarmatur DN 200–300 einbauen",
+   "einheit": "St",
+   "h_min": 2.1359,
+   "h_mittel": 3.5599,
+   "h_max": 4.9839,
+   "material": [
+    {
+     "code": "ARM_GROSS",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.5933
+    },
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 1.1866
+    }
+   ],
+   "bemerkung": "Klappe oder Schieber, Endarmatur.",
+   "stichworte": [
+    "absperrklappe",
+    "absperrarmatur",
+    "endarmatur",
+    "armatur",
+    "ad",
+    "-straßenkappe"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Schwere Armatur mit Bagger, zwei Anschlüsse. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
+  },
+  "F23": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Anbohrarmatur setzen bzw. Rohr anbohren",
+   "einheit": "St",
+   "h_min": 1.2878,
+   "h_mittel": 1.5151,
+   "h_max": 1.7424,
+   "material": [
+    {
+     "code": "ANBOHR",
+     "menge_je_einheit": 0.606
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.303
+    }
+   ],
+   "bemerkung": "Druckanbohrung an Bestandsleitung.",
+   "stichworte": [
+    "anbohrarmatur",
+    "druckanbohrarmatur",
+    "anbohrung",
+    "anbohren"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Anbohren unter Druck ca. 2–3 h. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 250.00 €): Kostenberechnung Biblis 04.06.2025: Einbindung herstellen inkl. Material 250 €/St (6.3.10)"
+  },
+  "F24": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Einbaugarnitur für Armatur setzen",
+   "einheit": "St",
+   "h_min": 0.5332,
+   "h_mittel": 0.8887,
+   "h_max": 1.2442,
+   "material": [
+    {
+     "code": "GARNITUR",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Teleskopgarnitur mit Straßenkappe.",
+   "stichworte": [
+    "einbaugarnitur",
+    "garnitur",
+    "teleskopisch",
+    "-hydrant"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Setzen und Einregulieren ca. 1 h. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
+  },
+  "F28": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Straßenkappe für Armatur bzw. Hydrant setzen und regulieren",
+   "einheit": "St",
+   "h_min": 1.2599,
+   "h_mittel": 1.4822,
+   "h_max": 1.7045,
+   "material": [
+    {
+     "code": "KAPPE",
+     "menge_je_einheit": 1.0
+    },
+    {
+     "code": "BET",
+     "menge_je_einheit": 0.02
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Höhenverstellbar, auf Tragplatte.",
+   "stichworte": [
+    "straßenkappe",
+    "schieberkappe",
+    "hydrantenkappe",
+    "tragplatte",
+    "hahnkasten"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Wie Schachtabdeckung setzen (S03, 2,2 h), aber kleines Bauteil: ca. die Hälfte. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 200.00 €): Kostenberechnung Biblis 04.06.2025: Schieber/Kappen auf Höhe setzen 200 €/St (5.2.21)"
+  },
+  "F25": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Übergangsstück einbauen",
+   "einheit": "St",
+   "h_min": 0.4931,
+   "h_mittel": 0.8218,
+   "h_max": 1.1505,
+   "material": [
+    {
+     "code": "UEBERGANG",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 0.2739
+    }
+   ],
+   "bemerkung": "Werkstoff- oder Dimensionsübergang.",
+   "stichworte": [
+    "übergangsstück",
+    "übergang"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwei Verbindungen. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F26": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Hydrant DN 50–80 setzen",
+   "einheit": "St",
+   "h_min": 1.6131,
+   "h_mittel": 2.6885,
+   "h_max": 3.7639,
+   "material": [
+    {
+     "code": "HYDRANT",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.3361
+    }
+   ],
+   "bemerkung": "Unterflur- oder Gartenhydrant mit Garnitur.",
+   "stichworte": [
+    "hydrant",
+    "gartenhydrant",
+    "-spülen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Setzen, anschließen, spülen. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
+  },
+  "F27": {
+   "gewerk": "Armaturen",
+   "taetigkeit": "Hinweisschild mit Pfosten setzen",
+   "einheit": "St",
+   "h_min": 0.2427,
+   "h_mittel": 0.4855,
+   "h_max": 0.7282,
+   "material": [
+    {
+     "code": "SCHILD",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Schild für Armatur oder Hydrant.",
+   "stichworte": [
+    "hinweisschild",
+    "schild",
+    "rohrpfosten",
+    "pfosten"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Pfosten setzen, Schild montieren. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
+  },
+  "X01": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Kernbohrung in Beton bzw. Mauerwerk, DN 300–500",
+   "einheit": "St",
+   "h_min": 1.8191,
+   "h_mittel": 3.0318,
+   "h_max": 4.2445,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KERNB",
+     "stunden_je_einheit": 3.0318
+    }
+   ],
+   "bemerkung": "Für Hausdurchführung.",
+   "stichworte": [
+    "kernbohrung",
+    "bohrung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Bohrleistung ca. 10–15 cm je Stunde bei 25–30 cm Wanddicke. | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
+  },
+  "X02": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Mediendurchführung bzw. Wanddichtung einbauen",
+   "einheit": "St",
+   "h_min": 2.1656,
+   "h_mittel": 3.6093,
+   "h_max": 5.053,
+   "material": [
+    {
+     "code": "WANDDURCHF",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Druckwasserdicht.",
+   "stichworte": [
+    "mediendurchführung",
+    "durchführung",
+    "wanddichtung"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Einsetzen und Verpressen ca. 2 h. | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
+  },
+  "P01": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Lastplattendruckversuch bzw. Verformungsmodul, je Versuch",
+   "einheit": "St",
+   "h_min": 1.7227,
+   "h_mittel": 2.0267,
+   "h_max": 2.3307,
+   "material": [],
+   "geraet": [
+    {
+     "code": "PLATTE",
+     "stunden_je_einheit": 2.0267
+    }
+   ],
+   "bemerkung": "Dynamischer oder statischer Plattendruckversuch.",
+   "stichworte": [
+    "lastplatte",
+    "lastplatt",
+    "verformungsmodul",
+    "kontrollprüfung",
+    "plattendruck"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Versuch mit Auswertung ca. 45–75 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 180.00 €): Kostenberechnung Biblis 04.06.2025: Lastplattendruckversuch 180 €/St (1.13)"
+  },
+  "P02": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Abfalldeklaration Boden: Probenahme und Analyse",
+   "einheit": "St",
+   "h_min": 3.9883,
+   "h_mittel": 4.6921,
+   "h_max": 5.3959,
+   "material": [
+    {
+     "code": "LABOR",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Mischprobe, Laboranalyse, Deklaration.",
+   "stichworte": [
+    "abfalldeklaration",
+    "deklaration",
+    "probenahme"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Probenahme ca. 1 h; Laborpreis als Material angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 600.00 €): Kostenberechnung Biblis 04.06.2025: Beprobung Boden/Aufbruch bzw. Asphalt 600 €/St (3.11, 3.15)"
+  },
+  "P03": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Druckprüfung einer Druckleitung, je Prüfabschnitt",
+   "einheit": "St",
+   "h_min": 2.9865,
+   "h_mittel": 5.9731,
+   "h_max": 8.9596,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 3.9821
+    }
+   ],
+   "bemerkung": "Eigenständige Prüfleistung mit Protokoll.",
+   "stichworte": [
+    "druckprüfung",
+    "druckprobe",
+    "dichtheitsprüfung",
+    "prüfabschnitt"
+   ],
+   "basis": "K09",
+   "status": "abgeleitet",
+   "annahme": "Wie K09 (Dichtheitsprüfung je Haltung, 3 h). | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
+  },
+  "P04": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Rammsondierung DPH, je m Sondiertiefe",
+   "einheit": "m",
+   "h_min": 0.2987,
+   "h_mittel": 0.4978,
+   "h_max": 0.6969,
+   "material": [],
+   "geraet": [
+    {
+     "code": "RAMM",
+     "stunden_je_einheit": 0.4978
+    }
+   ],
+   "bemerkung": "Schwere Rammsonde.",
+   "stichworte": [
+    "rammsondierung",
+    "sondierung",
+    "dph"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Ca. 3–5 m Sondierung je Stunde. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
+  },
+  "P05": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Rohrleitung spülen, je m",
+   "einheit": "m",
+   "h_min": 0.0299,
+   "h_mittel": 0.0398,
+   "h_max": 0.0498,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.0398
+    }
+   ],
+   "bemerkung": "Spülen bis Trinkwasserqualität bzw. Klarlauf.",
+   "stichworte": [
+    "spülen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Ca. 50 m je Stunde inkl. Anschluss. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 3.00 €): Kostenberechnung Biblis 04.06.2025: Desinfektion Wasserleitung 3 €/m (6.3.17)"
+  },
+  "P06": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Schweißnahtprüfung, zerstörungsfrei, je Naht",
+   "einheit": "St",
+   "h_min": 1.2733,
+   "h_mittel": 2.5467,
+   "h_max": 3.8201,
+   "material": [
+    {
+     "code": "NDT",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Prüfung durch Prüfstelle, Protokoll.",
+   "stichworte": [
+    "schweißnahtprüfung",
+    "schweißnähte",
+    "zerstörungsfreie"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Lohn nur Begleitung; Prüfkosten als Fremdleistung im Material angesetzt. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
+  },
+  "P05-ST": {
+   "gewerk": "Prüfung",
+   "taetigkeit": "Rohrleitung spülen, je Abschnitt",
+   "einheit": "St",
+   "h_min": 2.9865,
+   "h_mittel": 5.9731,
+   "h_max": 8.9596,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 3.9821
+    }
+   ],
+   "bemerkung": "Spülen eines Leitungsabschnitts bzw. einer Armatur.",
+   "stichworte": [
+    "spülen",
+    "rohrleitungen"
+   ],
+   "basis": "P05",
+   "status": "geschaetzt",
+   "annahme": "P05 = 0,02 h/m; ein Abschnitt von 100–200 m bzw. eine Armatur ca. 2–4 h. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
+  },
+  "L04": {
+   "gewerk": "Landschaftsbau",
+   "taetigkeit": "Vegetationstragschicht lockern, Bodenverbesserung einarbeiten",
+   "einheit": "m2",
+   "h_min": 0.0142,
+   "h_mittel": 0.0237,
+   "h_max": 0.0332,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.0237
+    }
+   ],
+   "bemerkung": "Fräsen bzw. Lockern, Zuschlagstoffe einarbeiten.",
+   "stichworte": [
+    "vegetationstragschicht",
+    "lockern",
+    "bodenverbess",
+    "einarbeiten"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Doppelter Aufwand von Rasen ansäen (L01, 0,01 h/m²). | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "S10": {
+   "gewerk": "Schutz",
+   "taetigkeit": "Kabel bzw. Kabelbündel unter Spannung im Graben sichern, je m",
+   "einheit": "m",
+   "h_min": 0.4736,
+   "h_mittel": 0.9471,
+   "h_max": 1.4207,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.5919
+    }
+   ],
+   "bemerkung": "Aufhängen, Schutzschalen, Abstützen.",
+   "stichworte": [
+    "kabelbündel",
+    "kabel",
+    "spannung",
+    "sichern",
+    "niederspannungskabel",
+    "fernmeldekabel",
+    "mittelspannungskabel"
+   ],
+   "basis": null,
+   "status": "unsicher",
+   "annahme": "UNSICHER: stark abhängig von Anzahl und Lage der Kabel. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "S11": {
+   "gewerk": "Schutz",
+   "taetigkeit": "Schutzrohr bzw. Bestandsleitung im Graben sichern, je m",
+   "einheit": "m",
+   "h_min": 0.3552,
+   "h_mittel": 0.7103,
+   "h_max": 1.0655,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.4735
+    }
+   ],
+   "bemerkung": "Aufhängen und Abstützen.",
+   "stichworte": [
+    "schutzrohr",
+    "rohr",
+    "abwasserführend",
+    "sichern",
+    "-kabelschutzrohr"
+   ],
+   "basis": null,
+   "status": "unsicher",
+   "annahme": "UNSICHER: wie S10, etwas leichter. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "S12": {
+   "gewerk": "Schutz",
+   "taetigkeit": "Bestandsobjekt schützen bzw. ummanteln (Mastleuchte, Stamm)",
+   "einheit": "St",
+   "h_min": 1.2317,
+   "h_mittel": 2.4635,
+   "h_max": 3.6952,
+   "material": [
+    {
+     "code": "BOHLEN",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Bohlenummantelung mit Polsterung, Rückbau.",
+   "stichworte": [
+    "mastleuchte",
+    "stammschutz",
+    "ummantelung",
+    "schutz",
+    "bohlen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Herstellen und Rückbau ca. 1–3 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "W01": {
+   "gewerk": "Wasserhaltung",
+   "taetigkeit": "Pumpe aufstellen und räumen, einschl. Schlauchleitung",
+   "einheit": "St",
+   "h_min": 2.3676,
+   "h_mittel": 4.7353,
+   "h_max": 7.1029,
+   "material": [],
+   "geraet": [
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.5919
+    }
+   ],
+   "bemerkung": "Tauchpumpe 10–30 m³/h.",
+   "stichworte": [
+    "pumpe",
+    "wasserhaltung",
+    "aufstellen",
+    "räumen",
+    "-pumpensumpf"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Aufstellen, anschließen, Rückbau ca. 3–5 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "W02": {
+   "gewerk": "Wasserhaltung",
+   "taetigkeit": "Pumpe vorhalten und betreiben, je Tag",
+   "einheit": "d",
+   "h_min": 0.4735,
+   "h_mittel": 1.1838,
+   "h_max": 1.8941,
+   "material": [],
+   "geraet": [
+    {
+     "code": "PUMPE",
+     "stunden_je_einheit": 28.4116
+    }
+   ],
+   "bemerkung": "Kontrolle, Energie über Gerätesatz.",
+   "stichworte": [
+    "pumpe",
+    "wasserhaltung",
+    "vorhalten",
+    "betreiben"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Kontrolle ca. 1 h je Tag; Gerät 24 h je Tag. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "L01": {
+   "gewerk": "Landschaftsbau",
+   "taetigkeit": "Rasen ansäen",
+   "einheit": "m2",
+   "h_min": 0.0219,
+   "h_mittel": 0.0258,
+   "h_max": 0.0297,
+   "material": [
+    {
+     "code": "SAAT",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Saatgut 5–25 g/m², einarbeiten.",
+   "stichworte": [
+    "rasen",
+    "ansäen",
+    "landschaftsrasen",
+    "parkplatzrasen"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Ca. 100 m² je Stunde. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden ansäen RSM Regio 2 €/m² (4.1.14)"
+  },
+  "L02": {
+   "gewerk": "Landschaftsbau",
+   "taetigkeit": "Dünger ausbringen, je kg",
+   "einheit": "kg",
+   "h_min": 0.0336,
+   "h_mittel": 0.0672,
+   "h_max": 0.1008,
+   "material": [
+    {
+     "code": "DUENGER",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Organischer Langzeitdünger.",
+   "stichworte": [
+    "düngen",
+    "grunddüngen",
+    "dünger"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Ca. 20 kg je Stunde. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "L03": {
+   "gewerk": "Landschaftsbau",
+   "taetigkeit": "Wurzelbehandlung: Wurzeln nachschneiden, je Stück",
+   "einheit": "St",
+   "h_min": 0.1776,
+   "h_mittel": 0.3551,
+   "h_max": 0.5327,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Schnitt und Wundbehandlung.",
+   "stichworte": [
+    "wurzelbeh",
+    "wurzelbehandlung",
+    "wurzeln",
+    "nachschneiden"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Ca. 10–25 min je Wurzel. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "E09": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden aus Zwischenlager laden, fördern, einbauen und verdichten",
+   "einheit": "m3",
+   "h_min": 0.2249,
+   "h_mittel": 0.2646,
+   "h_max": 0.3043,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.1587
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.0661
+    },
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.1984
+    }
+   ],
+   "bemerkung": "Eigener, gelagerter Boden; kein Fremdmaterial, keine Deponie.",
+   "stichworte": [
+    "boden",
+    "gelagert",
+    "lager",
+    "einbauen",
+    "verdichten"
+   ],
+   "basis": null,
+   "status": "abgeleitet",
+   "annahme": "E04 ohne Fremdmaterial (0,18 h/m³, BAG14 0,08, RUE 0,15) plus Laden und Transport wie E02 (BAG14 0,04, LKW 0,05). | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Hauptverfüllung mit Aushubmaterial 35 €/m³ (5.2.20); mit gelagertem Material 45 €/m³ (4.1.28)"
+  },
+  "E10": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden lösen, seitlich lagern, wieder verfüllen und verdichten",
+   "einheit": "m3",
+   "h_min": 0.4071,
+   "h_mittel": 0.5699,
+   "h_max": 0.7327,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.3087
+    },
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.3562
+    }
+   ],
+   "bemerkung": "Aushub und Wiedereinbau des eigenen Bodens; keine Deponie, kein Fremdmaterial.",
+   "stichworte": [
+    "boden",
+    "lösen",
+    "lagern",
+    "verfüllen",
+    "verdichten",
+    "-gelagert"
+   ],
+   "basis": null,
+   "status": "abgeleitet",
+   "annahme": "Summe aus E02 ohne Abfuhr und Deponie (0,06 h/m³) und E04 ohne Material (0,18 h/m³). | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 70.00 €): Kostenberechnung Biblis 04.06.2025: ausheben 35 + Hauptverfüllung Aushub 35 €/m³; Suchgraben ausheben+verfüllen 100 €/m³ (1.23)"
+  },
+  "E11": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden lösen, laden, fördern und zwischenlagern (ohne Deponie)",
+   "einheit": "m3",
+   "h_min": 0.1594,
+   "h_mittel": 0.1875,
+   "h_max": 0.2156,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.1562
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.1562
+    }
+   ],
+   "bemerkung": "Förderung zum Zwischenlager; Deponiegebühr fällt nicht an.",
+   "stichworte": [
+    "boden",
+    "graben",
+    "lösen",
+    "laden",
+    "fördern",
+    "lagern",
+    "gerät",
+    "-hand",
+    "-fels",
+    "-verfüllen"
+   ],
+   "basis": "E02",
+   "status": "abgeleitet",
+   "annahme": "E02 ohne Deponiegebühr (1,8 t × 17,50 €). | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: ausheben, laden 30–35 €/m³ + Zulage Zwischenlagerung 5 €/m³ (3.10)"
+  },
+  "E12": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Fels lösen, laden, fördern und lagern",
+   "einheit": "m3",
+   "h_min": 0.2812,
+   "h_mittel": 0.4178,
+   "h_max": 0.5544,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG25",
+     "stunden_je_einheit": 0.585
+    },
+    {
+     "code": "MEISSEL",
+     "stunden_je_einheit": 0.5014
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.1003
+    }
+   ],
+   "bemerkung": "Homogenbereich Fels, mit Meißel.",
+   "stichworte": [
+    "fels",
+    "lösen",
+    "laden",
+    "fördern",
+    "lagern"
+   ],
+   "basis": null,
+   "status": "unsicher",
+   "annahme": "UNSICHER: rund das Vierfache von E11 an Lohn plus Hydraulikhammer; Felsfestigkeit unbekannt, deshalb breite Spanne. | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 130.00 €): Tiefbau-Anbieter Wien, schwierige Böden 95–180 €/m³ (Datum unklar)"
+  },
+  "V03": {
+   "gewerk": "Verbau",
+   "taetigkeit": "Grabenverbau einbauen, vorhalten, rückbauen, Tiefe > 3,0 bis 4,0 m",
+   "einheit": "m2",
+   "h_min": 0.3895,
+   "h_mittel": 0.5564,
+   "h_max": 0.7233,
+   "material": [],
+   "geraet": [
+    {
+     "code": "VBG",
+     "stunden_je_einheit": 1.0654
+    },
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.0947
+    }
+   ],
+   "bemerkung": "Vollständige Verbauleistung für größere Tiefe (nicht nur die Zulage).",
+   "stichworte": [
+    "grabenverbau",
+    "grabenverbaugerät",
+    "verbau",
+    "stirnverbau",
+    "tiefe",
+    "herstellen",
+    "-vorhalten",
+    "-zulage"
+   ],
+   "basis": null,
+   "status": "abgeleitet",
+   "annahme": "V01 + Zulage V02 (0,35 + 0,12 h/m²; VBG 0,6 + 0,3 h/m²). | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "W03": {
+   "gewerk": "Wasserhaltung",
+   "taetigkeit": "Pumpensumpf herstellen und räumen",
+   "einheit": "St",
+   "h_min": 3.6625,
+   "h_mittel": 7.325,
+   "h_max": 10.9875,
+   "material": [
+    {
+     "code": "BRUNNENRING",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 1.8312
+    }
+   ],
+   "bemerkung": "Brunnenring mit Kiesfilter in der Baugrube.",
+   "stichworte": [
+    "pumpensumpf",
+    "brunnenring",
+    "betonbrunnenring"
+   ],
+   "basis": null,
+   "status": "unsicher",
+   "annahme": "UNSICHER: Ring setzen, Kiesfilter, Rückbau ca. 4–9 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
+  },
+  "F15": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Be- bzw. Entlüftungsabzweig am Mantelrohr herstellen, DN 250",
+   "einheit": "St",
+   "h_min": 1.6436,
+   "h_mittel": 2.7394,
+   "h_max": 3.8352,
+   "material": [
+    {
+     "code": "FT_ENTL",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 1.6436
+    }
+   ],
+   "bemerkung": "Senkrecht-Abzweig mit eingeschäumtem Kugelhahn und Endkappe.",
+   "stichworte": [
+    "entlüftung",
+    "belüftung",
+    "abzweig",
+    "kugelhahn",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Zwischen Bogen F11 (4,5 h) und T-Stück F12 (7 h): ein Abzweig mit kleiner Dimension. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "F19": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Anschluss an bestehende Mantelrohrleitung herstellen, DN 250",
+   "einheit": "St",
+   "h_min": 2.8673,
+   "h_mittel": 3.3733,
+   "h_max": 3.8793,
+   "material": [],
+   "geraet": [
+    {
+     "code": "SCHW",
+     "stunden_je_einheit": 1.6866
+    }
+   ],
+   "bemerkung": "Dämmung entfernen, anschweißen; Formteile gesondert.",
+   "stichworte": [
+    "anschluss",
+    "rohrltg",
+    "bestehende",
+    "ad"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Eine Rundnaht DN 250 (wie F16, 3 h) plus Freilegen und Dämmarbeiten an der Bestandsleitung. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 250.00 €): Kostenberechnung Biblis 04.06.2025: Anschluss an bestehende Leitung 250 €/St (6.3.15)"
+  },
+  "F29": {
+   "gewerk": "Formteile",
+   "taetigkeit": "Kreuzungsschale bzw. Zwischenlage an Leitungskreuzung einbauen",
+   "einheit": "St",
+   "h_min": 0.0822,
+   "h_mittel": 0.137,
+   "h_max": 0.1918,
+   "material": [
+    {
+     "code": "KREUZ",
+     "menge_je_einheit": 0.5479
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Elektrisch nichtleitende Trennung kreuzender Leitungen.",
+   "stichworte": [
+    "kreuzungsschale",
+    "zwischenlage"
+   ],
+   "basis": null,
+   "status": "geschaetzt",
+   "annahme": "Einlegen ca. 10–20 min. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
+  },
+  "B04-KP": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Fotodokumentation je Knotenpunkt",
+   "einheit": "St",
+   "h_min": 0.1673,
+   "h_mittel": 0.3346,
+   "h_max": 0.5019,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Digitale Fotos je Knotenpunkt, benannt nach Lageplan.",
+   "stichworte": [
+    "knotenpunkt",
+    "knotenpunkte",
+    "fotodokumentation",
+    "dokumentation"
+   ],
+   "basis": "B04",
+   "status": "geschaetzt",
+   "annahme": "Je Knotenpunkt Fotos aufnehmen und benennen, ca. 10–30 min. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
   }
  }
 }

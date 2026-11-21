@@ -109,6 +109,211 @@
    "bezeichnung": "Absperrmaterial, Miete je Woche",
    "einheit": "Wo",
    "preis_eur": 38.0
+  },
+  "SCHO": {
+   "bezeichnung": "Schotter 0/32",
+   "einheit": "t",
+   "preis_eur": 23.0
+  },
+  "VZ_MIETE": {
+   "bezeichnung": "Verkehrszeichen mit Ständer, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 2.5
+  },
+  "WL_MIETE": {
+   "bezeichnung": "Warnleuchte WL1, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 1.2
+  },
+  "BZ_MIETE": {
+   "bezeichnung": "Bauzaun H 2 m, Miete je m und Woche",
+   "einheit": "mWo",
+   "preis_eur": 0.35
+  },
+  "BZ_MIETE_TAG": {
+   "bezeichnung": "Bauzaun H 2 m, Miete je m und Tag",
+   "einheit": "md",
+   "preis_eur": 0.05
+  },
+  "SW_MIETE": {
+   "bezeichnung": "Schutzwand, Miete je m und Woche",
+   "einheit": "mWo",
+   "preis_eur": 0.8
+  },
+  "LS_MIETE": {
+   "bezeichnung": "Laufsteg mit Schutzwand, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 12.0
+  },
+  "ZELT_MIETE": {
+   "bezeichnung": "Witterungsschutz-Zelt, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 45.0
+  },
+  "UEB_MIETE": {
+   "bezeichnung": "Behelfsüberfahrt, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 60.0
+  },
+  "BRU_MIETE": {
+   "bezeichnung": "Leitungsbehelfsbrücke, Miete je m und Woche",
+   "einheit": "mWo",
+   "preis_eur": 18.0
+  },
+  "SCHL_MIETE": {
+   "bezeichnung": "Schlauch-/Anschlussleitung, Miete je m und Woche",
+   "einheit": "mWo",
+   "preis_eur": 0.05
+  },
+  "KAB_MIETE": {
+   "bezeichnung": "Baustromkabel, Miete je m und Woche",
+   "einheit": "mWo",
+   "preis_eur": 0.04
+  },
+  "ZAEHL_MIETE": {
+   "bezeichnung": "Wasserzähler/Standrohr, Miete je Stück und Woche",
+   "einheit": "StWo",
+   "preis_eur": 6.0
+  },
+  "FT_PE_BOGEN": {
+   "bezeichnung": "PE-Bogen/Winkel bis da 160",
+   "einheit": "St",
+   "preis_eur": 9.0
+  },
+  "FT_PE_T": {
+   "bezeichnung": "PE-T-Stück bis da 160",
+   "einheit": "St",
+   "preis_eur": 14.0
+  },
+  "FT_PE_MUFFE": {
+   "bezeichnung": "PE-Elektroschweißmuffe bis da 160",
+   "einheit": "St",
+   "preis_eur": 8.0
+  },
+  "FT_PE_KAPPE": {
+   "bezeichnung": "PE-Kappe / Verschlussmuffe bis da 160",
+   "einheit": "St",
+   "preis_eur": 7.0
+  },
+  "FT_ST_BOGEN": {
+   "bezeichnung": "Stahl-/KMR-Bogen DN 250",
+   "einheit": "St",
+   "preis_eur": 380.0
+  },
+  "FT_ST_T": {
+   "bezeichnung": "Stahl-/KMR-T-Stück DN 250",
+   "einheit": "St",
+   "preis_eur": 650.0
+  },
+  "FT_MUFFE_AD400": {
+   "bezeichnung": "Mantelrohr-Verbindungs-/Reduziermuffe bis AD 450",
+   "einheit": "St",
+   "preis_eur": 240.0
+  },
+  "FT_ENDMUFFE": {
+   "bezeichnung": "Abschluss-/Abschrumpf-/Endmuffe",
+   "einheit": "St",
+   "preis_eur": 120.0
+  },
+  "FT_BODEN": {
+   "bezeichnung": "Klöpperboden DN 250",
+   "einheit": "St",
+   "preis_eur": 160.0
+  },
+  "FT_FLANSCH": {
+   "bezeichnung": "Vorschweißflansch DN 250 PN 16",
+   "einheit": "St",
+   "preis_eur": 90.0
+  },
+  "ARM_KLEIN": {
+   "bezeichnung": "Absperrarmatur DN 50–100",
+   "einheit": "St",
+   "preis_eur": 280.0
+  },
+  "ARM_GROSS": {
+   "bezeichnung": "Absperrarmatur DN 200–300",
+   "einheit": "St",
+   "preis_eur": 1400.0
+  },
+  "ANBOHR": {
+   "bezeichnung": "Anbohrarmatur",
+   "einheit": "St",
+   "preis_eur": 190.0
+  },
+  "GARNITUR": {
+   "bezeichnung": "Einbaugarnitur teleskopisch",
+   "einheit": "St",
+   "preis_eur": 120.0
+  },
+  "UEBERGANG": {
+   "bezeichnung": "Übergangsstück",
+   "einheit": "St",
+   "preis_eur": 95.0
+  },
+  "HYDRANT": {
+   "bezeichnung": "Hydrant DN 50–80 mit Garnitur",
+   "einheit": "St",
+   "preis_eur": 650.0
+  },
+  "SCHILD": {
+   "bezeichnung": "Hinweisschild mit Pfosten",
+   "einheit": "St",
+   "preis_eur": 35.0
+  },
+  "NDT": {
+   "bezeichnung": "Zerstörungsfreie Nahtprüfung, Fremdleistung je Naht",
+   "einheit": "St",
+   "preis_eur": 90.0
+  },
+  "BRUNNENRING": {
+   "bezeichnung": "Betonbrunnenring DN 1000 mit Kiesfilter (Pumpensumpf)",
+   "einheit": "St",
+   "preis_eur": 90.0
+  },
+  "FT_ENTL": {
+   "bezeichnung": "KMR-Be-/Entlüftungsabzweig DN 250/50 mit Kugelhahn",
+   "einheit": "St",
+   "preis_eur": 520.0
+  },
+  "KREUZ": {
+   "bezeichnung": "Kreuzungsschale, elektrisch nichtleitend",
+   "einheit": "St",
+   "preis_eur": 18.0
+  },
+  "KAPPE": {
+   "bezeichnung": "Straßenkappe höhenverstellbar mit Tragplatte",
+   "einheit": "St",
+   "preis_eur": 75.0
+  },
+  "KMR250": {
+   "bezeichnung": "Kunststoffmantelrohr DN 250",
+   "einheit": "m",
+   "preis_eur": 165.0
+  },
+  "WANDDURCHF": {
+   "bezeichnung": "Mediendurchführung / Wanddichtung",
+   "einheit": "St",
+   "preis_eur": 320.0
+  },
+  "LABOR": {
+   "bezeichnung": "Laboranalyse Abfalldeklaration",
+   "einheit": "St",
+   "preis_eur": 220.0
+  },
+  "SAAT": {
+   "bezeichnung": "Rasensaatgut (5–25 g/m²)",
+   "einheit": "m2",
+   "preis_eur": 0.15
+  },
+  "DUENGER": {
+   "bezeichnung": "Organischer Langzeitdünger",
+   "einheit": "kg",
+   "preis_eur": 2.5
+  },
+  "BOHLEN": {
+   "bezeichnung": "Bohlen und Polstermaterial (Schutzummantelung)",
+   "einheit": "St",
+   "preis_eur": 30.0
   }
  }
 }

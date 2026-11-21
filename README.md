@@ -30,7 +30,7 @@ run anywhere, because `validate_gate.py` is the gate. Dependencies are for the U
 python3 validate_gate.py                        # THE GATE — must be green first
 python3 scripts/build_reference_prices.py       # data/reference_prices.json from real bids
 python3 scripts/dump_golden.py                  # data/golden/ — the on-stage fallback
-python3 validate.py                             # our estimate vs. a real €897,305.45 bid
+python3 validate.py                             # comparable-price engine vs. a real bid
 streamlit run app.py                            # the demo
 ```
 
@@ -40,70 +40,63 @@ streamlit run app.py                            # the demo
 
 ```
 app.py                      Streamlit — the demo surface
-validate_gate.py            twin-pair parser equivalence (the gate)
-validate.py                 measured error vs. a real human bid (the credibility layer)
+validate_gate.py            twin-pair parser equivalence (run before every push)
+validate.py                 comparable-price engine vs. a real bid (dev instrument)
 export_rfi.py               Bieterfragen-Katalog -> .docx
 core/
-  models.py                 NormalizedItem + Finding — the shared contract
-  parser_x83.py             GAEB XML; namespace-agnostic, OZ from RNoPart chain
+  models.py                 NormalizedItem — the shared contract
+  parser_x83.py             GAEB XML; namespace-agnostic, OZ + section from the tree
   parser_gaeb90.py          GAEB 90 fixed-width; per-file calibrated column slices
-  pricer.py                 benchmark first, labeled fallback rates second
-  detectors.py              three detectors, pure functions
-  constants.py              every tunable, inline — no JSON load path to fail on stage
+  stammdaten.py             the rate tables (Database/) + cost-base presets
+  classify.py               position -> Leistung code; Jev, cache, keyword fallback
+  kalkulation.py            Aufschlagskalkulation — the bid, as a price range
+  objects.py                the object table: (section, object, unit) + roll-up
+  logic.py                  cross-position contradictions, deterministic
+  detectors.py              price / scope / quantity risk findings
+  pricer.py                 comparable-price engine — cross-check only
+  constants.py              tunables, inline
 utils/text_cleaning.py      strip the HTML wrapper out of item text
-scripts/                    one-shot data builders
-data/reference_prices.json  ~720 real priced items — the core of the system
+views/reveal.py             the comparison against a real submitted bid
+Database/                   rate tables + labelled test data (synthetic)
+data/reference_prices.json  720 real unit prices from three submitted bids
+data/classification_cache.json   pre-computed Jev answers — the demo runs offline
 data/golden/                pre-parsed fixtures (fallback if a live parse dies)
 ```
 
-## Splitting the work
+## Where it stands
 
-> **Picking something up? Read [TASKS.md](TASKS.md)** — it has the open work written out
-> per person, with the traps and the facts each task needs.
+Every number below is measured, and reproducible with the commands above.
 
-Tasks are numbered and dependency-ordered. Each module is stubbed with the facts it needs
-in its docstring. Task briefs go in `.orch/tasks/NNN-*.md` — see `_TEMPLATE.md`.
-
-| # | Task | Files | Depends on | Status |
-|---|---|---|---|---|
-| 001 | **The gate** — both parsers | `core/models.py`, `core/parser_x83.py`, `core/parser_gaeb90.py`, `utils/text_cleaning.py`, `validate_gate.py` | — | **done** — `GATE GREEN`, 159/159 |
-| 002 | Reference prices + golden fixtures | `scripts/*` | 001 | **done** — 720 priced items, 9 fixtures |
-| 003 | Pricer | `core/pricer.py` | 002 | **done** — +6.3% vs. the real bid |
-| 004 | Three detectors | `core/detectors.py` | 003 | **done** — 59 findings, two-mode outlier test |
-| 005 | **The reveal** | `validate.py` | 003 | **done** — see numbers below |
-| 006 | RFI export | `export_rfi.py` | 004 | **open** — .docx Bieterfragen-Katalog in VOB German, no live LLM |
-| 007a | UI spine | `app.py` | 003 | **done** — upload → table → sliders → totals → reveal |
-| 007b | Findings panel + polish | `app.py` | 004 | **open** — panel now renders 23 findings; needs severity styling + layout |
-| 007c | Reveal view | `views/reveal.py` | 007a | **working draft** — extend, don't rewrite |
-
-The critical path (001 → 002 → 003 → 005 → 007a) is finished. `streamlit run app.py`
-now parses, prices and compares end to end against the real bid. What's left is **004,
-006 and the two UI pieces above** — three independent pickups, no shared files.
-
-### Where the reveal currently stands
-
-`python3 validate.py`, with the answer key **held out** of the benchmark:
+| Stage | What it does | State |
+|---|---|---|
+| Read | 4 GAEB formats, two formats byte-identical | **gate green** |
+| Classify | position -> Leistung, via Jev | **90 %** of the real tender |
+| Calculate | hours x wage + machine + material + markup | **84.7 %** coverage |
+| Check | risk / logic / comparable cross-check | 59 findings / quiet / labelled |
+| Hand back | Bieterfragen letter | done; **GAEB X84 bid file missing** |
 
 ```
-our estimate, 248 positions    954,062.31
-real submitted bid             897,305.45      +6.3%
-after fitting one scalar       78% of positions within +/-30%, median error 7%
-50 positions still disagree by >30%  <- the actual findings
+classifier   94 % correct on 2,496 labelled positions
+calculation  5.3 % median error against 2,459 real prices in Database/
+real tender  248 positions -> EUR 477,304 – 557,063 – 636,732
+             a contractor actually bid EUR 897,305 for this BoQ
 ```
 
-Two things to understand before you quote those numbers:
+**The 38 % gap is not a calculation error.** The engine reproduces the database's own
+prices to 5.3 %. The synthetic rates simply sit below market — `Database/` says so
+itself ("Preise plausibel Stand 2026, keine Marktabfrage"). Reaching the real bid would
+need a factor of 1.61 on everything. Either calibrate and say you calibrated, or show
+the range and name the reason. Do not quote the midpoint as a bid.
 
-- **The benchmark holds the answer key out.** `StBALV23040.D86` is both one of the three
-  bids in `reference_prices.json` *and* the bid we measure against. Pricing with it
-  included is circular. `pricer.without_source()` exists for this; `validate.py` always
-  uses it. It is worth €6.2k on the current pricer (it was €251k before the text-matching
-  tier landed) — the size moves, the principle doesn't. **Never show a judge the leaky
-  number.**
-- **Absolute level vs. position accuracy are different claims.** A benchmark from other
-  projects gets the *shape* of a price list right and its *level* roughly — site
-  conditions and competitive pressure move every rate at once. That is why the demo's
-  slider story works: the fitted scalar *is* the competitor's implied cost base
-  (`pricer.implied_cost_base`).
+### Two engines, deliberately
+
+The **calculation** (`core/kalkulation.py`) is the bid: bottom-up from the rate tables,
+works on a position nobody has ever quoted, auditable line by line.
+
+The **comparable-price engine** (`core/pricer.py`) is an independent second opinion from
+720 real prices. On its own it is -50 % with 91 % median per-position error, because two
+unrelated reference projects cannot carry a third. It stays as a cross-check — where the
+two agree, confidence is higher — and it is never the headline.
 
 ## Rules that are not negotiable
 
@@ -121,5 +114,9 @@ Two things to understand before you quote those numbers:
   `pricer.without_source(ref, answer_key)`. Worth €6.2k here today, €251k before the
   pricer improved — the magnitude is not the point, the circularity is.
 - **No live LLM in the demo path.** Pre-generate, cache to disk, ship the JSON.
+- **Changed the rate catalogue? Delete `data/classification_cache.json`.** The cache is
+  keyed on position text only, not on the catalogue version. Leaving it in place after an
+  extension keeps the old assignments and the new Leistungen are never found — coverage
+  stays flat and it looks like the extension did nothing. (It cost us exactly that once.)
 - **Don't loosen the gate to make it pass.** A real failure is useful; a gate that passes
   by weakened comparison is worse than no gate.

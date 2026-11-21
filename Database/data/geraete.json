@@ -44,6 +44,38 @@
   "SAEG": {
    "bezeichnung": "Fugenschneider",
    "kosten_eur_h": 12.0
+  },
+  "KRAN": {
+   "bezeichnung": "Autokran 40 t",
+   "kosten_eur_h": 120.0
+  },
+  "ORT": {
+   "bezeichnung": "Kabelortungsgerät",
+   "kosten_eur_h": 8.0
+  },
+  "PLATTE": {
+   "bezeichnung": "Lastplattengerät dynamisch",
+   "kosten_eur_h": 15.0
+  },
+  "RAMM": {
+   "bezeichnung": "Rammsonde DPH",
+   "kosten_eur_h": 18.0
+  },
+  "PUMPE": {
+   "bezeichnung": "Tauchpumpe E-Motor 10–30 m³/h",
+   "kosten_eur_h": 1.5
+  },
+  "KERNB": {
+   "bezeichnung": "Kernbohrgerät bis DN 500",
+   "kosten_eur_h": 25.0
+  },
+  "SCHW": {
+   "bezeichnung": "Schweißgerät / Heizwendelschweißgerät",
+   "kosten_eur_h": 6.0
+  },
+  "MEISSEL": {
+   "bezeichnung": "Hydraulikhammer am Bagger",
+   "kosten_eur_h": 35.0
   }
  }
 }

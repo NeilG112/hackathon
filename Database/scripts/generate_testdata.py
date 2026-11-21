@@ -34,12 +34,19 @@ Nur Standardbibliothek, fester Seed: jeder Lauf erzeugt dieselben Daten.
 from __future__ import annotations
 
 import argparse
+import statistics
+from collections import defaultdict
 import csv
 import json
 import math
 import os
 import random
 import sqlite3
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import katalog_erweiterung as erweiterung  # noqa: E402
+from marktpreise_2025 import MARKT_2025  # noqa: E402
 
 SEED = 2026
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -161,6 +168,109 @@ LEISTUNG = {row[0]: row for row in LEISTUNGEN}
 SPREIZUNG = 0.25   # h_min / h_max = h_mittel × (1 ∓ 0,25)
 BE_ANTEIL = 0.045  # Baustelleneinrichtung als Anteil der übrigen Einzelkosten
 
+GERAETE.update(erweiterung.GERAETE_NEU)
+MATERIALIEN.update(erweiterung.MATERIALIEN_NEU)
+
+
+# Referenzprofil 2025 für die Marktkalibrierung — dieselben Parameter, mit denen
+# der Generator ein Angebot aus 2025 kalkuliert (Mittellohn-Formel unten, Zuschlag-Mitte).
+REFERENZ_2025 = {"mittellohn": 57.5, "zuschlag": 0.225, "materialindex": 1.00}
+
+
+def _ek_teile(z: dict) -> tuple[float, float, float]:
+    """(Lohn, Material, Gerät) je Einheit beim Referenzprofil 2025, ohne Zuschlag."""
+    lohn = z["h_mittel"] * REFERENZ_2025["mittellohn"]
+    mat = sum(q * MATERIALIEN[m][2] for m, q in z["material"]) * REFERENZ_2025["materialindex"]
+    ger = sum(h * GERAETE[g][1] for g, h in z["geraet"])
+    return lohn, mat, ger
+
+
+def _skaliert(z: dict, ziel_ek: float, notiz: str) -> tuple[dict, float]:
+    """Neue Zeile, deren Einzelkosten `ziel_ek` treffen; Rückgabe (zeile, Faktor gesamt).
+
+    Zuerst werden nur Lohn- und Gerätestunden angepasst — Materialmengen sind
+    physikalisch (m³ Sand je m³ Graben) und bleiben. Nur wenn das Material allein
+    schon über dem Ziel läge, wird alles gleichmäßig skaliert.
+    """
+    lohn, mat, ger = _ek_teile(z)
+    gesamt = lohn + mat + ger
+    s = (ziel_ek - mat) / (lohn + ger) if lohn + ger > 0 else -1.0
+    if s >= 0.25:
+        s = min(s, 6.0)
+        neu = {**z, "h_mittel": round(z["h_mittel"] * s, 4),
+               "geraet": [(g, round(h * s, 4)) for g, h in z["geraet"]]}
+    else:
+        u = ziel_ek / gesamt
+        neu = {**z, "h_mittel": round(z["h_mittel"] * u, 4),
+               "geraet": [(g, round(h * u, 4)) for g, h in z["geraet"]],
+               "material": [(m, round(q * u, 4)) for m, q in z["material"]]}
+    return {**neu, "annahme": f"{z['annahme']} | {notiz}"}, ziel_ek / gesamt
+
+
+def marktkalibrierung(zeilen: list[dict]) -> list[dict]:
+    """Stunden auf Marktpreise 2025 kalibrieren — nur Internetquellen, keine Firmendaten.
+
+    1. Leistungen mit Marktpreis (`marktpreise_2025.py`, gleiche Einheit): Einheitspreis
+       beim Referenzprofil 2025 = Markt-Mittelwert; Spreizung aus Markt-min/max.
+    2. Übrige Leistungen: mit dem Median-Faktor (Markt / Modell) ihres Gewerks skaliert,
+       ohne Marktwert im Gewerk mit dem Median über alle kalibrierten Leistungen.
+    """
+    markup = 1 + REFERENZ_2025["zuschlag"]
+    out, faktoren = {}, defaultdict(list)
+    for z in zeilen:
+        m = MARKT_2025.get(z["code"])
+        if not (m and z["h_mittel"] and m[0].lower() == z["einheit"].lower()):
+            continue
+        einheit, lo, mid, hi, vertrauen, quelle = m
+        neu, f = _skaliert(z, mid / markup,
+                           f"Marktkalibriert 2025 (Vertrauen {vertrauen}, Ziel-EP {mid:.2f} €): {quelle}")
+        neu["spreizung"] = min(0.6, max(0.15, (hi - lo) / (2 * mid)))
+        out[z["code"]] = neu
+        faktoren[z["gewerk"]].append(f)
+    alle = [f for v in faktoren.values() for f in v]
+    global_median = statistics.median(alle)
+    for z in zeilen:
+        if z["code"] in out or not z["h_mittel"]:
+            continue
+        werte = faktoren.get(z["gewerk"], [])
+        f = statistics.median(werte) if len(werte) >= 2 else global_median
+        herkunft = f"Gewerk-Median {z['gewerk']}" if len(werte) >= 2 else "Gesamt-Median"
+        lohn, mat, ger = _ek_teile(z)
+        out[z["code"]], _ = _skaliert(z, (lohn + mat + ger) * f,
+                                      f"Mit {herkunft} Markt/Modell 2025 = {f:.2f} skaliert")
+    return [out.get(z["code"], z) for z in zeilen]
+
+
+def katalog() -> list[dict]:
+    """Der vollständige Leistungskatalog: 34 Basisleistungen plus Erweiterung.
+
+    Die Testdatenbank-Projekte kalkulieren weiter nur mit `LEISTUNGEN`; dieser
+    Katalog ist das, was die Laufzeit (`arbeitszeitrichtwerte.json`) bekommt.
+    """
+    basis = [{"code": c, "gewerk": g, "taetigkeit": k, "einheit": e, "h_mittel": h,
+              "spreizung": SPREIZUNG, "material": mats, "geraet": gers, "bemerkung": lt,
+              "stichworte": erweiterung.STICHWORTE_BASIS.get(c, []), "basis": None,
+              "status": "geschaetzt", "annahme": "Basiskatalog"}
+             for c, g, k, e, h, mats, gers, lt in LEISTUNGEN]
+    zeilen = basis + erweiterung.KATALOG_ERWEITERUNG
+    codes = [z["code"] for z in zeilen]
+    if len(codes) != len(set(codes)):
+        raise ValueError("doppelte Leistungscodes im Katalog")
+    zeilen = marktkalibrierung(zeilen)
+    for z in zeilen:
+        z["h_min"] = round(z["h_mittel"] * (1 - z["spreizung"]), 4)
+        z["h_max"] = round(z["h_mittel"] * (1 + z["spreizung"]), 4)
+        # B01 (Baustelleneinrichtung) hat 0 h: im Generator als Anteil gerechnet.
+        if z["h_mittel"] and not z["h_min"] < z["h_mittel"] < z["h_max"]:
+            raise ValueError(f"{z['code']}: h_min < h_mittel < h_max verletzt")
+        for m, _ in z["material"]:
+            if m not in MATERIALIEN:
+                raise ValueError(f"{z['code']}: unbekanntes Material {m}")
+        for g, _ in z["geraet"]:
+            if g not in GERAETE:
+                raise ValueError(f"{z['code']}: unbekanntes Gerät {g}")
+    return zeilen
+
 UNTERNEHMEN = {
     "id": 1, "firma": "Musterbau Tiefbau GmbH", "sitz": "Beispielstadt",
     "profil": "Mittelständischer Tief- und Leitungsbauer, ca. 60 gewerbliche Mitarbeiter",
@@ -174,7 +284,7 @@ ZUSCHLAG = (0.18, 0.27)         # BGK + AGK + W&G, je nach Auslastung
 STREUUNG = 0.07                 # Rauschen je Position (Kalkulatoren-Handschrift)
 LEISTUNGSFAKTOR = (0.92, 1.12)  # projektabhängige Erschwernis
 ZUSCHLAGSQUOTE = 0.30           # Anteil beauftragter Angebote (Annahme, synthetisch)
-ANZAHL_PROJEKTE = 140
+ANZAHL_PROJEKTE = 60
 
 # Wahrscheinlichkeiten je Projekt / Position für eingebaute Fehler
 P_VAGE_JE_POSITION = 0.04
@@ -198,6 +308,8 @@ PROJEKTTYPEN = {
     "Leerrohrtrasse": dict(L=(800, 2500), d=(0.8, 1.2), b=(0.4, 0.6),
                            opt=lambda r: {"kabel": True}),
     "Parkplatz und Zufahrt": dict(A=(800, 4000)),
+    "Fernwärme-/Kältetrasse": dict(L=(150, 600), d=(1.2, 1.8), b=(1.2, 1.6),
+                                   opt=lambda r: {"kmr": True, "strasse": "aufbruch"}),
 }
 ORTE = ["Beispielstadt", "Musterhausen", "Beispieldorf", "Musterau", "Testingen", "Demohausen",
         "Exempelberg", "Probstadt"]
@@ -235,8 +347,14 @@ VORBEMERKUNGEN = [
 
 # --- Mengenermittlung -------------------------------------------------------
 
-def graben_positionen(L: float, d: float, b: float, opt: dict) -> list[tuple]:
+def graben_positionen(L: float, d: float, b: float, opt: dict,
+                      prng: random.Random) -> list[tuple]:
     """(titel, code, menge, positionsart) aus der Grabengeometrie."""
+    return (basis_graben(L, d, b, opt) + ausstattung(L, opt, prng)
+            + erdbau_varianten(L, d, b, opt, prng) + leitung_zubehoer(L, opt, prng))
+
+
+def basis_graben(L: float, d: float, b: float, opt: dict) -> list[tuple]:
     schaechte = math.ceil(L / 45) if opt.get("kanal") else 0
     out = [("01", "B01", 1, "Normal"), ("01", "B02", math.ceil(L / 40) + 2, "Normal"),
            ("01", "B03", 40, "Eventual"), ("01", "B04", 1, "Normal")]
@@ -258,7 +376,9 @@ def graben_positionen(L: float, d: float, b: float, opt: dict) -> list[tuple]:
         flaeche = L * (b + 0.6) if opt["strasse"] == "aufbruch" else L * 6.5
         out += [("05", c, flaeche, "Normal") for c in ("E06", "E07", "T03", "T04")]
     if opt.get("pflaster"):
-        out += [("05", "T05", L * 2.5, "Normal"), ("05", "T06", L * 2, "Normal")]
+        out += [("05", "T05", L * 2.5, "Normal"), ("05", "T06", L * 2, "Normal"),
+                ("05", "L01", L * 1.5, "Normal"), ("05", "L02", L * 1.5 * 0.04, "Normal"),
+                ("05", "E08", L * 1.5 * 0.15, "Normal")]
     return out
 
 
@@ -270,6 +390,155 @@ def kanal_positionen(L: float, d: float, rohr: str, schaechte: int) -> list[tupl
     tiefe_zulage = schaechte * max(0, math.ceil((d - 3.0) / 0.5))
     if tiefe_zulage:
         out.append(("03", "S02", tiefe_zulage, "Normal"))
+    return out
+
+
+def wochen(L: float) -> int:
+    return math.ceil(L / 40) + 2
+
+
+def ausstattung(L: float, opt: dict, prng: random.Random) -> list[tuple]:
+    """Baustellenausstattung im Lebenszyklus herstellen → vorhalten → umsetzen."""
+    w = wochen(L)
+    zaun = round(L * prng.uniform(0.2, 0.4))
+    leuchten = math.ceil(L / 25)
+    out = [("01", "A01-H", zaun, "Normal"), ("01", "A01-V", zaun * w, "Normal"),
+           ("01", "A07-H", leuchten, "Normal"), ("01", "A07-V", leuchten * w, "Normal")]
+    # Nicht jedes LV schreibt Baustrom, Bauwasser, Container und Dokumentation aus;
+    # oft stecken sie in der Baustelleneinrichtung. Echtes LV: ~15 % Baustellen-Positionen.
+    if prng.random() < 0.45:
+        out += [("01", "B10", 1, "Normal"), ("01", "B11", w, "Normal"),
+                ("01", "B12", 50, "Normal"), ("01", "B13", 50 * w, "Normal")]
+    if prng.random() < 0.35:
+        out += [("01", "B14", 70, "Normal"), ("01", "B15", 70 * w, "Normal"),
+                ("01", "B16", 1, "Normal")]
+    if prng.random() < 0.35:
+        out += [("01", "B06", 2, "Normal"), ("01", "B05", w, "Normal")]
+    if prng.random() < 0.5:
+        out.append(("01", "B04-ST", 2, "Normal"))
+    if L > 400:
+        out += [("01", "A01-U", round(zaun * 0.3), "Normal"),
+                ("01", "A07-U", round(leuchten * 0.4), "Normal")]
+    if opt.get("strasse") == "aufbruch":
+        out += [("01", "A06-H", 6, "Normal"), ("01", "A06-V", 6 * w, "Normal"),
+                ("01", "A06-U", 2, "Normal"), ("01", "A04-H", 2, "Normal"),
+                ("01", "A04-V", 2 * w, "Normal"), ("01", "A04-U", 1, "Normal")]
+        if prng.random() < 0.4:
+            out += [("01", "B02-ST", 4, "Normal"), ("01", "B02-STWO", 4 * w, "Normal")]
+        if prng.random() < 0.5:
+            sw = round(L * 0.2)
+            out += [("01", "A08-H", sw, "Normal"), ("01", "A08-V", sw * w, "Normal"),
+                    ("01", "A08-U", round(sw * 0.3), "Normal")]
+    if opt.get("kanal") or opt.get("strasse"):
+        out += [("01", "A02-H", 2, "Normal"), ("01", "A02-V", 2 * w, "Normal"),
+                ("01", "A02-U", 1, "Normal")]
+    if opt.get("wasser") or opt.get("kmr"):
+        out += [("01", "A03-H", 1, "Normal"), ("01", "A03-V", w, "Normal")]
+        if L > 400:
+            out.append(("01", "A03-U", 1, "Normal"))
+    if (opt.get("kanal") or opt.get("kmr")) and prng.random() < 0.35:
+        bruecke = prng.choice([10, 12, 15])
+        out += [("01", "A05-H", bruecke, "Normal"), ("01", "A05-V", bruecke * w, "Normal")]
+        if prng.random() < 0.5:
+            out.append(("01", "A05-U", bruecke, "Normal"))
+    if prng.random() < 0.3:
+        out.append(("01", "A01-VD", zaun * w * 7, "Eventual"))
+    return out
+
+
+def erdbau_varianten(L: float, d: float, b: float, opt: dict, prng: random.Random) -> list[tuple]:
+    """Einheiten-Varianten und eigenständige Erdbau-, Schutz-, Prüf- und Wasserhaltungsleistungen."""
+    w = wochen(L)
+    out = [("02", "E03-ST", math.ceil(L / 60), "Normal"), ("02", "E10", L * 0.05, "Normal"),
+           ("02", "P01", math.ceil(L / 100), "Normal"),
+           ("02", "P02", max(1, math.ceil(L * b * d / 500)), "Normal")]
+    if prng.random() < 0.5:
+        out += [("02", "E11", L * b * d * 0.3, "Normal"), ("02", "E09", L * b * d * 0.3, "Normal")]
+    if prng.random() < 0.3:
+        out.append(("02", "E01-M3", L * b * 0.2, "Normal"))
+    if prng.random() < 0.15:
+        out.append(("02", "E12", L * b * 0.2, "Eventual"))
+    if prng.random() < 0.3:
+        out.append(("02", "P04", 10, "Normal"))
+    if opt.get("strasse") == "aufbruch":
+        out += [("02", "S10", L * 0.03, "Normal"), ("02", "S11", L * 0.02, "Normal"),
+                ("02", "B04-M2", L * b * 2, "Normal"), ("02", "T02-M3", L * 0.02, "Normal")]
+        if prng.random() < 0.4:
+            out += [("02", "T08", L * 0.1, "Normal"),
+                    ("02", "T10", L * 0.2, "Normal"), ("02", "T09", L * 0.3, "Normal"),
+                    ("05", "T12", L * 0.2, "Normal"), ("05", "T11", L * 0.3, "Normal")]
+    if opt.get("strasse") and prng.random() < 0.4:
+        out.append(("05", "E07-M3", L * 0.5, "Normal"))     # Nebenflächen nach Volumen
+    if opt.get("kanal") and prng.random() < 0.5:
+        out.append(("03", "K02", math.ceil(L / 30) * 4, "Normal"))   # Anschlussleitungen DN 200
+    if d > 1.75:
+        out.append(("02", "V01-M2D", 2 * L * min(d, 3.0) * 10, "Normal"))
+    if d > 3.0:
+        out.append(("02", "V02-M2D", 2 * L * (d - 3.0) * 10, "Normal"))
+        if prng.random() < 0.5:
+            out.append(("02", "V03", L * 0.2, "Normal"))
+    if d > 2.5:
+        out += [("02", "W01", math.ceil(L / 150), "Normal"), ("02", "W02", w * 5, "Normal"),
+                ("02", "W03", math.ceil(L / 150), "Normal")]
+    return out
+
+
+def leitung_zubehoer(L: float, opt: dict, prng: random.Random) -> list[tuple]:
+    """Formteile, Armaturen und Prüfungen für Druckleitungen (PE)."""
+    if not opt.get("wasser"):
+        return []
+    armaturen = math.ceil(L / 150)
+    anbohr = round(L / 20)
+    out = [("04", "F01", math.ceil(L / 40), "Normal"), ("04", "F02", math.ceil(L / 100), "Normal"),
+           ("04", "F03", math.ceil(L / 12), "Normal"), ("04", "F04", math.ceil(L / 200) + 1, "Normal"),
+           ("04", "F21", armaturen, "Normal"), ("04", "F23", anbohr, "Normal"),
+           ("04", "F24", armaturen + anbohr, "Normal"), ("04", "F28", armaturen + anbohr, "Normal"),
+           ("04", "F26", math.ceil(L / 120), "Normal"), ("04", "F27", math.ceil(L / 120), "Normal"),
+           ("04", "F25", max(1, round(L / 300)), "Normal"),
+           ("04", "K08", L, "Normal"), ("04", "K09-M", L, "Normal"), ("04", "P05", L, "Normal"),
+           ("04", "P05-ST", math.ceil(L / 300), "Normal"),
+           ("04", "B04-KP", math.ceil(L / 50), "Normal")]
+    if prng.random() < 0.4:
+        out.append(("04", "F29", math.ceil(L / 80), "Normal"))
+    return out
+
+
+def kmr_positionen(L: float, prng: random.Random) -> list[tuple]:
+    """Fernwärme-/Kältetrasse im Kunststoffmantelrohr: Vor- und Rücklauf."""
+    rohr = 2 * L
+    out = [("04", "K12", rohr, "Normal"), ("04", "F11", math.ceil(L / 40) * 2, "Normal"),
+           ("04", "F12", math.ceil(L / 150) * 2, "Normal"), ("04", "F13", round(rohr / 12), "Normal"),
+           ("04", "F14", 4, "Normal"), ("04", "F15", math.ceil(L / 200) * 2, "Normal"),
+           ("04", "F16", 2, "Normal"), ("04", "F18", math.ceil(L / 100), "Normal"),
+           ("04", "F19", 2, "Normal"), ("04", "F22", 2, "Normal"),
+           ("04", "F29", math.ceil(L / 60), "Normal"), ("04", "P06", round(rohr / 12), "Normal"),
+           ("04", "P03", 2, "Normal"), ("04", "P05-ST", 1, "Normal"),
+           ("04", "B04-KP", math.ceil(L / 50), "Normal")]
+    if prng.random() < 0.5:
+        out += [("04", "F17", 4, "Normal")]
+    if prng.random() < 0.6:
+        out += [("03", "X01", 2, "Normal"), ("03", "X02", 2, "Normal")]
+    return out
+
+
+def zusatz_flaeche(A: float, prng: random.Random) -> list[tuple]:
+    """Parkplatz: Ausstattung, Landschaftsbau, Prüfungen, Bestand."""
+    w = max(4, round(A / 400))
+    rasen = round(A * prng.uniform(0.1, 0.25))
+    zaun = round(4 * math.sqrt(A) * 0.5)
+    out = [("01", "A01-H", zaun, "Normal"), ("01", "A01-V", zaun * w, "Normal"),
+           ("01", "B10", 1, "Normal"), ("01", "B11", w, "Normal"), ("01", "B06", 1, "Normal"),
+           ("02", "P01", max(2, round(A / 400)), "Normal"), ("02", "P02", max(1, round(A / 800)), "Normal"),
+           ("05", "L01", rasen, "Normal"), ("05", "L02", round(rasen * 0.04, 1), "Normal"),
+           ("05", "L04", rasen, "Normal"), ("05", "E08", rasen * 0.15, "Normal")]
+    if prng.random() < 0.5:
+        baeume = prng.randint(2, 8)
+        out += [("05", "L03", baeume * 5, "Normal"), ("05", "S12", baeume, "Normal")]
+    if prng.random() < 0.4:
+        out += [("02", "T09", A * 0.1, "Normal"), ("05", "T11", A * 0.1, "Normal"),
+                ("02", "T10", math.sqrt(A), "Normal"), ("05", "T12", math.sqrt(A), "Normal")]
+    if prng.random() < 0.3:
+        out.append(("05", "T07", A * 0.3 * 0.15, "Normal"))
     return out
 
 
@@ -285,7 +554,7 @@ def flaechen_positionen(A: float) -> list[tuple]:
 
 
 def menge_runden(menge: float, einheit: str) -> float:
-    if einheit in ("St", "psch", "Wo", "h"):
+    if einheit in ("St", "psch", "Wo", "h", "StWo", "d"):
         return float(max(1, round(menge)))
     return round(menge, 1 if menge >= 100 else 2)
 
@@ -294,7 +563,8 @@ def menge_runden(menge: float, einheit: str) -> float:
 
 def projekt_spec(rng: random.Random, projekt_id: int) -> dict:
     """Ein zufälliges, in sich stimmiges Projekt des Unternehmens."""
-    typ = rng.choice(list(PROJEKTTYPEN))
+    # Typen gleichmäßig verteilen, damit jede Leistungsgruppe genug Fälle hat.
+    typ = list(PROJEKTTYPEN)[(projekt_id - 1) % len(PROJEKTTYPEN)]
     cfg = PROJEKTTYPEN[typ]
     ort = rng.choice(ORTE)
     jahr = rng.choice(list(MATERIALINDEX))
@@ -320,12 +590,22 @@ def kalkulationsparameter(rng: random.Random, jahr: int) -> dict:
 
 # --- Kalkulation ------------------------------------------------------------
 
+_KAT: dict = {}
+
+
+def kat() -> dict:
+    """Vollständiger Katalog als {code: zeile}; einmal gebaut."""
+    if not _KAT:
+        _KAT.update({z["code"]: z for z in katalog()})
+    return _KAT
+
+
 def einzelkosten(code: str, p: dict) -> tuple[float, float, float]:
-    """(Lohn, Material, Gerät) je Einheit, ohne Zuschlag."""
-    row = LEISTUNG[code]
-    lohn = row[4] * p["leistungsfaktor"] * p["mittellohn"]
-    mat = sum(q * MATERIALIEN[m][2] for m, q in row[5]) * p["materialindex"]
-    ger = sum(h * GERAETE[g][1] for g, h in row[6]) * p["leistungsfaktor"]
+    """(Lohn, Material, Gerät) je Einheit, ohne Zuschlag — aus dem vollen Katalog."""
+    z = kat()[code]
+    lohn = z["h_mittel"] * p["leistungsfaktor"] * p["mittellohn"]
+    mat = sum(q * MATERIALIEN[m][2] for m, q in z["material"]) * p["materialindex"]
+    ger = sum(h * GERAETE[g][1] for g, h in z["geraet"]) * p["leistungsfaktor"]
     return lohn, mat, ger
 
 
@@ -376,7 +656,8 @@ def lv_fehler(positionen: list[dict], projekt_id: int, rng: random.Random) -> li
         pos["menge"] = 1000.0
         out.append(erwartung(projekt_id, pos, "mengenplausibilitaet",
                              "Auffällig runde Menge (1.000) — vermutlich geschätzt, nicht ermittelt."))
-    rohre = [p for p in normale if p["leistung_code"].startswith("K") and p["einheit"] == "m"]
+    rohre = [p for p in normale
+             if p["leistung_code"] in ("K01", "K02", "K03", "K04", "K05", "K06", "K12")]
     if rohre and rng.random() < P_EINHEITENFEHLER:
         pos = rng.choice(rohre)
         pos["einheit"] = "m3"
@@ -422,7 +703,8 @@ def kommafehler(zeilen: list[dict], projekt_id: int, angebot_id: int,
 
 SCHEMA = """
 CREATE TABLE arbeitszeitrichtwerte (leistung_code TEXT PRIMARY KEY, gewerk TEXT, taetigkeit TEXT,
-  einheit TEXT, h_min REAL, h_mittel REAL, h_max REAL, bemerkung TEXT, herkunft TEXT);
+  einheit TEXT, h_min REAL, h_mittel REAL, h_max REAL, bemerkung TEXT, herkunft TEXT,
+  basis TEXT, status TEXT, annahme TEXT);
 CREATE TABLE geraete (code TEXT PRIMARY KEY, bezeichnung TEXT, kosten_eur_h REAL);
 CREATE TABLE materialien (code TEXT PRIMARY KEY, bezeichnung TEXT, einheit TEXT,
   preis_eur REAL, preisstand TEXT);
@@ -455,17 +737,28 @@ TITEL = {"01": "Baustelle und Verkehrssicherung", "02": "Erdarbeiten und Verbau"
 
 
 def projekt_positionen(spec: dict, next_id: int) -> list[dict]:
-    roh = (flaechen_positionen(spec["A"]) if spec["A"]
-           else graben_positionen(spec["L"], spec["d"], spec["b"], spec["opt"]))
+    # Eigener Zufallsstrom je Projekt: welche Zusatzleistungen ein Projekt hat,
+    # hängt nur von Seed und Projekt-ID ab.
+    prng = random.Random(SEED * 1000 + spec["id"])
+    if spec["A"]:
+        roh = flaechen_positionen(spec["A"]) + zusatz_flaeche(spec["A"], prng)
+    elif spec["opt"].get("kmr"):
+        roh = graben_positionen(spec["L"], spec["d"], spec["b"], spec["opt"], prng) \
+              + kmr_positionen(spec["L"], prng)
+    else:
+        roh = graben_positionen(spec["L"], spec["d"], spec["b"], spec["opt"], prng)
     positionen, zaehler = [], {}
     for titel, code, menge, art in sorted(roh, key=lambda r: r[0]):
-        row = LEISTUNG[code]
+        z = kat()[code]
+        if menge <= 0:
+            continue
         zaehler[titel] = zaehler.get(titel, 0) + 10
         positionen.append({
             "id": next_id + len(positionen), "projekt_id": spec["id"],
-            "oz": f"{titel}.{zaehler[titel]:04d}", "titel": TITEL[titel], "kurztext": row[2],
-            "langtext": row[7], "einheit": row[3], "menge": menge_runden(menge, row[3]),
-            "positionsart": art, "pauschal": int(row[3] == "psch"), "leistung_code": code,
+            "oz": f"{titel}.{zaehler[titel]:04d}", "titel": TITEL[titel],
+            "kurztext": z["taetigkeit"], "langtext": z["bemerkung"], "einheit": z["einheit"],
+            "menge": menge_runden(menge, z["einheit"]), "positionsart": art,
+            "pauschal": int(z["einheit"] == "psch"), "leistung_code": code,
             "abrechnungsmenge": None,
         })
     return positionen
@@ -480,18 +773,20 @@ def insert(con: sqlite3.Connection, table: str, rows: list[dict]) -> None:
 
 
 def stammdaten(con: sqlite3.Connection) -> None:
+    zeilen = katalog()
     insert(con, "arbeitszeitrichtwerte", [{
-        "leistung_code": c, "gewerk": g, "taetigkeit": k, "einheit": e,
-        "h_min": round(h * (1 - SPREIZUNG), 3), "h_mittel": h, "h_max": round(h * (1 + SPREIZUNG), 3),
-        "bemerkung": lt, "herkunft": HERKUNFT} for c, g, k, e, h, _m, _g, lt in LEISTUNGEN])
+        "leistung_code": z["code"], "gewerk": z["gewerk"], "taetigkeit": z["taetigkeit"],
+        "einheit": z["einheit"], "h_min": z["h_min"], "h_mittel": z["h_mittel"],
+        "h_max": z["h_max"], "bemerkung": z["bemerkung"], "herkunft": HERKUNFT,
+        "basis": z["basis"], "status": z["status"], "annahme": z["annahme"]} for z in zeilen])
     insert(con, "geraete", [{"code": c, "bezeichnung": n, "kosten_eur_h": k}
                             for c, (n, k) in GERAETE.items()])
     insert(con, "materialien", [{"code": c, "bezeichnung": n, "einheit": e, "preis_eur": p,
                                  "preisstand": "2025, synthetisch"} for c, (n, e, p) in MATERIALIEN.items()])
-    insert(con, "leistung_material", [{"leistung_code": row[0], "material_code": m, "menge_je_einheit": q}
-                                      for row in LEISTUNGEN for m, q in row[5]])
-    insert(con, "leistung_geraet", [{"leistung_code": row[0], "geraet_code": g, "stunden_je_einheit": h}
-                                    for row in LEISTUNGEN for g, h in row[6]])
+    insert(con, "leistung_material", [{"leistung_code": z["code"], "material_code": m,
+                                       "menge_je_einheit": q} for z in zeilen for m, q in z["material"]])
+    insert(con, "leistung_geraet", [{"leistung_code": z["code"], "geraet_code": g,
+                                     "stunden_je_einheit": h} for z in zeilen for g, h in z["geraet"]])
     insert(con, "unternehmen", [UNTERNEHMEN])
 
 
@@ -549,13 +844,19 @@ def export_runtime_json(data_dir: str) -> None:
     """Die Nachschlage-Tabellen, die eine Engine zur Laufzeit braucht — ohne SQL."""
     meta = {"herkunft": HERKUNFT, "seed": SEED,
             "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."}
-    write_json(os.path.join(data_dir, "arbeitszeitrichtwerte.json"), {"meta": meta, "leistungen": {
-        c: {"gewerk": g, "taetigkeit": k, "einheit": e,
-            "h_min": round(h * (1 - SPREIZUNG), 3), "h_mittel": h, "h_max": round(h * (1 + SPREIZUNG), 3),
-            "material": [{"code": m, "menge_je_einheit": q} for m, q in mats],
-            "geraet": [{"code": gc, "stunden_je_einheit": gh} for gc, gh in gers],
-            "bemerkung": lt}
-        for c, g, k, e, h, mats, gers, lt in LEISTUNGEN}})
+    zeilen = katalog()
+    meta_katalog = {**meta, "leistungen": len(zeilen),
+                    "katalog_hinweis": "status: abgeleitet = aus Basisleistung des Katalogs "
+                                       "gerechnet; geschaetzt = eigene Schätzung; unsicher = "
+                                       "breite reale Streuung. Annahme je Zeile in 'annahme'."}
+    write_json(os.path.join(data_dir, "arbeitszeitrichtwerte.json"), {"meta": meta_katalog, "leistungen": {
+        z["code"]: {"gewerk": z["gewerk"], "taetigkeit": z["taetigkeit"], "einheit": z["einheit"],
+                    "h_min": z["h_min"], "h_mittel": z["h_mittel"], "h_max": z["h_max"],
+                    "material": [{"code": m, "menge_je_einheit": q} for m, q in z["material"]],
+                    "geraet": [{"code": gc, "stunden_je_einheit": gh} for gc, gh in z["geraet"]],
+                    "bemerkung": z["bemerkung"], "stichworte": z["stichworte"],
+                    "basis": z["basis"], "status": z["status"], "annahme": z["annahme"]}
+        for z in zeilen}})
     write_json(os.path.join(data_dir, "materialien.json"), {"meta": meta, "materialien": {
         c: {"bezeichnung": n, "einheit": e, "preis_eur": p} for c, (n, e, p) in MATERIALIEN.items()}})
     write_json(os.path.join(data_dir, "geraete.json"), {"meta": meta, "geraete": {
