@@ -34,7 +34,7 @@ import pandas as pd
 import streamlit as st
 
 from core import (classify, constants, detectors, kalkulation, logic, objects,
-                  parser_gaeb90, parser_x83, pricer, stammdaten)
+                  parser_gaeb90, parser_x83, pricer, risk_engine, stammdaten)
 from views import reveal
 
 SAMPLE = constants.REVEAL["blank_boq"]
@@ -91,6 +91,58 @@ def load_reference():
 def rehydrate(dicts: list[dict]):
     from core.models import NormalizedItem
     return [NormalizedItem.from_dict(d) for d in dicts]
+
+
+@st.cache_data(show_spinner=False)
+def analyze_hybrid_cached(
+    item_dicts: list[dict],
+    remarks: list[str],
+    calculated_payload: list[dict],
+    priced_payload: list[dict],
+    use_jev: bool,
+):
+    """Cache the serializable end-to-end hybrid analysis for UI reruns."""
+    from core.kalkulation import CalculatedItem
+    from core.pricer import PricedItem
+
+    items = rehydrate(item_dicts)
+    item_by_key = {item.key(): item for item in items}
+
+    calculated = []
+    for payload in calculated_payload:
+        item = item_by_key.get(payload["key"])
+        if item is not None:
+            calculated.append(CalculatedItem(
+                item=item,
+                leistung=None,
+                ep_low=payload["ep_low"],
+                ep_mid=payload["ep_mid"],
+                ep_high=payload["ep_high"],
+            ))
+
+    priced = []
+    for payload in priced_payload:
+        item = item_by_key.get(payload["key"])
+        if item is not None:
+            priced.append(PricedItem(
+                item=item,
+                unit_price=payload["unit_price"],
+                total=payload["total"],
+                source=payload["source"],
+                comparables=payload["comparables"],
+                spread=payload["spread"],
+                bucket=payload["bucket"],
+                distribution=payload["distribution"],
+                note=payload["note"],
+            ))
+
+    return risk_engine.analyze_tender_hybrid(
+        items,
+        remarks,
+        calculated,
+        priced,
+        use_jev=use_jev,
+    )
 
 
 # --- sections --------------------------------------------------------------
@@ -587,6 +639,165 @@ def section_kalkulation(calculated, cov, data):
     return calculated
 
 
+def section_logic(items, remarks, hybrid_results, findings):
+    """Deterministic logic overview with direct drill-down."""
+    high = sum(1 for r in hybrid_results if r.risk_level == "high")
+    medium = sum(1 for r in hybrid_results if r.risk_level == "medium")
+    exposure = sum(r.euro_exposure for r in hybrid_results
+                   if r.risk_level in ("high", "medium"))
+
+    a, b, c = st.columns(3)
+    a.metric("Regelverstöße High", high)
+    b.metric("Hinweise Medium", medium)
+    c.metric("Betroffenes €-Exposure", f"€{exposure:,.0f}")
+
+    remark_findings = [
+        finding for finding in findings
+        if finding.detector == "vague_scope"
+        and finding.item.key().startswith("VORB-")
+    ]
+    if remark_findings:
+        st.subheader("Vertragsvorbemerkungen")
+        st.dataframe(pd.DataFrame([{
+            "Referenz": finding.item.key(),
+            "Hinweis": finding.rationale,
+            "Schweregrad": finding.severity,
+        } for finding in remark_findings]),
+            width="stretch", hide_index=True)
+
+    item_by_key = {item.key(): item for item in items}
+    known_flags = (
+        "META_MISMATCH", "ZERO_QTY", "MISSING_SPEC", "SCOPE_GAP",
+        "CATEGORY_MISMATCH", "QTY_OUTLIER", "MISSING_FOLLOW_UP",
+    )
+    rows = []
+    for result in hybrid_results:
+        item = item_by_key.get(result.key)
+        if item is None:
+            continue
+        logic_flags = [
+            detail for detail in result.reasons
+            if any(flag in detail for flag in known_flags)
+        ]
+        if not logic_flags and result.risk_level == "low":
+            continue
+        rows.append({
+            "OZ": item.key(),
+            "Position": item.short_text[:58],
+            "Menge": item.quantity,
+            "Einheit": constants.normalize_unit(item.unit),
+            "Regel-Flags": ", ".join(logic_flags) if logic_flags else "—",
+            "Schweregrad": result.risk_level,
+            "€-Exposure": round(result.euro_exposure, 2),
+            "Begründung": " | ".join(result.reasons),
+        })
+
+    if not rows:
+        st.success("Keine deterministischen Regelverstöße erkannt.")
+        return
+
+    frame = pd.DataFrame(rows)
+    severity_rank = {"low": 0, "medium": 1, "high": 2}
+    frame["_rank"] = frame["Schweregrad"].map(severity_rank)
+    frame = frame.sort_values(["_rank", "€-Exposure"], ascending=[False, False])
+    event = st.dataframe(
+        frame.drop(columns=["_rank"]),
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+        key="logic_result_table",
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+    selected_rows = event.selection.rows
+    if selected_rows:
+        row_index = selected_rows[0]
+        if 0 <= row_index < len(frame):
+            oz = frame.iloc[row_index]["OZ"]
+            item = item_by_key.get(oz)
+            if item is not None:
+                source = st.session_state.get("source")
+                filename = item.source_file or "Quelldokument"
+                payload = None
+                source_error = None
+                if source:
+                    try:
+                        filename, payload = source_document(source)
+                    except OSError as exc:
+                        source_error = str(exc)
+                show_position_details(item, items, remarks, filename, payload, source_error)
+
+
+def section_hybrid_risky(items, hybrid_results, findings):
+    """Hybrid prioritized risk table and RFI export."""
+    filtered = [
+        result for result in hybrid_results
+        if result.risk_level in ("high", "medium")
+    ]
+    high_count = sum(1 for r in filtered if r.risk_level == "high")
+    medium_count = sum(1 for r in filtered if r.risk_level == "medium")
+    positive = sorted(
+        r.euro_exposure for r in hybrid_results if r.euro_exposure > 0
+    )
+    threshold = (
+        pricer.percentile(positive, constants.HYBRID_EXPOSURE_PERCENTILE)
+        if positive else constants.SEVERITY_HIGH_EUR
+    )
+    speculation_count = sum(
+        1 for r in filtered if r.action_type == "SPECULATE_UP"
+    )
+
+    a, b, c, d = st.columns(4)
+    a.metric("High Risk Positionen", high_count)
+    b.metric("Medium Risk Positionen", medium_count)
+    c.metric("Top-10-%-Schwelle", f"€{threshold:,.2f}")
+    d.metric("VOB/B-Nachtragskandidaten", speculation_count)
+
+    filter_choice = st.segmented_control(
+        "Filter",
+        options=["Alle", "High", "Medium", "VOB/B-Spekulation"],
+        default="Alle",
+        key="hybrid_risk_filter",
+    )
+    if filter_choice == "High":
+        filtered = [r for r in filtered if r.risk_level == "high"]
+    elif filter_choice == "Medium":
+        filtered = [r for r in filtered if r.risk_level == "medium"]
+    elif filter_choice == "VOB/B-Spekulation":
+        filtered = [r for r in filtered if r.action_type == "SPECULATE_UP"]
+
+    filtered.sort(
+        key=lambda r: (0 if r.risk_level == "high" else 1, -r.euro_exposure)
+    )
+    item_by_key = {item.key(): item for item in items}
+    rows = []
+    for result in filtered:
+        item = item_by_key.get(result.key)
+        if item is None:
+            continue
+        reasons = " | ".join(result.reasons)
+        if result.judgments and result.judgments.reasons:
+            reasons += " | KI: " + " | ".join(result.judgments.reasons.values())
+        rows.append({
+            "Risiko": result.risk_level,
+            "OZ": item.key(),
+            "Position": item.short_text[:58],
+            "EP vorl.": round(result.pre_unit_price, 2),
+            "€-Exposure": round(result.euro_exposure, 2),
+            "Strategie": f"{result.action_type}: {result.strategy}",
+            "KI- & Regel-Begründung": reasons,
+        })
+
+    if rows:
+        st.dataframe(pd.DataFrame(rows), width="stretch",
+                     hide_index=True, height="stretch")
+    else:
+        st.success("Keine Position im gewählten Risiko-Filter.")
+
+    st.divider()
+    section_export(findings)
+
+
 def section_tricky(calculated):
     """Show unpriced positions and material pricing risks."""
     st.caption(
@@ -948,6 +1159,12 @@ def main():
 
     page = st.session_state.get("active_page", PAGES[0])
     st.title("Logik" if page == "Logic" else page)
+    use_jev = False
+    if page in ("Logic", "Heikle Positionen"):
+        use_jev = st.sidebar.checkbox(
+            "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
+            value=classify.jev_available(),
+        )
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
         return
@@ -955,8 +1172,6 @@ def main():
 
     if page == "Tender":
         section_items(items)
-    elif page == "Logic":
-        st.info("Die Logik-Prüfungen werden später ergänzt.")
     else:
         company = sidebar_kalkulation()
         data = stammdaten.load()
@@ -965,6 +1180,36 @@ def main():
         # scores near zero on real wording — that is the 3% coverage bug.
         assignments = classify.classify(items, data)
         calculated = kalkulation.calculate(items, assignments, company, data)
+        reference = load_reference()
+        priced = pricer.price_boq(items, reference, {
+            "mittellohn_eur_h": company.mittellohn_eur_h,
+            "overhead_pct": company.total_markup_pct,
+            "profit_pct": company.wg_pct,
+        })
+        calculated_payload = [{
+            "key": c.item.key(),
+            "ep_low": c.ep_low,
+            "ep_mid": c.ep_mid,
+            "ep_high": c.ep_high,
+        } for c in calculated]
+        priced_payload = [{
+            "key": p.item.key(),
+            "unit_price": p.unit_price,
+            "total": p.total,
+            "source": p.source,
+            "comparables": p.comparables,
+            "spread": p.spread,
+            "bucket": p.bucket,
+            "distribution": p.distribution,
+            "note": p.note,
+        } for p in priced]
+        hybrid_results, findings = analyze_hybrid_cached(
+            [item.as_dict() for item in items],
+            list(remarks),
+            calculated_payload,
+            priced_payload,
+            bool(use_jev),
+        )
         if page == "Gruppen & Angebot":
             cov = classify.coverage(assignments)
             if cov["pct"] < 50:
@@ -980,8 +1225,10 @@ def main():
                 remarks,
                 calculated,
             )
-        else:
-            section_tricky(calculated)
+        elif page == "Logic":
+            section_logic(items, remarks, hybrid_results, findings)
+        elif page == "Heikle Positionen":
+            section_hybrid_risky(items, hybrid_results, findings)
 
 
 main()

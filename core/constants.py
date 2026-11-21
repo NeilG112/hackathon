@@ -198,6 +198,51 @@ UNIT_RULE_MIN_SUPPORT = 0.70   # the bar a rule must clear to be worth keeping
 TOP_N_FINDINGS = 20         # PLAN.md: top 15-25 by euro leverage
 SEVERITY_ORDER = ("high", "medium", "low")
 
+# --- Hybrid risk and logic pipeline ---------------------------------------
+HYBRID_MAX_LLM_ITEMS = 60
+HYBRID_EXPOSURE_PERCENTILE = 0.90
+HYBRID_HIGH_SCORE_THRESH = 0.70
+HYBRID_MED_SCORE_THRESH = 0.50
+HYBRID_DIVERGENCE_THRESH = 0.40
+
+SPECIALIST_KEYWORDS: tuple[str, ...] = (
+    "bauseits",
+    "nach vorgabe",
+    "komplettanlage",
+    "komplett",
+    "raumsystem",
+    "pauschal",
+    "nach aufwand",
+    "o.ä.",
+    "o. ä.",
+    "ggf.",
+    "wie angeordnet",
+    "audio",
+    "medientechnik",
+    "sonderkonstruktion",
+    "nach beigefügter zeichnung",
+    "nach wahl des auftraggebers",
+)
+
+EVENTUAL_KEYWORDS: tuple[str, ...] = (
+    "eventual",
+    "bedarfsposition",
+    "alternativ",
+    "wahlposition",
+    "nur auf anordnung",
+)
+
+BLACKBOX_KEYWORDS: tuple[str, ...] = (
+    "anlage",
+    "system",
+    "komplett",
+    "sonder",
+    "bauwerk",
+    "schacht",
+    "steuerung",
+    "technik",
+)
+
 # --- The reveal (PLAN.md step 4, the whole pitch) -------------------------
 REVEAL = {
     "blank_boq": "Dataset/[NUMMER_001]_leer.X83",

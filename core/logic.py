@@ -32,8 +32,9 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from core import constants
-from core.models import Finding, NormalizedItem
-from core.objects import UNKNOWN_TAG, ObjectRow
+from core.models import Finding, LogicResult, NormalizedItem
+from core.objects import UNKNOWN_TAG, ObjectRow, build, tag_of
+from utils.text_cleaning import clean_item_text, compare_key
 
 # --- the rule table a civil engineer owns ---------------------------------
 #
@@ -184,15 +185,31 @@ def check_relations(
     return findings
 
 
-def check_magnitude(items: Sequence[NormalizedItem]) -> list[Finding]:
+def _pre_unit_price(
+    item: NormalizedItem,
+    pre_prices: dict[str, float] | None,
+) -> float:
+    if pre_prices:
+        price = pre_prices.get(item.key())
+        if price is not None:
+            return float(price)
+    if item.unit_price is not None:
+        return float(item.unit_price)
+    if item.total_price is not None and item.quantity > 0:
+        return float(item.total_price) / float(item.quantity)
+    return 0.0
+
+
+def check_magnitude(
+    items: Sequence[NormalizedItem],
+    pre_prices: dict[str, float] | None = None,
+) -> list[Finding]:
     """Order-of-magnitude quantity outliers — the misplaced-zero check.
 
     Compares each position against its peers: the same object measured in the
     same unit elsewhere in the tender. Needs `MIN_PEERS` to say anything, and
     uses the median so one bad value cannot drag the baseline.
     """
-    from core.objects import tag_of
-
     groups: dict[tuple[str, str], list[NormalizedItem]] = defaultdict(list)
     for item in items:
         tag = tag_of(item)
@@ -227,14 +244,17 @@ def check_magnitude(items: Sequence[NormalizedItem]) -> list[Finding]:
                     f"{tag} positions ({median:,.0f} {unit}). A misplaced "
                     "decimal or a genuinely unusual position — worth one look."
                 ),
-                euro_leverage=abs((item.total_price or 0.0)),
+                euro_leverage=abs(item.quantity * _pre_unit_price(item, pre_prices)),
                 evidence={"tag": tag, "unit": unit, "median": median,
                           "ratio": round(ratio, 2), "peers": len(peers)},
             ))
     return findings
 
 
-def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
+def check_duplicates(
+    items: Sequence[NormalizedItem],
+    pre_prices: dict[str, float] | None = None,
+) -> list[Finding]:
     """Positions repeating the same work — *"summary and duplicate is a good thing"*.
 
     Same wording, same unit, different OZ. Often legitimate (the same work in
@@ -242,8 +262,6 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     locations are named: identical work in the *same* location is the
     suspicious case.
     """
-    from utils.text_cleaning import compare_key
-
     groups: dict[tuple[str, str], list[NormalizedItem]] = defaultdict(list)
     for item in items:
         signature = compare_key(item.short_text)
@@ -254,7 +272,12 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     for (_sig, unit), group in groups.items():
         if len(group) < 2:
             continue
-        exposure = sum(i.total_price or 0.0 for i in group)
+        exposure = sum(
+            i.quantity * _pre_unit_price(i, pre_prices)
+            if pre_prices or i.unit_price is not None or i.total_price is not None
+            else 0.0
+            for i in group
+        )
         locations = {i.location() for i in group}
         same_place = len(locations) == 1
         if not same_place and exposure < DUPLICATE_MIN_VALUE:
@@ -280,17 +303,169 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     return findings
 
 
+def _text(item: NormalizedItem) -> str:
+    return f"{clean_item_text(item.short_text)} {clean_item_text(item.long_text)}".lower()
+
+
+def _severity_rank(severity: str) -> int:
+    return {"low": 0, "medium": 1, "high": 2}.get(severity, 0)
+
+
+def run_logic_engine(
+    items: Sequence[NormalizedItem],
+    rows: Sequence[ObjectRow] | None = None,
+    pre_prices: dict[str, float] | None = None,
+) -> dict[str, LogicResult]:
+    """Run deterministic, per-position rules for a tender of any practical size."""
+
+    if rows is None:
+        rows = build(items, depth=2)
+
+    results: dict[str, LogicResult] = {
+        item.key(): LogicResult([], "low", [], [])
+        for item in items
+    }
+
+    def add(item: NormalizedItem, flag: str, severity: str, detail: str) -> None:
+        result = results[item.key()]
+        if flag not in result.flags:
+            result.flags.append(flag)
+        if flag not in result.tags:
+            result.tags.append(flag)
+        if detail not in result.details:
+            result.details.append(detail)
+        if _severity_rank(severity) > _severity_rank(result.severity):
+            result.severity = severity
+
+    # Per-item textual and unit rules.
+    for item in items:
+        key = item.key()
+        unit = constants.normalize_unit(item.unit)
+        short_text = clean_item_text(item.short_text)
+        long_text = clean_item_text(item.long_text)
+        text = _text(item)
+
+        if (unit == "psch" or item.is_lump_sum) and item.quantity not in (0.0, 1.0):
+            add(item, "META_MISMATCH", "high",
+                f"Pauschale Einheit {item.unit!r} hat Menge {item.quantity:g}, "
+                "erwartet 0 oder 1.")
+
+        if item.quantity <= 0 and not any(
+            keyword in text for keyword in constants.EVENTUAL_KEYWORDS
+        ):
+            add(item, "ZERO_QTY", "high",
+                f"Menge ist {item.quantity:g}; keine Eventualposition erkannt.")
+
+        short_norm = compare_key(short_text)
+        long_norm = compare_key(long_text)
+        if any(keyword in short_norm for keyword in constants.BLACKBOX_KEYWORDS):
+            if not long_norm or len(long_text) < 25 or long_norm == short_norm:
+                add(item, "MISSING_SPEC", "medium",
+                    "Komplexer/Black-Box-Text hat keine eigenständig ausreichende "
+                    "Langbeschreibung.")
+
+        if any(keyword in text for keyword in ("lieferung", "liefern")):
+            montage_words = ("montage", "einbau", "verlegen", "versetzen", "anschließen")
+            has_montage = any(word in text for word in montage_words)
+            if not has_montage:
+                own_tag = tag_of(item)
+                location = item.location(depth=2)
+                has_peer = own_tag != UNKNOWN_TAG and any(
+                    peer.location(depth=2) == location
+                    and tag_of(peer) == own_tag
+                    and any(word in _text(peer) for word in montage_words)
+                    for peer in items
+                )
+                if not has_peer:
+                    add(item, "SCOPE_GAP", "medium",
+                        "Lieferleistung genannt, aber Montage-/Einbauumfang nicht "
+                        "sichtbar und keine passende Peer-Position in diesem Abschnitt.")
+
+        # Unit and peer-magnitude outliers are separate signals combined here.
+        qty_outlier_details: list[str] = []
+        normalized_text = compare_key(f"{short_text} {long_text}")
+        for keyword, expected_unit in constants.UNIT_EXPECTED_BY_KEYWORD.items():
+            if keyword in normalized_text and unit != constants.normalize_unit(expected_unit):
+                qty_outlier_details.append(
+                    f"Einheit {item.unit!r} passt nicht zur erwarteten Einheit "
+                    f"{expected_unit!r} für Schlüsselwort {keyword!r}."
+                )
+                break
+        if qty_outlier_details:
+            add(item, "QTY_OUTLIER", "medium", " | ".join(qty_outlier_details))
+
+    # Attach peer-magnitude findings to the same per-key results.
+    for finding in check_magnitude(items, pre_prices):
+        key = finding.item.key()
+        if key in results:
+            add(finding.item, "QTY_OUTLIER", "medium", finding.rationale)
+
+    # Relation findings identify category and quantity conflicts.
+    relation_findings = check_relations(rows, items, include_companions=False)
+    for finding in relation_findings:
+        positions = finding.evidence.get("positions", [])
+        if finding.item.key() in positions:
+            positions = [finding.item.key()]
+        for position_key in positions:
+            if position_key not in results:
+                continue
+            representative = next(
+                (item for item in items if item.key() == position_key),
+                finding.item,
+            )
+            add(representative, "CATEGORY_MISMATCH", "high", finding.rationale)
+
+    # Explicit companion-quantity gaps within the location.
+    for item in items:
+        location = item.location(depth=2)
+        location_items = [peer for peer in items if peer.location(depth=2) == location]
+
+        is_concrete = tag_of(item) == "Beton"
+        has_concrete = is_concrete and item.quantity >= 10.0
+        if has_concrete:
+            concrete_qty = sum(
+                peer.quantity for peer in location_items if tag_of(peer) == "Beton"
+            )
+            own_long = clean_item_text(item.long_text).lower()
+            own_suppressed = any(
+                marker in own_long for marker in ("inkl.", "einschl.", "schalung", "bewehr")
+            )
+            has_companion = any(
+                "schalung" in _text(peer) or "bewehr" in _text(peer)
+                for peer in location_items
+            )
+            if concrete_qty >= 10.0 and not has_companion and not own_suppressed:
+                add(item, "MISSING_FOLLOW_UP", "medium",
+                    f"Beton in Abschnitt {location!r}: mindestens "
+                    f"{concrete_qty:g} m³, aber keine Schalungs-/Bewehrungsposition gefunden.")
+
+        is_excavation = tag_of(item) == "Bodenaushub"
+        if is_excavation:
+            own_long = clean_item_text(item.long_text).lower()
+            own_suppressed = any(
+                marker in own_long for marker in ("inkl.", "einschl.", "schalung", "verfüll")
+            )
+            has_backfill = any(tag_of(peer) == "Verfüllung" for peer in location_items)
+            if not has_backfill and not own_suppressed:
+                add(item, "MISSING_FOLLOW_UP", "medium",
+                    f"Bodenaushub in Abschnitt {location!r}, aber keine "
+                    "Verfüllungsposition gefunden.")
+
+    return results
+
+
 def run_all(
     rows: Sequence[ObjectRow],
     items: Sequence[NormalizedItem],
     top_n: int | None = None,
     include_companions: bool = False,
+    pre_prices: dict[str, float] | None = None,
 ) -> list[Finding]:
     """Every cross-position check, ranked by euro exposure."""
     findings = (
         check_relations(rows, items, include_companions)
-        + check_magnitude(items)
-        + check_duplicates(items)
+        + check_magnitude(items, pre_prices)
+        + check_duplicates(items, pre_prices)
     )
     findings.sort(key=lambda f: (-f.euro_leverage,
                                  constants.SEVERITY_ORDER.index(f.severity)))

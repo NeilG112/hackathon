@@ -155,3 +155,90 @@ class Finding:
     rationale: str         # plain-English why, shown next to the row
     euro_leverage: float = 0.0   # quantity x price exposure; the ranking value
     evidence: dict = field(default_factory=dict)
+
+
+@dataclass
+class LogicResult:
+    """Deterministic logic findings for one tender position."""
+
+    flags: list[str]
+    severity: str
+    tags: list[str]
+    details: list[str] = field(default_factory=list)
+
+
+@dataclass
+class HybridItemState:
+    """Combined deterministic state of one position for hybrid risk scoring."""
+
+    key: str
+    oz: str
+    qty: float
+    unit: str
+    logic_flags: list[str]
+    logic_severity: str
+    logic_details: list[str]
+    is_specialist: bool
+    specialist_hits: list[str]
+    pre_unit_price: float
+    price_source: str
+    euro_exposure: float
+    engine_divergence: float = 0.0
+    benchmark_band: str = ""
+
+
+@dataclass
+class AtomicLLMJudgments:
+    """Atomic hybrid-pipeline judgments produced by the LLM specialist."""
+
+    unklar_beschrieben: float
+    menge_unplausibel: float
+    preis_unplausibel: float
+    spezialgewerk: float
+    nachtragspotenzial: float
+    mindermengen_risiko: float = 0.0
+    reasons: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class HybridRiskResult:
+    """Final hybrid risk result for one tender position."""
+
+    key: str
+    risk_level: str
+    euro_exposure: float
+    pre_unit_price: float
+    reasons: list[str]
+    strategy: str
+    action_type: str
+    speculation_candidate: bool
+    judgments: Optional[AtomicLLMJudgments] = None
+
+    def to_finding(self, item: NormalizedItem) -> Finding:
+        evidence = {
+            "key": self.key,
+            "risk_level": self.risk_level,
+            "pre_unit_price": self.pre_unit_price,
+            "reasons": list(self.reasons),
+            "strategy": self.strategy,
+            "action_type": self.action_type,
+            "speculation_candidate": self.speculation_candidate,
+        }
+        if self.judgments is not None:
+            evidence["judgments"] = {
+                "unklar_beschrieben": self.judgments.unklar_beschrieben,
+                "menge_unplausibel": self.judgments.menge_unplausibel,
+                "preis_unplausibel": self.judgments.preis_unplausibel,
+                "spezialgewerk": self.judgments.spezialgewerk,
+                "nachtragspotenzial": self.judgments.nachtragspotenzial,
+                "mindermengen_risiko": self.judgments.mindermengen_risiko,
+                "reasons": dict(self.judgments.reasons),
+            }
+        return Finding(
+            item=item,
+            detector="hybrid_risk",
+            severity=self.risk_level,
+            rationale=" | ".join(self.reasons),
+            euro_leverage=self.euro_exposure,
+            evidence=evidence,
+        )

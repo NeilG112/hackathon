@@ -29,9 +29,19 @@ a EUR 90,000 line is the conversation.
 from __future__ import annotations
 
 import sys
+import os
 from typing import Dict, List
 
-from core import constants, parser_gaeb90, parser_x83, pricer
+from core import (
+    classify,
+    constants,
+    kalkulation,
+    parser_gaeb90,
+    parser_x83,
+    pricer,
+    risk_engine,
+)
+import export_rfi
 from core.models import NormalizedItem
 
 BLANK = constants.REVEAL["blank_boq"]
@@ -43,6 +53,56 @@ THRESHOLD = constants.REVEAL["disagreement_threshold_pct"]
 JOIN_WIDTHS = (2, 2, 4)
 MIN_JOIN_RATE = 0.90      # below this the join is broken, not the pricing
 TOP_DEVIATIONS = 12
+
+
+def validate_hybrid_pipeline() -> int:
+    """Offline smoke/regression check for the complete hybrid pipeline."""
+    paths = [
+        BLANK,
+        "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+    ]
+    reference = pricer.load_reference_prices()
+    data = None
+
+    for path in paths:
+        if not os.path.exists(path):
+            continue
+        items = parser_x83.parse(path)
+        remarks = parser_x83.parse_remarks(path)
+
+        from core import stammdaten
+        data = data or stammdaten.load()
+        assignments = classify.classify(items, data, use_jev=False)
+        company = stammdaten.companies()[0]
+        calculated = kalkulation.calculate(items, assignments, company, data)
+        priced = pricer.price_boq(items, reference)
+
+        hybrid_results, findings = risk_engine.analyze_tender_hybrid(
+            items,
+            remarks,
+            calculated,
+            priced,
+            use_jev=False,
+        )
+        if not hybrid_results:
+            raise AssertionError(f"Hybrid pipeline returned no positions: {path}")
+        if not any(result.euro_exposure > 0 for result in hybrid_results):
+            raise AssertionError(
+                f"Hybrid pipeline computed no positive euro_exposure: {path}"
+            )
+        if not findings:
+            raise AssertionError(f"Hybrid pipeline returned no findings: {path}")
+
+        catalog = export_rfi.build_catalog(findings, {"title": "Test"})
+        if not isinstance(catalog, list) or not catalog:
+            raise AssertionError(f"Bieterfragen-Katalog invalid: {path}")
+
+        print(
+            f"hybrid smoke {os.path.basename(path)}: "
+            f"{len(hybrid_results)} results, {len(findings)} findings, "
+            f"{len(catalog)} catalog entries"
+        )
+    return 0
 
 
 def euro(value: float) -> str:
@@ -213,4 +273,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    hybrid_status = validate_hybrid_pipeline()
+    if hybrid_status:
+        sys.exit(hybrid_status)
     sys.exit(main())
