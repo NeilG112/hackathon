@@ -38,6 +38,7 @@ real classifier replaces the keywords.
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Iterable, Sequence
 
@@ -106,6 +107,65 @@ def tag_of(item: NormalizedItem) -> str:
         if any(t in text for t in terms) and not any(b in text for b in blockers):
             return tag
     return UNKNOWN_TAG
+
+
+def trade_of(item: NormalizedItem, assignments: dict | None, data=None) -> str:
+    """The trade this position belongs to.
+
+    Prefers the catalogue's own `gewerk` for the classified Leistung — a
+    curated taxonomy of ~14 trades, which is what an estimator actually thinks
+    in. Falls back to the keyword tag only where classification failed.
+
+    This replaces `tag_of` as the grouping axis. The keyword tagger was written
+    before classification worked and guessed at objects from word matches; with
+    86 % of positions classified there is no reason to guess.
+    """
+    if assignments and data is not None:
+        code, _confidence = assignments.get(item.key(), (None, 0.0))
+        if code:
+            leistung = data.leistung(code)
+            if leistung and leistung.gewerk:
+                return leistung.gewerk
+    # Deliberately one bucket, not a keyword guess. Falling back to the old
+    # tagger here invented six extra trades ("Dämmung", "Beton", "Asphalt")
+    # that carried no money and only existed because a word matched.
+    return "nicht zugeordnet"
+
+
+def by_trade(
+    items: Iterable[NormalizedItem],
+    assignments: dict | None = None,
+    data=None,
+    calculated: Sequence | None = None,
+) -> list[ObjectRow]:
+    """One row per trade. The view a company actually reads.
+
+    `build()` keys on (section, object, unit) because the inconsistency checks
+    need that precision — 124 rows for a 248-position tender. Nobody reads 124
+    rows. This collapses the same data to ~14, which is the level at which an
+    estimator decides where his money and his risk are.
+    """
+    value_by_oz = {}
+    if calculated:
+        value_by_oz = {c.item.key(): (c.total or 0.0) for c in calculated}
+
+    totals: dict[str, ObjectRow] = {}
+    units: dict[str, Counter] = {}
+    for item in items:
+        trade = trade_of(item, assignments, data)
+        row = totals.get(trade)
+        if row is None:
+            row = ObjectRow(location="(Projekt)", obj=trade, unit="")
+            totals[trade] = row
+            units[trade] = Counter()
+        row.quantity += item.quantity
+        row.value += value_by_oz.get(item.key(), 0.0)
+        row.positions.append(item.key())
+        units[trade][constants.normalize_unit(item.unit)] += 1
+
+    for trade, row in totals.items():
+        row.unit = ", ".join(u for u, _ in units[trade].most_common(3) if u)
+    return sorted(totals.values(), key=lambda r: (-r.value, -len(r.positions)))
 
 
 def build(

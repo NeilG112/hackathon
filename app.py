@@ -23,9 +23,12 @@ rather than fabricating output.
 
 from __future__ import annotations
 
+import html
 import os
+import re
 import tempfile
 import traceback
+import xml.etree.ElementTree as ET
 
 import pandas as pd
 import streamlit as st
@@ -34,19 +37,18 @@ from core import (classify, constants, detectors, kalkulation, logic, objects,
                   parser_gaeb90, parser_x83, pricer, stammdaten)
 from views import reveal
 
-ONE_SENTENCE = (
-    "It reads a construction tender file, finds the line items that will cost "
-    "the contractor money, and writes the clarification letter he'd otherwise "
-    "spend four hours on."
-)
-
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
+PAGES = ("Tender", "Groups", "Logic", "Das Angebot", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
 
-st.set_page_config(page_title="Bid & Risk Assistant", layout="wide")
+st.set_page_config(
+    page_title="Bid & Risk Assistant",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 
 # --- parsing ---------------------------------------------------------------
@@ -119,46 +121,35 @@ def sidebar_kalkulation() -> stammdaten.Company:
     return stammdaten.Company(chosen.name, wage, markup, perf, mat, chosen.profil)
 
 
-def sidebar_company() -> dict:
-    """Legacy comparable-pricing sliders (cross-check engine only)."""
-    st.sidebar.header("Vergleichspreise (Quercheck)")
-    labels = {
-        "mittellohn_eur_h": "Average loaded wage (€/h)",
-        "overhead_pct": "Site overhead (%)",
-        "profit_pct": "Risk & profit (%)",
-        "risk_appetite": "Pricing aggression",
-    }
-    company = {}
-    for field, default in constants.DEFAULT_COMPANY.items():
-        lo, hi, step = constants.SLIDER_RANGES[field]
-        company[field] = st.sidebar.slider(
-            labels.get(field, field), float(lo), float(hi), float(default), float(step)
-        )
-    multiplier = pricer.company_multiplier(company)
-    st.sidebar.metric("Effect on every rate", f"{multiplier:.3f}×")
-    st.sidebar.caption(
-        "At the defaults this is exactly 1.000× — the estimate is then the raw "
-        "benchmark of real observed prices, with nothing added by us."
-    )
-    return company
-
-
-def section_upload():
+def section_upload(show_controls: bool = True):
     """Upload -> parse. Writes (items, remarks, label) into session state."""
-    st.subheader("1 · The tender")
+    if show_controls:
+        def upload_controls():
+            upload = st.file_uploader(
+                "Tender-Datei hochladen",
+                type=[s.lstrip(".") for s in XML_SUFFIXES + GAEB90_SUFFIXES],
+            )
+            if st.button("Beispiel-LV laden", type="primary"):
+                st.session_state["source"] = ("disk", SAMPLE)
+                st.rerun()
+            if upload is not None:
+                uploaded_source = ("upload", upload.name, upload.getvalue())
+                if st.session_state.get("source") != uploaded_source:
+                    st.session_state["source"] = uploaded_source
+                    st.rerun()
 
-    upload = st.file_uploader(
-        "Drop a tender file",
-        type=[s.lstrip(".") for s in XML_SUFFIXES + GAEB90_SUFFIXES],
-    )
-    if st.button("Use the sample tender", type="primary"):
-        st.session_state["source"] = ("disk", SAMPLE)
-    if upload is not None:
-        st.session_state["source"] = ("upload", upload.name, upload.getvalue())
+        if st.session_state.get("source"):
+            with st.expander("Tender-Datei wechseln"):
+                upload_controls()
+        else:
+            upload_controls()
 
     source = st.session_state.get("source")
     if not source:
-        st.info("Drop a tender file above, or load the sample to see it work.")
+        if show_controls:
+            st.info("Lade eine GAEB-Datei hoch oder öffne das Beispiel-LV.")
+        else:
+            st.info("Wechsle zu „Tender“, um eine GAEB-Datei zu laden.")
         return None
 
     try:
@@ -171,17 +162,20 @@ def section_upload():
     except ValueError as exc:
         # Known-unknown format. Say so plainly and offer the sample — do not
         # guess at a parse and present fabricated positions as real.
-        st.error(f"{exc} — this build reads GAEB X83 and GAEB 90 D83/D84/D86.")
+        st.error(f"{exc} — unterstützt werden GAEB X83 und GAEB 90 D83/D84/D86.")
         st.session_state.pop("source", None)
         return None
     except Exception:                                      # noqa: BLE001
-        st.error("That file did not parse. Falling back to the stored fixture.")
+        st.error(
+            "Die Datei konnte nicht gelesen werden. "
+            "Gespeicherte Beispieldaten werden versucht."
+        )
         with st.expander("What went wrong"):
             st.code(traceback.format_exc())
         try:
             from scripts.dump_golden import load as load_golden
             items, remarks = load_golden(source[1])
-            st.success(f"Loaded {len(items)} positions from data/golden/.")
+            st.success(f"{len(items)} Positionen aus data/golden/ geladen.")
             return items, remarks, os.path.basename(source[1]) + " (fixture)"
         except Exception:                                  # noqa: BLE001
             st.session_state.pop("source", None)
@@ -193,26 +187,26 @@ def section_upload():
         # records and no quantity records, because it references the .D83/.D86
         # it was bid against. Say that, rather than showing an empty table.
         st.warning(
-            f"**{label} carries prices but no quantities.** That is normal for a "
-            "bid submission — it references the tender file it was bid against, "
-            "and the two are joined on item number. Load that tender file "
-            "instead and this bid becomes its answer key."
+            f"**{label} enthält Preise, aber keine Mengen.** Das ist bei einem "
+            "Angebot normal: Es verweist auf das zugehörige LV. Bitte lade "
+            "stattdessen die Leistungsverzeichnis-Datei."
         )
         st.session_state.pop("source", None)
         return None
 
     priced_in_file = sum(1 for i in items if i.unit_price is not None)
-    st.success(
-        f"**{len(items)} positions** parsed from {label}"
-        + (f" — {priced_in_file} of them already carry prices" if priced_in_file else "")
-        + (f", plus {len(remarks)} contract preamble blocks" if remarks else "")
-    )
+    if show_controls:
+        st.caption(
+            f"{len(items)} Positionen aus {label}"
+            + (f" — {priced_in_file} davon enthalten bereits Preise" if priced_in_file else "")
+            + (f", dazu {len(remarks)} Vertragsvorbemerkungen" if remarks else "")
+        )
     return items, remarks, label
 
 
 def section_items(items):
     """The parsed bill of quantities."""
-    st.subheader("2 · What's in it")
+    st.subheader("Ausgelesene Positionen")
     frame = pd.DataFrame([{
         "OZ": i.key(),
         "Position": i.short_text,
@@ -220,73 +214,288 @@ def section_items(items):
         "Einheit": constants.normalize_unit(i.unit),
         "Pauschal": "ja" if i.is_lump_sum else "",
     } for i in items])
-    st.dataframe(frame, width="stretch", hide_index=True, height=320)
+    st.dataframe(frame, width="stretch", hide_index=True, height="stretch")
 
 
-def section_objects(items, priced):
-    """The object table and the project roll-up. Returns the table rows."""
-    st.subheader("3 · What the project is made of")
-    rows = objects.build(items, priced)
-    cov = objects.coverage(rows)
-
-    st.caption(
-        f"{cov['positions']} positions grouped into {cov['rows']} "
-        f"(section × object × unit) cells. **{cov['tagged_pct']}% of positions "
-        f"were classified**; {cov['unknown']} are “unklar” and are excluded "
-        "from every cross-position check — a wrong tag would produce a "
-        "confident false finding, which is worse than no finding."
-    )
-
-    left, right = st.columns(2)
-    with left:
-        st.markdown("**Project roll-up** — the manual-summing job")
-        st.dataframe(pd.DataFrame([{
-            "Objekt": r.obj, "Menge": round(r.quantity, 1), "Einheit": r.unit,
-            "Positionen": len(r.positions),
-        } for r in objects.rollup(rows) if r.obj != objects.UNKNOWN_TAG][:14]),
-            width="stretch", hide_index=True, height=300)
-    with right:
-        st.markdown("**By section** — the key the logic checks use")
-        st.dataframe(pd.DataFrame([{
-            "Abschnitt": r.location[:38], "Objekt": r.obj,
-            "Menge": round(r.quantity, 1), "Einheit": r.unit,
-            "Pos.": len(r.positions),
-        } for r in rows if r.obj != objects.UNKNOWN_TAG][:14]),
-            width="stretch", hide_index=True, height=300)
-    return rows
+def source_document(source):
+    """Return the original file name and bytes for the active tender."""
+    if source[0] == "upload":
+        return source[1], source[2]
+    with open(source[1], "rb") as handle:
+        return os.path.basename(source[1]), handle.read()
 
 
-def section_logic(rows, items):
-    """Cross-position contradictions."""
-    st.subheader("4 · Does the tender contradict itself?")
-    st.caption(
-        "Checks that only exist between positions: containment (heated floor "
-        "area cannot exceed the slab), order-of-magnitude quantity outliers "
-        "(the misplaced zero), and repeated positions. All deterministic — "
-        "same tender, same findings, every run."
-    )
-    found = logic.run_all(rows, items)
-    if not found:
-        st.success(
-            "No cross-position contradictions found. That is a real result, "
-            "not a placeholder — on this tender the containment rules have no "
-            "matching pairs to test."
+@st.cache_data(show_spinner=False)
+def source_location(filename: str, payload: bytes, source_ref: str) -> tuple[str, bool]:
+    """Locate a source item without exposing its raw XML or fixed-width record."""
+    suffix = os.path.splitext(filename)[1].lower()
+    if suffix in XML_SUFFIXES:
+        root = ET.fromstring(payload)
+        for element in root.iter():
+            local_tag = element.tag.rsplit("}", 1)[-1]
+            if (
+                local_tag == parser_x83.ITEM_TAG
+                and element.attrib.get("ID") == source_ref
+            ):
+                return f"GAEB-XML · Element-ID {source_ref}", True
+        return f"Kein XML-Element mit ID {source_ref} gefunden.", False
+
+    match = re.fullmatch(r"type-21 #(\d+)", source_ref)
+    if suffix in GAEB90_SUFFIXES and match:
+        target = int(match.group(1))
+        lines = payload.decode(
+            parser_gaeb90.ENCODING,
+            errors="replace",
+        ).splitlines()
+        records = [
+            (line_number, line)
+            for line_number, line in enumerate(lines, start=1)
+            if line.startswith("21")
+        ]
+        if 1 <= target <= len(records):
+            line_number, _ = records[target - 1]
+            return f"GAEB 90 · Datensatz 21 · Zeile {line_number}", True
+        return f"Datensatz {source_ref} nicht gefunden.", False
+
+    return "Für dieses Dateiformat ist keine Fundstelle verfügbar.", False
+
+
+def tender_document_html(
+    items,
+    remarks: list[str],
+    selected_key: str,
+    filename: str,
+) -> str:
+    """Render the parsed source tender as a navigable, highlighted document table."""
+    rows = []
+    if remarks:
+        rows.append(
+            '<tr class="section"><th colspan="6">'
+            "Vertragsvorbemerkungen</th></tr>"
         )
-        return []
-    st.dataframe(pd.DataFrame([{
-        "OZ": f.item.key(), "Schwere": f.severity,
-        "€ exposure": round(f.euro_leverage, 2), "Befund": f.rationale,
-    } for f in found]), width="stretch", hide_index=True)
-    return found
+        for index, remark in enumerate(remarks, start=1):
+            rows.append(
+                '<tr class="remark"><td colspan="6">'
+                f'<strong>Vorbemerkung {index}</strong>'
+                f'<div class="long-text">{html.escape(remark)}</div></td></tr>'
+            )
+
+    current_section = None
+    for item in items:
+        if item.section_path != current_section:
+            current_section = item.section_path
+            section = " › ".join(current_section) or "Ohne Abschnitt"
+            rows.append(
+                '<tr class="section"><th colspan="6">'
+                f'{html.escape(section)}</th></tr>'
+            )
+
+        short_text = item.short_text or f"Position {item.oz}"
+        long_text = item.long_text or short_text
+        if long_text.startswith(short_text):
+            long_text = long_text[len(short_text):].lstrip(" ,;:-")
+        elif long_text.endswith(short_text):
+            long_text = long_text[:-len(short_text)].rstrip(" ,;:-")
+        description = f"<strong>{html.escape(short_text)}</strong>"
+        if long_text:
+            description += f'<div class="long-text">{html.escape(long_text)}</div>'
+        if item.is_lump_sum:
+            description += '<div class="flag">Pauschalposition</div>'
+
+        selected = " selected" if item.key() == selected_key else ""
+        row_id = ' id="selected-position"' if selected else ""
+        rows.append(
+            f'<tr class="position{selected}"{row_id}>'
+            f'<td class="oz">{html.escape(item.oz)}</td>'
+            f'<td class="description">{description}</td>'
+            f'<td class="number">{item.quantity:g}</td>'
+            f'<td>{html.escape(item.unit)}</td>'
+            f'<td class="number">{_price(item.unit_price)}</td>'
+            f'<td class="number">{_price(item.total_price)}</td>'
+            "</tr>"
+        )
+
+    return f"""<!doctype html>
+    <html lang="de">
+      <head>
+        <meta charset="utf-8">
+        <style>
+          * {{ box-sizing: border-box; }}
+          body {{ margin: 0; color: #172033; background: #fff;
+                 font: 14px/1.45 Arial, sans-serif; }}
+          .file-name {{ padding: 12px 14px; border-bottom: 1px solid #cbd5e1;
+                        font-weight: 700; }}
+          table {{ width: 100%; border-collapse: collapse; table-layout: fixed; }}
+          thead {{ position: sticky; top: 0; z-index: 2; }}
+          th {{ padding: 9px 10px; text-align: left; background: #e8edf4;
+                border-bottom: 1px solid #cbd5e1; }}
+          td {{ padding: 9px 10px; vertical-align: top;
+                border-bottom: 1px solid #e2e8f0; overflow-wrap: anywhere; }}
+          th:nth-child(1) {{ width: 11%; }}
+          th:nth-child(2) {{ width: 53%; }}
+          th:nth-child(3) {{ width: 9%; }}
+          th:nth-child(4) {{ width: 8%; }}
+          th:nth-child(5), th:nth-child(6) {{ width: 9.5%; }}
+          .section th {{ padding: 11px 10px; color: #334155;
+                         background: #f1f5f9; border-top: 1px solid #cbd5e1; }}
+          .remark td {{ padding: 12px 14px; background: #fff;
+                        border-bottom: 1px solid #e2e8f0; }}
+          .position:nth-child(even) {{ background: #fafbfd; }}
+          .position.selected td {{ background: #fff3bf; }}
+          .position.selected td:first-child {{ border-left: 4px solid #d59b00;
+                                                font-weight: 700; }}
+          .long-text {{ margin-top: 4px; white-space: pre-wrap; }}
+          .number {{ text-align: right; white-space: nowrap; }}
+          .flag {{ margin-top: 5px; font-size: 12px; color: #64748b; }}
+        </style>
+      </head>
+      <body>
+        <div class="file-name">{html.escape(filename)} · Leistungsverzeichnis</div>
+        <table aria-label="Originale GAEB-Positionen">
+          <thead><tr>
+            <th>OZ</th><th>Leistungstext</th><th>Menge</th>
+            <th>Einheit</th><th>EP</th><th>Gesamt</th>
+          </tr></thead>
+          <tbody>{''.join(rows)}</tbody>
+        </table>
+        <script>
+          document.getElementById("selected-position")?.scrollIntoView(
+            {{block: "center"}}
+          );
+        </script>
+      </body>
+    </html>
+    """
 
 
-def section_kalkulation(items, company, data):
+def _price(value: float | None) -> str:
+    return f"€{value:,.2f}" if value is not None else "—"
+
+
+@st.dialog("Originales Leistungsverzeichnis", width="large")
+def show_position_details(
+    item,
+    items,
+    remarks: list[str],
+    filename: str,
+    payload: bytes | None,
+    source_error: str | None,
+):
+    """Show the entire source tender with the matching position highlighted."""
+    location = item.source_ref or "Keine Quellreferenz vorhanden."
+    if source_error:
+        st.warning(f"Quelldokument konnte nicht geöffnet werden: {source_error}")
+    elif payload is not None and item.source_ref:
+        location, found = source_location(filename, payload, item.source_ref)
+        if not found:
+            st.info("Die Position ist in den geparsten Daten enthalten, "
+                    "aber keine genaue Fundstelle wurde gefunden.")
+    else:
+        st.info("Für diese Position ist keine genaue Fundstelle verfügbar.")
+    st.caption(f"{filename} · {len(items)} Positionen · Fundstelle: {location}")
+    st.iframe(
+        tender_document_html(items, remarks, item.key(), filename),
+        height=600,
+        alt=f"Leistungsverzeichnis aus {filename}, Position {item.oz} markiert",
+    )
+
+
+def section_groups(items, assignments, data, filename: str, remarks: list[str]):
+    """List trade groups; opening one shows the positions in that trade."""
+    rows = objects.by_trade(items, assignments, data)
+    selected_key = st.session_state.get("selected_group_key")
+    selected = next((row for row in rows if row.key == selected_key), None)
+
+    if selected is None:
+        st.caption(f"{len(rows)} Gruppen · {len(items)} Positionen")
+        query = st.text_input("Gruppe suchen", placeholder="Gewerk")
+        query = query.casefold().strip()
+        visible_rows = [row for row in rows if query in row.obj.casefold()]
+        if not visible_rows:
+            st.info("Keine passende Gruppe gefunden.")
+            return
+
+        with st.container(key="group_list"):
+            for index, row in enumerate(visible_rows):
+                with st.container(border=True):
+                    name, details, action = st.columns(
+                        [5, 2.5, 2],
+                        vertical_alignment="center",
+                    )
+                    name.markdown(f"**{row.obj}**")
+                    name.caption(f"{len(row.positions)} Positionen")
+                    details.caption(f"Einheiten: {row.unit or '—'}")
+                    if action.button(
+                        "Öffnen →",
+                        key=f"open_group_{index}",
+                        width="stretch",
+                    ):
+                        st.session_state["selected_group_key"] = row.key
+                        st.session_state.pop("group_positions", None)
+                        st.session_state.pop("opened_position_key", None)
+                        st.rerun()
+        return
+
+    if st.button("← Alle Gruppen"):
+        st.session_state.pop("selected_group_key", None)
+        st.session_state.pop("group_positions", None)
+        st.session_state.pop("opened_position_key", None)
+        st.rerun()
+    st.subheader(selected.obj)
+    st.caption(
+        f"{len(selected.positions)} Positionen · "
+        f"Einheiten: {selected.unit or '—'}"
+    )
+    item_by_key = {item.key(): item for item in items}
+    group_items = [item_by_key[key] for key in selected.positions if key in item_by_key]
+    st.caption("Klicke auf eine Position, um alle Details und ihre Fundstelle zu öffnen.")
+    event = st.dataframe(pd.DataFrame([{
+        "OZ": item.key(),
+        "Position": item.short_text,
+        "Menge": item.quantity,
+        "Einheit": constants.normalize_unit(item.unit),
+        "Pauschal": "ja" if item.is_lump_sum else "",
+    } for item in group_items]),
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+        key="group_positions",
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+    selected_rows = event.selection.rows
+    if selected_rows:
+        row_index = selected_rows[0]
+        if 0 <= row_index < len(group_items):
+            item = group_items[row_index]
+            if st.session_state.get("opened_position_key") != item.key():
+                st.session_state["opened_position_key"] = item.key()
+                source = st.session_state.get("source")
+                payload = None
+                source_error = None
+                if source:
+                    try:
+                        filename, payload = source_document(source)
+                    except OSError as exc:
+                        filename = item.source_file or "Quelldokument"
+                        source_error = str(exc)
+                else:
+                    filename = item.source_file or "Quelldokument"
+                    source_error = "Keine Quelldatei im aktuellen Sitzungskontext."
+                show_position_details(
+                    item,
+                    items,
+                    remarks,
+                    filename,
+                    payload,
+                    source_error,
+                )
+    else:
+        st.session_state.pop("opened_position_key", None)
+
+
+def section_kalkulation(calculated, cov, data):
     """Bottom-up Aufschlagskalkulation — the bid. Returns calculated items."""
-    st.subheader("5 · Das Angebot")
-
-    assignments = classify.classify(items, data, use_jev=False)
-    cov = classify.coverage(assignments)
-    calculated = kalkulation.calculate(items, assignments, company, data)
     stats = kalkulation.summarize(calculated)
 
     a, b, c, d = st.columns(4)
@@ -323,43 +532,53 @@ def section_kalkulation(items, company, data):
         "EP min": c.ep_low, "EP mittel": c.ep_mid, "EP max": c.ep_high,
         "GP": c.total,
         "Grundlage": c.note[:60],
-    } for c in calculated]), width="stretch", hide_index=True, height=320)
+    } for c in calculated]), width="stretch", hide_index=True, height="stretch")
     return calculated
 
 
 def section_tricky(calculated):
-    """Positions nobody can price confidently from what is written."""
-    st.subheader("6 · Heikle Positionen")
+    """Show unpriced positions and material pricing risks."""
     st.caption(
-        "The estimator's ask: *“who can tell how much this costs? Is it 50,000 "
-        "or 200,000? If a system hints that this position is tricky, that is "
-        "an advantage.”* Three signals: no Leistung could be assigned, the "
-        "standard times themselves disagree widely, or the position is a lump "
-        "sum with no measurable quantity."
+        "Gezeigt werden nicht kalkulierbare Positionen, große Kostenspannen "
+        "und Pauschalpositionen. Bezifferbare Risiken stehen nach €-Spanne "
+        "sortiert; bei nicht kalkulierbaren Positionen ist der Betrag unbekannt."
     )
     rows = []
     for c in calculated:
         reasons = []
         if not c.priced:
-            reasons.append("keine Leistung zuordenbar")
+            reasons.append("nicht kalkulierbar")
         elif c.band_width > 0.35:
-            reasons.append(f"Spanne ±{100*c.band_width/2:.0f}%")
+            reasons.append(f"Preisspanne ±{100*c.band_width/2:.0f}%")
         if c.item.is_lump_sum:
             reasons.append("Pauschalposition")
-        if reasons:
-            rows.append({
-                "OZ": c.item.key(), "Position": c.item.short_text[:58],
-                "Menge": c.item.quantity,
-                "Einheit": constants.normalize_unit(c.item.unit),
-                "€ unsicher": round(c.euro_at_stake, 2),
-                "Grund": ", ".join(reasons),
-            })
+        if not reasons:
+            continue
+        rows.append({
+            "OZ": c.item.key(), "Position": c.item.short_text[:58],
+            "Menge": c.item.quantity,
+            "Einheit": constants.normalize_unit(c.item.unit),
+            "€ unsicher": round(c.euro_at_stake, 2) if c.priced else None,
+            "Grund": ", ".join(reasons),
+            "_unpriced": not c.priced,
+            "_band_width": c.band_width,
+            "_lump_sum": c.item.is_lump_sum,
+        })
     if not rows:
         st.success("Keine auffällig unsicheren Positionen.")
         return
-    frame = pd.DataFrame(rows).sort_values("€ unsicher", ascending=False)
-    st.markdown(f"**{len(frame)} Positionen** brauchen einen Menschen.")
-    st.dataframe(frame.head(25), width="stretch", hide_index=True)
+    frame = pd.DataFrame(rows).sort_values(
+        ["_unpriced", "€ unsicher", "_band_width", "_lump_sum"],
+        ascending=[True, False, False, False],
+    ).head(25)
+    frame.insert(0, "Rang", range(1, len(frame) + 1))
+    st.markdown(f"**Top {len(frame)} nach Risiko**")
+    st.dataframe(
+        frame.drop(columns=["_unpriced", "_band_width", "_lump_sum"]),
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+    )
 
 
 def section_pricing(items, company, reference):
@@ -522,48 +741,90 @@ def section_export(findings):
 
 
 def main():
-    st.title("Bid & Risk Assistant")
-    st.write(ONE_SENTENCE)
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMain"] { overflow: hidden !important; }
+        [data-testid="stMainBlockContainer"] {
+            box-sizing: border-box;
+            height: 100% !important;
+            max-height: 100% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+            height: 100%;
+            min-height: 0;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stElementContainer"]:has(
+            [data-testid="stDataFrame"]
+        ) {
+            flex: 1 1 0%;
+            min-height: 0;
+            overflow: hidden;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stDataFrame"] {
+            display: block;
+            height: 100% !important;
+            max-height: 100% !important;
+            min-height: 0 !important;
+        }
+        [data-testid="stMainBlockContainer"] .st-key-group_list {
+            height: calc(100dvh - 16rem);
+            max-height: calc(100dvh - 16rem);
+            min-height: 0;
+            overflow-y: auto;
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="secondary"] {
+            border: 0;
+            background: transparent;
+            text-align: left;
+            justify-content: flex-start;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.sidebar.markdown("### Bid & Risk Assistant")
+    st.sidebar.caption("Benutzermodus")
+    active_page = st.session_state.get("active_page", PAGES[0])
+    for candidate in PAGES:
+        if st.sidebar.button(
+            candidate,
+            key=f"navigate_{candidate}",
+            type="primary" if candidate == active_page else "secondary",
+            width="stretch",
+        ):
+            st.session_state["active_page"] = candidate
+            st.rerun()
 
-    kalk_company = sidebar_kalkulation()
-    data = stammdaten.load()
-    company = sidebar_company()
-    reference = load_reference()
-    if reference.get("meta", {}).get("missing"):
-        st.warning(
-            "No benchmark found — run `python3 scripts/build_reference_prices.py`. "
-            "Until then every position falls back to a hand-authored rate."
-        )
-
-    loaded = section_upload()
+    page = st.session_state.get("active_page", PAGES[0])
+    st.title("Logik" if page == "Logic" else page)
+    loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
         return
     items, remarks, label = loaded
 
-    # Resolve the answer key BEFORE pricing. If this tender's bid is one of the
-    # bids the benchmark was built from, it has to come out of the benchmark
-    # for every number on the page — not just the comparison. Pricing with the
-    # full benchmark and then claiming the answer was held out is the most
-    # flattering thing this app could do, and it would be a lie worth €251k.
-    answer, source_label, held_out = answer_key_for(label)
-    if held_out:
-        reference = pricer.without_source(reference, held_out)
-        st.caption(
-            f"**{held_out} is held out of the benchmark below.** It is one of "
-            "the bids the benchmark is built from, so leaving it in would mean "
-            "pricing this tender partly with its own answer."
-        )
-
-    section_items(items)
-    priced = pricer.price_boq(items, reference, company)
-    rows = section_objects(items, priced)
-    section_logic(rows, items)
-    calculated = section_kalkulation(items, kalk_company, data)
-    section_tricky(calculated)
-    priced, _ = section_pricing(items, company, reference)
-    findings = section_findings(priced, remarks)
-    section_reveal(priced, answer, source_label)
-    section_export(findings)
+    if page == "Tender":
+        section_items(items)
+    elif page == "Groups":
+        data = stammdaten.load()
+        assignments = classify.classify(items, data, use_jev=False)
+        section_groups(items, assignments, data, label, remarks)
+    elif page == "Logic":
+        st.info("Die Logik-Prüfungen werden später ergänzt.")
+    else:
+        company = sidebar_kalkulation()
+        data = stammdaten.load()
+        assignments = classify.classify(items, data, use_jev=False)
+        calculated = kalkulation.calculate(items, assignments, company, data)
+        if page == "Das Angebot":
+            cov = classify.coverage(assignments)
+            section_kalkulation(calculated, cov, data)
+        else:
+            section_tricky(calculated)
 
 
 main()

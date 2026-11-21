@@ -11,6 +11,18 @@
   "source": "none",
   "text": "Steigeisen [PERSON_089] niro kunststoffummantelt Steigmaß 250mm Form B"
  },
+ "00bc1e2cac5db20d": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 150 / DN 100"
+ },
+ "00effe395a4bcb56": {
+  "code": null,
+  "confidence": 0.024,
+  "source": "none",
+  "text": "Einweisung des Betriebspersonals"
+ },
  "02180150ec7437b9": {
   "code": "F27",
   "confidence": 1.0,
@@ -35,11 +47,29 @@
   "source": "jev",
   "text": "Wandblende für Wanddurchführungen bis D 200 mm"
  },
+ "0401f4ba60c61fcf": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 80"
+ },
+ "040d26b436d7154a": {
+  "code": null,
+  "confidence": 0.033,
+  "source": "none",
+  "text": "Wartungsvertrag"
+ },
  "0445c49fcaa34762": {
   "code": "B03",
   "confidence": 0.71,
   "source": "jev",
   "text": "Schweißgerät Elektro mit Bedienung"
+ },
+ "045c73c41cc6fd7a": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rückschlagklappe DN 100 PN10 ohne Gewichtshebel"
  },
  "0567d2088ba660a3": {
   "code": "F25",
@@ -52,6 +82,12 @@
   "confidence": 0.036,
   "source": "none",
   "text": "Be- und Entlüftungsgarnitur für Trinkwasser DN50, kompakte Bauweise, bestehend aus einem S"
+ },
+ "059eba9eb30984be": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Losflansch DN 200, PN 10"
  },
  "05eb93539c278e87": {
   "code": null,
@@ -76,6 +112,18 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Erdverbindungskabel NYY 7 x 1,5 mm²"
+ },
+ "078fdba68450f23e": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Wandblende für Wanddurchführungen bis D 400 mm"
+ },
+ "07929c7208168926": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Bauhelfer bzw. Hilfsarbeiterstunden"
  },
  "07f64a2a838aa9e8": {
   "code": "F28",
@@ -124,6 +172,18 @@
   "confidence": 0.97,
   "source": "jev",
   "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2-4m vorhalten"
+ },
+ "0a06bd77e4e24857": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Thermische Luftmengenmessung"
+ },
+ "0a207eae3779a9b7": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Magnetisch-Induktive Durchflussmessung DN 100"
  },
  "0a6feaa5741c7933": {
   "code": "A02-V",
@@ -191,6 +251,12 @@
   "source": "jev",
   "text": "Verbindungsmuffe AD 400mm [PERSON_052] AD 273mm [PERSON_044] 25bar"
  },
+ "0d7f53aabc1b88a3": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Treibpumpe PER00110"
+ },
  "0e3022041fba40b1": {
   "code": null,
   "confidence": 0.033,
@@ -233,6 +299,12 @@
   "source": "jev",
   "text": "[PERSON_115]-Bogen DN 65, 45 - 90 Grad"
  },
+ "1086ee0bf16d4292": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Absperrklappe Zwischenflanschausführung DN 100 PN 10/16"
+ },
  "1118a65c4900d1c8": {
   "code": "B03",
   "confidence": 1.0,
@@ -256,6 +328,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Winkel 90Grad PE DN/OD63 SDR11"
+ },
+ "120d506d4d2a3e61": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 150"
  },
  "125d53a635f6b462": {
   "code": "F02",
@@ -281,11 +359,29 @@
   "source": "jev",
   "text": "[PERSON_089] geschweißt [PERSON_044] [PERSON_052] AD 273mm AD 400mm T 1,75-2,5m Messltg"
  },
+ "13bffa5a09397874": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "PER000115-Flansch DN 150, PN 10"
+ },
  "1428e471e73ffdd2": {
   "code": "A01-V",
   "confidence": 1.0,
   "source": "jev",
   "text": "Bauzaun H 2m vorhalten"
+ },
+ "14be245dd98f506a": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "[PERSON_00000070]"
+ },
+ "151e39a8ae18816f": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 100"
  },
  "1520789c3e6e6b12": {
   "code": "E03-ST",
@@ -304,6 +400,18 @@
   "confidence": 0.93,
   "source": "jev",
   "text": "Gartenhydrant DN50 Teleskop-Einbaugarnitur 0,94 - 1,60m"
+ },
+ "169ba1cbe7ce3d0b": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 200"
+ },
+ "16ac73fdd7c9134c": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "An- un Abreise des Montagepersonals"
  },
  "16ed850a5fa4a115": {
   "code": "E06",
@@ -364,6 +472,12 @@
   "confidence": 0.1,
   "source": "none",
   "text": "Zulage fachgerechte Entsorgung für vorbeschriebenen Wurzelstock."
+ },
+ "19dfaf7c88659887": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Analytischer Nachweis Garantiewerte"
  },
  "1a0f91c874f3c03d": {
   "code": "L03",
@@ -455,6 +569,12 @@
   "source": "jev",
   "text": "Muffe PE DN/OD40 SDR11"
  },
+ "1d8aa5a558d8f439": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Pass- und Ausbaustück DN 65 PN 10"
+ },
  "1e2384ec97b3eb1a": {
   "code": null,
   "confidence": 0.059,
@@ -521,11 +641,23 @@
   "source": "jev",
   "text": "Abschrumpfmuffe Da 125 mm"
  },
+ "209f5087b11437c7": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Absperrschieber DN 80, PN 16"
+ },
  "2119d2d09a0a788f": {
   "code": "V01",
   "confidence": 0.46,
   "source": "jev",
   "text": "Rohr Kunststoff abwasserführend DN150-200 T bis 3m sichern"
+ },
+ "212f8f6ac886dc1d": {
+  "code": null,
+  "confidence": 0.037,
+  "source": "none",
+  "text": "Desinfektion Entarsenierungsfilter"
  },
  "21df84b458905f4b": {
   "code": "B04",
@@ -659,11 +791,23 @@
   "source": "jev",
   "text": "X-Stück dukt.Guss PN16 DN300"
  },
+ "2aba4ba0ecb6ced2": {
+  "code": null,
+  "confidence": 0.024,
+  "source": "none",
+  "text": "Pflichtenheft und Übergabe elektrotechnische Unterlagen"
+ },
  "2af1e82cdf855f2f": {
   "code": "E10",
   "confidence": 0.89,
   "source": "jev",
   "text": "Aushub und Wiederverfüllung mit Verdichtung,"
+ },
+ "2b897be02214815f": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Absperrschieber handbetätigt versetzen, DN 200"
  },
  "2bbc45d86a792359": {
   "code": "F28",
@@ -682,6 +826,18 @@
   "confidence": 0.97,
   "source": "jev",
   "text": "Schachtabdeckung Klasse B 125 liefern und versetzen"
+ },
+ "2df6e0f6e227f1d1": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Losflansch DN 80, PN 10"
+ },
+ "2e191bdc38b5b806": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Anschweissmuffe 2 Zoll"
  },
  "2e624b1847f7d1de": {
   "code": "E02",
@@ -707,11 +863,23 @@
   "source": "none",
   "text": "Formstahl"
  },
+ "2eabe9263465887a": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 150, 45 - 90 Grad"
+ },
  "2ece36ca0365aeaa": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "[PERSON_115]-Blindflansch DN 65"
+ },
+ "2f47bb6c8a52b139": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Losflansch DN 125, PN 10"
  },
  "2f56343a2e14e944": {
   "code": "E10",
@@ -797,6 +965,12 @@
   "source": "jev",
   "text": "Kappe PE DN/OD63 SDR11"
  },
+ "31c503fb370ade8a": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Pass- und Ausbaustück DN 100 PN 10"
+ },
  "324b1e4d8db568d3": {
   "code": "F04",
   "confidence": 0.97,
@@ -808,6 +982,12 @@
   "confidence": 0.79,
   "source": "jev",
   "text": "Membrangesteuertes 3 - Wege Be- und Entlüftungsventil"
+ },
+ "336675bac4ca84bd": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 100, 45 - 90 Grad"
  },
  "336cc401ca4b8d79": {
   "code": "B03",
@@ -826,6 +1006,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Zerstörungsfreie Schweißnahtprüfung"
+ },
+ "3473333e1d3be712": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Absperrschieber mit Elektroantrieb versetzen, DN 150"
  },
  "34a478bf72f53d4f": {
   "code": "B04-ST",
@@ -941,6 +1127,18 @@
   "source": "none",
   "text": "Zulage zur Position Absetzbecken für Umsetzen bei Bedarf im gesamten Baufeld vor Ort."
  },
+ "38b6709ff6218a10": {
+  "code": null,
+  "confidence": 0.032,
+  "source": "none",
+  "text": "Kellerentwässerungspumpe"
+ },
+ "38df2e7464a55a0d": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 25, PN 16"
+ },
  "3924221629ee308b": {
   "code": null,
   "confidence": 0.0,
@@ -965,11 +1163,23 @@
   "source": "jev",
   "text": "Druckrohr aus duktilem Gusseisen, innen zementiert"
  },
+ "3aa6bfcf296e49f3": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Kleinleitungen DN 20"
+ },
  "3ad8e25c9bb09d8a": {
   "code": "F21",
   "confidence": 0.72,
   "source": "jev",
   "text": "Kugelhahn DN 32, PN 16"
+ },
+ "3b1feed1c6fa7bb9": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rohrhalter (Ständer/Wandkonsolen) DN 65 - 250"
  },
  "3b8b5ba10172f304": {
   "code": null,
@@ -1061,11 +1271,29 @@
   "source": "jev",
   "text": "Einweisung des Betriebspersonals"
  },
+ "3fed5226b02471a2": {
+  "code": null,
+  "confidence": 0.043,
+  "source": "none",
+  "text": "Filterfüllung Entarsenierungsfilter"
+ },
+ "409ee18f3b769897": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "PER000115-Flansch DN 100, PN 10"
+ },
  "40a06f45b67117ce": {
   "code": "E07-M3",
   "confidence": 0.84,
   "source": "jev",
   "text": "Liefern und Einbauen einer kombinierten Frostschutz-, Kiestragschicht,"
+ },
+ "40cd2f08e109ca9c": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 80"
  },
  "41e94c1ac240cca8": {
   "code": "W01",
@@ -1103,11 +1331,23 @@
   "source": "jev",
   "text": "Zulage zu den Positionen Hydranten- oder Sickerschächte für"
  },
+ "4375168f7f3c113b": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 125"
+ },
  "439c9dee6bfa60bf": {
   "code": "A03-H",
   "confidence": 1.0,
   "source": "jev",
   "text": "Witterungsschutz-Zelt 10GradC aufstellen räumen"
+ },
+ "43dcac8286c78fe2": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 150, PN 10"
  },
  "451d3cd91dccc52e": {
   "code": "W01",
@@ -1126,6 +1366,18 @@
   "confidence": 0.107,
   "source": "none",
   "text": "Zulage zur Bodenbewegung der Position Bodenaushub Wasserleitungen"
+ },
+ "457ef40a48af07e9": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Zeit-, Montage- und [PERSON_0118]"
+ },
+ "460192179d09a6d2": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Schweißgerät Elektro mit Bedienung"
  },
  "4621f3b5910e6948": {
   "code": "F27",
@@ -1151,11 +1403,29 @@
   "source": "jev",
   "text": "Absperrschieber handbetätigt versetzen, DN 150"
  },
+ "4887e71700db1c19": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_0000068] aus PER000115 Zuluft/Abluft [PERSON_00000066]"
+ },
  "48e2ad6751318c98": {
   "code": "F25",
   "confidence": 0.78,
   "source": "jev",
   "text": "Reduzierung DN 200 / DN 150"
+ },
+ "496a4885e96e027a": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Manometer bis 1 bar"
+ },
+ "49a7f376d4f2b702": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 65 / DN 50"
  },
  "49e64dadea7017a7": {
   "code": null,
@@ -1223,6 +1493,12 @@
   "source": "jev",
   "text": "Reduzierung DN 100 / DN 50"
  },
+ "4e1dbc8a39dcf808": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_00000066] inkl. Verdichtereinheit"
+ },
  "4e3d611c62771c1e": {
   "code": "T02",
   "confidence": 0.99,
@@ -1235,6 +1511,18 @@
   "source": "jev",
   "text": "Inbetriebnahme und Probebetrieb"
  },
+ "4f0e5c894139ee5d": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Kleintransporter Nutzlast 1,0 to mit Bedienung"
+ },
+ "4f715cfdf8b03f76": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Formstahl"
+ },
  "507adc7237d429e3": {
   "code": "S01",
   "confidence": 0.99,
@@ -1246,6 +1534,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Kupplung PP DN63 PN16"
+ },
+ "50be256b14cb219d": {
+  "code": null,
+  "confidence": 0.029,
+  "source": "none",
+  "text": "Demontage und Wiedermontage Filterbodenentlüftung Filterbecken"
  },
  "50f7cffb1c31b6c6": {
   "code": "A01-H",
@@ -1276,6 +1570,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Erdaushub geböscht für neuen [PERSON_006] DN 1200"
+ },
+ "52eaba90b6901df5": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 200 / DN 150"
  },
  "5312bce2b2ed712f": {
   "code": "T07",
@@ -1319,6 +1619,12 @@
   "source": "jev",
   "text": "Liefern und einbauen von Trassenband Breite 40 mm,"
  },
+ "5475a8dad1fdb3ec": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 100 / DN 50 exzentrisch"
+ },
  "547d5234b12108b2": {
   "code": null,
   "confidence": 0.0,
@@ -1342,6 +1648,12 @@
   "confidence": 0.88,
   "source": "jev",
   "text": "Betrieb der vorbeschriebenen Pumpen,"
+ },
+ "55b5bb5a48c96497": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 65, 45 - 90 Grad"
  },
  "56173bfca722ac93": {
   "code": null,
@@ -1451,6 +1763,12 @@
   "source": "jev",
   "text": "Ausbau und Entsorgung Filterfüllung"
  },
+ "5e7f148378546249": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 200"
+ },
  "5e887c5a3d93b891": {
   "code": null,
   "confidence": 0.0,
@@ -1498,6 +1816,30 @@
   "confidence": 0.98,
   "source": "jev",
   "text": "Bogen bis 45Grad [PERSON_052] AD 273mm [PERSON_044] 25bar"
+ },
+ "60ece0db810cd269": {
+  "code": null,
+  "confidence": 0.087,
+  "source": "none",
+  "text": "Anschweissmuffe 2 Zoll, Einbau in Blindflansch PN 10"
+ },
+ "60f82677ef4538ea": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000000110]"
+ },
+ "611be6d8d366dd33": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Storz-C-Kupplung (Niro)"
+ },
+ "613ac782b795d7a3": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 80, 45 - 90 Grad"
  },
  "618a1059283c4462": {
   "code": null,
@@ -1565,6 +1907,12 @@
   "source": "jev",
   "text": "Absperrklappe Endarmatur EN-GJS DN250 PN16 [PERSON_029]"
  },
+ "6483327a0ab71760": {
+  "code": null,
+  "confidence": 0.026,
+  "source": "none",
+  "text": "Regelklappe DN 100"
+ },
  "653ca5ba62eb2712": {
   "code": "F18",
   "confidence": 0.74,
@@ -1582,6 +1930,18 @@
   "confidence": 0.061,
   "source": "none",
   "text": "Hindernis im Boden, aus Beton, abbrechen,"
+ },
+ "65b86e0a43e2cf36": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Pass- und Ausbaustück DN 200 PN 10"
+ },
+ "6666f3984e0ac955": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 65"
  },
  "666b557d56571b15": {
   "code": "F04",
@@ -1601,6 +1961,12 @@
   "source": "none",
   "text": "Messdose"
  },
+ "671aca5437f01794": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "PER000115-Flansch DN 125, PN 10"
+ },
  "675bdff7966194d2": {
   "code": "B03",
   "confidence": 0.88,
@@ -1612,6 +1978,18 @@
   "confidence": 0.8,
   "source": "jev",
   "text": "Anschlussltg Entwässerung DN100 verlegen räumen"
+ },
+ "67d90f9c53bad2a3": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Magnetventil DN 50"
+ },
+ "691c78b92b02df3a": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Absperrschieber DN 150, PN 16"
  },
  "6943c294161ec971": {
   "code": "T03",
@@ -1630,6 +2008,12 @@
   "confidence": 0.074,
   "source": "none",
   "text": "Zulage zur Position Verlegung PE 100 RC DN/OD 63 SDR 11 für:"
+ },
+ "6a3444527ddeb943": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "PER000115-Flansch DN 50, PN 10/16"
  },
  "6ad96e3a152aaf02": {
   "code": null,
@@ -1673,6 +2057,12 @@
   "source": "jev",
   "text": "Plattendruckversuche"
  },
+ "6ba33969dfbe6650": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 80"
+ },
  "6c1d5d4382f1f2ce": {
   "code": null,
   "confidence": 0.0,
@@ -1703,11 +2093,29 @@
   "source": "jev",
   "text": "Druckrohr PE100 TW DN/OD63 SDR11 Graben verbaut T 1,25-1,75m"
  },
+ "6ccd8e39d1db2818": {
+  "code": null,
+  "confidence": 0.038,
+  "source": "none",
+  "text": "Kugelrückschlagventil DN 50"
+ },
+ "6cf5bc67030646cf": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "Probennahmestation"
+ },
  "6d60ad20aa3defb8": {
   "code": "E02",
   "confidence": 0.81,
   "source": "jev",
   "text": "Boden laden transp. LKW AN bis 3km, SU"
+ },
+ "6d636fe81625973f": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Flexible Rohrkupplung, zugfest, DN 200"
  },
  "6dc8f36307f01667": {
   "code": "W03",
@@ -1739,6 +2147,12 @@
   "source": "jev",
   "text": "Kupplung PP DN40 PN16"
  },
+ "6ec2d0db6e93140d": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Manometer bis 3 bar"
+ },
  "6ed19059c32d35e3": {
   "code": "F21",
   "confidence": 0.98,
@@ -1768,6 +2182,12 @@
   "confidence": 0.95,
   "source": "jev",
   "text": "Provisorische Überfahrten/Durchfahrten im Ausführungsbereich für Anlieger und oder Waldarb"
+ },
+ "70150683eaa610f3": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 100 / DN 65, exzentrisch"
  },
  "702bb1c3f2316b49": {
   "code": "E01",
@@ -1870,6 +2290,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "LKW bis 12 to Nutzlast"
+ },
+ "7647e62abf46c93a": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 32, PN 16"
  },
  "76e58f2d39b15d0d": {
   "code": "S03",
@@ -1985,11 +2411,41 @@
   "source": "none",
   "text": "[PERSON_177]"
  },
+ "7d5ed6092edee4c8": {
+  "code": null,
+  "confidence": 0.024,
+  "source": "none",
+  "text": "Desinfektion der Gesamtanlage"
+ },
  "7d8467b8863fad0c": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Minibagger"
+ },
+ "7dde4e84f1bfb91d": {
+  "code": null,
+  "confidence": 0.029,
+  "source": "none",
+  "text": "Erneuerung Filterdüsen (inkl. Ausbau vorh. Düsen)"
+ },
+ "7de349f1181cd86a": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 200, 45 - 90 Grad"
+ },
+ "7df3051f5211808e": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_0000068] aus PER000115 Zuluft/Abluft Reinwasserkammern"
+ },
+ "7f26237134c13db7": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Übergangsflansch PN 10/16, DN 15"
  },
  "7f78b5aa807f1848": {
   "code": null,
@@ -2039,6 +2495,12 @@
   "source": "jev",
   "text": "Kabelkreuzung unter Spannung Mittelspannungskabel T bis 1,25m sichern"
  },
+ "816c87d9e548ee9e": {
+  "code": null,
+  "confidence": 0.033,
+  "source": "none",
+  "text": "Über-/Unterdrucksicherung Gebäude"
+ },
  "81e962c432641dd1": {
   "code": "T07",
   "confidence": 1.0,
@@ -2050,6 +2512,12 @@
   "confidence": 0.04,
   "source": "none",
   "text": "Zuschlag für [PERSON_121]"
+ },
+ "820e386c293323ba": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Kleinleitungen DN 25"
  },
  "8227d9ed2c19855d": {
   "code": "K11",
@@ -2081,6 +2549,12 @@
   "source": "none",
   "text": "Doppelmuffenbogen dukt.Guss 45Grad MMK-Stück Steckmuffe 16bar DN300"
  },
+ "82fd2632908ba6e8": {
+  "code": null,
+  "confidence": 0.026,
+  "source": "none",
+  "text": "Inbetriebnahme und Probebetrieb"
+ },
  "832a12ced1829a4c": {
   "code": "F01",
   "confidence": 0.97,
@@ -2110,6 +2584,12 @@
   "confidence": 0.045,
   "source": "none",
   "text": "Doppelmuffenbogen dukt.Guss 11Grad MMK-Stück Steckmuffe 16bar DN300"
+ },
+ "85a6a090b68b629a": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rohrhalter (Abhängung) DN 65 - 250"
  },
  "85fb0778e7e5a021": {
   "code": "B04",
@@ -2141,11 +2621,29 @@
   "source": "none",
   "text": "Flanschnachumhüllung mit Schrumpfmanschette, konfektioniert wie folgt:"
  },
+ "8875dd5acebbc84e": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Kleinleitungen DN 32"
+ },
+ "88e50bfc20ee1105": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Übergangsflansch PN 10/16, DN 20"
+ },
  "8912103189f79115": {
   "code": "F21",
   "confidence": 0.96,
   "source": "jev",
   "text": "Magnetventil DN 50"
+ },
+ "8988dda869b2eb68": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 100 / DN 50"
  },
  "89941ed93c218397": {
   "code": "X02",
@@ -2165,6 +2663,12 @@
   "source": "jev",
   "text": "Gewölbter Boden Klöpperform Kohlenstoffstahl Schweißen [PERSON_044] AD 273mm"
  },
+ "8a0aa774e157c72b": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Demontage, Ausbringen und Entsorgung der bestehenden Rohrleitungen"
+ },
  "8a27e19e1f688f00": {
   "code": "F27",
   "confidence": 0.99,
@@ -2176,6 +2680,12 @@
   "confidence": 0.85,
   "source": "jev",
   "text": "Einweisung Bedien- und Wartungspersonal"
+ },
+ "8a998b39ff0ad80e": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Kleinleitungen DN 15"
  },
  "8aaebec1b26505fb": {
   "code": "L04",
@@ -2231,6 +2741,12 @@
   "source": "none",
   "text": "Kleinleitungen DN 15"
  },
+ "8d99b5a80f27f71a": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 100"
+ },
  "8dac41a46c7a24de": {
   "code": "B04-ST",
   "confidence": 0.94,
@@ -2261,11 +2777,23 @@
   "source": "jev",
   "text": "Bestands-Dokumentation in [PERSON_097] liefern"
  },
+ "8f58e4cc4ab875a1": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "Siphon DN 200 in vertikaler Bauart"
+ },
  "8f60387fc86f1add": {
   "code": "B04-ST",
   "confidence": 0.76,
   "source": "jev",
   "text": "Werks- und Montageplanung"
+ },
+ "8f6e6abf6143dbb8": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 15, PN 16"
  },
  "8fb7ddc676a57b39": {
   "code": "B04-ST",
@@ -2405,6 +2933,12 @@
   "source": "none",
   "text": "Erschwerniszulage zur Position Spülbohrung 1 und 2 PE DA 355 für:"
  },
+ "972840827669f86c": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Storz-B-Kupplung (Niro)"
+ },
  "97e49e39e53d98f7": {
   "code": null,
   "confidence": 0.0,
@@ -2422,6 +2956,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Zulage für das Setzen einer jeweiligen Rohrabsperrblase DN 300 und eines Abschlussdeckels "
+ },
+ "98a712c9d32f2944": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "PER000115-Rohr DN 125"
  },
  "9904bfdb5d55466d": {
   "code": "B04-ST",
@@ -2465,6 +3005,12 @@
   "source": "jev",
   "text": "Reduzierung DN 250 / DN 150"
  },
+ "9d1a35b572a25229": {
+  "code": null,
+  "confidence": 0.037,
+  "source": "none",
+  "text": "Wandblende für Wanddurchführungen bis D 200 mm"
+ },
  "9e59a338d899c178": {
   "code": "B03",
   "confidence": 1.0,
@@ -2476,6 +3022,12 @@
   "confidence": 0.053,
   "source": "none",
   "text": "Kleinleitungen DN 20"
+ },
+ "9f33e6bd0af32d3c": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 50"
  },
  "9f4602be609fc78f": {
   "code": "B04-KP",
@@ -2501,6 +3053,12 @@
   "source": "jev",
   "text": "Reduzierung DN 300 / DN 200"
  },
+ "9fc0463fa291d669": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "PER000115-Flansch DN 200, PN 10"
+ },
  "a0158ff2a46e99cc": {
   "code": "S03",
   "confidence": 0.99,
@@ -2519,11 +3077,23 @@
   "source": "jev",
   "text": "Kugelformstück, 2 - teilig als D - Kugel DN 100/100"
  },
+ "a0b1122a5c6daaef": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Manometerventil DN 15"
+ },
  "a0bcd776b1c9254d": {
   "code": "A07-V",
   "confidence": 0.99,
   "source": "jev",
   "text": "Warnleuchte WL1 vorhalten"
+ },
+ "a100c9774eb7e6af": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "PER000115-Abgang 45 Grad DN 100"
  },
  "a10ca4ddf7204bf2": {
   "code": "F25",
@@ -2549,11 +3119,23 @@
   "source": "none",
   "text": "Demontage und Wiedermontage Überlaufrinne Filterbecken"
  },
+ "a1eca86e34f8bc91": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rückschlagklappe DN 200 PN10 ohne Gewichtshebel"
+ },
  "a204f6f7ccd14605": {
   "code": "B03",
   "confidence": 0.77,
   "source": "jev",
   "text": "LKW Fahrer-in 12-20t"
+ },
+ "a20b03d11aa0ce64": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Bogen DN 125, 45 - 90 Grad"
  },
  "a20f2bfa4715602b": {
   "code": "F25",
@@ -2723,6 +3305,12 @@
   "source": "none",
   "text": "Zulage zur Rohrposition GGG ZMU DN 300, Muffenverbindung für Rohre mit ZM - Umhüllung hers"
  },
+ "aa2a0417a435a02f": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 100 / DN 80"
+ },
  "aa6df84cd7099f6d": {
   "code": "E04",
   "confidence": 0.96,
@@ -2746,6 +3334,12 @@
   "confidence": 0.53,
   "source": "jev",
   "text": "Absperrschieber DN 150, PN 16"
+ },
+ "abbefe8343ebf8f1": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rückschlagklappe DN 65 PN10 mit Gewichtshebel"
  },
  "acfe54485fcfb26f": {
   "code": "B15",
@@ -2843,6 +3437,12 @@
   "source": "jev",
   "text": "UHPC-Stahlbetonrohre DN 800 mm liefern und verlegen"
  },
+ "b2961565db0f40b3": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Absperrklappe Zwischenflanschausführung DN 150 PN 10/16"
+ },
  "b2ca71dc40524d79": {
   "code": null,
   "confidence": 0.115,
@@ -2879,6 +3479,12 @@
   "source": "jev",
   "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km von Hand Sohlen-B 2,5-3m T bis "
  },
+ "b46a54ad5b2f42cc": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 150"
+ },
  "b4b4fcdebcfe2e2e": {
   "code": "B04-ST",
   "confidence": 0.91,
@@ -2897,17 +3503,35 @@
   "source": "none",
   "text": "Zulage reinigen Tragschicht- und Binderschicht, für fachgerechte Entsorgung anfallender St"
  },
+ "b5f043a9189d26e1": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Anschweissmuffe 3/4\""
+ },
  "b5f9e2ebf2380fb8": {
   "code": "T01",
   "confidence": 1.0,
   "source": "jev",
   "text": "Asphalt schneiden, bis 15 cm"
  },
+ "b659eee1ed147555": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Absperrschieber handbetätigt versetzen, DN 150"
+ },
  "b68ff277336e856a": {
   "code": "A06-V",
   "confidence": 0.95,
   "source": "jev",
   "text": "Verkehrszeichen Zusatzzeichen 1000-22 RA1 Gr.1 vorhalten"
+ },
+ "b7d65e4ac92822ed": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "PER000115-Flansch DN 80, PN 10"
  },
  "b7eafd296c08c37c": {
   "code": null,
@@ -2962,6 +3586,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Absperrschieber Spindelgewinde innen EN-GJS-500-7 Handbetätigung Innen-/Außenschutz PN16 D"
+ },
+ "b9c96155838e9e8f": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Kleinleitungen DN 50"
  },
  "ba1b2f75f6bc0c76": {
   "code": null,
@@ -3053,6 +3683,12 @@
   "source": "jev",
   "text": "Absperrschieber mit beidseitigem PE-Rohrstutzen d63"
  },
+ "c1208bdeb6f7997e": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "PER000115-Abgang 90 Grad DN 65"
+ },
  "c134d9def265a824": {
   "code": "B06",
   "confidence": 1.0,
@@ -3065,11 +3701,23 @@
   "source": "none",
   "text": "Boden Verkehrsfläche lösen mit Gerät laden transp. LKW AN entsorgen Vergüt.Entsorg. AN AVV"
  },
+ "c16ee3504a2dac4e": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Ausbau und Entsorgung Stützschichten in Dolomitfilter"
+ },
  "c1c6fea083ba420f": {
   "code": "F28",
   "confidence": 0.97,
   "source": "jev",
   "text": "Straßenkappe höhenverstellbar, bestehend aus Kappe, Ziehring und Deckel mit Haltestift, fü"
+ },
+ "c1c982187f04a35f": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Luftfiltereinheit [PERSON_000000000000066]"
  },
  "c1d82acb052c0057": {
   "code": null,
@@ -3119,6 +3767,12 @@
   "source": "jev",
   "text": "Gewölbter Boden Klöpperform Kohlenstoffstahl Schweißen [PERSON_044] AD 273mm"
  },
+ "c3a370a327a7bbd1": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rohrleitungs- und Instrumentierungsfließbild"
+ },
  "c3e7224064d25676": {
   "code": null,
   "confidence": 0.033,
@@ -3149,6 +3803,12 @@
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "c55131155b44af0b": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Übergangsflansch PN 10/16, DN 32"
+ },
  "c583cd4d10be2ade": {
   "code": null,
   "confidence": 0.0,
@@ -3173,6 +3833,24 @@
   "source": "jev",
   "text": "Treibpumpe [PERSON_110]"
  },
+ "c64b26c8bec05170": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Flexible Rohrkupplung, zugfest, DN 150"
+ },
+ "c67d873411a205e3": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_000000000000000000000000090] / [PERSON_00000066]"
+ },
+ "c6eafb550bf1b949": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Losflansch DN 100, PN 10"
+ },
  "c6ef778a0f80f950": {
   "code": "L04",
   "confidence": 0.85,
@@ -3185,17 +3863,35 @@
   "source": "none",
   "text": "Magnetisch-Induktive Durchflussmessung DN 100"
  },
+ "c6fa8fd03cb3aa06": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 20, PN 16"
+ },
  "c751529dca7e9c50": {
   "code": "T11",
   "confidence": 0.97,
   "source": "jev",
   "text": "Pflasterdecke gebraucht seitl.lagernd L/B 200/100mm D 100mm"
  },
+ "c7caeccb89bae380": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 250 / DN 150"
+ },
  "c811f08f60c9ec56": {
   "code": "F17",
   "confidence": 1.0,
   "source": "jev",
   "text": "Vorschweißflansch PN16 [PERSON_089] [PERSON_029] DN250"
+ },
+ "c82ff9451708c894": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 200, PN 10"
  },
  "c87989536948d277": {
   "code": "A07-U",
@@ -3215,6 +3911,12 @@
   "source": "jev",
   "text": "Kugelhahn DN 15, PN 16"
  },
+ "c89296ca8c5e7fde": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Flexible Rohrkupplung, zugfest, DN 100"
+ },
  "c8ae605f4df49fbc": {
   "code": "F25",
   "confidence": 0.81,
@@ -3232,6 +3934,12 @@
   "confidence": 0.55,
   "source": "jev",
   "text": "Absperrklappe Zwischenflanschausführung DN 150 PN 10/16"
+ },
+ "c9ebb3dd9494ca59": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Absperrschieber DN 65, PN 16"
  },
  "ca1dcd7dad9e4946": {
   "code": "B04-ST",
@@ -3275,17 +3983,35 @@
   "source": "jev",
   "text": "[PERSON_115]-Losflansch DN 100, PN 10"
  },
+ "cad94eb980e811f4": {
+  "code": "B01",
+  "confidence": 0.143,
+  "source": "keyword",
+  "text": "Baustelleneinrichtung und -räumung"
+ },
  "cb4fe4ee8dc049a9": {
   "code": null,
   "confidence": 0.038,
   "source": "none",
   "text": "Zulage zu den Positionen Start- und Zielgruben für notwendige Zwischengruben, die der AN n"
  },
+ "cbcd8d74abee8b9a": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Anschweissmuffe 1/2\""
+ },
  "cbd21efd2a78544c": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Leckageüberwachung von Fernwärmerohren / -kälterohren Stationäres Überwachungsgerät"
+ },
+ "cbf4c69a108e88d9": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Schlagbohrer 1500 Watt mit Bedienung"
  },
  "cbf79d1cf9768187": {
   "code": "B03",
@@ -3305,11 +4031,23 @@
   "source": "jev",
   "text": "Wurzelstock roden fräsen T 50-100cm Durchm. 50-60cm Direktbeladung laden transp. LKW AN"
  },
+ "cc3c821eb03721f5": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Entwässerungscontainer und Beprobung nach DepV"
+ },
  "cdb7bfb44b48970f": {
   "code": "X02",
   "confidence": 0.77,
   "source": "jev",
   "text": "Zulage zu den Positionen Hydrantenschächte für"
+ },
+ "cdfd001bb73dd7f3": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Halbe Anschweissmuffe 1/2\""
  },
  "ce2c70c2cf518778": {
   "code": "T06",
@@ -3413,6 +4151,12 @@
   "source": "jev",
   "text": "Asphaltoberbau schneiden D 5-10cm T 100mm"
  },
+ "d28f642647cee1af": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Wandblende für Wanddurchführungen bis D 300 mm"
+ },
  "d3a7b9ad8ee8bd2f": {
   "code": "S10",
   "confidence": 1.0,
@@ -3449,6 +4193,12 @@
   "source": "jev",
   "text": "Zulage zur Schachtabdeckung DN 800 mit Flanschrahmen,"
  },
+ "d51de58905cd43e0": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Anschweissmuffe 1 Zoll"
+ },
  "d52fe5eea9b37397": {
   "code": "L02",
   "confidence": 1.0,
@@ -3479,6 +4229,12 @@
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "d6e7bbdec45d3ad3": {
+  "code": null,
+  "confidence": 0.032,
+  "source": "none",
+  "text": "Probennahmeventil DN 15"
+ },
  "d6ed862b4512f071": {
   "code": null,
   "confidence": 0.0,
@@ -3496,6 +4252,24 @@
   "confidence": 0.0,
   "source": "none",
   "text": "LTE Antenne mit Kabel"
+ },
+ "d7abbbfd4108fcc7": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Flüssigkeitsstrahl-Feststoffpumpe"
+ },
+ "d7d96fabfcc4b9f3": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "Anlagenkennzeichnung"
+ },
+ "d7f63a10f29c09df": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Pass- und Ausbaustück DN 150 PN 16"
  },
  "d81ac4cf983de953": {
   "code": "T07",
@@ -3557,11 +4331,23 @@
   "source": "jev",
   "text": "Verdrahtungsplan"
  },
+ "dba90ad023df995a": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 50, PN 16"
+ },
  "dc205892940b1dfa": {
   "code": "B01",
   "confidence": 1.0,
   "source": "jev",
   "text": "Baustelleneinrichtung und -räumung"
+ },
+ "dc8b9d8102618e2e": {
+  "code": null,
+  "confidence": 0.04,
+  "source": "none",
+  "text": "Ausbau und Entsorgung Filterfüllung"
  },
  "dca4237b54f945c4": {
   "code": "F25",
@@ -3587,17 +4373,35 @@
   "source": "none",
   "text": "[PERSON_115]-Losflansch DN 150, PN 10"
  },
+ "de8e808040247c63": {
+  "code": null,
+  "confidence": 0.043,
+  "source": "none",
+  "text": "Ingenieur, Projektleiter"
+ },
  "de9b1dec31cb1dd5": {
   "code": "E04",
   "confidence": 0.94,
   "source": "jev",
   "text": "Bodenaustausch Rohrgraben - Grubenkies"
  },
+ "df674b99fa635edc": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Polier- oder Obermonteur"
+ },
  "df725a70cbb4268f": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Wasserhaltung Bach bis 150 l/s"
+ },
+ "dfdba3aaf9c53120": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Losflansch DN 150, PN 10"
  },
  "e041735a1f9a0ff9": {
   "code": "B01",
@@ -3610,6 +4414,12 @@
   "confidence": 0.8,
   "source": "jev",
   "text": "Kugelhahn DN 20, PN 16"
+ },
+ "e0c5197037727a35": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Übergangsflansch PN 10/16, DN 25"
  },
  "e0d4b0baaa926470": {
   "code": null,
@@ -3635,6 +4445,12 @@
   "source": "none",
   "text": "Messprotokoll je Messschleife (VL + RL),"
  },
+ "e1d05a64797fe8d0": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Luftfiltereinheit Zuluft/Abluft Reinwasserkammern"
+ },
  "e1db068f61ce3fba": {
   "code": "V01-M2D",
   "confidence": 0.99,
@@ -3653,6 +4469,12 @@
   "source": "none",
   "text": "Horizontale Spülbohrung 2 für PE100RC TW AD/WD 355/32,2 mm"
  },
+ "e38daddf7d7e00be": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Facharbeiterstunde"
+ },
  "e390fb559df43146": {
   "code": null,
   "confidence": 0.026,
@@ -3665,17 +4487,35 @@
   "source": "jev",
   "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km von Hand Sohlen-B 2,5-3m T bis "
  },
+ "e456b7c4b970a25a": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 100"
+ },
  "e49c2f992374114b": {
   "code": "F15",
   "confidence": 0.84,
   "source": "jev",
   "text": "Be-/Entlüfter G 3/4 x 1/2, PN 10"
  },
+ "e4e1244fac73726d": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Übersichts-Fließbild für Wandaufhängung"
+ },
  "e515957a75a29d4b": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "Edelstahl-Rohr DN 125"
+ },
+ "e534099dccb4453b": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "Absperrschieber DN 200, PN 10, mit E-Antrieb"
  },
  "e596c14e6d384aa5": {
   "code": "F11",
@@ -3713,6 +4553,12 @@
   "source": "jev",
   "text": "[PERSON_006] DN 2500"
  },
+ "e708e55e9b073c05": {
+  "code": null,
+  "confidence": 0.034,
+  "source": "none",
+  "text": "Absperrschieber DN 200, PN 10"
+ },
  "e726db7daadf97fc": {
   "code": "A06-V",
   "confidence": 0.96,
@@ -3730,6 +4576,18 @@
   "confidence": 0.0,
   "source": "none",
   "text": "[PERSON_016] mit Dichtungsband"
+ },
+ "e83b2e218ed7edde": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kugelhahn DN 65, PN 16"
+ },
+ "e8a23aca578600d5": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "PER000115-Flansch DN 65, PN 10/16"
  },
  "e8e7581ee166c1d4": {
   "code": "B04-ST",
@@ -3815,11 +4673,29 @@
   "source": "jev",
   "text": "Druckrohr dukt.Guss TW DN300 Muffenverb. PFA 16 bar Graben abgeböscht T 1,75-4m"
  },
+ "ec2a565727bcacf1": {
+  "code": null,
+  "confidence": 0.033,
+  "source": "none",
+  "text": "Über-/Unterdrucksicherung Gebäude"
+ },
  "ec7c060e0f3d58e8": {
   "code": "F23",
   "confidence": 1.0,
   "source": "jev",
   "text": "Druckanbohrarmatur PE DN/OD160"
+ },
+ "ed0e0688823e748d": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Absperrschieber mit Elektroantrieb versetzen, DN 200"
+ },
+ "ed67493b8fc9d4d6": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Übergangsflansch PN 10/16, DN 50"
  },
  "ed87b435957581ae": {
   "code": "E08",
@@ -3838,6 +4714,12 @@
   "confidence": 0.95,
   "source": "jev",
   "text": "Druckprobe Kälteversorgung"
+ },
+ "ede35e6c11108435": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000000000000000092]"
  },
  "edf604ab9cbd14b2": {
   "code": "F25",
@@ -3893,11 +4775,35 @@
   "source": "jev",
   "text": "Asphalttragschicht [PERSON_015] Bk1,0 AC22TN Bindem. 50/70 D 10cm"
  },
+ "efa42d89f7395bd6": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Glasrohranzeiger Siphon"
+ },
+ "efc101852248a27d": {
+  "code": null,
+  "confidence": 0.029,
+  "source": "none",
+  "text": "Demontage und Wiedermontage Überlaufrinne Filterbecken"
+ },
+ "f0104bb819ba87d5": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Rückschlagklappe DN 150 PN10 ohne Gewichtshebel"
+ },
  "f03a9afc2f06cb84": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
+ },
+ "f04a7b36779fe362": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Be-/Entlüfter G 3/4 x 1/2, PN 10"
  },
  "f0756a99a36ebc86": {
   "code": "T07",
@@ -3941,6 +4847,12 @@
   "source": "jev",
   "text": "Winkel 45Grad PE DN/OD110 SDR11"
  },
+ "f25235ae40d2008c": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 100 / DN 65"
+ },
  "f27c8d3667167e48": {
   "code": "B03",
   "confidence": 0.87,
@@ -3958,6 +4870,12 @@
   "confidence": 0.84,
   "source": "jev",
   "text": "Zulage zur Position GGG Rohr DN 300"
+ },
+ "f2e2fceb1d9c36d2": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Wasserstrahlventilator 60 m3/h"
  },
  "f30da0dce4dceb7f": {
   "code": "F18",
@@ -3988,6 +4906,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Explosionsstampfer Bedienungspersonal"
+ },
+ "f400fcdbf3af13f7": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Flex 2000 Watt mit Bedienung"
  },
  "f401fe047208be5a": {
   "code": "S11",
@@ -4115,6 +5039,18 @@
   "source": "none",
   "text": "Sickerpackung zur Wasserleitungsschachtentwässerung wie folgt:"
  },
+ "f90a389a6132b042": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Reduzierung DN 300 / DN 200"
+ },
+ "f95b9b0d99bf6d63": {
+  "code": null,
+  "confidence": 0.069,
+  "source": "none",
+  "text": "Siphon aus Kleinleitung DN 15 mit Schauglas"
+ },
  "f99826f4e6a75451": {
   "code": "B03",
   "confidence": 1.0,
@@ -4187,6 +5123,12 @@
   "source": "jev",
   "text": "Baufacharbeiter-in sämtliche Kosten/Zuschläge"
  },
+ "fdfa8d54e2c3a696": {
+  "code": null,
+  "confidence": 0.03,
+  "source": "none",
+  "text": "Dokumentation mit Funktions- und Betriebsbeschreibung"
+ },
  "fe65643113fffefd": {
   "code": "F22",
   "confidence": 0.96,
@@ -4247,11 +5189,23 @@
   "source": "jev",
   "text": "Verkehrszeichen Zusatzzeichen 1000-22 Gr.1 aufbauen abbauen"
  },
+ "ffaf741a9f61c6b0": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Änderungen Fertigungszeichnungen, etc."
+ },
  "ffb5a403542ee1f7": {
   "code": "F19",
   "confidence": 0.125,
   "source": "keyword",
   "text": "Bestehende Betonrohre DN 800 schneiden"
+ },
+ "ffc8f5f3c5afeb02": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "PER000115-Blindflansch DN 65"
  },
  "ffffb48693c5e524": {
   "code": "P06",
