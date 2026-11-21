@@ -328,7 +328,19 @@ def classify_hybrid_risk(
         strategy = "Kalkulationsansatz und Mengenansatz intern gegenprüfen"
 
     if not reasons:
-        reasons = ["Keine deterministische oder atomare Risikohypothese über dem Grenzwert."]
+        # A position can reach "high" on euro exposure alone, with no rule and
+        # no judgment firing. Reporting "nothing found" there is misleading:
+        # the finding IS the money. Name it, so the estimator knows why it is
+        # on his list and can decide in one read.
+        if exposure_high:
+            reasons = [
+                f"Gehört mit {state.euro_exposure:,.0f} € zu den wertvollsten "
+                f"{(1 - constants.HYBRID_EXPOSURE_PERCENTILE) * 100:.0f} % der "
+                "Positionen. Kein konkreter Mangel gefunden — aber hier kostet "
+                "ein Fehler am meisten."
+            ]
+        else:
+            reasons = ["Keine Auffälligkeit über den Grenzwerten."]
 
     return HybridRiskResult(
         key=state.key,

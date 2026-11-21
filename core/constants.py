@@ -203,7 +203,25 @@ HYBRID_MAX_LLM_ITEMS = 60
 HYBRID_EXPOSURE_PERCENTILE = 0.90
 HYBRID_HIGH_SCORE_THRESH = 0.70
 HYBRID_MED_SCORE_THRESH = 0.50
-HYBRID_DIVERGENCE_THRESH = 0.40
+
+# Disagreement between the two pricing engines, as a usable risk signal.
+#
+# **Disabled on purpose.** It compares the bottom-up calculation against the
+# comparable-price engine, and that second engine is measured at -50 % on the
+# total with 91 % median per-position error. Comparing a calculation against
+# noise produces noise, and it showed: at 0.40 it fired on 154 of 248
+# positions (62 %) — the median divergence is 0.69, so the *typical* position
+# was already over the line — and it claimed 57 of the 60 LLM slots, leaving
+# three for everything else.
+#
+# Normalising out the systematic offset (median ratio 0.70) does not rescue
+# it: that only drops 80 % to 66 %, because the two engines disagree by 14.4x
+# between p10 and p90, so there is no stable baseline to normalise against.
+#
+# Re-enable by setting this to ~0.40 once the comparable engine is worth
+# comparing against — i.e. once it has a benchmark with real coverage of the
+# trades in the tender.
+HYBRID_DIVERGENCE_THRESH = float("inf")
 
 SPECIALIST_KEYWORDS: tuple[str, ...] = (
     "bauseits",
