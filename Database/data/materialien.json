@@ -1,0 +1,114 @@
+{
+ "meta": {
+  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
+  "seed": 2026,
+  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."
+ },
+ "materialien": {
+  "SAND": {
+   "bezeichnung": "Sand 0/2",
+   "einheit": "t",
+   "preis_eur": 21.5
+  },
+  "FSS": {
+   "bezeichnung": "Frostschutzmaterial 0/45",
+   "einheit": "t",
+   "preis_eur": 19.8
+  },
+  "BET": {
+   "bezeichnung": "Beton C20/25",
+   "einheit": "m3",
+   "preis_eur": 152.0
+  },
+  "MAG": {
+   "bezeichnung": "Magerbeton C8/10",
+   "einheit": "m3",
+   "preis_eur": 118.0
+  },
+  "KG150": {
+   "bezeichnung": "PVC-KG-Rohr DN 150",
+   "einheit": "m",
+   "preis_eur": 11.8
+  },
+  "KG200": {
+   "bezeichnung": "PVC-KG-Rohr DN 200",
+   "einheit": "m",
+   "preis_eur": 19.9
+  },
+  "SB300": {
+   "bezeichnung": "Stahlbetonrohr DN 300",
+   "einheit": "m",
+   "preis_eur": 46.0
+  },
+  "SB500": {
+   "bezeichnung": "Stahlbetonrohr DN 500",
+   "einheit": "m",
+   "preis_eur": 92.0
+  },
+  "PE110": {
+   "bezeichnung": "PE-HD-Rohr da 110 SDR 11",
+   "einheit": "m",
+   "preis_eur": 9.4
+  },
+  "PE160": {
+   "bezeichnung": "PE-HD-Rohr da 160 SDR 11",
+   "einheit": "m",
+   "preis_eur": 19.6
+  },
+  "KSR": {
+   "bezeichnung": "Kabelschutzrohr DN 110",
+   "einheit": "m",
+   "preis_eur": 2.7
+  },
+  "WARN": {
+   "bezeichnung": "Trassenwarnband",
+   "einheit": "m",
+   "preis_eur": 0.16
+  },
+  "SCH1000": {
+   "bezeichnung": "Schachtbauteile DN 1000 (Boden, Ringe, Konus)",
+   "einheit": "St",
+   "preis_eur": 1180.0
+  },
+  "ABD": {
+   "bezeichnung": "Schachtabdeckung Klasse D 400",
+   "einheit": "St",
+   "preis_eur": 335.0
+  },
+  "ANSCH": {
+   "bezeichnung": "Formteile / Anschlussmaterial",
+   "einheit": "St",
+   "preis_eur": 85.0
+  },
+  "PFL": {
+   "bezeichnung": "Betonsteinpflaster 8 cm",
+   "einheit": "m2",
+   "preis_eur": 17.5
+  },
+  "BORD": {
+   "bezeichnung": "Hochbordstein 15/30",
+   "einheit": "m",
+   "preis_eur": 13.2
+  },
+  "ACT": {
+   "bezeichnung": "Asphalttragschicht AC 22 TS",
+   "einheit": "t",
+   "preis_eur": 71.0
+  },
+  "ACD": {
+   "bezeichnung": "Asphaltdeckschicht AC 11 DS",
+   "einheit": "t",
+   "preis_eur": 86.0
+  },
+  "DEP": {
+   "bezeichnung": "Deponiegebühr Boden Z 1.1",
+   "einheit": "t",
+   "preis_eur": 17.5
+  },
+  "BAKE": {
+   "bezeichnung": "Absperrmaterial, Miete je Woche",
+   "einheit": "Wo",
+   "preis_eur": 38.0
+  }
+ }
+}

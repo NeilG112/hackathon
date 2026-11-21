@@ -1,0 +1,699 @@
+{
+ "meta": {
+  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
+  "seed": 2026,
+  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."
+ },
+ "leistungen": {
+  "E01": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Oberboden abtragen und seitlich lagern",
+   "einheit": "m2",
+   "h_min": 0.009,
+   "h_mittel": 0.012,
+   "h_max": 0.015,
+   "material": [],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.01
+    }
+   ],
+   "bemerkung": "Oberboden d = 20 cm abtragen, im Baufeld lagern, gegen Vernässung schützen."
+  },
+  "E02": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden Homogenbereich B2 lösen, laden, abfahren",
+   "einheit": "m3",
+   "h_min": 0.045,
+   "h_mittel": 0.06,
+   "h_max": 0.075,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 1.8
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.05
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.05
+    }
+   ],
+   "bemerkung": "Grabenaushub maschinell, Boden laden, zur Deponie fahren, Gebühr nach Wiegeschein."
+  },
+  "E03": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Boden von Hand lösen im Bereich vorhandener Leitungen",
+   "einheit": "m3",
+   "h_min": 1.65,
+   "h_mittel": 2.2,
+   "h_max": 2.75,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 1.8
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 2.0
+    }
+   ],
+   "bemerkung": "Handschachtung im Kreuzungsbereich von Fremdleitungen."
+  },
+  "E04": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Graben mit Fremdmaterial verfüllen und lagenweise verdichten",
+   "einheit": "m3",
+   "h_min": 0.135,
+   "h_mittel": 0.18,
+   "h_max": 0.225,
+   "material": [
+    {
+     "code": "SAND",
+     "menge_je_einheit": 1.9
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.08
+    },
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.15
+    }
+   ],
+   "bemerkung": "Einbau in Lagen ≤ 30 cm, Dpr ≥ 97 %."
+  },
+  "E05": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Leitungszone mit Sand 0/2 herstellen",
+   "einheit": "m3",
+   "h_min": 0.338,
+   "h_mittel": 0.45,
+   "h_max": 0.562,
+   "material": [
+    {
+     "code": "SAND",
+     "menge_je_einheit": 1.8
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.3
+    }
+   ],
+   "bemerkung": "Bettung und Abdeckung 30 cm über Rohrscheitel."
+  },
+  "E06": {
+   "gewerk": "Erdbau",
+   "taetigkeit": "Planum herstellen und verdichten",
+   "einheit": "m2",
+   "h_min": 0.015,
+   "h_mittel": 0.02,
+   "h_max": 0.025,
+   "material": [],
+   "geraet": [
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.01
+    }
+   ],
+   "bemerkung": "Planum Ev2 ≥ 45 MN/m², Höhentoleranz ± 2 cm."
+  },
+  "E07": {
+   "gewerk": "Oberbau",
+   "taetigkeit": "Frostschutzschicht 0/45 einbauen, d = 30 cm",
+   "einheit": "m2",
+   "h_min": 0.038,
+   "h_mittel": 0.05,
+   "h_max": 0.062,
+   "material": [
+    {
+     "code": "FSS",
+     "menge_je_einheit": 0.6
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RLD",
+     "stunden_je_einheit": 0.02
+    },
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.02
+    }
+   ],
+   "bemerkung": "Ev2 ≥ 120 MN/m² auf der Oberfläche."
+  },
+  "V01": {
+   "gewerk": "Verbau",
+   "taetigkeit": "Grabenverbau einbauen, vorhalten, rückbauen, Tiefe ≤ 3,0 m",
+   "einheit": "m2",
+   "h_min": 0.262,
+   "h_mittel": 0.35,
+   "h_max": 0.438,
+   "material": [],
+   "geraet": [
+    {
+     "code": "VBG",
+     "stunden_je_einheit": 0.6
+    },
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.08
+    }
+   ],
+   "bemerkung": "Abrechnung nach verbauter Grabenwandfläche."
+  },
+  "V02": {
+   "gewerk": "Verbau",
+   "taetigkeit": "Zulage Grabenverbau für Tiefe > 3,0 bis 4,0 m",
+   "einheit": "m2",
+   "h_min": 0.09,
+   "h_mittel": 0.12,
+   "h_max": 0.15,
+   "material": [],
+   "geraet": [
+    {
+     "code": "VBG",
+     "stunden_je_einheit": 0.3
+    }
+   ],
+   "bemerkung": "Zulage zur Position Grabenverbau."
+  },
+  "K01": {
+   "gewerk": "Kanal",
+   "taetigkeit": "PVC-KG-Rohr DN 150 verlegen",
+   "einheit": "m",
+   "h_min": 0.165,
+   "h_mittel": 0.22,
+   "h_max": 0.275,
+   "material": [
+    {
+     "code": "KG150",
+     "menge_je_einheit": 1.02
+    },
+    {
+     "code": "ANSCH",
+     "menge_je_einheit": 0.05
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.2
+    }
+   ],
+   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan."
+  },
+  "K02": {
+   "gewerk": "Kanal",
+   "taetigkeit": "PVC-KG-Rohr DN 200 verlegen",
+   "einheit": "m",
+   "h_min": 0.21,
+   "h_mittel": 0.28,
+   "h_max": 0.35,
+   "material": [
+    {
+     "code": "KG200",
+     "menge_je_einheit": 1.02
+    },
+    {
+     "code": "ANSCH",
+     "menge_je_einheit": 0.05
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.25
+    }
+   ],
+   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan."
+  },
+  "K03": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Stahlbetonrohr DN 300 verlegen",
+   "einheit": "m",
+   "h_min": 0.413,
+   "h_mittel": 0.55,
+   "h_max": 0.688,
+   "material": [
+    {
+     "code": "SB300",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.25
+    }
+   ],
+   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916."
+  },
+  "K04": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Stahlbetonrohr DN 500 verlegen",
+   "einheit": "m",
+   "h_min": 0.637,
+   "h_mittel": 0.85,
+   "h_max": 1.062,
+   "material": [
+    {
+     "code": "SB500",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG25",
+     "stunden_je_einheit": 0.35
+    }
+   ],
+   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916."
+  },
+  "K05": {
+   "gewerk": "Wasser",
+   "taetigkeit": "PE-HD-Rohr da 110 verlegen, einschl. Schweißverbindungen",
+   "einheit": "m",
+   "h_min": 0.225,
+   "h_mittel": 0.3,
+   "h_max": 0.375,
+   "material": [
+    {
+     "code": "PE110",
+     "menge_je_einheit": 1.02
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.3
+    }
+   ],
+   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert."
+  },
+  "K06": {
+   "gewerk": "Wasser",
+   "taetigkeit": "PE-HD-Rohr da 160 verlegen, einschl. Schweißverbindungen",
+   "einheit": "m",
+   "h_min": 0.315,
+   "h_mittel": 0.42,
+   "h_max": 0.525,
+   "material": [
+    {
+     "code": "PE160",
+     "menge_je_einheit": 1.02
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.35
+    }
+   ],
+   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert."
+  },
+  "K07": {
+   "gewerk": "Kabel",
+   "taetigkeit": "Kabelschutzrohr DN 110 verlegen",
+   "einheit": "m",
+   "h_min": 0.045,
+   "h_mittel": 0.06,
+   "h_max": 0.075,
+   "material": [
+    {
+     "code": "KSR",
+     "menge_je_einheit": 1.03
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "In vorbereiteten Graben, Muffen gesteckt."
+  },
+  "K08": {
+   "gewerk": "Kabel",
+   "taetigkeit": "Trassenwarnband verlegen",
+   "einheit": "m",
+   "h_min": 0.007,
+   "h_mittel": 0.01,
+   "h_max": 0.013,
+   "material": [
+    {
+     "code": "WARN",
+     "menge_je_einheit": 1.05
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "30 cm über Leitung."
+  },
+  "K09": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Dichtheitsprüfung je Haltung",
+   "einheit": "St",
+   "h_min": 2.25,
+   "h_mittel": 3.0,
+   "h_max": 3.75,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 2.0
+    }
+   ],
+   "bemerkung": "Prüfung mit Luft nach DIN EN 1610, Protokoll."
+  },
+  "K10": {
+   "gewerk": "Kanal",
+   "taetigkeit": "TV-Inspektion des neuen Kanals",
+   "einheit": "m",
+   "h_min": 0.03,
+   "h_mittel": 0.04,
+   "h_max": 0.05,
+   "material": [],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.04
+    }
+   ],
+   "bemerkung": "Befahrung, Video und Bericht."
+  },
+  "K11": {
+   "gewerk": "Kanal",
+   "taetigkeit": "Hausanschluss herstellen, einschl. Abzweig",
+   "einheit": "St",
+   "h_min": 4.875,
+   "h_mittel": 6.5,
+   "h_max": 8.125,
+   "material": [
+    {
+     "code": "ANSCH",
+     "menge_je_einheit": 2.5
+    },
+    {
+     "code": "KG150",
+     "menge_je_einheit": 3.0
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 1.5
+    }
+   ],
+   "bemerkung": "Anschluss bis Grundstücksgrenze."
+  },
+  "S01": {
+   "gewerk": "Schacht",
+   "taetigkeit": "Schacht DN 1000 aus Fertigteilen setzen, Tiefe bis 3,0 m",
+   "einheit": "St",
+   "h_min": 5.625,
+   "h_mittel": 7.5,
+   "h_max": 9.375,
+   "material": [
+    {
+     "code": "SCH1000",
+     "menge_je_einheit": 1.0
+    },
+    {
+     "code": "MAG",
+     "menge_je_einheit": 0.4
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG25",
+     "stunden_je_einheit": 2.5
+    }
+   ],
+   "bemerkung": "Fertigteile nach DIN 4034-1."
+  },
+  "S02": {
+   "gewerk": "Schacht",
+   "taetigkeit": "Zulage Schachttiefe je angefangene 0,5 m über 3,0 m",
+   "einheit": "St",
+   "h_min": 1.2,
+   "h_mittel": 1.6,
+   "h_max": 2.0,
+   "material": [
+    {
+     "code": "SCH1000",
+     "menge_je_einheit": 0.18
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG25",
+     "stunden_je_einheit": 0.4
+    }
+   ],
+   "bemerkung": "Zulage zur Position Schacht."
+  },
+  "S03": {
+   "gewerk": "Schacht",
+   "taetigkeit": "Schachtabdeckung D 400 setzen und regulieren",
+   "einheit": "St",
+   "h_min": 1.65,
+   "h_mittel": 2.2,
+   "h_max": 2.75,
+   "material": [
+    {
+     "code": "ABD",
+     "menge_je_einheit": 1.0
+    },
+    {
+     "code": "BET",
+     "menge_je_einheit": 0.05
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 1.0
+    }
+   ],
+   "bemerkung": "Auf Höhe der fertigen Oberfläche."
+  },
+  "S04": {
+   "gewerk": "Schacht",
+   "taetigkeit": "Gerinne herstellen",
+   "einheit": "St",
+   "h_min": 2.625,
+   "h_mittel": 3.5,
+   "h_max": 4.375,
+   "material": [
+    {
+     "code": "BET",
+     "menge_je_einheit": 0.15
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 2.0
+    }
+   ],
+   "bemerkung": "Gerinne in Beton, Berme mit Gefälle."
+  },
+  "T01": {
+   "gewerk": "Straße",
+   "taetigkeit": "Asphalt schneiden",
+   "einheit": "m",
+   "h_min": 0.038,
+   "h_mittel": 0.05,
+   "h_max": 0.062,
+   "material": [],
+   "geraet": [
+    {
+     "code": "SAEG",
+     "stunden_je_einheit": 0.05
+    }
+   ],
+   "bemerkung": "Schnitttiefe bis 20 cm."
+  },
+  "T02": {
+   "gewerk": "Straße",
+   "taetigkeit": "Asphalt aufbrechen, laden, entsorgen",
+   "einheit": "m2",
+   "h_min": 0.045,
+   "h_mittel": 0.06,
+   "h_max": 0.075,
+   "material": [
+    {
+     "code": "DEP",
+     "menge_je_einheit": 0.25
+    }
+   ],
+   "geraet": [
+    {
+     "code": "BAG14",
+     "stunden_je_einheit": 0.04
+    },
+    {
+     "code": "LKW",
+     "stunden_je_einheit": 0.03
+    }
+   ],
+   "bemerkung": "Dicke bis 15 cm, teerfrei lt. Gutachten."
+  },
+  "T03": {
+   "gewerk": "Straße",
+   "taetigkeit": "Asphalttragschicht AC 22 TS einbauen, d = 10 cm",
+   "einheit": "m2",
+   "h_min": 0.022,
+   "h_mittel": 0.03,
+   "h_max": 0.037,
+   "material": [
+    {
+     "code": "ACT",
+     "menge_je_einheit": 0.245
+    }
+   ],
+   "geraet": [
+    {
+     "code": "FER",
+     "stunden_je_einheit": 0.006
+    },
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.01
+    }
+   ],
+   "bemerkung": "Maschineller Einbau."
+  },
+  "T04": {
+   "gewerk": "Straße",
+   "taetigkeit": "Asphaltdeckschicht AC 11 DS einbauen, d = 4 cm",
+   "einheit": "m2",
+   "h_min": 0.019,
+   "h_mittel": 0.025,
+   "h_max": 0.031,
+   "material": [
+    {
+     "code": "ACD",
+     "menge_je_einheit": 0.1
+    }
+   ],
+   "geraet": [
+    {
+     "code": "FER",
+     "stunden_je_einheit": 0.005
+    },
+    {
+     "code": "WAL",
+     "stunden_je_einheit": 0.01
+    }
+   ],
+   "bemerkung": "Maschineller Einbau."
+  },
+  "T05": {
+   "gewerk": "Straße",
+   "taetigkeit": "Betonsteinpflaster 8 cm verlegen, einschl. Bettung",
+   "einheit": "m2",
+   "h_min": 0.285,
+   "h_mittel": 0.38,
+   "h_max": 0.475,
+   "material": [
+    {
+     "code": "PFL",
+     "menge_je_einheit": 1.02
+    },
+    {
+     "code": "SAND",
+     "menge_je_einheit": 0.08
+    }
+   ],
+   "geraet": [
+    {
+     "code": "RUE",
+     "stunden_je_einheit": 0.05
+    }
+   ],
+   "bemerkung": "Läuferverband, Fugen mit Sand."
+  },
+  "T06": {
+   "gewerk": "Straße",
+   "taetigkeit": "Hochbordstein 15/30 in Beton setzen",
+   "einheit": "m",
+   "h_min": 0.21,
+   "h_mittel": 0.28,
+   "h_max": 0.35,
+   "material": [
+    {
+     "code": "BORD",
+     "menge_je_einheit": 1.0
+    },
+    {
+     "code": "BET",
+     "menge_je_einheit": 0.06
+    }
+   ],
+   "geraet": [
+    {
+     "code": "KLG",
+     "stunden_je_einheit": 0.3
+    }
+   ],
+   "bemerkung": "Rückenstütze in Beton C20/25."
+  },
+  "B01": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Baustelleneinrichtung einrichten, vorhalten, räumen",
+   "einheit": "psch",
+   "h_min": 0.0,
+   "h_mittel": 0.0,
+   "h_max": 0.0,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Kalkuliert als Anteil der Einzelkosten aller übrigen Positionen."
+  },
+  "B02": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Verkehrssicherung vorhalten",
+   "einheit": "Wo",
+   "h_min": 0.75,
+   "h_mittel": 1.0,
+   "h_max": 1.25,
+   "material": [
+    {
+     "code": "BAKE",
+     "menge_je_einheit": 1.0
+    }
+   ],
+   "geraet": [],
+   "bemerkung": "Absperrung und Beschilderung nach RSA, je Woche."
+  },
+  "B03": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Stundenlohnarbeiten Facharbeiter",
+   "einheit": "h",
+   "h_min": 0.75,
+   "h_mittel": 1.0,
+   "h_max": 1.25,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Nur auf Anordnung der Bauleitung."
+  },
+  "B04": {
+   "gewerk": "Baustelle",
+   "taetigkeit": "Bestandsdokumentation und Aufmaß",
+   "einheit": "psch",
+   "h_min": 10.5,
+   "h_mittel": 14.0,
+   "h_max": 17.5,
+   "material": [],
+   "geraet": [],
+   "bemerkung": "Digitale Bestandspläne nach Vorgabe des Netzbetreibers."
+  }
+ }
+}

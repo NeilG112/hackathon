@@ -97,6 +97,43 @@ def compose_oz(item: ET.Element, parents: Dict[ET.Element, ET.Element]) -> str:
     return "".join(oz_parts(item, parents))
 
 
+LABEL_TAGS = ("LblTx", "OutlineText", "Label", "Description")
+# A category's label lives in its own direct children; `BoQBody` holds the
+# child categories and items. Searching the whole subtree picks up the first
+# *position's* description instead and silently labels every section with the
+# name of one of its line items.
+BODY_TAGS = ("BoQBody", "Itemlist")
+
+
+def section_path(item: ET.Element, parents: Dict[ET.Element, ET.Element]) -> tuple[str, ...]:
+    """Labels of the `BoQCtgy` ancestors, outermost -> innermost.
+
+    These carry the construction section — "Tiefbau Ost - Haupttrasse 2023",
+    "BA 01 + BA 02", "[ORT_030]" — which is the location key the inconsistency
+    engine groups on. Falls back to the category's RNoPart when a node has no
+    readable label, so the path never silently collapses.
+    """
+    labels: List[str] = []
+    cursor: Optional[ET.Element] = item
+    while cursor in parents:
+        cursor = parents[cursor]
+        if local_name(cursor.tag) != CATEGORY_TAG:
+            continue
+        label_scope = [c for c in cursor if local_name(c.tag) not in BODY_TAGS]
+        text = ""
+        for tag in LABEL_TAGS:
+            for child in label_scope:
+                found = child if local_name(child.tag) == tag else _find_descendant(child, tag)
+                text = _text_of(found)
+                if text:
+                    break
+            if text:
+                break
+        labels.append(text[:70] or f"Abschnitt {cursor.attrib.get('RNoPart', '?')}")
+    labels.reverse()
+    return tuple(labels)
+
+
 def _quantity(item: ET.Element) -> float:
     raw = (getattr(_child(item, "Qty"), "text", "") or "").strip()
     if not raw:
@@ -130,6 +167,7 @@ def parse(path: str) -> List[NormalizedItem]:
             NormalizedItem(
                 oz=compose_oz(el, parents),
                 oz_parts=oz_parts(el, parents),
+                section_path=section_path(el, parents),
                 quantity=_quantity(el),
                 unit=(getattr(_child(el, "QU"), "text", "") or "").strip(),
                 short_text=_text_of(outline) or short_text(long),

@@ -30,7 +30,8 @@ import traceback
 import pandas as pd
 import streamlit as st
 
-from core import constants, detectors, parser_gaeb90, parser_x83, pricer
+from core import (classify, constants, detectors, kalkulation, logic, objects,
+                  parser_gaeb90, parser_x83, pricer, stammdaten)
 from views import reveal
 
 ONE_SENTENCE = (
@@ -92,9 +93,35 @@ def rehydrate(dicts: list[dict]):
 
 # --- sections --------------------------------------------------------------
 
+def sidebar_kalkulation() -> stammdaten.Company:
+    """The cost base the bottom-up calculation uses.
+
+    These are the parameters the client said a contractor must bring himself:
+    *"Maschinenstundensätze hast du aus der Firma gegeben"*. Presets come from
+    the bidder profiles in the test database.
+    """
+    st.sidebar.header("Kalkulationsgrundlage")
+    presets = stammdaten.companies()
+    names = [c.name for c in presets]
+    chosen = presets[names.index(st.sidebar.selectbox("Profil", names))]
+
+    wage = st.sidebar.slider("Mittellohn (€/h)", 35.0, 95.0,
+                             float(chosen.mittellohn_eur_h), 0.5)
+    markup = st.sidebar.slider("Zuschlag AGK+BGK+W&G (%)", 0.0, 45.0,
+                               float(chosen.zuschlag_pct), 0.5)
+    perf = st.sidebar.slider("Leistungsfaktor", 0.6, 1.6,
+                             float(chosen.leistungsfaktor), 0.05,
+                             help=">1 = slower than the standard times")
+    mat = st.sidebar.slider("Materialfaktor", 0.6, 1.6,
+                            float(chosen.materialfaktor), 0.05)
+    if chosen.profil:
+        st.sidebar.caption(chosen.profil)
+    return stammdaten.Company(chosen.name, wage, markup, perf, mat, chosen.profil)
+
+
 def sidebar_company() -> dict:
-    """Company cost base sliders. Returns the dict the pricer consumes."""
-    st.sidebar.header("Your cost base")
+    """Legacy comparable-pricing sliders (cross-check engine only)."""
+    st.sidebar.header("Vergleichspreise (Quercheck)")
     labels = {
         "mittellohn_eur_h": "Average loaded wage (€/h)",
         "overhead_pct": "Site overhead (%)",
@@ -196,9 +223,154 @@ def section_items(items):
     st.dataframe(frame, width="stretch", hide_index=True, height=320)
 
 
+def section_objects(items, priced):
+    """The object table and the project roll-up. Returns the table rows."""
+    st.subheader("3 · What the project is made of")
+    rows = objects.build(items, priced)
+    cov = objects.coverage(rows)
+
+    st.caption(
+        f"{cov['positions']} positions grouped into {cov['rows']} "
+        f"(section × object × unit) cells. **{cov['tagged_pct']}% of positions "
+        f"were classified**; {cov['unknown']} are “unklar” and are excluded "
+        "from every cross-position check — a wrong tag would produce a "
+        "confident false finding, which is worse than no finding."
+    )
+
+    left, right = st.columns(2)
+    with left:
+        st.markdown("**Project roll-up** — the manual-summing job")
+        st.dataframe(pd.DataFrame([{
+            "Objekt": r.obj, "Menge": round(r.quantity, 1), "Einheit": r.unit,
+            "Positionen": len(r.positions),
+        } for r in objects.rollup(rows) if r.obj != objects.UNKNOWN_TAG][:14]),
+            width="stretch", hide_index=True, height=300)
+    with right:
+        st.markdown("**By section** — the key the logic checks use")
+        st.dataframe(pd.DataFrame([{
+            "Abschnitt": r.location[:38], "Objekt": r.obj,
+            "Menge": round(r.quantity, 1), "Einheit": r.unit,
+            "Pos.": len(r.positions),
+        } for r in rows if r.obj != objects.UNKNOWN_TAG][:14]),
+            width="stretch", hide_index=True, height=300)
+    return rows
+
+
+def section_logic(rows, items):
+    """Cross-position contradictions."""
+    st.subheader("4 · Does the tender contradict itself?")
+    st.caption(
+        "Checks that only exist between positions: containment (heated floor "
+        "area cannot exceed the slab), order-of-magnitude quantity outliers "
+        "(the misplaced zero), and repeated positions. All deterministic — "
+        "same tender, same findings, every run."
+    )
+    found = logic.run_all(rows, items)
+    if not found:
+        st.success(
+            "No cross-position contradictions found. That is a real result, "
+            "not a placeholder — on this tender the containment rules have no "
+            "matching pairs to test."
+        )
+        return []
+    st.dataframe(pd.DataFrame([{
+        "OZ": f.item.key(), "Schwere": f.severity,
+        "€ exposure": round(f.euro_leverage, 2), "Befund": f.rationale,
+    } for f in found]), width="stretch", hide_index=True)
+    return found
+
+
+def section_kalkulation(items, company, data):
+    """Bottom-up Aufschlagskalkulation — the bid. Returns calculated items."""
+    st.subheader("5 · Das Angebot")
+
+    assignments = classify.classify(items, data, use_jev=False)
+    cov = classify.coverage(assignments)
+    calculated = kalkulation.calculate(items, assignments, company, data)
+    stats = kalkulation.summarize(calculated)
+
+    a, b, c, d = st.columns(4)
+    a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
+             help="Mittelwert der Spanne")
+    b.metric("Spanne", f"€{stats['total_low']:,.0f} – {stats['total_high']:,.0f}")
+    c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
+             help=f"{stats['unpriced']} Positionen ohne zugeordnete Leistung")
+    d.metric("davon Lohn", f"€{stats['labour_eur']:,.0f}")
+
+    if cov["pct"] < 50:
+        st.error(
+            f"**Nur {cov['pct']}% der Positionen konnten einer Leistung "
+            f"zugeordnet werden.** Der Katalog hat "
+            f"{len(data.leistungen)} Einträge; dieses LV beschreibt Arbeiten, "
+            "die darin nicht vorkommen. Die Summe oben deckt deshalb nur einen "
+            "Teil des Leistungsverzeichnisses ab — sie ist kein vollständiges "
+            "Angebot. Ein größerer Katalog oder ein semantischer Klassifikator "
+            "behebt das; Stichwortabgleich reicht hier nicht."
+        )
+    if data.is_synthetic:
+        st.caption(
+            "⚠️ Die Stammdaten sind **synthetisch** (eigene Schätzungen in "
+            "ARH-Größenordnung, keine Marktabfrage). Das Verfahren ist echt, "
+            "die Zahlen sind Platzhalter, bis echte Firmenwerte hinterlegt sind."
+        )
+
+    st.dataframe(pd.DataFrame([{
+        "OZ": c.item.key(),
+        "Position": c.item.short_text[:52],
+        "Menge": c.item.quantity,
+        "Einheit": constants.normalize_unit(c.item.unit),
+        "Leistung": c.leistung.code if c.leistung else "—",
+        "EP min": c.ep_low, "EP mittel": c.ep_mid, "EP max": c.ep_high,
+        "GP": c.total,
+        "Grundlage": c.note[:60],
+    } for c in calculated]), width="stretch", hide_index=True, height=320)
+    return calculated
+
+
+def section_tricky(calculated):
+    """Positions nobody can price confidently from what is written."""
+    st.subheader("6 · Heikle Positionen")
+    st.caption(
+        "The estimator's ask: *“who can tell how much this costs? Is it 50,000 "
+        "or 200,000? If a system hints that this position is tricky, that is "
+        "an advantage.”* Three signals: no Leistung could be assigned, the "
+        "standard times themselves disagree widely, or the position is a lump "
+        "sum with no measurable quantity."
+    )
+    rows = []
+    for c in calculated:
+        reasons = []
+        if not c.priced:
+            reasons.append("keine Leistung zuordenbar")
+        elif c.band_width > 0.35:
+            reasons.append(f"Spanne ±{100*c.band_width/2:.0f}%")
+        if c.item.is_lump_sum:
+            reasons.append("Pauschalposition")
+        if reasons:
+            rows.append({
+                "OZ": c.item.key(), "Position": c.item.short_text[:58],
+                "Menge": c.item.quantity,
+                "Einheit": constants.normalize_unit(c.item.unit),
+                "€ unsicher": round(c.euro_at_stake, 2),
+                "Grund": ", ".join(reasons),
+            })
+    if not rows:
+        st.success("Keine auffällig unsicheren Positionen.")
+        return
+    frame = pd.DataFrame(rows).sort_values("€ unsicher", ascending=False)
+    st.markdown(f"**{len(frame)} Positionen** brauchen einen Menschen.")
+    st.dataframe(frame.head(25), width="stretch", hide_index=True)
+
+
 def section_pricing(items, company, reference):
-    """Price every position and show the totals. Returns the priced list."""
-    st.subheader("3 · What it should cost")
+    """Comparable-price cross-check. Secondary to the calculation above."""
+    st.subheader("7 · Quercheck gegen echte Angebotspreise")
+    st.caption(
+        "A second, independent estimate from 720 unit prices in three real "
+        "submitted bids. Where the two engines agree, confidence is higher; "
+        "where they diverge, look. Measured on its own (answer key held out) "
+        "this engine is −50% on the total, so it is a cross-check, not a bid."
+    )
     priced = pricer.price_boq(items, reference, company)
     stats = pricer.summarize(priced)
 
@@ -240,7 +412,7 @@ def section_pricing(items, company, reference):
 
 def section_findings(priced, remarks):
     """Top findings by € leverage. Lights up when task 004 lands."""
-    st.subheader(f"4 · Top {constants.TOP_N_FINDINGS} positions worth arguing about")
+    st.subheader(f"8 · Top {constants.TOP_N_FINDINGS} positions worth arguing about")
     st.caption(
         "Ranked by € leverage (quantity × price exposure). Where no comparable "
         f"exists we print “{constants.NO_COMPARABLE_LABEL}” rather than invent a number."
@@ -271,7 +443,7 @@ def section_findings(priced, remarks):
 
 def section_reveal(priced, answer, source_label):
     """The reveal. PLAN.md step 4 — this is the whole pitch."""
-    st.subheader("5 · How wrong are we?")
+    st.subheader("9 · How wrong are we?")
 
     if answer is None:
         st.caption(
@@ -309,7 +481,7 @@ def constants_sources() -> list[str]:
 
 def section_export(findings):
     """Bieterfragen-Katalog download. Lights up when task 006 lands."""
-    st.subheader("6 · The letter")
+    st.subheader("10 · The letter")
     if not findings:
         st.button("Export clarification letter (.docx)", disabled=True)
         st.caption("No findings are available for export.")
@@ -353,6 +525,8 @@ def main():
     st.title("Bid & Risk Assistant")
     st.write(ONE_SENTENCE)
 
+    kalk_company = sidebar_kalkulation()
+    data = stammdaten.load()
     company = sidebar_company()
     reference = load_reference()
     if reference.get("meta", {}).get("missing"):
@@ -381,6 +555,11 @@ def main():
         )
 
     section_items(items)
+    priced = pricer.price_boq(items, reference, company)
+    rows = section_objects(items, priced)
+    section_logic(rows, items)
+    calculated = section_kalkulation(items, kalk_company, data)
+    section_tricky(calculated)
     priced, _ = section_pricing(items, company, reference)
     findings = section_findings(priced, remarks)
     section_reveal(priced, answer, source_label)

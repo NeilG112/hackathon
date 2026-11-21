@@ -49,6 +49,14 @@ class NormalizedItem:
     # the two formats pad levels differently — see `padded_key`.
     oz_parts: tuple[str, ...] = ()
 
+    # The hierarchy's *labels*, outermost -> innermost: "Tiefbau Ost -
+    # Haupttrasse 2023" > "[ORT_030]". This is the location key, and the
+    # inconsistency engine does not work without it: "300 m2 of floor heating
+    # over 50 m2 of slab" is only a contradiction *within one section*. Summed
+    # across a whole site, heating spread over twelve floors looks fine and the
+    # finding disappears. See core/objects.py.
+    section_path: tuple[str, ...] = ()
+
     short_text: str = ""
     long_text: str = ""
     is_lump_sum: bool = False
@@ -65,6 +73,18 @@ class NormalizedItem:
     def key(self) -> str:
         """Join key. Use this, never the list index (the 248/249 gap)."""
         return normalize_oz(self.oz)
+
+    def location(self, depth: int = 2) -> str:
+        """The section this position sits in — the inconsistency engine's key.
+
+        `depth` trades sensitivity against noise: too shallow and everything
+        is one location (contradictions average away); too deep and every
+        position is its own location (nothing to compare). Two levels matches
+        the Bauabschnitt / Bereich split these tenders actually use.
+        """
+        if not self.section_path:
+            return "(ohne Abschnitt)"
+        return " > ".join(self.section_path[:depth])
 
     def padded_key(self, widths: tuple[int, ...]) -> str:
         """Join key with each OZ level zero-padded to `widths`.
@@ -105,6 +125,7 @@ class NormalizedItem:
         return {
             "oz": self.oz,
             "oz_parts": list(self.oz_parts),
+            "section_path": list(self.section_path),
             "quantity": self.quantity,
             "unit": self.unit,
             "short_text": self.short_text,
@@ -120,6 +141,7 @@ class NormalizedItem:
     def from_dict(cls, raw: dict) -> "NormalizedItem":
         data = dict(raw)
         data["oz_parts"] = tuple(data.get("oz_parts") or ())
+        data["section_path"] = tuple(data.get("section_path") or ())
         return cls(**data)
 
 

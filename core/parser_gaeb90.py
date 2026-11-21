@@ -40,6 +40,7 @@ ITEM_RECORD = "21"        # quantity + unit
 PRICE_RECORD = "23"       # unit price (EP) + total (GB) + quantity
 SHORT_TEXT_RECORD = "25"  # Kurztext
 LONG_TEXT_RECORD = "26"   # Langtext continuation lines
+SUBTITLE_RECORD = "12"    # the Titel/Bereich label that follows a type-11
 HIERARCHY_RECORD = "11"   # Titel / Bereich — resets the current item
 
 _DIGITS = set("0123456789")
@@ -332,6 +333,10 @@ def parse(path: str) -> List[NormalizedItem]:
     items: List[NormalizedItem] = []
     current: Optional[NormalizedItem] = None
     long_text: List[str] = []
+    # Running hierarchy labels: type 11 opens a Titel/Bereich, type 12 adds its
+    # text. Together they are the location key the inconsistency engine needs.
+    section: List[str] = []
+    pending_depth = 0
 
     def flush() -> None:
         if current is not None:
@@ -345,6 +350,7 @@ def parse(path: str) -> List[NormalizedItem]:
             long_text = []
             current = NormalizedItem(
                 oz=_slice(line, layout.oz),
+                section_path=tuple(section),
                 quantity=_scaled_int(_slice(line, layout.quantity), QTY_SCALE),
                 unit=_slice(line, layout.unit),
                 source_file=path,
@@ -359,9 +365,21 @@ def parse(path: str) -> List[NormalizedItem]:
             long_text.append(line[2:])
 
         elif kind == HIERARCHY_RECORD:
+            # '1101       N    Titel' / '110101     N    Bereich'. The record
+            # only says which *level* opened; the readable name arrives in the
+            # type-12 line that follows. Depth comes from the OZ width.
             flush()
             current = None
             long_text = []
+            depth = max(1, len(_slice(line, layout.oz).replace(" ", "")) // 2)
+            section = section[: depth - 1]
+            pending_depth = depth
+
+        elif kind == SUBTITLE_RECORD:
+            text = line[2:].strip()
+            if text and pending_depth:
+                section = section[: pending_depth - 1] + [text]
+                pending_depth = 0
 
     flush()
 

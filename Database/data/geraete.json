@@ -1,0 +1,49 @@
+{
+ "meta": {
+  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
+  "seed": 2026,
+  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."
+ },
+ "geraete": {
+  "BAG14": {
+   "bezeichnung": "Mobilbagger 14 t",
+   "kosten_eur_h": 68.0
+  },
+  "BAG25": {
+   "bezeichnung": "Kettenbagger 25 t",
+   "kosten_eur_h": 98.0
+  },
+  "RLD": {
+   "bezeichnung": "Radlader 2 m³",
+   "kosten_eur_h": 58.0
+  },
+  "LKW": {
+   "bezeichnung": "LKW 3-Achs-Kipper",
+   "kosten_eur_h": 72.0
+  },
+  "RUE": {
+   "bezeichnung": "Rüttelplatte 400 kg",
+   "kosten_eur_h": 9.5
+  },
+  "WAL": {
+   "bezeichnung": "Tandemwalze 3 t",
+   "kosten_eur_h": 31.0
+  },
+  "FER": {
+   "bezeichnung": "Asphaltfertiger",
+   "kosten_eur_h": 185.0
+  },
+  "VBG": {
+   "bezeichnung": "Grabenverbaugerät (Vorhaltung)",
+   "kosten_eur_h": 14.0
+  },
+  "KLG": {
+   "bezeichnung": "Kleingerät / Handwerkzeug",
+   "kosten_eur_h": 4.0
+  },
+  "SAEG": {
+   "bezeichnung": "Fugenschneider",
+   "kosten_eur_h": 12.0
+  }
+ }
+}
