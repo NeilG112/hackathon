@@ -109,16 +109,49 @@ def sidebar_kalkulation() -> stammdaten.Company:
 
     wage = st.sidebar.slider("Mittellohn (€/h)", 35.0, 95.0,
                              float(chosen.mittellohn_eur_h), 0.5)
-    markup = st.sidebar.slider("Zuschlag AGK+BGK+W&G (%)", 0.0, 45.0,
-                               float(chosen.zuschlag_pct), 0.5)
+
+    # The markup, split into its three parts. Arithmetically a combined number
+    # is identical — 15 + 5 is always 20 — but split, the estimator can see
+    # which decision costs what: keep the AGK, waive the BGK on a strategic
+    # job, set W&G where he wants it.
+    st.sidebar.markdown("**Zuschläge**")
+    agk = st.sidebar.slider(
+        "AGK — Allgemeine Geschäftskosten (%)", 0.0, 30.0,
+        float(chosen.agk_pct), 0.5,
+        help="Kosten des Unternehmens außerhalb der Baustelle, auf ein "
+             "ganzes Jahr gerechnet.")
+    bgk = st.sidebar.slider("BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
+                            float(chosen.bgk_pct), 0.5)
+    wg = st.sidebar.slider("W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
+                           float(chosen.wg_pct), 0.5)
+
+    # AGK is an annual figure. A ten-month job carries ten twelfths of it.
+    months = st.sidebar.slider(
+        "Bauzeit (Monate)", 1.0, 24.0, float(chosen.bauzeit_monate), 1.0,
+        help="Nur die AGK werden anteilig umgelegt — BGK und W&G nicht.")
+
+    company = stammdaten.Company(
+        chosen.name, wage, chosen.zuschlag_pct, chosen.leistungsfaktor,
+        chosen.materialfaktor, chosen.profil,
+        agk_pct=agk, bgk_pct=bgk, wg_pct=wg, bauzeit_monate=months,
+    )
+    st.sidebar.metric("Zuschlag gesamt", f"{company.total_markup_pct:.1f} %")
+    if months != 12:
+        st.sidebar.caption(
+            f"AGK {agk:.1f} % × {months:.0f}/12 = **{company.agk_wirksam_pct:.1f} %** "
+            f"— {12 - months:+.0f} Monate gegenüber dem Jahr."
+        )
+
     perf = st.sidebar.slider("Leistungsfaktor", 0.6, 1.6,
                              float(chosen.leistungsfaktor), 0.05,
-                             help=">1 = slower than the standard times")
+                             help=">1 = langsamer als die Richtwerte")
     mat = st.sidebar.slider("Materialfaktor", 0.6, 1.6,
                             float(chosen.materialfaktor), 0.05)
+    company.leistungsfaktor = perf
+    company.materialfaktor = mat
     if chosen.profil:
         st.sidebar.caption(chosen.profil)
-    return stammdaten.Company(chosen.name, wage, markup, perf, mat, chosen.profil)
+    return company
 
 
 def section_upload(show_controls: bool = True):
@@ -927,7 +960,10 @@ def main():
     else:
         company = sidebar_kalkulation()
         data = stammdaten.load()
-        assignments = classify.classify(items, data, use_jev=False)
+        # No use_jev=False here: the cache still answers the prepared tender
+        # offline, but an uploaded file is not in it and the keyword fallback
+        # scores near zero on real wording — that is the 3% coverage bug.
+        assignments = classify.classify(items, data)
         calculated = kalkulation.calculate(items, assignments, company, data)
         if page == "Gruppen & Angebot":
             cov = classify.coverage(assignments)

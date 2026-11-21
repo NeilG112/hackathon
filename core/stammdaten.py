@@ -58,16 +58,65 @@ class Leistung:
         return f"{self.code} · {self.taetigkeit}"
 
 
+# When only a combined markup is known, split it in this ratio. Chosen so the
+# total is unchanged — switching to the split view must not move the bid by a
+# cent until someone actually drags a slider.
+DEFAULT_SPLIT = {"agk": 0.60, "bgk": 0.15, "wg": 0.25}
+
+
 @dataclass
 class Company:
-    """The cost base. Mirrors the `bieter` table so profiles can be loaded."""
+    """The cost base: wages, factors, and the markup broken into its parts."""
 
     name: str = "Eigene Kalkulation"
     mittellohn_eur_h: float = 58.0
-    zuschlag_pct: float = 22.0      # AGK + BGK + Wagnis & Gewinn, combined
+    zuschlag_pct: float = 22.0      # combined AGK + BGK + W&G, as loaded
     leistungsfaktor: float = 1.0    # >1 = slower than the standard times
     materialfaktor: float = 1.0     # >1 = buys material dearer
     profil: str = ""
+
+    # The markup, split. A combined number is fine arithmetically — 15 + 5 is
+    # always 20 — but it hides where the money goes. Split, an estimator can
+    # say "I need my 15 % AGK, I'll waive BGK on this one, and I'll take 8 %
+    # Wagnis & Gewinn", and see what each decision costs.
+    agk_pct: Optional[float] = None   # Allgemeine Geschäftskosten (annual)
+    bgk_pct: Optional[float] = None   # Baustellengemeinkosten
+    wg_pct: Optional[float] = None    # Wagnis und Gewinn
+
+    # AGK is the firm's overhead **for a full year**. A job that runs ten
+    # months should carry ten twelfths of it, not a year's worth. Only AGK
+    # scales this way: site overhead and profit do not.
+    bauzeit_monate: float = 12.0
+
+    def __post_init__(self) -> None:
+        if self.agk_pct is None and self.bgk_pct is None and self.wg_pct is None:
+            total = float(self.zuschlag_pct or 0.0)
+            self.agk_pct = round(total * DEFAULT_SPLIT["agk"], 2)
+            self.bgk_pct = round(total * DEFAULT_SPLIT["bgk"], 2)
+            self.wg_pct = round(total * DEFAULT_SPLIT["wg"], 2)
+        else:
+            self.agk_pct = float(self.agk_pct or 0.0)
+            self.bgk_pct = float(self.bgk_pct or 0.0)
+            self.wg_pct = float(self.wg_pct or 0.0)
+
+    @property
+    def agk_wirksam_pct(self) -> float:
+        """AGK actually carried by this job, prorated over the build time."""
+        months = max(0.0, float(self.bauzeit_monate or 12.0))
+        return self.agk_pct * months / 12.0
+
+    @property
+    def total_markup_pct(self) -> float:
+        """What actually gets added on top of the direct costs."""
+        return self.agk_wirksam_pct + self.bgk_pct + self.wg_pct
+
+    def markup_factor(self) -> float:
+        return 1.0 + self.total_markup_pct / 100.0
+
+    def describe_markup(self) -> str:
+        return (f"AGK {self.agk_pct:.1f} % × {self.bauzeit_monate:.0f}/12 = "
+                f"{self.agk_wirksam_pct:.1f} %  ·  BGK {self.bgk_pct:.1f} %  ·  "
+                f"W&G {self.wg_pct:.1f} %  →  {self.total_markup_pct:.1f} %")
 
 
 class Stammdaten:

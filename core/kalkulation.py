@@ -176,7 +176,11 @@ def calculate_item(
                   f"die Position in {item.unit} — nicht direkt kalkulierbar"),
         )
 
-    markup = 1.0 + company.zuschlag_pct / 100.0
+    # AGK prorated over the build time, plus BGK and W&G. See
+    # Company.markup_factor — a combined percentage hides which decision costs
+    # what, and AGK is an annual figure a ten-month job should only carry ten
+    # twelfths of.
+    markup = company.markup_factor()
     mid = unit_costs(leistung, company, data, leistung.h_mittel)
     low = unit_costs(leistung, company, data, leistung.h_min)
     high = unit_costs(leistung, company, data, leistung.h_max)
@@ -194,7 +198,7 @@ def calculate_item(
             f"{company.mittellohn_eur_h:,.2f} €/h"
             + (f" + {mid.machine_eur:,.2f} € Gerät" if mid.machine_eur else "")
             + (f" + {mid.material_eur:,.2f} € Material" if mid.material_eur else "")
-            + f", +{company.zuschlag_pct:.0f}% Zuschlag"
+            + f", +{company.total_markup_pct:.1f}% Zuschlag"
         ),
     )
 
