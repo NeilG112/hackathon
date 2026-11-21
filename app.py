@@ -310,17 +310,43 @@ def constants_sources() -> list[str]:
 def section_export(findings):
     """Bieterfragen-Katalog download. Lights up when task 006 lands."""
     st.subheader("6 · The letter")
+    if not findings:
+        st.button("Export clarification letter (.docx)", disabled=True)
+        st.caption("No findings are available for export.")
+        return
+
+    import export_rfi
+    project = {"title": "Bieterfragen-Katalog"}
+    catalog = export_rfi.build_catalog(findings, project)
+    if not catalog:
+        st.button("Export clarification letter (.docx)", disabled=True)
+        st.caption("No findings are available for export.")
+        return
+
     try:
-        import export_rfi
-        catalog = export_rfi.build_catalog(findings, {"title": "Bieterfragen"})
+        with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as handle:
+            out_path = handle.name
+        export_rfi.to_docx(catalog, out_path, project)
+        with open(out_path, "rb") as handle:
+            payload = handle.read()
+        os.unlink(out_path)
         st.download_button(
             "Export clarification letter (.docx)",
-            data=export_rfi.to_markdown(catalog, {"title": "Bieterfragen"}),
+            data=payload,
             file_name="Bieterfragen-Katalog.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
-    except NotImplementedError:
-        st.button("Export clarification letter (.docx)", disabled=True)
-        st.caption("The RFI export is task 006 — not built yet.")
+    except Exception as exc:
+        fallback = export_rfi.to_markdown(catalog, project).encode("utf-8")
+        st.warning("DOCX export is unavailable; the Markdown fallback is ready.")
+        st.download_button(
+            "Export clarification letter (.md)",
+            data=fallback,
+            file_name="Bieterfragen-Katalog.md",
+            mime="text/markdown",
+        )
+        with st.expander("Export details"):
+            st.code(str(exc))
 
 
 def main():

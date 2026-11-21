@@ -1,0 +1,11 @@
+{
+  "unit_price_outlier": {
+    "question": "Für die Position OZ {oz} - {kurztext} werden bitte die Einheit {einheit} und die vorgesehene Menge von {menge} bestätigt. Wie ist die Leistungsabgrenzung gegenüber andersartigen Leistungen festgelegt?"
+  },
+  "vague_scope": {
+    "question": "Für die Position OZ {oz} - {kurztext} (Menge: {menge} {einheit}) ist die Leistungsbeschreibung in Teilen nicht eindeutig. Bitte bestätigen Sie den vollständigen Leistungsumfang und grenzen Sie die enthaltenen sowie die gesondert zu vergütenden Leistungen ab."
+  },
+  "qty_sanity": {
+    "question": "Für die Position OZ {oz} - {kurztext} wird um Bestätigung gebeten, ob die Menge von {menge} {einheit} und die gewählte Mengeneinheit zutreffend und vollständig bemessen sind."
+  }
+}
