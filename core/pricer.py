@@ -150,15 +150,23 @@ def build_distributions(
 
 
 def without_source(reference: dict, source: str) -> dict:
-    """`reference` with one bid held out of the distributions. Leave-one-out."""
-    rebuilt = build_distributions(reference.get("items", []), exclude_sources=[source])
+    """`reference` with one bid held out — distributions **and** item list.
+
+    Both must be filtered. The distributions feed the bucket/unit tiers, but
+    `nearest_comparables` reads `items` directly and prices the large majority
+    of positions, so filtering only the distributions leaves the tier that does
+    nearly all the work still looking at the answer. That bug silently returned
+    a perfect text match to the held-out bid's own line for the same position.
+    """
+    dropped = os.path.basename(source)
+    kept = [r for r in reference.get("items", [])
+            if os.path.basename(r.get("src", "")) != dropped]
+
+    rebuilt = build_distributions(kept)
     meta = dict(reference.get("meta", {}))
-    meta["held_out"] = os.path.basename(source)
-    meta["priced_items"] = sum(
-        1 for r in reference.get("items", [])
-        if os.path.basename(r.get("src", "")) != os.path.basename(source)
-    )
-    return {**rebuilt, "items": reference.get("items", []), "meta": meta}
+    meta["held_out"] = dropped
+    meta["priced_items"] = len(kept)
+    return {**rebuilt, "items": kept, "meta": meta}
 
 
 def bucket_for(item: NormalizedItem) -> str:
