@@ -314,6 +314,11 @@
    "bezeichnung": "Bohlen und Polstermaterial (Schutzummantelung)",
    "einheit": "St",
    "preis_eur": 30.0
+  },
+  "ZMAT": {
+   "bezeichnung": "Material- und Fremdleistungsanteil (1 EUR je Einheit)",
+   "einheit": "EUR",
+   "preis_eur": 1.0
   }
  }
 }
