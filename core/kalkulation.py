@@ -185,6 +185,18 @@ def calculate_item(
     low = unit_costs(leistung, company, data, leistung.h_min)
     high = unit_costs(leistung, company, data, leistung.h_max)
 
+    # A direct cost of EUR 0.00 is not a price, it is a missing one. Checked on
+    # the result, not the inputs: a row with only h_max (or only h_min) still
+    # has nothing to price the mid value from. 724 catalogue rows extracted
+    # from tender PDFs carry no Aufwandswerte at all (status `ohne_preis`).
+    if mid.ekt <= 0:
+        reason = f" ({leistung.bemerkung})" if leistung.bemerkung else ""
+        return CalculatedItem(
+            item=item, leistung=leistung, confidence=confidence,
+            note=(f"{leistung.code} hat keine Aufwandswerte für den "
+                  f"Mittelwert — nicht kalkulierbar{reason}"),
+        )
+
     return CalculatedItem(
         item=item,
         leistung=leistung,

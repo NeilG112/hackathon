@@ -53,6 +53,15 @@ class Leistung:
     material: list = field(default_factory=list)   # [{code, menge_je_einheit}]
     geraet: list = field(default_factory=list)     # [{code, stunden_je_einheit}]
     bemerkung: str = ""
+    status: str = ""   # abgeleitet | geschaetzt | unsicher | marktpreis | ohne_preis
+
+    @property
+    def has_rates(self) -> bool:
+        """True when the row can produce a mid price (h_mittel, material or
+        machine time). Informational — the authoritative 0-EUR guard sits in
+        `kalkulation.calculate_item` and checks the computed direct cost.
+        """
+        return bool(self.h_mittel or self.material or self.geraet)
 
     def label(self) -> str:
         return f"{self.code} · {self.taetigkeit}"
@@ -188,6 +197,7 @@ def load() -> Stammdaten:
             material=v.get("material", []) or [],
             geraet=v.get("geraet", []) or [],
             bemerkung=v.get("bemerkung", ""),
+            status=v.get("status", ""),
         )
         for code, v in raw_l.items()
     }
