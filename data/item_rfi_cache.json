@@ -75,6 +75,10 @@
   "bidder_question_de": "Bezüglich Position 02020001 (Absteckung der Wasserleitung) bitten wir um Prüfung und Bestätigung der Menge von 55 St, da diese im Verhältnis zur beschriebenen Leistung unplausibel erscheint.",
   "commercial_reason_de": "Die ausgeschriebene Menge von 55 Stück für die Absteckung der Wasserleitung ist im Vergleich zu marktüblichen Positionen dieser Art extrem hoch und wirkt unplausibel. Es besteht das Risiko eines massiven Kalkulationsfehlers durch einen möglichen Komma- oder Zehnerpotenzfehler in der Mengenangabe, was zu erheblichen Preisabweichungen oder Mindermengenrisiken führen kann."
  },
+ "9026f60bd2dcf4db1f027011d451264e19cd0290e645ed5a279ba6c42e0f33bd": {
+  "bidder_question_de": "Bezüglich der Position 03060008 wird um Mitteilung gebeten, wie viele Teilinbetriebnahmen konkret vorgesehen sind und in welchen zeitlichen Abständen diese voraussichtlich erfolgen sollen.",
+  "commercial_reason_de": "Die Position ist als Pauschale ('psch') ausgeschrieben, während die Vorbemerkungen eine stufenweise Inbetriebnahme und potenzielle Mehrfachinbetriebnahmen fordern. Da die Anzahl der Teilinbetriebnahmen sowie der genaue zeitliche Ablauf nicht definiert sind, besteht ein hohes Risiko für unkalkulierbare Mehraufwendungen und Nachtragsforderungen."
+ },
  "939d8c91d4a32dc38024f5f158400c80ad1cec65b14e9ce925b7152e8b726f4f": {
   "bidder_question_de": "Bezüglich Position 131 'Warnleuchte WL1 aufbauen abbauen': Bitte geben Sie an, über welchen Zeitraum die Warnleuchten vorzuhalten sind und ob die Stromversorgung der Leuchten in dieser Position oder in einer anderen Position enthalten ist.",
   "commercial_reason_de": "Die Position beschreibt lediglich das Auf- und Abbauen der Warnleuchte. Es fehlen Angaben zur Vorhaltung (Mietdauer/Zeitraum) sowie zur Stromversorgung der Leuchten, was zu einer unvollständigen Kalkulation der Betriebskosten führt."

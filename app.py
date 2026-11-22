@@ -19,6 +19,7 @@ rather than fabricating output.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import os
@@ -40,12 +41,8 @@ from views import vergabe as vergabe_view
 
 SAMPLE = constants.REVEAL["blank_boq"]
 PAGES = ("Tender", "Gruppen & Angebot", "Vergabe", "Logik", "Heikle Positionen")
-# Kept as an argument to analyze_hybrid_cached so its signature stays stable.
-# The Streamlit memo layer is gone: it kept serving results from before a
-# slider moved or a rate table changed, and tracking down "why did the number
-# not update" cost more than re-running costs. The on-disk caches
-# (classification, judgments, deep logic) stay — they are what keeps the demo
-# offline and free.
+# These caches live in st.session_state: switching pages reuses results, while
+# a new browser session starts with a clean LV.
 HYBRID_ANALYSIS_CACHE_VERSION = "item-rfi-v1"
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
@@ -106,7 +103,7 @@ def load_from_disk(path: str):
 
 
 def load_from_upload(name: str, payload: bytes):
-    """Parse uploaded bytes. Cached on content, so sliders don't re-parse."""
+    """Parse uploaded bytes."""
     suffix = os.path.splitext(name)[1] or ".x83"
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:
         handle.write(payload)
@@ -127,6 +124,30 @@ def rehydrate(dicts: list[dict]):
     return [NormalizedItem.from_dict(d) for d in dicts]
 
 
+def lv_analysis_session_key(
+    item_dicts: list[dict],
+    remarks: list[str],
+    calculated_payload: list[dict],
+    priced_payload: list[dict],
+    use_jev: bool,
+    model_signature: str,
+) -> str:
+    """Stable session key for one LV's current analysis inputs."""
+    payload = {
+        "items": item_dicts,
+        "remarks": remarks,
+        "calculated": calculated_payload,
+        "priced": priced_payload,
+        "use_jev": use_jev,
+        "model_signature": model_signature,
+        "rules_version": logic.RULES_VERSION,
+        "analysis_version": HYBRID_ANALYSIS_CACHE_VERSION,
+    }
+    return hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
 def analyze_hybrid_cached(
     item_dicts: list[dict],
     remarks: list[str],
@@ -135,7 +156,7 @@ def analyze_hybrid_cached(
     use_jev: bool,
     analysis_version: str,
 ):
-    """Cache hybrid analysis; version invalidates results from older pipelines."""
+    """Run hybrid analysis on a session-cache miss."""
     from core.kalkulation import CalculatedItem
     from core.pricer import PricedItem
 
@@ -185,9 +206,17 @@ def evaluate_cluster_deep_cached(
     rules_version: str,
     payloads: dict[str, str],
 ) -> dict[str, dict]:
-    """Deep cluster cache key: filename + rule catalogue version + payload."""
+    """Cache deep cluster results for this browser session and model."""
     del filename
     adapter = deep_logic.get_adapter()
+    payload_fingerprint = hashlib.sha256(
+        json.dumps(payloads, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    session_cache_key = f"{rules_version}:{adapter.name}:{payload_fingerprint}"
+    session_cache = st.session_state.setdefault("lv_cluster_analysis_cache", {})
+    if session_cache_key in session_cache:
+        return session_cache[session_cache_key]
+
     model = adapter.name
     from types import SimpleNamespace
 
@@ -216,13 +245,15 @@ def evaluate_cluster_deep_cached(
         max_clusters=12,
         write_cache=True,
     )
-    return {
+    output = {
         cluster_id: {
             **evaluation.as_dict(),
             "model": model,
         }
         for cluster_id, evaluation in evaluations.items()
     }
+    session_cache[session_cache_key] = output
+    return output
 
 
 # --- sections --------------------------------------------------------------
@@ -378,11 +409,30 @@ def section_upload(show_controls: bool = True):
 
     try:
         if source[0] == "disk":
-            raw, remarks = load_from_disk(source[1])
-            label = os.path.basename(source[1])
+            source_path = _project_path(source[1])
+            with open(source_path, "rb") as handle:
+                source_bytes = handle.read()
+            suffix = os.path.splitext(source_path)[1].lower()
+            label = os.path.basename(source_path)
         else:
-            raw, remarks = load_from_upload(source[1], source[2])
+            source_bytes = source[2]
+            suffix = os.path.splitext(source[1])[1].lower()
             label = source[1]
+        parse_cache_key = hashlib.sha256(
+            suffix.encode("utf-8") + b"\0" + source_bytes
+        ).hexdigest()
+        parse_cache = st.session_state.setdefault("lv_parse_cache", {})
+        if parse_cache_key in parse_cache:
+            raw, remarks, pdf_confidence = parse_cache[parse_cache_key]
+            if pdf_confidence is not None:
+                st.session_state["pdf_confidence"] = pdf_confidence
+        else:
+            if source[0] == "disk":
+                raw, remarks = load_from_disk(source[1])
+            else:
+                raw, remarks = load_from_upload(source[1], source_bytes)
+            pdf_confidence = st.session_state.get("pdf_confidence")
+            parse_cache[parse_cache_key] = (raw, remarks, pdf_confidence)
     except ValueError as exc:
         # Known-unknown format. Say so plainly and offer the sample — do not
         # guess at a parse and present fabricated positions as real.
@@ -2396,8 +2446,56 @@ def section_export(findings, cluster_evaluations=None):
 
 def main():
     if "_persisted_session_restored" not in st.session_state:
+        has_current_source = "source" in st.session_state
+        has_current_page = "active_page" in st.session_state
+        has_current_manual_prices = "manual_prices" in st.session_state
+        has_current_vergabe = "vergabe_entscheidungen" in st.session_state
+        has_current_selected_rfis = "selected_rfis" in st.session_state
+        has_current_selected_rfqs = "selected_rfqs" in st.session_state
+        has_current_cluster_questions = "rfi_cluster_questions" in st.session_state
+        has_current_use_jev = "use_jev" in st.session_state
+        has_current_use_deep_logic = "use_deep_logic" in st.session_state
+        current_source = st.session_state.get("source")
+        current_page = st.session_state.get("active_page")
+        current_manual_prices = st.session_state.get("manual_prices")
+        current_vergabe = st.session_state.get("vergabe_entscheidungen")
+        current_selected_rfis = st.session_state.get("selected_rfis")
+        current_selected_rfqs = st.session_state.get("selected_rfqs")
+        current_cluster_questions = st.session_state.get("rfi_cluster_questions")
+        current_use_jev = st.session_state.get("use_jev")
+        current_use_deep_logic = st.session_state.get("use_deep_logic")
         session_store.restore(st.session_state)
         st.session_state["_persisted_session_restored"] = True
+        if has_current_source:
+            st.session_state["source"] = current_source
+        else:
+            st.session_state.pop("source", None)
+        st.session_state["active_page"] = (
+            current_page if has_current_page else "Tender"
+        )
+        st.session_state["manual_prices"] = (
+            current_manual_prices if has_current_manual_prices else {}
+        )
+        st.session_state["vergabe_entscheidungen"] = (
+            current_vergabe if has_current_vergabe else {}
+        )
+        st.session_state["selected_rfis"] = (
+            current_selected_rfis if has_current_selected_rfis else []
+        )
+        st.session_state["selected_rfqs"] = (
+            current_selected_rfqs if has_current_selected_rfqs else []
+        )
+        st.session_state["rfi_cluster_questions"] = (
+            current_cluster_questions if has_current_cluster_questions else []
+        )
+        st.session_state.pop("selected_group_key", None)
+        st.session_state.pop("opened_position_key", None)
+        st.session_state["use_jev"] = (
+            current_use_jev if has_current_use_jev else False
+        )
+        st.session_state["use_deep_logic"] = (
+            current_use_deep_logic if has_current_use_deep_logic else False
+        )
     st.session_state.setdefault("use_jev", False)
     st.session_state.setdefault("selected_rfis", [])
     st.session_state.setdefault("selected_rfqs", [])
@@ -2405,66 +2503,14 @@ def main():
     st.markdown(
         """
         <style>
-        /* The page never scrolls: everything is pinned to the viewport. */
-        html, body,
-        [data-testid="stApp"],
-        [data-testid="stAppViewContainer"] {
-            height: 100dvh !important;
-            max-height: 100dvh !important;
-            overflow: hidden !important;
-        }
-        [data-testid="stMain"] {
-            height: 100dvh !important;
-            min-width: 0 !important;
-            overflow: hidden !important;
-        }
-        /* Main area is a flex column exactly one viewport tall. The top
-           padding clears Streamlit's fixed header (Deploy / menu). */
+        /* Keep the normal document flow. Earlier viewport-pinning made the
+           end of long pages and export controls inaccessible on common laptop
+           heights; this app has more content than a single viewport. */
         [data-testid="stMainBlockContainer"] {
             box-sizing: border-box;
-            display: flex !important;
-            flex-direction: column !important;
             width: 100% !important;
             max-width: 100% !important;
-            height: 100dvh !important;
-            min-height: 0 !important;
-            overflow: hidden !important;
-            padding: 3.75rem clamp(0.75rem, 3vw, 3rem) 0.75rem !important;
-        }
-        [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            gap: clamp(0.35rem, 1.2dvh, 1rem) !important;
-            /* Last resort only: if the fixed header content cannot fit at
-               all (tiny window), scroll inside the panel, never the page. */
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        /* Fixed-size content keeps its natural height ... */
-        [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] > * {
-            flex-shrink: 0;
-        }
-        /* Keep tab headers intrinsic; only their active panel takes leftover space. */
-        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] {
-            flex: 1 1 0% !important;
-            min-height: 8rem !important;
-        }
-        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div {
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [role="tablist"] {
-            flex: 0 0 auto !important;
-        }
-        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [data-testid="stTabPanel"][role="tabpanel"] {
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            overflow-y: auto;
-        }
-        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [data-testid="stTabPanel"][role="tabpanel"] > [data-testid="stVerticalBlock"] {
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
+            padding: 3.75rem clamp(0.75rem, 3vw, 3rem) 1.5rem !important;
         }
         [data-testid="stMainBlockContainer"] [data-testid="stDataFrame"] {
             flex: 1 1 0% !important;
@@ -2598,12 +2644,21 @@ def main():
     use_deep_logic = False
     if page == "Logik":
         st.session_state.setdefault("use_deep_logic", False)
+
+        def _remember_deep_logic() -> None:
+            st.session_state["use_deep_logic"] = (
+                st.session_state["use_deep_logic_toggle"]
+            )
+
         use_deep_logic = st.sidebar.toggle(
             "Cluster-Tiefenprüfung (Gemma 4)",
+            value=bool(st.session_state["use_deep_logic"]),
+            key="use_deep_logic_toggle",
+            on_change=_remember_deep_logic,
             help="Prüft Cluster optional mit gemma-4-31B-it (deep_logic). "
                  "Deterministische Regeln laufen unabhängig davon.",
-            key="use_deep_logic",
         )
+        use_deep_logic = bool(st.session_state["use_deep_logic"])
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
         return
@@ -2615,7 +2670,7 @@ def main():
     if page == "Tender":
         # The per-position breakdown lives here, beside the positions it
         # describes, so the group overview stays readable.
-        assignments = classify.classify(items, data)
+        assignments = classify.classify(items, data, use_jev=False)
         calculated = kalkulation.calculate(items, assignments, company, data)
         pdf_confidence = st.session_state.get("pdf_confidence")
         if pdf_confidence and label.lower().endswith(".pdf"):
@@ -2641,10 +2696,10 @@ def main():
         section_position_table(items, assignments, calculated, data, company)
         section_angebot_export(items, calculated, label)
     else:
-        # No use_jev=False here: the cache still answers the prepared tender
-        # offline, but an uploaded file is not in it and the keyword fallback
-        # scores near zero on real wording — that is the 3% coverage bug.
-        assignments = classify.classify(items, data)
+        # Page navigation and pop-ups must be deterministic unless the user
+        # explicitly starts a Jev deep check. Classification is cached, and
+        # keyword fallback avoids surprise API calls on every rerun.
+        assignments = classify.classify(items, data, use_jev=False)
         calculated = kalkulation.calculate(items, assignments, company, data)
         reference = load_reference()
         priced = pricer.price_boq(items, reference, {
@@ -2670,17 +2725,45 @@ def main():
             "note": p.note,
             "similarity_score": p.similarity_score,
         } for p in priced]
-        hybrid_results, findings = analyze_hybrid_cached(
-            [item.as_dict() for item in items],
+        item_dicts = [item.as_dict() for item in items]
+        hybrid_use_jev = bool(
+            use_jev
+            and page in ("Logik", "Heikle Positionen")
+        )
+        model_signature = ""
+        if hybrid_use_jev:
+            model_signature = "|".join((
+                classify.JEV_MODEL,
+                deep_logic.ITEM_RFI_MODEL,
+                deep_logic.get_adapter().name,
+            ))
+        analysis_session_key = lv_analysis_session_key(
+            item_dicts,
             list(remarks),
             calculated_payload,
             priced_payload,
-            bool(
-                use_jev
-                and page in ("Logik", "Heikle Positionen")
-            ),
-            HYBRID_ANALYSIS_CACHE_VERSION,
+            hybrid_use_jev,
+            model_signature,
         )
+        analysis_session_cache = st.session_state.setdefault(
+            "lv_hybrid_analysis_cache", {}
+        )
+        cached_hybrid = analysis_session_cache.get(analysis_session_key)
+        if cached_hybrid is not None:
+            hybrid_results, findings = cached_hybrid
+        else:
+            hybrid_results, findings = analyze_hybrid_cached(
+                item_dicts,
+                list(remarks),
+                calculated_payload,
+                priced_payload,
+                hybrid_use_jev,
+                HYBRID_ANALYSIS_CACHE_VERSION,
+            )
+            analysis_session_cache[analysis_session_key] = (
+                hybrid_results,
+                findings,
+            )
         if page == "Gruppen & Angebot":
             cov = classify.coverage(assignments)
             entscheidungen = vergabe_view.gespeicherte_entscheidungen(label)

@@ -183,7 +183,7 @@ class OpenAIAdapter:
                     "Authorization": f"Bearer {self.key}",
                 },
             )
-            with urllib.request.urlopen(request, timeout=60.0) as response:
+            with urllib.request.urlopen(request, timeout=20.0) as response:
                 return json.loads(response.read().decode("utf-8"))
 
         try:

@@ -17,13 +17,6 @@ SESSION_FILE = os.environ.get(
 )
 
 PERSISTED_KEYS = {
-    "active_page",
-    "source",
-    "manual_prices",
-    "rfi_cluster_questions",
-    "selected_group_key",
-    "opened_position_key",
-    "vergabe_entscheidungen",
 }
 
 
@@ -32,7 +25,6 @@ def _is_persisted_key(key: str) -> bool:
         key in PERSISTED_KEYS
         or key.endswith("_slider")
         or key.endswith("_number")
-        or "::" in key
     )
 
 

@@ -7,7 +7,15 @@ import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 import export_rfi
-from core import deep_logic, risk_engine, session_store
+from core import (
+    classify,
+    deep_logic,
+    judgments,
+    parser_x83,
+    risk_engine,
+    session_store,
+)
+from core.models import AtomicLLMJudgments
 
 
 X83_FILES = (
@@ -43,6 +51,103 @@ class AppLogicTests(unittest.TestCase):
         )
         app.session_state["active_page"] = page
         return app
+
+    def test_app_starts_on_tender_without_restored_tender_data(self):
+        app = AppTest.from_file(
+            os.path.abspath("app.py"),
+            default_timeout=120,
+        )
+        app.run()
+
+        self.assertFalse(app.exception)
+        self.assertEqual(app.session_state["active_page"], "Tender")
+        self.assertNotIn("source", app.session_state)
+        self.assertEqual(app.session_state["manual_prices"], {})
+        titles = [title.value for title in app.title]
+        self.assertIn("Tender", titles)
+
+    def test_subpage_navigation_without_toggle_makes_no_jev_calls(self):
+        app = self._app_for_page("Tender")
+
+        with (
+            patch.object(classify, "classify_jev") as classify_call,
+            patch.object(judgments, "judge_item_jev") as judgment_call,
+            patch.object(classify, "save_cache"),
+        ):
+            app.run()
+            for page in (
+                "Gruppen & Angebot",
+                "Vergabe",
+                "Logik",
+                "Heikle Positionen",
+            ):
+                app.session_state["active_page"] = page
+                app.run()
+                self.assertFalse(app.exception)
+
+        classify_call.assert_not_called()
+        judgment_call.assert_not_called()
+
+    def test_lv_analysis_and_cluster_results_are_reused_across_subtabs(self):
+        st.cache_data.clear()
+        app = self._app_for_page("Heikle Positionen")
+        app.session_state["use_jev"] = True
+
+        with (
+            patch.object(
+                risk_engine,
+                "analyze_tender_hybrid",
+                wraps=risk_engine.analyze_tender_hybrid,
+            ) as analyze,
+            patch.object(judgments, "load_judgment_cache", return_value={}),
+            patch.object(judgments, "save_judgment_cache"),
+            patch.object(
+                judgments,
+                "judge_item_jev",
+                return_value=AtomicLLMJudgments(0, 0, 0, 0, 0),
+            ) as jev_call,
+            patch.object(deep_logic, "evaluate_item_rfis", return_value={}),
+            patch.object(
+                parser_x83,
+                "parse",
+                wraps=parser_x83.parse,
+            ) as parse_x83,
+        ):
+            app.run()
+            jev_calls_after_first_run = jev_call.call_count
+            self.assertGreater(jev_calls_after_first_run, 0)
+            self.assertEqual(parse_x83.call_count, 1)
+            app.session_state["active_page"] = "Logik"
+            app.run()
+            app.session_state["active_page"] = "Heikle Positionen"
+            app.run()
+            self.assertEqual(jev_call.call_count, jev_calls_after_first_run)
+            self.assertEqual(parse_x83.call_count, 1)
+            self.assertEqual(analyze.call_count, 1)
+
+        st.cache_data.clear()
+        app = self._app_for_page("Logik")
+        app.session_state["use_deep_logic"] = True
+
+        with patch.object(
+            deep_logic,
+            "evaluate_clusters",
+            return_value={},
+        ) as evaluate:
+            app.run()
+            app.session_state["active_page"] = "Vergabe"
+            app.run()
+            self.assertTrue(app.session_state["use_deep_logic"])
+            app.session_state["active_page"] = "Logik"
+            app.run()
+
+            second_session = self._app_for_page("Logik")
+            second_session.session_state["use_deep_logic"] = True
+            second_session.run()
+
+        self.assertEqual(evaluate.call_count, 2)
+        self.assertTrue(app.session_state["use_deep_logic"])
+        self.assertTrue(app.sidebar.toggle[0].value)
 
     def test_logic_tab_renders_for_all_x83_samples(self):
         for relative_path in X83_FILES:
