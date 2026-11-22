@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Bieterfragen-Katalog export -> .docx. Task 006.
+"""Export selected Bieterfragen and Nachunternehmer-Anfragen as .docx/.md.
 
-Turns ranked findings into the formal clarification letter the estimator would
-otherwise spend four hours writing. The German goes HERE, in the artifact, with
-correct VOB phrasing. The narration elsewhere stays plain English.
+Turns selected findings into a formal clarification and inquiry catalogue.
+The German goes HERE, in the artifact, with correct VOB phrasing.
 
 The exporter itself makes no LLM calls. Position questions use the templates
 unless the risk pipeline supplies a cached, position-specific question.
@@ -186,8 +185,8 @@ def to_docx(catalog: Sequence[dict], out_path: str, project: dict) -> str:
     heading = document.add_heading(title, level=1)
     heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph(
-        "Im nachstehenden Bieterfragen-Katalog werden Rückfragen zu den "
-        "ausgewiesenen Leistungspositionen zusammengestellt."
+        "Im nachstehenden Export sind Bieterfragen zu Leistungspositionen "
+        "sowie Anfragen für Nachunternehmerleistungen zusammengestellt."
     )
 
     cluster_entries = [
@@ -196,18 +195,28 @@ def to_docx(catalog: Sequence[dict], out_path: str, project: dict) -> str:
     ]
     position_entries = [
         entry for entry in catalog
-        if entry.get("group") != "cluster"
+        if entry.get("group") not in ("cluster", "rfq")
+    ]
+    rfq_entries = [
+        entry for entry in catalog
+        if entry.get("group") == "rfq"
     ]
     widths = (Cm(1.0), Cm(2.5), Cm(7.0), Cm(2.0), Cm(1.8), Cm(5.0))
-    headers = ("Nr.", "OZ", "Kurztext", "Menge", "Einheit", "Bieterfrage")
 
-    def render_group(group_title: str, entries: Sequence[dict]) -> None:
+    def render_group(
+        group_title: str,
+        entries: Sequence[dict],
+        request_header: str,
+    ) -> None:
         if not entries:
             return
         document.add_heading(group_title, level=2)
         table = document.add_table(rows=1, cols=6)
         table.style = "Table Grid"
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        headers = (
+            "Nr.", "OZ", "Kurztext", "Menge", "Einheit", request_header,
+        )
         for cell, header, width in zip(table.rows[0].cells, headers, widths):
             cell.text = header
             cell.width = width
@@ -225,8 +234,13 @@ def to_docx(catalog: Sequence[dict], out_path: str, project: dict) -> str:
                 cell.text = str(value)
                 cell.width = width
 
-    render_group("Fragen zu Bauabschnitten", cluster_entries)
-    render_group("Fragen zu Einzelpositionen", position_entries)
+    render_group("Fragen zu Bauabschnitten", cluster_entries, "Bieterfrage")
+    render_group("Fragen zu Einzelpositionen (VOB/A)", position_entries, "Bieterfrage")
+    render_group(
+        "Nachunternehmer-Anfragen",
+        rfq_entries,
+        "Anfrage an Nachunternehmer",
+    )
 
     document.save(out_path)
     return out_path
@@ -238,8 +252,8 @@ def to_markdown(catalog: Sequence[dict], project: dict) -> str:
     lines = [
         f"# {title}",
         "",
-        "Im nachstehenden Bieterfragen-Katalog werden Rückfragen zu den "
-        "ausgewiesenen Leistungspositionen zusammengestellt.",
+        "Im nachstehenden Export sind Bieterfragen zu Leistungspositionen "
+        "sowie Anfragen für Nachunternehmerleistungen zusammengestellt.",
         "",
     ]
     cluster_entries = [
@@ -248,16 +262,25 @@ def to_markdown(catalog: Sequence[dict], project: dict) -> str:
     ]
     position_entries = [
         entry for entry in catalog
-        if entry.get("group") != "cluster"
+        if entry.get("group") not in ("cluster", "rfq")
+    ]
+    rfq_entries = [
+        entry for entry in catalog
+        if entry.get("group") == "rfq"
     ]
 
-    def render_group(group_title: str, entries: Sequence[dict]) -> None:
+    def render_group(
+        group_title: str,
+        entries: Sequence[dict],
+        request_header: str,
+    ) -> None:
         if not entries:
             return
         lines.extend([
             f"## {group_title}",
             "",
-            "| Nr. | OZ | Kurztext | Menge | Einheit | Bieterfrage |",
+            "| Nr. | OZ | Kurztext | Menge | Einheit | "
+            f"{request_header} |",
             "|---:|:---|:---|---:|:---|:---|",
         ])
         for entry in entries:
@@ -276,6 +299,11 @@ def to_markdown(catalog: Sequence[dict], project: dict) -> str:
             )
         lines.append("")
 
-    render_group("Fragen zu Bauabschnitten", cluster_entries)
-    render_group("Fragen zu Einzelpositionen", position_entries)
+    render_group("Fragen zu Bauabschnitten", cluster_entries, "Bieterfrage")
+    render_group("Fragen zu Einzelpositionen (VOB/A)", position_entries, "Bieterfrage")
+    render_group(
+        "Nachunternehmer-Anfragen",
+        rfq_entries,
+        "Anfrage an Nachunternehmer",
+    )
     return "\n".join(lines) + "\n"

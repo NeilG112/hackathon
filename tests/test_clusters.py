@@ -80,6 +80,76 @@ class ClusterTests(unittest.TestCase):
         self.assertEqual(len(systems), 1)
         self.assertEqual(set(systems[0].positions), {position.key() for position in items})
 
+    def test_two_position_material_free_large_dn_step_forms_system(self):
+        items = [
+            item("0351", "Trinkwasserleitung DN50 verlegen"),
+            item("0352", "Trinkwasserleitung DN200 verlegen"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+
+        self.assertEqual(len(systems), 1)
+        self.assertEqual(set(systems[0].positions), {position.key() for position in items})
+
+    def test_generic_material_cluster_does_not_absorb_entire_section(self):
+        items = [
+            item(f"05{index:02}", "Rohr PE100 DN50")
+            for index in range(1, 13)
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+
+        self.assertGreaterEqual(len(systems), 2)
+        self.assertLessEqual(max(len(cluster.positions) for cluster in systems), 8)
+
+    def test_high_building_and_tga_features_create_system_clusters(self):
+        groups = (
+            ("Beton", "Stahlbetonstütze C25/30 XC4", "Stahlbetonstütze C25/30 XC4 einbauen"),
+            ("Brandschutz", "Trockenbauwand F90 EI90", "Trockenbauwand F90 EI90 montieren"),
+            ("Elektro", "NYM-Kabel 5x2,5 400V", "NYM-Kabel 5x2,5 400V anschließen"),
+            ("Dämmung", "Wärmedämmung 100 mm WLG 035", "Wärmedämmung 100 mm WLG 035 montieren"),
+        )
+        items = []
+        expected = {}
+        for index, (name, first, second) in enumerate(groups):
+            section = f"System {name}"
+            first_item = item(f"06{index}1", first, section)
+            second_item = item(f"06{index}2", second, section)
+            items.extend((first_item, second_item))
+            expected[name] = {first_item.key(), second_item.key()}
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+        by_title = {cluster.title: set(cluster.positions) for cluster in systems}
+
+        for feature, positions in expected.items():
+            with self.subTest(feature=feature):
+                matched = [
+                    title
+                    for title, cluster_positions in by_title.items()
+                    if feature.lower() in title.lower()
+                    and cluster_positions == positions
+                ]
+                self.assertTrue(matched)
+        titles = " ".join(by_title)
+        for marker in ("C25/30", "XC4", "F90", "EI90", "5x2.5", "400V", "100mm", "035"):
+            with self.subTest(marker=marker):
+                self.assertIn(marker.lower(), titles.lower())
+
     def test_material_does_not_merge_unrelated_strands(self):
         items = [
             item("0401", "Trinkwasser Druckrohr PE100 DN50"),

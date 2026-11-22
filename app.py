@@ -8,9 +8,9 @@
 
 Lead with that sentence. No vocabulary lesson, no file extensions.
 
-Wired: upload -> parse -> item table, trade groups, bottom-up calculation,
-benchmark cross-check, risk/logic findings, reveal and RFI export. Optional AI
-checks are controlled separately from deterministic rules.
+Wired: upload -> parse -> item table, trade groups, transparent bottom-up
+calculation, risk/logic findings, and Bieterfragen export. Optional AI checks
+are controlled separately from deterministic rules.
 
 Fallbacks, in order: live parse -> `data/golden/` fixture -> an honest
 "format not supported" with the sample loaded on a button. Degrade visibly
@@ -26,18 +26,17 @@ import re
 import tempfile
 import traceback
 import xml.etree.ElementTree as ET
+from difflib import SequenceMatcher
 
 import pandas as pd
 import streamlit as st
 
-from core import (classify, clusters, constants, deep_logic, detectors, facts,
+from core import (classify, clusters, constants, deep_logic, domain, facts,
                   kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
                   risk_engine, session_store, stammdaten, vergabe)
-from views import reveal
 from views import vergabe as vergabe_view
 
 SAMPLE = constants.REVEAL["blank_boq"]
-ANSWER_KEY = constants.REVEAL["answer_key"]
 PAGES = ("Tender", "Gruppen & Angebot", "Vergabe", "Logik", "Heikle Positionen")
 HYBRID_ANALYSIS_CACHE_VERSION = "item-rfi-v1"
 
@@ -65,8 +64,16 @@ st.set_page_config(
 
 # --- parsing ---------------------------------------------------------------
 
+def _project_path(path: str) -> str:
+    """Resolve project-relative resources regardless of the launch directory."""
+    if os.path.isabs(path):
+        return path
+    return os.path.join(constants.PROJECT_ROOT, path)
+
+
 def parse_path(path: str):
     """Parse by format. Returns (items, remarks). Raises on unknown format."""
+    path = _project_path(path)
     suffix = os.path.splitext(path)[1].lower()
     if suffix in XML_SUFFIXES:
         return parser_x83.parse(path), parser_x83.parse_remarks(path)
@@ -405,7 +412,7 @@ def section_upload(show_controls: bool = True):
     return items, remarks, label
 
 
-def section_items(items):
+def section_items(items, remarks, filename):
     """The parsed bill of quantities."""
     st.subheader("Ausgelesene Positionen")
     priced_in_lv = any(
@@ -428,7 +435,7 @@ def section_items(items):
         "EP (€)": i.unit_price,
         "GP (€)": i.total_price,
     } for i in items])
-    st.dataframe(
+    event = st.dataframe(
         frame,
         column_config={
             "EP (€)": st.column_config.NumberColumn(format="€ %.2f"),
@@ -437,15 +444,26 @@ def section_items(items):
         width="stretch",
         hide_index=True,
         height="stretch",
+        key="tender_items_table",
+        on_select="rerun",
+        selection_mode="single-row",
     )
+    selected_rows = event.selection.rows
+    if selected_rows:
+        row_index = selected_rows[0]
+        if 0 <= row_index < len(items):
+            _open_position_details(
+                items[row_index], items, remarks, filename
+            )
 
 
 def source_document(source):
     """Return the original file name and bytes for the active tender."""
     if source[0] == "upload":
         return source[1], source[2]
-    with open(source[1], "rb") as handle:
-        return os.path.basename(source[1]), handle.read()
+    path = _project_path(source[1])
+    with open(path, "rb") as handle:
+        return os.path.basename(path), handle.read()
 
 
 @st.cache_data(show_spinner=False)
@@ -732,8 +750,189 @@ def show_position_details(
     )
 
 
+def _open_position_details(
+    item, items, remarks, filename, calculated_by_key=None,
+):
+    st.session_state["opened_position_key"] = item.key()
+    source = st.session_state.get("source")
+    payload = None
+    source_error = None
+    fallback_filename = item.source_file or filename or "Quelldokument"
+    if source:
+        try:
+            filename, payload = source_document(source)
+        except OSError as exc:
+            filename = fallback_filename
+            source_error = str(exc)
+    else:
+        filename = fallback_filename
+        source_error = "Keine Quelldatei im aktuellen Sitzungskontext."
+    show_position_details(
+        item,
+        items,
+        remarks,
+        filename,
+        payload,
+        source_error,
+        calculated_by_key,
+    )
+
+
+def _action_entry_is_selected(state_key, entry):
+    selected_entries = st.session_state.get(state_key, [])
+    if not isinstance(selected_entries, list):
+        return False
+    entry_id = entry.get("id")
+    entry_oz = entry.get("oz")
+    return any(
+        isinstance(selected, dict)
+        and (
+            (entry_id and selected.get("id") == entry_id)
+            or (entry_oz and selected.get("oz") == entry_oz)
+        )
+        for selected in selected_entries
+    )
+
+
+def _store_selected_action(state_key, entry, confirmation):
+    selected_entries = st.session_state.get(state_key, [])
+    if not isinstance(selected_entries, list):
+        selected_entries = []
+    if not _action_entry_is_selected(state_key, entry):
+        selected_entries.append(entry)
+    st.session_state[state_key] = selected_entries
+
+    if state_key == "selected_rfis" and entry.get("kind") == "cluster":
+        cluster_questions = st.session_state.get("rfi_cluster_questions", [])
+        if not isinstance(cluster_questions, list):
+            cluster_questions = []
+        if not any(
+            isinstance(question, dict)
+            and question.get("cluster_id") == entry.get("cluster_id")
+            for question in cluster_questions
+        ):
+            cluster_question = dict(entry)
+            cluster_question.update({
+                "category": entry.get("contradiction_category"),
+                "title": entry.get("cluster_title"),
+                "analysis": entry.get("reason_de"),
+            })
+            cluster_questions.append(cluster_question)
+        st.session_state["rfi_cluster_questions"] = cluster_questions
+
+    st.toast(confirmation)
+
+
+def _position_action_entry(item, action_type, reason, source, severity="medium"):
+    oz = item.display_oz
+    short_text = item.short_text or item.long_text or "Leistung gemäß LV"
+    unit = constants.normalize_unit(item.unit) or "—"
+    quantity = f"{item.quantity:g} {unit}"
+    if action_type == "RFI":
+        question = (
+            f"Bitte konkretisieren Sie im Sinne der VOB/A den Leistungsumfang "
+            f"der Position {oz} („{short_text}“) mit {quantity} und bestätigen "
+            f"Sie die für die Preisbildung maßgeblichen Angaben. "
+            f"Prüfhinweis: {reason}"
+        )
+    else:
+        question = (
+            f"Bitte erstellen Sie ein Nachunternehmer-Angebot für Position "
+            f"{oz} („{short_text}“), Menge {quantity}. Bitte weisen Sie den "
+            f"Preis sowie enthaltene Nebenleistungen und notwendige "
+            f"Schnittstellen aus. Prüfhinweis: {reason}"
+        )
+    return {
+        "id": f"{action_type}:position:{item.key()}",
+        "kind": "position",
+        "action_type": action_type,
+        "source": source,
+        "position_key": item.key(),
+        "oz": oz,
+        "short_text": short_text,
+        "quantity": item.quantity,
+        "unit": unit,
+        "severity": severity,
+        "reason_de": reason,
+        "question": question,
+    }
+
+
+def _cluster_action_entry(card, action_type):
+    cluster_id = str(card["cluster_id"])
+    affected_ozs = list(card.get("affected_ozs") or [])
+    title = str(card.get("title") or cluster_id)
+    reason = str(card.get("analysis") or "")
+    oz_text = ", ".join(affected_ozs) if affected_ozs else "siehe Cluster"
+    if action_type == "RFI":
+        question = (
+            f"Bitte erläutern Sie den Befund zum Cluster „{title}“ im Sinne "
+            f"der VOB/A und konkretisieren Sie die betroffenen Leistungen "
+            f"(OZ {oz_text}). Hintergrund: {reason}"
+        )
+    else:
+        question = (
+            f"Bitte prüfen Sie die Leistungen im Cluster „{title}“ "
+            f"(OZ {oz_text}) und erstellen Sie ein Nachunternehmer-Angebot. "
+            f"Bitte weisen Sie Preis, Nebenleistungen und Schnittstellen aus. "
+            f"Prüfhinweis: {reason}"
+        )
+    return {
+        "id": f"{action_type}:cluster:{cluster_id}",
+        "kind": "cluster",
+        "action_type": action_type,
+        "source": "Logik",
+        "cluster_id": cluster_id,
+        "cluster_title": title,
+        "contradiction_category": card.get("category"),
+        "reason_de": reason,
+        "question": question,
+        "affected_ozs": affected_ozs,
+        "euro_exposure_estimate": card.get("euro_exposure_estimate", 0.0),
+        "severity": card.get("severity", "medium"),
+    }
+
+
+def _render_action_button(
+    state_key, entry, label, selected_label, toast_message, widget_key,
+):
+    selected = _action_entry_is_selected(state_key, entry)
+    st.button(
+        selected_label if selected else label,
+        key=widget_key,
+        disabled=selected,
+        on_click=_store_selected_action,
+        args=(state_key, entry, toast_message),
+        width="stretch",
+    )
+
+
+def _group_subgroups(items):
+    section_labels = {
+        item.location(depth=2)
+        for item in items
+        if item.section_path
+    }
+    if len(section_labels) > 1:
+        labels = [item.location(depth=2) for item in items]
+        source = "LV-Abschnitt"
+    else:
+        tags = [objects.tag_of(item) for item in items]
+        if len(set(tags)) > 1:
+            labels = tags
+            source = "Positionstyp"
+        else:
+            labels = [next(iter(section_labels), "(ohne Untergruppe)")] * len(items)
+            source = "LV-Abschnitt"
+
+    subgroups = {}
+    for label, item in zip(labels, items):
+        subgroups.setdefault(label, []).append(item)
+    return subgroups, source
+
+
 def section_groups(items, assignments, data, filename: str, remarks: list[str],
-                   calculated=None, vergabe_ergebnis=None):
+                   calculated=None):
     """List trade groups; opening one shows the positions in that trade."""
     if "manual_prices" not in st.session_state:
         st.session_state["manual_prices"] = {}
@@ -742,23 +941,22 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
         c.item.key(): c for c in (calculated or [])
     }
     rows = objects.by_trade(items, assignments, data, calculated)
-    if calculated:
-        stats = kalkulation.summarize(calculated)
-        a, b, c = st.columns(3)
-        if vergabe_ergebnis is not None:
-            a.metric("Angebotssumme", f"€{vergabe_ergebnis.angebotssumme:,.0f}",
-                     help="Inklusive der Entscheidungen auf der Seite Vergabe "
-                          "(Nachunternehmerangebote ersetzen die eigene "
-                          "Kalkulation des Gewerks).")
-        else:
-            a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
-                     help="Mittelwert der Spanne")
-        b.metric("Spanne", f"€{stats['total_low']:,.0f} – "
-                 f"{stats['total_high']:,.0f}")
-        c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
-                 help=f"{stats['unpriced']} Positionen ohne zugeordnete Leistung")
 
     item_by_key = {item.key(): item for item in items}
+
+    def position_total(position_key):
+        item = item_by_key.get(position_key)
+        if item is None:
+            return 0.0
+        override = manual_prices.get(position_key)
+        if override is not None:
+            return override["gp"]
+        if item.total_price is not None:
+            return item.total_price
+        if item.unit_price is not None:
+            return item.unit_price * item.quantity
+        estimate = calculated_by_key.get(position_key)
+        return (estimate.total or 0.0) if estimate is not None else 0.0
 
     selected_key = st.session_state.get("selected_group_key")
     selected = next((row for row in rows if row.key == selected_key), None)
@@ -780,23 +978,17 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
                         vertical_alignment="center",
                     )
                     name.markdown(f"**{row.obj}**")
-                    name.caption(f"{len(row.positions)} Positionen")
-                    value = 0.0
-                    for position_key in row.positions:
-                        item = item_by_key.get(position_key)
-                        if item is None:
-                            continue
-                        override = manual_prices.get(position_key)
-                        if override:
-                            value += override["gp"]
-                        elif item.total_price is not None:
-                            value += item.total_price
-                        elif item.unit_price is not None:
-                            value += item.unit_price * item.quantity
-                        else:
-                            estimate = calculated_by_key.get(position_key)
-                            if estimate is not None:
-                                value += estimate.total or 0.0
+                    group_positions = [
+                        item_by_key[position_key]
+                        for position_key in row.positions
+                        if position_key in item_by_key
+                    ]
+                    subgroups, _subgroup_source = _group_subgroups(group_positions)
+                    name.caption(
+                        f"{len(row.positions)} Positionen · "
+                        f"{len(subgroups)} Untergruppen"
+                    )
+                    value = sum(position_total(key) for key in row.positions)
                     details.caption(
                         f"{row.unit or '—'} · Gesamt: €{value:,.2f}"
                     )
@@ -806,6 +998,7 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
                         width="stretch",
                     ):
                         st.session_state["selected_group_key"] = row.key
+                        st.session_state.pop("selected_group_subgroup_key", None)
                         st.session_state.pop("group_positions", None)
                         st.session_state.pop("opened_position_key", None)
                         st.rerun()
@@ -813,6 +1006,7 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
 
     if st.button("← Alle Gruppen"):
         st.session_state.pop("selected_group_key", None)
+        st.session_state.pop("selected_group_subgroup_key", None)
         st.session_state.pop("group_positions", None)
         st.session_state.pop("opened_position_key", None)
         st.rerun()
@@ -823,6 +1017,61 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
     )
     item_by_key = {item.key(): item for item in items}
     group_items = [item_by_key[key] for key in selected.positions if key in item_by_key]
+    subgroup_items, subgroup_source = _group_subgroups(group_items)
+    selected_subgroup = st.session_state.get("selected_group_subgroup_key")
+    if selected_subgroup not in subgroup_items:
+        selected_subgroup = None
+        st.session_state.pop("selected_group_subgroup_key", None)
+
+    if len(subgroup_items) > 1:
+        st.caption(
+            f"Untergruppen nach {subgroup_source} · "
+            "anklicken, um die Positionsübersicht zu öffnen."
+        )
+        with st.expander(
+            f"Untergruppenübersicht ({len(subgroup_items)})",
+            expanded=selected_subgroup is None,
+        ):
+            ordered_subgroups = sorted(
+                subgroup_items.items(),
+                key=lambda entry: (
+                    -sum(position_total(item.key()) for item in entry[1]),
+                    entry[0].casefold(),
+                ),
+            )
+            for index, (subgroup_name, subgroup_positions) in enumerate(ordered_subgroups):
+                with st.container(border=True):
+                    name, details, action = st.columns(
+                        [5, 2.5, 2],
+                        vertical_alignment="center",
+                    )
+                    name.markdown(f"**{subgroup_name}**")
+                    name.caption(f"{len(subgroup_positions)} Positionen")
+                    details.caption(
+                        f"Gesamt: €{sum(position_total(item.key()) for item in subgroup_positions):,.2f}"
+                    )
+                    if action.button(
+                        "Übersicht öffnen →",
+                        key=f"open_subgroup_{index}",
+                        width="stretch",
+                    ):
+                        st.session_state["selected_group_subgroup_key"] = subgroup_name
+                        st.session_state.pop("group_positions", None)
+                        st.session_state.pop("opened_position_key", None)
+                        st.rerun()
+
+        if selected_subgroup is not None:
+            if st.button(
+                "Alle Positionen der Gruppe anzeigen",
+                key="show_all_group_positions",
+            ):
+                st.session_state.pop("selected_group_subgroup_key", None)
+                st.session_state.pop("group_positions", None)
+                st.session_state.pop("opened_position_key", None)
+                st.rerun()
+            st.markdown(f"#### {selected_subgroup}")
+            group_items = subgroup_items[selected_subgroup]
+
     st.caption(
         "EP und GP zeigen Angebotspreise; bei einer unbepriessten LV-Datei "
         "werden die kalkulierten Werte angezeigt. "
@@ -883,38 +1132,37 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
     if selected_rows:
         row_index = selected_rows[0]
         if 0 <= row_index < len(group_items):
-            item = group_items[row_index]
-            st.session_state["opened_position_key"] = item.key()
-            source = st.session_state.get("source")
-            payload = None
-            source_error = None
-            if source:
-                try:
-                    filename, payload = source_document(source)
-                except OSError as exc:
-                    filename = item.source_file or "Quelldokument"
-                    source_error = str(exc)
-            else:
-                filename = item.source_file or "Quelldokument"
-                source_error = "Keine Quelldatei im aktuellen Sitzungskontext."
-            show_position_details(
-                item,
+            _open_position_details(
+                group_items[row_index],
                 items,
                 remarks,
                 filename,
-                payload,
-                source_error,
                 calculated_by_key,
             )
 
 
-def section_kalkulation(calculated, cov, data):
-    """Bottom-up Aufschlagskalkulation — the bid. Returns calculated items."""
+def section_kalkulation(
+    items, assignments, calculated, cov, data, company, vergabe_ergebnis=None,
+):
+    """Show each cost component that makes up the position price."""
+    st.subheader("Positionskalkulation")
     stats = kalkulation.summarize(calculated)
+    offer_total = (
+        vergabe_ergebnis.angebotssumme
+        if vergabe_ergebnis is not None
+        else stats["total_mid"]
+    )
 
     a, b, c, d = st.columns(4)
-    a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
-             help="Mittelwert der Spanne")
+    a.metric(
+        "Angebotssumme",
+        f"€{offer_total:,.0f}",
+        help=(
+            "Inklusive der Entscheidungen auf der Seite Vergabe."
+            if vergabe_ergebnis is not None
+            else "Mittelwert der kalkulierten Spanne."
+        ),
+    )
     b.metric("Spanne", f"€{stats['total_low']:,.0f} – {stats['total_high']:,.0f}")
     c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
              help=f"{stats['unpriced']} Positionen ohne zugeordnete Leistung")
@@ -936,17 +1184,114 @@ def section_kalkulation(calculated, cov, data):
             "ARH-Größenordnung, keine Marktabfrage). Das Verfahren ist echt, "
             "die Zahlen sind Platzhalter, bis echte Firmenwerte hinterlegt sind."
         )
+    st.caption(
+        "Kosten und Arbeitsstunden gelten je Einheit; der Gesamtpreis ergibt "
+        "sich aus Menge × Einheitspreis."
+    )
 
-    st.dataframe(pd.DataFrame([{
-        "OZ": c.item.display_oz,
-        "Position": c.item.short_text[:52],
-        "Menge": c.item.quantity,
-        "Einheit": constants.normalize_unit(c.item.unit),
-        "Leistung": c.leistung.code if c.leistung else "—",
-        "EP min": c.ep_low, "EP mittel": c.ep_mid, "EP max": c.ep_high,
-        "GP": c.total,
-        "Grundlage": c.note[:60],
-    } for c in calculated]), width="stretch", hide_index=True, height="stretch")
+    trade_by_key = {
+        key: row.obj
+        for row in objects.by_trade(items, assignments, data, calculated)
+        for key in row.positions
+    }
+    rows = []
+    for entry in calculated:
+        breakdown = entry.breakdown
+        ekt = breakdown.ekt if entry.priced else None
+        agk = (
+            ekt * company.agk_wirksam_pct / 100.0
+            if ekt is not None else None
+        )
+        bgk = (
+            ekt * company.bgk_pct / 100.0
+            if ekt is not None else None
+        )
+        wg = (
+            ekt * company.wg_pct / 100.0
+            if ekt is not None else None
+        )
+        surcharge = entry.ep_mid - ekt if ekt is not None else None
+        rows.append({
+            "OZ": entry.item.display_oz,
+            "Position": entry.item.short_text or entry.item.long_text,
+            "Gewerk": trade_by_key.get(
+                entry.item.key(),
+                "nicht zugeordnet",
+            ),
+            "Leistung": (
+                entry.leistung.label() if entry.leistung else "—"
+            ),
+            "Menge": entry.item.quantity,
+            "Einheit": constants.normalize_unit(entry.item.unit) or "—",
+            "Arbeitsstunden/Einh.": (
+                breakdown.labour_hours if entry.priced else None
+            ),
+            "Lohn €/Einh.": (
+                breakdown.labour_eur if entry.priced else None
+            ),
+            "Maschinenstunden/Einh.": (
+                breakdown.machine_hours if entry.priced else None
+            ),
+            "Gerät €/Einh.": (
+                breakdown.machine_eur if entry.priced else None
+            ),
+            "Material €/Einh.": (
+                breakdown.material_eur if entry.priced else None
+            ),
+            "EKT €/Einh.": ekt,
+            "AGK €/Einh.": agk,
+            "BGK €/Einh.": bgk,
+            "W&G €/Einh.": wg,
+            "Zuschläge €/Einh.": surcharge,
+            "EP €/Einh.": entry.ep_mid,
+            "GP €": entry.total,
+        })
+
+    column_config = {
+        "OZ": st.column_config.TextColumn("OZ", width="small"),
+        "Position": st.column_config.TextColumn("Position", width="small"),
+        "Gewerk": st.column_config.TextColumn("Gewerk", width="small"),
+        "Leistung": st.column_config.TextColumn("Leistung", width="small"),
+        "Menge": st.column_config.NumberColumn(
+            "Menge", format="%.3f", width="small",
+        ),
+        "Einheit": st.column_config.TextColumn("Einheit", width="small"),
+        "Arbeitsstunden/Einh.": st.column_config.NumberColumn(
+            "Arbeitsstunden/Einh.", format="%.3f", width="small",
+        ),
+        "Lohn €/Einh.": st.column_config.NumberColumn(
+            "Lohn €/Einh.", format="€ %.2f", width="small",
+        ),
+        "Maschinenstunden/Einh.": st.column_config.NumberColumn(
+            "Maschinenstunden/Einh.", format="%.3f", width="small",
+        ),
+        "Gerät €/Einh.": st.column_config.NumberColumn(
+            "Gerät €/Einh.", format="€ %.2f", width="small",
+        ),
+    }
+    for column in (
+        "Material €/Einh.",
+        "EKT €/Einh.",
+        "AGK €/Einh.",
+        "BGK €/Einh.",
+        "W&G €/Einh.",
+        "Zuschläge €/Einh.",
+        "EP €/Einh.",
+        "GP €",
+    ):
+        column_config[column] = st.column_config.NumberColumn(
+            column,
+            format="€ %.2f",
+            width="small",
+        )
+
+    st.dataframe(
+        pd.DataFrame(rows),
+        column_config=column_config,
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+    )
     return calculated
 
 
@@ -964,10 +1309,20 @@ def section_logic(
     item_by_key = {item.key(): item for item in items}
     item_by_display_oz = {item.display_oz: item for item in items}
     facts_by_key = {item.key(): facts.extract_facts(item) for item in items}
+    active_domains = domain.detect_lv_domains(items, remarks)
     cluster_list = clusters.build_clusters(
         items,
         facts_by_key,
         calculated=calculated,
+        preambles=remarks,
+        domains=active_domains,
+    )
+    cluster_priority = {"SYSTEM": 0, "FRAME": 1}
+    cluster_list.sort(
+        key=lambda cluster: (
+            -float(cluster.euro_exposure or 0.0),
+            cluster_priority.get(cluster.kind, 2),
+        )
     )
 
     cluster_flags = logic.check_cluster_rules(
@@ -976,6 +1331,7 @@ def section_logic(
         facts_by_key,
         calculated=calculated,
         remarks=remarks,
+        domains=active_domains,
     )
 
     pre_prices = {
@@ -987,49 +1343,173 @@ def section_logic(
         items,
         pre_prices=pre_prices,
     )
+    calculated_by_key = {
+        calculated_item.item.key(): calculated_item
+        for calculated_item in (calculated or [])
+    }
     position_rows = []
+    position_row_items = []
     for item in items:
         result = position_results[item.key()]
         if not result.flags:
             continue
         position_rows.append({
             "OZ": item.display_oz,
+            "Kurztext": item.short_text,
+            "Regelkategorie": ", ".join(result.flags),
             "Schweregrad": _severity_label(result.severity),
-            "Regeln": ", ".join(result.flags),
-            "Befund": " | ".join(result.details),
+            "Begründung": " | ".join(result.details),
         })
+        position_row_items.append(item)
 
     duplicate_findings = logic.check_duplicates(items, pre_prices)
-    st.subheader("Positionsregeln und mögliche Duplikate")
-    st.markdown("**Positionsbezogene Regeln**")
-    if position_rows:
-        st.dataframe(
-            pd.DataFrame(position_rows),
-            width="stretch",
-            hide_index=True,
-        )
-    else:
-        st.caption("Keine positionsbezogenen Regelbefunde.")
+    duplicate_rows = []
+    duplicate_row_items = []
+    for finding in duplicate_findings:
+        duplicate_positions = [
+            item_by_key[key]
+            for key in finding.evidence.get("positions", [])
+            if key in item_by_key
+        ]
+        for left_index, left_item in enumerate(duplicate_positions):
+            for right_item in duplicate_positions[left_index + 1:]:
+                similarity = SequenceMatcher(
+                    None,
+                    left_item.short_text.casefold(),
+                    right_item.short_text.casefold(),
+                ).ratio()
+                duplicate_rows.append({
+                    "OZ 1": left_item.display_oz,
+                    "Kurztext 1": left_item.short_text,
+                    "OZ 2": right_item.display_oz,
+                    "Kurztext 2": right_item.short_text,
+                    "Einheit": constants.normalize_unit(left_item.unit),
+                    "Menge 1": left_item.quantity,
+                    "Menge 2": right_item.quantity,
+                    "Ähnlichkeit": similarity,
+                })
+                duplicate_row_items.append(left_item)
 
-    st.markdown("**Mögliche Duplikate**")
-    if duplicate_findings:
-        st.dataframe(
-            pd.DataFrame([{
-                "OZ": finding.item.display_oz,
-                "Vergleichspositionen": ", ".join(
-                    item_by_key[key].display_oz
-                    if key in item_by_key else key
-                    for key in finding.evidence.get("positions", [])
-                ),
-                "Schweregrad": _severity_label(finding.severity),
-                "EUR-Exposure": round(finding.euro_leverage, 2),
-                "Befund": finding.rationale,
-            } for finding in duplicate_findings]),
-            width="stretch",
-            hide_index=True,
+    def render_position_findings():
+        st.subheader("Positionsbezogene Regelbefunde")
+        position_event = None
+        if position_rows:
+            position_event = st.dataframe(
+                pd.DataFrame(position_rows),
+                width="stretch",
+                hide_index=True,
+                height="stretch",
+                key="logic_position_findings_table",
+                on_select="rerun",
+                selection_mode="single-row",
+            )
+        else:
+            st.caption("Keine positionsbezogenen Regelbefunde.")
+
+        selected_position_rows = (
+            list(position_event.selection.rows)
+            if position_event is not None else []
         )
-    else:
-        st.caption("Keine möglichen Duplikate gefunden.")
+        if selected_position_rows:
+            row_index = selected_position_rows[0]
+            if 0 <= row_index < len(position_row_items):
+                item = position_row_items[row_index]
+                row = position_rows[row_index]
+                st.caption(f"Aktionen für OZ {item.display_oz}")
+                rfi_column, rfq_column = st.columns(2)
+                with rfi_column:
+                    _render_action_button(
+                        "selected_rfis",
+                        _position_action_entry(
+                            item,
+                            "RFI",
+                            row["Begründung"],
+                            "Logik",
+                            row["Schweregrad"],
+                        ),
+                        "Als Bieterfrage übernehmen",
+                        "✓ Als Bieterfrage übernommen",
+                        "Bieterfrage wurde für den Export vorgemerkt.",
+                        f"logic_position_rfi_{item.key()}",
+                    )
+                with rfq_column:
+                    _render_action_button(
+                        "selected_rfqs",
+                        _position_action_entry(
+                            item,
+                            "RFQ",
+                            row["Begründung"],
+                            "Logik",
+                            row["Schweregrad"],
+                        ),
+                        "Als Nachunternehmen weiterleiten",
+                        "✓ Für NU-Anfrage vorgemerkt",
+                        "Position wurde für die Nachunternehmer-Anfrage vorgemerkt.",
+                        f"logic_position_rfq_{item.key()}",
+                    )
+
+        st.subheader("Mögliche Duplikate")
+        duplicate_event = None
+        if duplicate_rows:
+            duplicate_event = st.dataframe(
+                pd.DataFrame(duplicate_rows),
+                width="stretch",
+                hide_index=True,
+                height="stretch",
+                column_config={
+                    "Menge 1": st.column_config.NumberColumn(format="%.3f"),
+                    "Menge 2": st.column_config.NumberColumn(format="%.3f"),
+                    "Ähnlichkeit": st.column_config.NumberColumn(
+                        format="%.0%"
+                    ),
+                },
+                key="logic_duplicate_pairs_table",
+                on_select="rerun",
+                selection_mode="single-row",
+            )
+        else:
+            st.caption("Keine möglichen Duplikate gefunden.")
+
+        current_selections = {
+            "logic_position_findings_table": (
+                list(position_event.selection.rows)
+                if position_event is not None else []
+            ),
+            "logic_duplicate_pairs_table": (
+                list(duplicate_event.selection.rows)
+                if duplicate_event is not None else []
+            ),
+        }
+        previous_selections = st.session_state.get(
+            "_logic_table_selections", {}
+        )
+        changed_selection = next(
+            (
+                (key, rows)
+                for key, rows in current_selections.items()
+                if rows and rows != previous_selections.get(key, [])
+            ),
+            None,
+        )
+        st.session_state["_logic_table_selections"] = current_selections
+        if changed_selection is None:
+            return
+
+        table_key, selected_rows = changed_selection
+        row_index = selected_rows[0]
+        selected_items = (
+            position_row_items
+            if table_key == "logic_position_findings_table"
+            else duplicate_row_items
+        )
+        if 0 <= row_index < len(selected_items):
+            _open_position_details(
+                selected_items[row_index],
+                items,
+                remarks,
+                filename,
+                calculated_by_key,
+            )
 
     payloads = {}
     cluster_by_id = {cluster.cluster_id: cluster for cluster in cluster_list}
@@ -1095,6 +1575,7 @@ def section_logic(
             "category": flag.rule_id,
             "title": flag.cluster_title,
             "analysis": flag.reason_de,
+            "severity": flag.severity,
             "confidence": 1.0,
             "model": None,
             "computed": dict(flag.computed),
@@ -1127,6 +1608,7 @@ def section_logic(
             "category": evaluation.get("contradiction_category", "UNKNOWN"),
             "title": cluster.title if cluster is not None else cluster_id,
             "analysis": evaluation.get("reason_de") or "",
+            "severity": evaluation.get("severity") or "medium",
             "confidence": float(evaluation.get("confidence") or 0.0),
             "model": evaluation.get("model") or "LLM",
             "computed": {},
@@ -1164,23 +1646,57 @@ def section_logic(
         if oz in calculated_by_display_oz
     )
 
+    st.subheader("Cluster- & Systemprüfungen")
     a, b = st.columns(2)
     a.metric("Cluster-Befunde", len(cards))
     b.metric(
         "Summe EUR",
         f"€{unique_position_exposure:,.0f}",
         help="Kalkulationswert der betroffenen Positionen; jede OZ wird nur "
-             "einmal gezählt.",
+             "einmal gezählt. Summe der eindeutigen betroffenen Positionen.",
     )
     c, d = st.columns(2)
-    c.metric("Deterministisch vs. LLM", f"{deterministic_count} vs. {llm_count}")
-    d.metric("Geprüfte Cluster", len(cluster_list))
+    jev_enabled = bool(st.session_state.get("use_jev", False))
+    llm_available = not isinstance(
+        deep_logic.get_adapter(),
+        deep_logic.OfflineAdapter,
+    )
+    llm_help = (
+        "Deterministisch = Beanstandungen durch feste DIN-/VOB-Regeln; "
+        "LLM = Beanstandungen durch die optionale KI-Tiefenprüfung. "
+    )
+    if not use_deep_logic:
+        llm_help += "Die Cluster-Tiefenprüfung ist deaktiviert."
+    else:
+        llm_help += (
+            "Die Cluster-Tiefenprüfung ist aktiviert."
+            if llm_available
+            else "Die Cluster-Tiefenprüfung läuft ohne LLM im Offline-Modus."
+        )
+    if not llm_available:
+        llm_help += " Kein LLM-API-Key bzw. kein nutzbarer LLM-Adapter gesetzt."
+    llm_help += (
+        " Die separate Jev-Top-60-Prüfung (use_jev) ist "
+        f"{'aktiv' if jev_enabled else 'deaktiviert'}."
+    )
+    c.metric(
+        "Deterministisch vs. LLM",
+        f"{deterministic_count} vs. {llm_count}",
+        help=llm_help,
+    )
+    d.metric(
+        "Geprüfte Cluster",
+        len(cluster_list),
+        help="Anzahl der gebildeten Cluster. Für die LLM-Prüfung werden "
+             "höchstens 12 Cluster nach Euro-Exposure priorisiert.",
+    )
 
     if not cards:
         st.success(
-            f"Keine Cluster-Widersprueche gefunden. "
+            f"Keine Cluster-Widersprüche gefunden. "
             f"{len(cluster_list)} Cluster wurden geprueft."
         )
+        render_position_findings()
         return
 
     if "rfi_cluster_questions" not in st.session_state:
@@ -1258,26 +1774,32 @@ def section_logic(
                 else:
                     st.caption("Keine betroffenen OZ hinterlegt.")
 
-            if st.button(
-                "Als Bieterfrage uebernehmen",
-                key=f"rfi_cluster_{card['cluster_id']}_{index}",
-            ):
-                question = dict(card)
-                question.update({
-                    "contradiction_category": card["category"],
-                    "cluster_title": card["title"],
-                    "reason_de": card["analysis"],
-                })
-                question["affected_ozs"] = list(card["affected_ozs"])
-                existing_ids = {
-                    entry.get("cluster_id")
-                    for entry in st.session_state["rfi_cluster_questions"]
-                }
-                if card["cluster_id"] not in existing_ids:
-                    st.session_state["rfi_cluster_questions"].append(question)
+            rfi_column, rfq_column = st.columns(2)
+            with rfi_column:
+                _render_action_button(
+                    "selected_rfis",
+                    _cluster_action_entry(card, "RFI"),
+                    "Als Bieterfrage übernehmen",
+                    "✓ Als Bieterfrage übernommen",
+                    "Bieterfrage wurde für den Export vorgemerkt.",
+                    f"rfi_cluster_{card['cluster_id']}_{index}",
+                )
+            with rfq_column:
+                _render_action_button(
+                    "selected_rfqs",
+                    _cluster_action_entry(card, "RFQ"),
+                    "Als Nachunternehmen weiterleiten",
+                    "✓ Für NU-Anfrage vorgemerkt",
+                    "Cluster wurde für die Nachunternehmer-Anfrage vorgemerkt.",
+                    f"rfq_cluster_{card['cluster_id']}_{index}",
+                )
+
+    render_position_findings()
 
 
-def section_hybrid_risky(items, hybrid_results, findings):
+def section_hybrid_risky(
+    items, hybrid_results, findings, remarks, filename, calculated,
+):
     """Hybrid prioritized risk table and RFI export."""
     filtered = [
         result for result in hybrid_results
@@ -1299,7 +1821,7 @@ def section_hybrid_risky(items, hybrid_results, findings):
     a, b, c, d = st.columns(4)
     a.metric("Positionen mit hohem Risiko", high_count)
     b.metric("Positionen mit mittlerem Risiko", medium_count)
-    c.metric("Top-10-%-Schwelle", f"€{threshold:,.2f}")
+    c.metric("Schwelle der obersten 10 %", f"€{threshold:,.2f}")
     d.metric("VOB/B-Nachtragskandidaten", speculation_count)
 
     filter_choice = st.segmented_control(
@@ -1320,6 +1842,8 @@ def section_hybrid_risky(items, hybrid_results, findings):
     )
     item_by_key = {item.key(): item for item in items}
     rows = []
+    row_items = []
+    row_results = []
     for result in filtered:
         item = item_by_key.get(result.key)
         if item is None:
@@ -1334,12 +1858,76 @@ def section_hybrid_risky(items, hybrid_results, findings):
             "EP vorl.": round(result.pre_unit_price, 2),
             "€-Exposure": round(result.euro_exposure, 2),
             "Strategie": f"{result.action_type}: {result.strategy}",
-            "KI- & Regel-Begründung": reasons,
+            "KI- und Regelbegründung": reasons,
         })
+        row_items.append(item)
+        row_results.append(result)
 
     if rows:
-        st.dataframe(pd.DataFrame(rows), width="stretch",
-                     hide_index=True, height="stretch")
+        event = st.dataframe(
+            pd.DataFrame(rows),
+            width="stretch",
+            hide_index=True,
+            height="stretch",
+            key="risky_items_table",
+            on_select="rerun",
+            selection_mode="single-row",
+        )
+        selected_rows = list(event.selection.rows)
+        previous_selection = st.session_state.get(
+            "_risky_table_selection", []
+        )
+        st.session_state["_risky_table_selection"] = selected_rows
+        calculated_by_key = {
+            calculated_item.item.key(): calculated_item
+            for calculated_item in calculated
+        }
+        if selected_rows:
+            row_index = selected_rows[0]
+            if 0 <= row_index < len(row_items):
+                item = row_items[row_index]
+                result = row_results[row_index]
+                reason = " | ".join(result.reasons)
+                st.caption(f"Aktionen für OZ {item.display_oz}")
+                rfi_column, rfq_column = st.columns(2)
+                with rfi_column:
+                    _render_action_button(
+                        "selected_rfis",
+                        _position_action_entry(
+                            item,
+                            "RFI",
+                            reason,
+                            "Heikle Positionen",
+                            _severity_label(result.risk_level),
+                        ),
+                        "Als Bieterfrage übernehmen",
+                        "✓ Als Bieterfrage übernommen",
+                        "Bieterfrage wurde für den Export vorgemerkt.",
+                        f"risky_position_rfi_{item.key()}",
+                    )
+                with rfq_column:
+                    _render_action_button(
+                        "selected_rfqs",
+                        _position_action_entry(
+                            item,
+                            "RFQ",
+                            reason,
+                            "Heikle Positionen",
+                            _severity_label(result.risk_level),
+                        ),
+                        "Als Nachunternehmen weiterleiten",
+                        "✓ Für NU-Anfrage vorgemerkt",
+                        "Position wurde für die Nachunternehmer-Anfrage vorgemerkt.",
+                        f"risky_position_rfq_{item.key()}",
+                    )
+                if selected_rows != previous_selection:
+                    _open_position_details(
+                        item,
+                        items,
+                        remarks,
+                        filename,
+                        calculated_by_key,
+                    )
     else:
         st.success("Keine Position im gewählten Risiko-Filter.")
 
@@ -1395,127 +1983,12 @@ def section_tricky(calculated):
     )
 
 
-def section_pricing(items, company, reference, priced=None):
-    """Comparable-price cross-check. Secondary to the calculation above."""
-    st.subheader("7 · Quercheck gegen echte Angebotspreise")
-    st.caption(
-        "A second, independent estimate from 720 unit prices in three real "
-        "submitted bids. Where the two engines agree, confidence is higher; "
-        "where they diverge, look. Measured on its own (answer key held out) "
-        "this engine is −50% on the total, so it is a cross-check, not a bid."
-    )
-    if priced is None:
-        priced = pricer.price_boq(items, reference, company)
-    stats = pricer.summarize(priced)
-
-    a, b, c, d = st.columns(4)
-    a.metric("Estimated total", f"€{stats['total']:,.0f}")
-    b.metric("Priced from real bids", f"{stats['benchmark_share_pct']:.0f}%")
-    c.metric("No comparable", stats["no_comparable"],
-             help="Positions we refuse to price rather than invent a number for.")
-    d.metric("On fallback rates", f"€{stats['fallback_value']:,.0f}",
-             help="Value resting on hand-authored rates, not observed prices.")
-
-    frame = pd.DataFrame([{
-        "OZ": p.item.display_oz,
-        "Position": p.item.short_text[:60],
-        "Menge": p.item.quantity,
-        "Einheit": constants.normalize_unit(p.item.unit),
-        "EP €": p.unit_price if p.unit_price is not None else None,
-        "GP €": p.total if p.total is not None else None,
-        "Quelle": {
-            "benchmark_match": "matched comparable",
-            "benchmark": "bucket median",
-            "benchmark_unit": "unit median",
-            "fallback_rate": "fallback rate",
-            "none": constants.NO_COMPARABLE_LABEL,
-        }[p.source],
-        "Basis": p.note[:70],
-    } for p in priced])
-    st.dataframe(frame, width="stretch", hide_index=True, height=320)
-
-    if stats["no_comparable"]:
-        st.caption(
-            f"{stats['no_comparable']} positions print "
-            f"“{constants.NO_COMPARABLE_LABEL}”. These are mostly rental and "
-            "time-on-site units with nothing comparable in the benchmark. "
-            "An honest blank beats an invented euro."
-        )
-    return priced, stats
-
-
-def section_findings(priced, remarks):
-    """Top findings by € leverage. Lights up when task 004 lands."""
-    st.subheader(f"8 · Top {constants.TOP_N_FINDINGS} positions worth arguing about")
-    st.caption(
-        "Ranked by € leverage (quantity × price exposure). Where no comparable "
-        f"exists we print “{constants.NO_COMPARABLE_LABEL}” rather than invent a number."
-    )
-    try:
-        findings = detectors.run_all(priced, remarks, top_n=constants.TOP_N_FINDINGS)
-    except NotImplementedError:
-        st.info(
-            "Detectors are task 004 — not built yet. The pricing above is live; "
-            "this panel fills in once `core/detectors.py` is implemented."
-        )
-        return []
-
-    if not findings:
-        st.success("No findings above the detection thresholds.")
-        return []
-
-    st.dataframe(pd.DataFrame([{
-        "OZ": f.item.display_oz,
-        "Position": f.item.short_text[:60],
-        "Detector": f.detector,
-        "Schweregrad": _severity_label(f.severity),
-        "€ leverage": round(f.euro_leverage, 2),
-        "Why": f.rationale,
-    } for f in findings]), width="stretch", hide_index=True)
-    return findings
-
-
-def section_reveal(priced, answer, source_label):
-    """The reveal. PLAN.md step 4 — this is the whole pitch."""
-    st.subheader("9 · How wrong are we?")
-
-    if answer is None:
-        st.caption(
-            "This tender has no submitted bid to check against. Load the sample "
-            "tender to see the comparison that does."
-        )
-        return
-
-    reveal.render(priced, answer, source_label)
-
-
-def answer_key_for(label: str):
-    """Find a real submitted bid to measure this tender against.
-
-    Two cases exist. The demo blank has a known sibling bid for the same BoQ.
-    A file the user uploads may itself be priced (.D84/.D86), in which case it
-    is its own answer key — and must then be held out of the benchmark, or we
-    would be checking our homework against our own source.
-    """
-    if label.startswith(os.path.basename(SAMPLE)):
-        raw, _ = load_from_disk(ANSWER_KEY)
-        return rehydrate(raw), os.path.basename(ANSWER_KEY), os.path.basename(ANSWER_KEY)
-
-    for source in constants_sources():
-        if label.startswith(os.path.basename(source)):
-            raw, _ = load_from_disk(source)
-            return rehydrate(raw), os.path.basename(source), os.path.basename(source)
-    return None, "", ""
-
-
-def constants_sources() -> list[str]:
-    """The bids the benchmark was built from, per reference_prices.json."""
-    return load_reference().get("meta", {}).get("sources", [])
-
-
 def section_export(findings, cluster_evaluations=None):
-    """Download a Bieterfragen catalogue from position or cluster findings."""
-    st.subheader("10 · The letter")
+    """Download selected Bieterfragen and Nachunternehmer-Anfragen."""
+    project_title = (
+        "Export: Bieterfragen (VOB/A) & Nachunternehmer-Anfragen"
+    )
+    st.subheader(project_title)
     cluster_evaluations = [
         {
             **entry,
@@ -1525,58 +1998,177 @@ def section_export(findings, cluster_evaluations=None):
             "cluster_title": (
                 entry.get("cluster_title") or entry.get("title")
             ),
-            "reason_de": entry.get("reason_de") or entry.get("analysis"),
+            "reason_de": (
+                entry.get("question")
+                or entry.get("reason_de")
+                or entry.get("analysis")
+            ),
         }
         for entry in (cluster_evaluations or [])
         if isinstance(entry, dict)
     ]
-    if not findings and not cluster_evaluations:
-        st.button("Export clarification letter (.docx)", disabled=True)
-        st.caption("No findings are available for export.")
-        return
-
     import export_rfi
-    project = {"title": "Bieterfragen-Katalog"}
+    project = {"title": project_title}
     catalog = export_rfi.build_catalog(
         findings or [],
         project,
         cluster_evaluations=cluster_evaluations,
     )
+
+    def unique_selected_entries(state_key):
+        entries = st.session_state.get(state_key, [])
+        if not isinstance(entries, list):
+            return []
+        unique = []
+        seen_ids = set()
+        seen_ozs = set()
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            entry_id = entry.get("id") or entry.get("cluster_id")
+            oz = entry.get("oz")
+            if (
+                (entry_id and entry_id in seen_ids)
+                or (oz and oz in seen_ozs)
+            ):
+                continue
+            if entry_id:
+                seen_ids.add(entry_id)
+            if oz:
+                seen_ozs.add(oz)
+            unique.append(entry)
+        return unique
+
+    selected_rfis = unique_selected_entries("selected_rfis")
+    selected_rfqs = unique_selected_entries("selected_rfqs")
+    legacy_cluster_ids = {
+        str(entry.get("cluster_id"))
+        for entry in cluster_evaluations
+        if entry.get("cluster_id")
+    }
+
+    for state_key, entries in (
+        ("selected_rfis", selected_rfis),
+        ("selected_rfqs", selected_rfqs),
+    ):
+        for entry in entries:
+            kind = entry.get("kind")
+            cluster_id = entry.get("cluster_id")
+            if (
+                state_key == "selected_rfis"
+                and kind == "cluster"
+                and str(cluster_id) in legacy_cluster_ids
+            ):
+                continue
+
+            action_group = (
+                "rfq"
+                if state_key == "selected_rfqs"
+                else "cluster" if kind == "cluster" else "position"
+            )
+            affected_ozs = list(entry.get("affected_ozs") or [])
+            oz = (
+                ", ".join(str(value) for value in affected_ozs)
+                if affected_ozs else str(entry.get("oz") or "—")
+            )
+            quantity = entry.get("quantity")
+            try:
+                quantity_text = f"{float(quantity):g}" if quantity is not None else ""
+            except (TypeError, ValueError):
+                quantity_text = str(quantity or "")
+            try:
+                exposure = float(
+                    entry.get("euro_exposure_estimate")
+                    or entry.get("euro_leverage")
+                    or 0.0
+                )
+            except (TypeError, ValueError):
+                exposure = 0.0
+            catalog.append({
+                "nr": 0,
+                "id": entry.get("id"),
+                "oz": oz,
+                "kurztext": (
+                    entry.get("short_text")
+                    or entry.get("cluster_title")
+                    or "Ausgewählte Position"
+                ),
+                "menge": quantity_text,
+                "einheit": str(entry.get("unit") or ""),
+                "detector": str(entry.get("action_type") or state_key),
+                "severity": str(entry.get("severity") or "medium"),
+                "euro_leverage": round(exposure, 2),
+                "frage": str(
+                    entry.get("question")
+                    or entry.get("reason_de")
+                    or "Bitte klären Sie die Angaben zu dieser Leistung."
+                ),
+                "cluster_title": str(entry.get("cluster_title") or ""),
+                "din_ref": "",
+                "affected_ozs": affected_ozs or [oz],
+                "group": action_group,
+            })
+
+    for index, entry in enumerate(catalog, start=1):
+        entry["nr"] = index
+
     if not catalog:
-        st.button("Export clarification letter (.docx)", disabled=True)
-        st.caption("No findings are available for export.")
+        st.download_button(
+            "Export (.docx)",
+            data=b"",
+            file_name="Bieterfragen-und-NU-Anfragen.docx",
+            disabled=True,
+        )
+        st.download_button(
+            "Export (.md)",
+            data=b"",
+            file_name="Bieterfragen-und-NU-Anfragen.md",
+            disabled=True,
+        )
+        st.caption("Es liegen keine exportierbaren Bieterfragen vor.")
         return
 
+    markdown_payload = export_rfi.to_markdown(
+        catalog, project
+    ).encode("utf-8")
+    st.download_button(
+        "Export (.md)",
+        data=markdown_payload,
+        file_name="Bieterfragen-und-NU-Anfragen.md",
+        mime="text/markdown",
+        key="selected_questions_markdown_export",
+    )
+
+    out_path = None
     try:
         with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as handle:
             out_path = handle.name
         export_rfi.to_docx(catalog, out_path, project)
         with open(out_path, "rb") as handle:
-            payload = handle.read()
-        os.unlink(out_path)
+            docx_payload = handle.read()
         st.download_button(
-            "Export clarification letter (.docx)",
-            data=payload,
-            file_name="Bieterfragen-Katalog.docx",
+            "Export (.docx)",
+            data=docx_payload,
+            file_name="Bieterfragen-und-NU-Anfragen.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            key="selected_questions_docx_export",
         )
     except Exception as exc:
-        fallback = export_rfi.to_markdown(catalog, project).encode("utf-8")
-        st.warning("DOCX export is unavailable; the Markdown fallback is ready.")
-        st.download_button(
-            "Export clarification letter (.md)",
-            data=fallback,
-            file_name="Bieterfragen-Katalog.md",
-            mime="text/markdown",
-        )
-        with st.expander("Export details"):
+        st.warning("DOCX-Export nicht verfügbar; Markdown-Export ist bereit.")
+        with st.expander("Exportdetails"):
             st.code(str(exc))
+    finally:
+        if out_path and os.path.exists(out_path):
+            os.unlink(out_path)
 
 
 def main():
     if "_persisted_session_restored" not in st.session_state:
         session_store.restore(st.session_state)
         st.session_state["_persisted_session_restored"] = True
+    st.session_state.setdefault("use_jev", False)
+    st.session_state.setdefault("selected_rfis", [])
+    st.session_state.setdefault("selected_rfqs", [])
 
     st.markdown(
         """
@@ -1729,6 +2321,13 @@ def main():
     )
     st.sidebar.markdown("### Bid & Risk Assistant")
     st.sidebar.caption("Benutzermodus")
+    st.sidebar.checkbox(
+        "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
+        key="use_jev",
+        help="Jev priorisiert die 60 risikoreichsten Positionen. "
+             "Die Offline-Risikobewertung läuft unabhängig davon.",
+    )
+    use_jev = st.session_state["use_jev"]
     active_page = st.session_state.get("active_page", PAGES[0])
     if active_page in ("Groups", "Das Angebot"):
         active_page = "Gruppen & Angebot"
@@ -1748,7 +2347,6 @@ def main():
         page = "Logik"
         st.session_state["active_page"] = page
     st.title(page)
-    use_jev = False
     use_deep_logic = False
     if page == "Logik":
         use_deep_logic = st.sidebar.checkbox(
@@ -1758,21 +2356,13 @@ def main():
                  "Deterministische Regeln laufen unabhängig davon.",
             key="use_deep_logic",
         )
-    elif page == "Heikle Positionen":
-        use_jev = st.sidebar.checkbox(
-            "Jev-Risikotriage (Top 60 Positionen)",
-            value=False,
-            help="Übergibt die priorisierten Positionen optional an Jev. "
-                 "Die Offline-Risikobewertung läuft unabhängig davon.",
-            key="use_jev",
-        )
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
         return
     items, remarks, label = loaded
 
     if page == "Tender":
-        section_items(items)
+        section_items(items, remarks, label)
     else:
         company = sidebar_kalkulation()
         data = stammdaten.load()
@@ -1810,53 +2400,43 @@ def main():
             list(remarks),
             calculated_payload,
             priced_payload,
-            bool(use_jev),
+            bool(
+                use_jev
+                and page in ("Logik", "Heikle Positionen")
+            ),
             HYBRID_ANALYSIS_CACHE_VERSION,
         )
         if page == "Gruppen & Angebot":
-            group_tab, calculation_tab, pricing_tab, reveal_tab = st.tabs([
-                "Gewerke & Positionen",
-                "Positionskalkulation",
-                "Benchmark-Quercheck",
-                "Angebots-Reveal",
-            ])
-            with group_tab:
-                cov = classify.coverage(assignments)
-                if cov["pct"] < 50:
-                    st.warning(
-                        f"Nur {cov['pct']}% der Positionen konnten einer "
-                        "Leistung zugeordnet werden."
-                    )
-                entscheidungen = vergabe_view.gespeicherte_entscheidungen(label)
-                section_groups(
+            cov = classify.coverage(assignments)
+            entscheidungen = vergabe_view.gespeicherte_entscheidungen(label)
+            vergabe_ergebnis = (
+                vergabe.auswerten(
                     items,
                     assignments,
                     data,
-                    label,
-                    remarks,
                     calculated,
-                    vergabe.auswerten(
-                        items, assignments, data, calculated, company,
-                        entscheidungen,
-                    ) if entscheidungen else None,
+                    company,
+                    entscheidungen,
                 )
-            with calculation_tab:
-                section_kalkulation(calculated, cov, data)
-            pricing_company = {
-                "mittellohn_eur_h": company.mittellohn_eur_h,
-                "overhead_pct": company.total_markup_pct,
-                "profit_pct": company.wg_pct,
-            }
-            with pricing_tab:
-                section_pricing(
-                    items,
-                    pricing_company,
-                    reference,
-                    priced=priced,
-                )
-            with reveal_tab:
-                answer, _answer_label, source_label = answer_key_for(label)
-                section_reveal(priced, answer, source_label)
+                if entscheidungen else None
+            )
+            section_kalkulation(
+                items,
+                assignments,
+                calculated,
+                cov,
+                data,
+                company,
+                vergabe_ergebnis,
+            )
+            section_groups(
+                items,
+                assignments,
+                data,
+                label,
+                remarks,
+                calculated,
+            )
         elif page == "Vergabe":
             vergabe_view.render(
                 label,
@@ -1875,7 +2455,14 @@ def main():
                 use_deep_logic=use_deep_logic,
             )
         elif page == "Heikle Positionen":
-            section_hybrid_risky(items, hybrid_results, findings)
+            section_hybrid_risky(
+                items,
+                hybrid_results,
+                findings,
+                remarks,
+                label,
+                calculated,
+            )
 
     session_store.persist(st.session_state)
 

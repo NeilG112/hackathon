@@ -24,6 +24,11 @@ Rationale: the ~30 trade PDFs (Maler, Trockenbau, Fliesen, Estrich, Teppich, Sch
 Tiefbau / Rohrleitung / Schacht / Straßenbau. A co-occurrence matrix over 30 heterogeneous
 documents is noise, and it costs the entire build window. Cutting it buys back Saturday.
 
+> **Current rule-engine scope:** `core/domain.py` now detects Tiefbau, Hochbau/Rohbau,
+> Ausbau, TGA Elektro and TGA SHK from LV text, section labels and preambles. The
+> deterministic domain checks are completeness heuristics and do not imply that the
+> historical reference-price corpus covers those trades.
+
 ---
 
 ## Verified facts this plan rests on

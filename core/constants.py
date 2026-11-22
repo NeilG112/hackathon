@@ -12,6 +12,10 @@ hand-authored rates are permitted at all — confirm before leaning on them.
 
 from __future__ import annotations
 
+import os
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # --- Company cost base (the Streamlit sliders) -----------------------------
 
 DEFAULT_COMPANY = {
@@ -181,17 +185,21 @@ PROVISIONAL_SHARE_WARN_PCT = 15.0   # Eventualpositionen share of total value
 # that unit. A rule below ~70% fires on correctly-priced work more often than
 # on errors, which is worse than having no rule.
 #
-# Kept (measured):      boden 82% of 17   verfüllen 100% of 3
-# Dropped (measured):   rohr      38% of 42    leitung 31% of 26
-#                       asphalt   33% of 3     schacht 100% but n=2
-#                       pflaster 100% but n=2  aushub  100% but n=1
+# Kept (measured):      excavation terms are volume; verfüllen 100% of 3
+# Dropped (measured):   generic "boden" (82% of 17) is too broad for
+#                       Bodenbelag, Bodenplatte, Oberboden and Fußboden.
+#                       rohr 38% of 42; leitung 31% of 26; asphalt 33% of 3
+#                       schacht, pflaster and aushub have insufficient samples.
 #
 # `rohr -> m` is the instructive one. It looks obvious and it is wrong: in
 # "Kies-Sand-Gemisch Einbettung Rohr DN300-400 verdichten" the pipe is what the
 # gravel surrounds, and m3 is the correct basis. The keyword names the subject
 # of the position, not how it is measured — only the verb would tell you that.
 UNIT_EXPECTED_BY_KEYWORD = {
-    "boden": "m3",
+    "bodenaushub": "m3",
+    "erdaushub": "m3",
+    "baugrubenaushub": "m3",
+    "grabenaushub": "m3",
     "verfüllen": "m3",
 }
 UNIT_RULE_MIN_SUPPORT = 0.70   # the bar a rule must clear to be worth keeping
@@ -249,7 +257,7 @@ BLACKBOX_KEYWORDS: tuple[str, ...] = (
     "technik",
 )
 
-# --- The reveal (PLAN.md step 4, the whole pitch) -------------------------
+# --- Validation comparison data -------------------------------------------
 REVEAL = {
     "blank_boq": "Dataset/[NUMMER_001]_leer.X83",
     "answer_key": "Dataset/StBALV23040.D86",
@@ -257,8 +265,8 @@ REVEAL = {
     "disagreement_threshold_pct": 30.0,
 }
 
-GOLDEN_DIR = "data/golden"
-REFERENCE_PRICES = "data/reference_prices.json"
+GOLDEN_DIR = os.path.join(PROJECT_ROOT, "data", "golden")
+REFERENCE_PRICES = os.path.join(PROJECT_ROOT, "data", "reference_prices.json")
 
 # --- Vergabe (make-or-buy) ----------------------------------------------------
 NU_TYPISCHE_GEWERKE = frozenset({"Prüfung", "Landschaftsbau"})

@@ -27,11 +27,13 @@ margin, and anything resting on an `unklar` tag is suppressed outright.
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Sequence
 
 from core import constants
+from core.domain import detect_lv_domains
 from core.models import ClusterFlag, Finding, LogicResult, NormalizedItem
 from core.objects import UNKNOWN_TAG, ObjectRow, build, tag_of
 from utils.text_cleaning import clean_item_text, compare_key
@@ -114,9 +116,10 @@ class RuleSpec:
     din_ref: str
     severity: str
     reason_de: str
+    domains: tuple[str, ...] = ("COMMON",)
 
 
-RULES_VERSION = "1"
+RULES_VERSION = "2"
 
 # Civil engineers may maintain this catalogue. Bounds are factor corridors,
 # bridges are explicit conversions, and every rule has an exposure threshold.
@@ -133,56 +136,158 @@ RULES: tuple[RuleSpec, ...] = (
         "section", (0.8, 1.2), TRENCH_BRIDGE, 0.20, 5000.0, True, "",
         "high",
         "Leitungsgraben und Bodenaushub weichen vom plausiblen Tiefen-Breiten-Korridor ab.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "BEDDING_IN_TRENCH", "containment", "Bettung", "Bodenaushub", "",
         "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
         "high",
         "Bettungsmenge liegt oberhalb der enthaltenen Erd-/Grabenaushubmenge.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "BACKFILL_BALANCE", "containment", "Verfüllung", "Bodenaushub", "",
         "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
         "high",
         "Verfuellmenge liegt oberhalb der Bodenaushubmenge.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "DIN4124_VERBAU", "requires", "Grabenverbau", "Aboeschung", "",
         "section", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN 4124",
         "high",
         "Tiefe ueber 1,25 m verlangt Grabenverbau oder Aboeschung.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "PRESSURE_TEST", "requires", "phase pruefung", "montage_trinkwasser_druckrohr", "",
         "system", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN EN 805",
         "high",
         "Montiertes Trink-/Druckrohr aus PE, Guss oder Stahl benoetigt eine Pruefposition.",
+        ("TIEFBAU", "TGA_SHK"),
     ),
     RuleSpec(
         "SURFACE_RESTORE", "requires", "phase wiederherstellung", "abbruch_oberflaeche", "",
         "section", (1.0, 1.0), None, 0.0, 2000.0, True, "",
         "high",
         "Abbruch von Asphalt, Pflaster oder Decke verlangt eine Wiederherstellung.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "SHAFT_COVER_CARD", "cardinality", "Schachtabdeckungen", "Schaechte", "",
         "section", (0.8, 1.2), None, 0.20, 1000.0, True, "",
         "medium",
         "Anzahl der Schachtabdeckungen und Schaechte liegt ausserhalb 0,8 bis 1,2.",
+        ("TIEFBAU",),
     ),
     RuleSpec(
         "DN_STEP", "spec_consistency", "DN-Sprung", "reduzier|uebergang|adapter", "",
         "system", (2.0, 2.0), None, 0.0, 2000.0, True, "",
         "medium",
         "Im System liegt ein Sprung von mindestens zwei Normstufen ohne Ausgleichselement.",
+        ("TIEFBAU", "TGA_SHK"),
     ),
     RuleSpec(
         "SITE_SETUP", "presence", "Baustelleneinrichtung", "", "",
         "frame", (1.0, 1.0), None, 0.0, 1000.0, True, "",
         "medium",
         "Im Projekt fehlt ein Frame-Cluster zur Baustelleneinrichtung.",
+        ("COMMON",),
     ),
 )
+
+
+def _domain_rule(
+    rule_id: str,
+    domain: str,
+    subject: str,
+    object_terms: str,
+    din_ref: str,
+    reason: str,
+) -> RuleSpec:
+    return RuleSpec(
+        rule_id, "requires", subject, object_terms, "",
+        "section", (1.0, 1.0), None, 0.0, 0.0, True, din_ref,
+        "medium", reason, (domain,),
+    )
+
+
+DOMAIN_RULES: tuple[RuleSpec, ...] = (
+    _domain_rule(
+        "DIN18331_MISSING_CONCRETE", "HOCHBAU_ROHBAU",
+        "Schalung oder Bewehrung", "Beton|Betonage|Stahlbeton",
+        "DIN 18331",
+        "Mögliche Lücke: Schalung oder Bewehrung ist beschrieben, aber keine Betonleistung im Abschnitt erkennbar.",
+    ),
+    _domain_rule(
+        "DIN18330_SCAFFOLD_MISSING", "HOCHBAU_ROHBAU",
+        "Mauerwerk oder Fassade über 2,50 m", "Gerüst|Absturzsicherung|Seitenschutz",
+        "DIN 18330",
+        "Mögliche Lücke: Mauerwerks- oder Fassadenarbeiten über 2,50 m ohne erkennbare Gerüst-/Absturzsicherung.",
+    ),
+    _domain_rule(
+        "DIN18533_PROTECTION_MISSING", "HOCHBAU_ROHBAU",
+        "Erdberührte Abdichtung", "Schutzschicht|Schutzlage|Drainage",
+        "DIN 18533",
+        "Mögliche Lücke: Bei erdberührter Abdichtung ist keine Schutzschicht oder Drainage erkennbar.",
+    ),
+    _domain_rule(
+        "DIN18340_DRYWALL_FIRE_SPEC", "AUSBAU",
+        "Trockenbau mit Feuerwiderstand", "Systemaufbau|Spachtelgüte",
+        "DIN 18340",
+        "Mögliche Lücke: Bei F30/F90-Trockenbau fehlen Systemkomponenten oder eine Spachtelgüte Q1–Q4.",
+    ),
+    _domain_rule(
+        "DIN18353_SCREED_COMPONENTS", "AUSBAU",
+        "Estrich", "Randdämmstreifen|Trittschalldämmung|Aufheizprotokoll",
+        "DIN 18353",
+        "Mögliche Lücke: Zum Estrich fehlen Rand-/Trittschalldämmung oder bei beheiztem Estrich ein Aufheizprotokoll.",
+    ),
+    _domain_rule(
+        "MLAR_FIRE_STOP_MISSING", "TGA_ELEKTRO",
+        "Leitung durch Brandabschnitt", "Brandschott|Abschottung",
+        "MLAR",
+        "Mögliche Lücke: Leitungsführung durch Brandabschnitte ohne erkennbare Brandschottung.",
+    ),
+    _domain_rule(
+        "DIN_VDE_0100_600_TEST", "TGA_ELEKTRO",
+        "Verteilung oder Stromkreis", "Erstprüfung|Messprotokoll",
+        "DIN VDE 0100-600",
+        "Mögliche Lücke: Für Verteilungen/Stromkreise ist keine Erstprüfung oder Messdokumentation erkennbar.",
+    ),
+    _domain_rule(
+        "ELECTRO_LIGHTING_CONNECTION", "TGA_ELEKTRO",
+        "Leuchte oder Aktor", "Montage|Anschluss",
+        "",
+        "Mögliche Lücke: Leuchten/Aktoren sind beschrieben, aber Montage oder Anschluss ist nicht erkennbar.",
+    ),
+    _domain_rule(
+        "GEG_PIPE_INSULATION", "TGA_SHK",
+        "Heizungs- oder Warmwasserleitung", "Dämmung|Isolierung",
+        "GEG",
+        "Mögliche Lücke: Für Heizungs-/Warmwasserleitungen ist keine Dämmung erkennbar.",
+    ),
+    _domain_rule(
+        "DIN18380_HYDRAULIC_BALANCE", "TGA_SHK",
+        "Heiz- oder Kältenetz", "Hydraulischer Abgleich|Einregulierung",
+        "DIN 18380",
+        "Mögliche Lücke: Für das Heiz-/Kältenetz ist kein hydraulischer Abgleich erkennbar.",
+    ),
+    _domain_rule(
+        "DIN_EN_806_POTABLE_WATER_TEST", "TGA_SHK",
+        "Trinkwasserleitung", "Druckprobe|Spülung|Hygiene-Nachweis",
+        "DIN EN 806 / VDI 6023",
+        "Mögliche Lücke: Für Trinkwasser fehlen Druckprobe, Spülung oder Hygiene-Nachweis.",
+    ),
+)
+RULES = RULES + DOMAIN_RULES
+RULES_BY_DOMAIN: dict[str, tuple[RuleSpec, ...]] = {
+    domain: tuple(rule for rule in RULES if domain in rule.domains)
+    for domain in (
+        "COMMON", "TIEFBAU", "HOCHBAU_ROHBAU", "AUSBAU",
+        "TGA_ELEKTRO", "TGA_SHK",
+    )
+}
 
 
 def _rule_by_id(rule_id: str) -> RuleSpec:
@@ -350,14 +455,229 @@ def _make_flag(
     )
 
 
+def _normalized_item_text(item: NormalizedItem) -> str:
+    return _normalize_german_text(_item_text(item))
+
+
+def _contains_any(text: str, terms: Sequence[str]) -> bool:
+    return any(_normalize_german_text(term) in text for term in terms)
+
+
+def _domain_rule_finding(
+    rule: RuleSpec,
+    positions: Sequence[NormalizedItem],
+) -> tuple[list[NormalizedItem], dict, str] | None:
+    texts = {item.key(): _normalized_item_text(item) for item in positions}
+    section_text = " ".join(texts.values())
+
+    def matching(predicate) -> list[NormalizedItem]:
+        return [item for item in positions if predicate(texts[item.key()])]
+
+    missing: list[str] = []
+    subjects: list[NormalizedItem] = []
+
+    if rule.id == "DIN18331_MISSING_CONCRETE":
+        subjects = matching(lambda text: _contains_any(
+            text, ("schalung", "bewehrung", "bewehrungsstahl"),
+        ))
+        if not subjects or _contains_any(
+            section_text, ("beton", "betonage", "stahlbeton"),
+        ):
+            return None
+        missing = ["Betonposition"]
+
+    elif rule.id == "DIN18330_SCAFFOLD_MISSING":
+        masonry = matching(lambda text: _contains_any(
+            text, ("mauerwerk", "fassade", "aussenwand"),
+        ))
+        heights = []
+        height_patterns = (
+            r"\b(?:h|hoehe|wandhoehe|gebaeudehoehe)\s*"
+            r"(?:bis|ueber|>\s*)?\s*(\d{1,2}(?:[,.]\d{1,2})?)\s*m\b",
+            r"\b(?:bis|ueber|>)\s*(\d{1,2}(?:[,.]\d{1,2})?)\s*m\b",
+            r"\b(\d{1,2}(?:[,.]\d{1,2})?)\s*m\s*(?:hoch|wandhoehe)\b",
+        )
+        for item in masonry:
+            text = texts[item.key()]
+            values = [
+                float(value.replace(",", "."))
+                for pattern in height_patterns
+                for value in re.findall(pattern, text)
+            ]
+            if any(value > 2.5 for value in values):
+                heights.append(item)
+        if not heights or _contains_any(
+            section_text,
+            ("geruest", "absturzsicherung", "seitenschutz", "fanggeruest", "arbeitsbuehne"),
+        ):
+            return None
+        subjects = heights
+        missing = ["Gerüst-/Absturzsicherung"]
+
+    elif rule.id == "DIN18533_PROTECTION_MISSING":
+        subjects = matching(lambda text: (
+            "abdichtung" in text
+            and _contains_any(
+                text,
+                ("erdberuehrt", "erdreich", "kellerabdichtung",
+                 "bauwerksabdichtung", "perimeter"),
+            )
+        ))
+        if not subjects or _contains_any(
+            section_text,
+            ("schutzschicht", "schutzlage", "noppenbahn", "drainage",
+             "drainmatte", "drainplatte", "perimeterdaemmung"),
+        ):
+            return None
+        missing = ["Schutzschicht/Drainage"]
+
+    elif rule.id == "DIN18340_DRYWALL_FIRE_SPEC":
+        subjects = matching(lambda text: (
+            _contains_any(text, ("trockenbau", "gipskarton", "gipsfaser"))
+            and bool(re.search(r"\b(?:f|ei)\s*(?:30|90)\b", text))
+        ))
+        if not subjects:
+            return None
+        if not _contains_any(
+            section_text,
+            ("staenderwerk", "unterkonstruktion", "beplankung", "daemmstoff",
+             "mineralwolle", "plattenstaerke", "systemaufbau", "zulassung",
+             "bauartgenehmigung"),
+        ):
+            missing.append("Systemkomponenten")
+        if not re.search(r"\bq\s*[1-4]\b", section_text):
+            missing.append("Spachtelgüte Q1–Q4")
+        if not missing:
+            return None
+
+    elif rule.id == "DIN18353_SCREED_COMPONENTS":
+        subjects = matching(lambda text: "estrich" in text)
+        if not subjects:
+            return None
+        if not _contains_any(
+            section_text,
+            ("randdaemmstreifen", "randdaemmung", "trittschall",
+             "schalldaemmung", "schalldaemmstreifen"),
+        ):
+            missing.append("Randdämmstreifen/Trittschalldämmung")
+        heated = _contains_any(
+            section_text,
+            ("fussbodenheizung", "heizkabel", "heizestrich", "heizkreis"),
+        )
+        if heated and not _contains_any(
+            section_text,
+            ("aufheizprotokoll", "funktionsheizen", "belegreifheizen",
+             "heizprotokoll"),
+        ):
+            missing.append("Aufheizprotokoll")
+        if not missing:
+            return None
+
+    elif rule.id == "MLAR_FIRE_STOP_MISSING":
+        subjects = matching(lambda text: _contains_any(text, ("leitung", "kabel")))
+        if (
+            not subjects
+            or not _contains_any(
+                section_text, ("brandabschnitt", "brandschutzabschnitt"),
+            )
+            or _contains_any(
+                section_text, ("brandschott", "abschottung", "feuerstop"),
+            )
+        ):
+            return None
+        missing = ["Brandschottung"]
+
+    elif rule.id == "DIN_VDE_0100_600_TEST":
+        subjects = matching(lambda text: _contains_any(
+            text, ("stromkreis", "verteilung", "schaltanlage", "elektrische anlage"),
+        ))
+        if not subjects or _contains_any(
+            section_text,
+            ("erstpruefung", "messprotokoll", "pruefprotokoll",
+             "vde 0100-600", "schutzmassnahmenpruefung"),
+        ):
+            return None
+        missing = ["Erstprüfung/Messprotokoll"]
+
+    elif rule.id == "ELECTRO_LIGHTING_CONNECTION":
+        subjects = matching(lambda text: _contains_any(text, ("leuchte", "aktor")))
+        if not subjects or _contains_any(
+            section_text, ("montage", "anschluss", "anschliessen"),
+        ):
+            return None
+        missing = ["Montage/Anschluss"]
+
+    elif rule.id == "GEG_PIPE_INSULATION":
+        subjects = matching(lambda text: (
+            _contains_any(text, ("heizung", "warmwasser"))
+            and _contains_any(text, ("leitung", "rohr"))
+        ))
+        if not subjects or _contains_any(
+            section_text,
+            ("daemmung", "daemmstaerke", "isolierung", "waermedaemmung", "geg"),
+        ):
+            return None
+        missing = ["Dämmung"]
+
+    elif rule.id == "DIN18380_HYDRAULIC_BALANCE":
+        subjects = matching(lambda text: _contains_any(
+            text,
+            ("heizungsnetz", "kaeltenetz", "heizkreis", "kuehlnetz",
+             "heizungsanlage", "kaelteanlage"),
+        ))
+        if not subjects or _contains_any(
+            section_text,
+            ("hydraulischer abgleich", "hydraulischeinregulierung",
+             "einregulierung", "abgleich", "voreinstellung"),
+        ):
+            return None
+        missing = ["Hydraulischer Abgleich"]
+
+    elif rule.id == "DIN_EN_806_POTABLE_WATER_TEST":
+        subjects = matching(lambda text: (
+            "trinkwasser" in text
+            and _contains_any(text, ("leitung", "rohr", "installation"))
+        ))
+        if not subjects:
+            return None
+        if not _contains_any(section_text, ("druckprobe", "druckpruefung")):
+            missing.append("Druckprobe")
+        if not _contains_any(section_text, ("spuelung", "spuelen", "spuelprotokoll")):
+            missing.append("Spülung")
+        if not _contains_any(
+            section_text,
+            ("hygiene", "vdi 6023", "desinfektion", "hygienenachweis"),
+        ):
+            missing.append("Hygiene-Nachweis")
+        if not missing:
+            return None
+
+    else:
+        return None
+
+    return subjects, {"missing": missing}, f"Fehlende Signale: {', '.join(missing)}."
+
+
 def check_cluster_rules(
     clusters,
     items,
     facts,
     calculated=None,
     remarks=None,
+    domains=None,
 ) -> list[ClusterFlag]:
     """Evaluate catalogue rules across section, system and frame clusters."""
+    clusters = list(clusters)
+    items = list(items)
+    active_domains = (
+        set(domains)
+        if domains is not None
+        else detect_lv_domains(items, remarks)
+    )
+    active_rules = (
+        rule for rule in RULES
+        if "COMMON" in rule.domains or active_domains.intersection(rule.domains)
+    )
     item_by_key = {item.key(): item for item in items}
     by_cluster_positions: dict[str, list[NormalizedItem]] = {}
     for cluster in clusters:
@@ -375,9 +695,29 @@ def check_cluster_rules(
     def remark_reason(rule: RuleSpec) -> str:
         return f"{rule.reason_de} Projektweit durch Vorbemerkung ausgeschlossen."
 
-    for rule in RULES:
+    for rule in active_rules:
         if suppressed_by_remarks(remarks, rule):
             # Projektweite Vorbemerkung: keine Regel- und keine False-Positive-Findung.
+            continue
+
+        if rule in DOMAIN_RULES:
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                finding = _domain_rule_finding(rule, positions)
+                if finding is None:
+                    continue
+                subject_items, computed, detail = finding
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
+                reason = f"{rule.reason_de} {detail}"
+                if rule.din_ref:
+                    reason += f" ({rule.din_ref})."
+                flags.append(_make_flag(
+                    rule, cluster, reason, computed,
+                    [item.key() for item in subject_items],
+                ))
             continue
 
         if rule.id == "TRENCH_VOLUME":
@@ -942,6 +1282,8 @@ def run_logic_engine(
     pre_prices: dict[str, float] | None = None,
     clusters=None,
     facts=None,
+    remarks=None,
+    domains=None,
 ) -> dict[str, LogicResult]:
     """Run deterministic, per-position rules for a tender of any practical size."""
 
@@ -1011,8 +1353,9 @@ def run_logic_engine(
         # Unit and peer-magnitude outliers are separate signals combined here.
         qty_outlier_details: list[str] = []
         normalized_text = compare_key(f"{short_text} {long_text}")
+        normalized_words = set(normalized_text.split())
         for keyword, expected_unit in constants.UNIT_EXPECTED_BY_KEYWORD.items():
-            if keyword in normalized_text and unit != constants.normalize_unit(expected_unit):
+            if keyword in normalized_words and unit != constants.normalize_unit(expected_unit):
                 qty_outlier_details.append(
                     f"Einheit {item.unit!r} passt nicht zur erwarteten Einheit "
                     f"{expected_unit!r} für Schlüsselwort {keyword!r}."
@@ -1079,7 +1422,13 @@ def run_logic_engine(
                     "Verfüllungsposition gefunden.")
 
     if clusters is not None and facts is not None:
-        for cluster_flag in check_cluster_rules(clusters, items, facts):
+        for cluster_flag in check_cluster_rules(
+            clusters,
+            items,
+            facts,
+            remarks=remarks,
+            domains=domains,
+        ):
             for position_key in cluster_flag.affected_positions:
                 if position_key not in results:
                     continue

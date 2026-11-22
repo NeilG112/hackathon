@@ -14,14 +14,30 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 from core import objects
+from core.domain import detect_lv_domains
 from core.facts import PositionFacts
 from core.models import Cluster, NormalizedItem
 
 DN_SERIES = (50, 63, 80, 100, 125, 150, 200, 250, 300, 400, 500)
+MAX_WEAK_CONTEXT_DISTANCE = 3
+MAX_WEAK_CONTEXT_CLUSTER_SIZE = 8
+_CONCRETE_CLASS = re.compile(r"\bc\s*(\d{2})\s*/\s*(\d{2})\b")
+_EXPOSURE_CLASS = re.compile(r"\b(xc|xd|xs|xf|xa)\s*([1-4])\b")
+_FIRE_CLASS = re.compile(r"\b(f|ei)\s*(30|60|90|120)\b")
+_CABLE_CROSS_SECTION = re.compile(
+    r"(?<!\w)(\d{1,3})\s*[x×]\s*(\d+(?:[,.]\d+)?)"
+    r"(?:\s*mm(?:2|²)?)?(?!\w)"
+)
+_VOLTAGE = re.compile(r"\b(\d+(?:[,.]\d+)?)\s*(kv|v)\b")
+_INSULATION_THICKNESS = re.compile(
+    r"\b(?:waermedaemm\w*|daemm\w*|isolier\w*)\D{0,20}(\d{1,3})\s*mm\b"
+)
+_WLG = re.compile(r"\bwlg\s*0?(\d{2,3})\b")
 _SYSTEM_GENERIC_TERMS = {
     "aus", "bau", "druck", "einbau", "einbauen", "herstellen", "im",
-    "leitung", "leitungen", "montage", "montieren", "nach", "rohr",
-    "rohre", "verlegen", "verlegung", "von", "zu",
+    "anschliessen", "einsetzen", "liefern", "leitung", "leitungen",
+    "montage", "montieren", "nach", "rohr", "rohre", "kabel",
+    "verlegen", "verlegung", "von", "zu",
 }
 _SYSTEM_MATERIAL_TERMS = {
     "beton", "ggg", "guss", "pe", "pe100", "pehd", "pvc", "stahl",
@@ -29,39 +45,83 @@ _SYSTEM_MATERIAL_TERMS = {
 }
 
 FRAME_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Baustelleneinrichtung", (
+        "baustelleneinrichtung", "bauzaun", "container", "standplatz",
+        "baustellenzufahrt",
+    )),
+    ("Entsorgung & Schadstoffe", (
+        "entsorgung", "entsorgen", "abfall", "deponie", "schadstoff",
+        "asbest", "kontaminiert", "dekontamination",
+    )),
+    ("Dokumentation & Revision", (
+        "dokumentation", "bestandsplan", "aufmass", "revision",
+        "revisionsunterlage", "fotodokumentation", "pruefprotokoll",
+        "einmessung",
+    )),
+    ("Arbeitssicherheit & Schutzmaßnahmen", (
+        "arbeitssicherheit", "arbeitsschutz", "schutzmassnahme", "psa",
+        "absturzsicherung", "absperrung", "sicherheitseinrichtung",
+    )),
     ("Wasserhaltung", (
         "wasserhaltung", "grundwasserabsenkung", "grundwasserbrunnen",
     )),
     ("Verkehrssicherung", (
-        "verkehrssicherung", "verkehrssicherungsdienst", "bauliche verkehrssicherung",
+        "verkehrssicherung", "verkehrssicherungsdienst",
+        "bauliche verkehrssicherung",
     )),
-    ("Entsorgung", (
-        "entsorgung", "abfuhr", "entsorgen", "deponie",
+    ("Gerüstbau & Absturzsicherung", (
+        "geruest", "absturzsicherung", "seitenschutz", "fanggeruest",
+        "arbeitsbuehne",
     )),
-    ("Dokumentation", (
-        "dokumentation", "bestandsplan", "aufmass", "aufma\u00df", "fotodokumentation",
+    ("Brandschutzabschottung & Bauendreinigung", (
+        "brandschott", "abschottung", "brandschutz", "bauendreinigung",
+        "schlussreinigung", "grundreinigung",
+    )),
+    ("Prüfung & Inbetriebnahme", (
+        "pruefung", "erstpruefung", "messprotokoll", "inbetriebnahme",
+        "funktionspruefung", "druckprobe", "spuelung",
     )),
 )
+FRAME_DOMAINS: dict[str, tuple[str, ...]] = {
+    "Wasserhaltung": ("TIEFBAU",),
+    "Verkehrssicherung": ("TIEFBAU",),
+    "Gerüstbau & Absturzsicherung": ("HOCHBAU_ROHBAU", "AUSBAU"),
+    "Brandschutzabschottung & Bauendreinigung": (
+        "AUSBAU", "TGA_ELEKTRO", "TGA_SHK",
+    ),
+    "Prüfung & Inbetriebnahme": ("TGA_ELEKTRO", "TGA_SHK"),
+}
+_SYSTEM_FEATURE_GROUPS = {
+    "BETON": "Beton",
+    "BRANDSCHUTZ": "Brandschutz",
+    "ELEKTRO": "Elektro",
+    "DAEMMUNG": "Dämmung",
+}
 
 
 @dataclass
 class _UnionFind:
     parent: dict[int, int]
+    sizes: dict[int, int]
 
     @classmethod
     def for_range(cls, size: int) -> "_UnionFind":
-        return cls({i: i for i in range(size)})
+        return cls({i: i for i in range(size)}, {i: 1 for i in range(size)})
 
     def find(self, value: int) -> int:
         if self.parent[value] != value:
             self.parent[value] = self.find(self.parent[value])
         return self.parent[value]
 
+    def component_size(self, value: int) -> int:
+        return self.sizes[self.find(value)]
+
     def union(self, left: int, right: int) -> None:
         left_root = self.find(left)
         right_root = self.find(right)
         if left_root != right_root:
             self.parent[right_root] = left_root
+            self.sizes[left_root] += self.sizes[right_root]
 
 
 def _cluster_id(kind: str, title: str) -> str:
@@ -83,19 +143,125 @@ def _material_key(material: str | None) -> str:
     return (material or "").strip().lower()
 
 
+def _normalized_item_text(item: NormalizedItem) -> str:
+    return (
+        f"{item.short_text} {item.long_text}".lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
+
+
+def _system_features(item: NormalizedItem) -> set[str]:
+    text = _normalized_item_text(item)
+    features: set[str] = set()
+
+    concrete_class = _CONCRETE_CLASS.search(text)
+    exposure_class = _EXPOSURE_CLASS.search(text)
+    if concrete_class or exposure_class:
+        features.add("GROUP:BETON")
+    if concrete_class:
+        features.add(
+            f"BETONGUETE:C{concrete_class.group(1)}/{concrete_class.group(2)}"
+        )
+    if exposure_class:
+        features.add(
+            f"EXPOSITION:{exposure_class.group(1).upper()}{exposure_class.group(2)}"
+        )
+
+    fire_classes = {
+        f"{match.group(1).upper()}{match.group(2)}"
+        for match in _FIRE_CLASS.finditer(text)
+    }
+    if fire_classes:
+        features.add("GROUP:BRANDSCHUTZ")
+        features.update(f"BRANDSCHUTZ:{value}" for value in fire_classes)
+
+    cross_sections = {
+        f"{match.group(1)}x{match.group(2).replace(',', '.')}"
+        for match in _CABLE_CROSS_SECTION.finditer(text)
+    }
+    voltages = {
+        f"{match.group(1).replace(',', '.')}{match.group(2).upper()}"
+        for match in _VOLTAGE.finditer(text)
+    }
+    if cross_sections or voltages:
+        features.add("GROUP:ELEKTRO")
+        features.update(f"KABELQUERSCHNITT:{value}" for value in cross_sections)
+        features.update(f"SPANNUNG:{value}" for value in voltages)
+
+    thickness = _INSULATION_THICKNESS.search(text)
+    wlg = _WLG.search(text)
+    if thickness or wlg:
+        features.add("GROUP:DAEMMUNG")
+    if thickness:
+        features.add(f"DAEMMSTAERKE:{thickness.group(1)}mm")
+    if wlg:
+        features.add(f"WLG:{wlg.group(1).zfill(3)}")
+
+    return features
+
+
+def _feature_title(features: set[str]) -> str:
+    for group, label in _SYSTEM_FEATURE_GROUPS.items():
+        if f"GROUP:{group}" in features:
+            parts = [label]
+            details = sorted(
+                feature.split(":", 1)[1]
+                for feature in features
+                if ":" in feature
+                and feature.split(":", 1)[0] != "GROUP"
+            )
+            parts.extend(details[:3])
+            return " ".join(parts)
+    return "unbenannt"
+
+
 def _strand_context(item: NormalizedItem) -> set[str]:
-    """Return descriptive pipe-line terms, excluding DN, material and generic work words."""
-    text = f"{item.short_text} {item.long_text}".lower()
+    """Return trade/strand terms, excluding sizes, material and generic work words."""
+    text = _normalized_item_text(item)
+    has_pipe = bool(re.search(r"\b(?:rohr|leitung)\w*\b", text))
+    has_cable = "kabel" in text
     text = re.sub(r"\bdn(?:/od)?\s*\d+\b", " ", text)
+    for pattern in (
+        _CONCRETE_CLASS,
+        _EXPOSURE_CLASS,
+        _FIRE_CLASS,
+        _CABLE_CROSS_SECTION,
+        _VOLTAGE,
+        _INSULATION_THICKNESS,
+        _WLG,
+    ):
+        text = pattern.sub(" ", text)
     text = re.sub(r"\b(?:pe\s*-?\s*hd|pe100|pvc|ggg|stahl|guss)\b", " ", text)
     terms: set[str] = set()
-    for token in re.findall(r"[a-zäöüß]+", text):
+    for token in re.findall(r"[a-z]+", text):
         for suffix in ("rohrleitung", "leitungen", "leitung", "rohre", "rohr"):
             if token.endswith(suffix) and len(token) > len(suffix):
                 token = token[:-len(suffix)]
                 break
         if token not in _SYSTEM_GENERIC_TERMS | _SYSTEM_MATERIAL_TERMS:
             terms.add(token)
+    if not terms:
+        if has_pipe:
+            terms.add("_generic_pipe")
+        elif has_cable:
+            terms.add("_generic_cable")
+        else:
+            feature_groups = {
+                feature.removeprefix("GROUP:")
+                for feature in _system_features(item)
+                if feature.startswith("GROUP:")
+            }
+            if "BETON" in feature_groups:
+                terms.add("_generic_concrete")
+            elif "BRANDSCHUTZ" in feature_groups:
+                terms.add("_generic_fire")
+            elif "ELEKTRO" in feature_groups:
+                terms.add("_generic_electro")
+            elif "DAEMMUNG" in feature_groups:
+                terms.add("_generic_insulation")
     return terms
 
 
@@ -144,10 +310,17 @@ def build_clusters(
     items,
     facts: dict[str, PositionFacts],
     calculated=None,
+    preambles=None,
+    domains=None,
 ) -> list[Cluster]:
     """Build section, system, and project frame clusters."""
     item_list = list(items)
     facts_by_key = _facts_for(item_list, facts)
+    active_domains = (
+        set(domains)
+        if domains is not None
+        else detect_lv_domains(item_list, preambles)
+    )
 
     value_by_oz: dict[str, float] = {}
     if calculated:
@@ -174,9 +347,17 @@ def build_clusters(
     # Adjacent DN positions can link unless their strand terms conflict.
     # Larger DN jumps and equal material additionally need shared context.
     by_top_section: dict[str, list[int]] = defaultdict(list)
+    features_by_key = {
+        item.key(): _system_features(item)
+        for item in item_list
+    }
     for index, item in enumerate(item_list):
         position_facts = facts_by_key[item.key()]
-        if position_facts.dn is not None or position_facts.material is not None:
+        if (
+            position_facts.dn is not None
+            or position_facts.material is not None
+            or features_by_key[item.key()]
+        ):
             by_top_section[item.location(depth=1)].append(index)
 
     for top_section, indexes in by_top_section.items():
@@ -194,10 +375,41 @@ def build_clusters(
                 same_strand = bool(left_context & right_context)
                 if left_context and right_context and not same_strand:
                     continue
+                weak_context = (
+                    not left_context
+                    or not right_context
+                    or left_context <= {
+                        "_generic_pipe", "_generic_cable", "_generic_concrete",
+                        "_generic_fire", "_generic_electro",
+                        "_generic_insulation",
+                    }
+                    or right_context <= {
+                        "_generic_pipe", "_generic_cable", "_generic_concrete",
+                        "_generic_fire", "_generic_electro",
+                        "_generic_insulation",
+                    }
+                )
+                if (
+                    weak_context
+                    and abs(left_index - right_index) > MAX_WEAK_CONTEXT_DISTANCE
+                ):
+                    continue
                 shares_material = (
                     _material_key(left_facts.material) != ""
                     and _material_key(left_facts.material)
                     == _material_key(right_facts.material)
+                )
+                left_features = features_by_key[item_list[left_index].key()]
+                right_features = features_by_key[item_list[right_index].key()]
+                shares_feature_group = bool(
+                    {
+                        feature for feature in left_features
+                        if feature.startswith("GROUP:")
+                    }
+                    & {
+                        feature for feature in right_features
+                        if feature.startswith("GROUP:")
+                    }
                 )
                 dn_related = _dn_related(left_facts.dn, right_facts.dn)
                 can_bridge_dn_step = (
@@ -206,7 +418,19 @@ def build_clusters(
                          or right_facts.material is None
                          or shares_material)
                 )
-                if dn_related or can_bridge_dn_step:
+                feature_related = shares_feature_group and same_strand
+                if not (
+                    dn_related
+                    or can_bridge_dn_step
+                    or feature_related
+                ):
+                    continue
+                if weak_context:
+                    left_size = union.component_size(left_index)
+                    right_size = union.component_size(right_index)
+                    if left_size + right_size > MAX_WEAK_CONTEXT_CLUSTER_SIZE:
+                        continue
+                if dn_related or can_bridge_dn_step or feature_related:
                     union.union(left_index, right_index)
 
         components: dict[int, list[NormalizedItem]] = defaultdict(list)
@@ -214,8 +438,23 @@ def build_clusters(
             components[union.find(index)].append(item_list[index])
 
         for positions in components.values():
-            if len(positions) < 3:
+            component_features = set().union(*(
+                features_by_key[item.key()] for item in positions
+            ))
+            if len(positions) < 2:
                 continue
+            if not component_features and len(positions) < 3:
+                component_dns = [
+                    facts_by_key[item.key()].dn
+                    for item in positions
+                    if facts_by_key[item.key()].dn in DN_SERIES
+                ]
+                if (
+                    len(component_dns) < 2
+                    or DN_SERIES.index(max(component_dns))
+                    - DN_SERIES.index(min(component_dns)) < 2
+                ):
+                    continue
 
             dns = [
                 facts_by_key[item.key()].dn
@@ -235,12 +474,22 @@ def build_clusters(
                 if len(distinct_materials) == 1
                 else None
             )
+            feature_label = _feature_title(component_features)
+            if material:
+                feature_details = [
+                    part for part in feature_label.split()
+                    if _material_key(part) != _material_key(material)
+                    and part.lower() != "unbenannt"
+                ]
+                system_label = " ".join((material, *feature_details)).strip()
+            else:
+                system_label = feature_label
             dn_text = (
                 f"DN{min(dns)}-{max(dns)}"
                 if dns
                 else "DNunbenannt"
             )
-            title = f"System {material or 'unbenannt'} {dn_text}"
+            title = f"System {system_label} {dn_text}"
             cluster_seed = top_section + "|" + title + "|" + ",".join(sorted(
                 item.key() for item in positions
             ))
@@ -253,30 +502,27 @@ def build_clusters(
                 value_by_oz,
             ))
 
-    # Project-wide fixed frame catalog.
-    for title in (
-        "Baustelleneinrichtung",
-        "Wasserhaltung",
-        "Verkehrssicherung",
-        "Entsorgung",
-        "Dokumentation",
-    ):
+    # Universal frames always remain available; trade frames are domain-gated.
+    for title, terms in FRAME_RULES:
+        required_domains = FRAME_DOMAINS.get(title, ())
+        if required_domains and not active_domains.intersection(required_domains):
+            continue
         positions: list[NormalizedItem] = []
         for item in item_list:
             position_facts = facts_by_key[item.key()]
-            text = f"{item.short_text} {item.long_text}".lower()
-            matched = False
+            text = _normalized_item_text(item)
             if title == "Baustelleneinrichtung":
                 matched = (
                     position_facts.object_tag == "Baustelle"
                     or position_facts.phase == "vorhalten"
+                    or any(term in text for term in terms)
                 )
-            elif title == "Dokumentation":
-                matched = position_facts.object_tag == "Dokumentation"
-                if not matched:
-                    matched = any(term in text for term in dict(FRAME_RULES)[title])
             else:
-                matched = any(term in text for term in dict(FRAME_RULES)[title])
+                matched = (
+                    (title == "Dokumentation & Revision"
+                     and position_facts.object_tag == "Dokumentation")
+                    or any(term in text for term in terms)
+                )
             if matched:
                 positions.append(item)
         if positions:

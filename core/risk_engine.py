@@ -453,6 +453,7 @@ def analyze_tender_hybrid(
         items,
         facts_by_key,
         calculated=calculated,
+        preambles=remarks,
     )
     logic_results = logic.run_logic_engine(
         items,
@@ -460,6 +461,7 @@ def analyze_tender_hybrid(
         pre_prices=pre_prices,
         clusters=clusters,
         facts=facts_by_key,
+        remarks=remarks,
     )
     states = build_item_states(
         items,

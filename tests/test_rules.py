@@ -9,6 +9,7 @@ from core.logic import (
     UnitBridge,
     _subject_suppressed,
     check_cluster_rules,
+    run_logic_engine,
     suppressed_by_remarks,
 )
 from core.models import NormalizedItem
@@ -36,6 +37,33 @@ def cluster_for(items, facts, extra=None):
     return clusters
 
 
+class PositionRuleTests(unittest.TestCase):
+    def test_volume_unit_rule_matches_specific_excavation_terms_only(self):
+        area_positions = [
+            item("01", "Bodenbelag", "Fläche"),
+            item("02", "Oberboden", "Fläche"),
+            item("03", "Bodenplatte", "Fläche"),
+            item("04", "Fußboden", "Fläche"),
+        ]
+        for position in area_positions:
+            position.unit = "m²"
+            result = run_logic_engine([position])[position.key()]
+            with self.subTest(text=position.short_text):
+                self.assertNotIn("QTY_OUTLIER", result.flags)
+
+        excavation_positions = [
+            item("11", "Bodenaushub", "Erdbau"),
+            item("12", "Erdaushub", "Erdbau"),
+            item("13", "Baugrubenaushub", "Erdbau"),
+            item("14", "Grabenaushub", "Erdbau"),
+        ]
+        for position in excavation_positions:
+            position.unit = "m²"
+            result = run_logic_engine([position])[position.key()]
+            with self.subTest(text=position.short_text):
+                self.assertIn("QTY_OUTLIER", result.flags)
+
+
 class ClusterRuleTests(unittest.TestCase):
     def test_unit_bridge_corridor(self):
         bridge = UnitBridge("m", "m3", 0.8, 1.2, "breite_m_x_tiefe_m")
@@ -45,7 +73,7 @@ class ClusterRuleTests(unittest.TestCase):
         ids = {rule.id for rule in RULES}
         self.assertIn("TRENCH_VOLUME", ids)
         self.assertIn("DIN4124_VERBAU", ids)
-        self.assertEqual(RULES_VERSION, "1")
+        self.assertEqual(RULES_VERSION, "2")
 
     def test_trench_positive_and_inclusive_negative(self):
         positive = [
@@ -286,6 +314,19 @@ class ClusterRuleTests(unittest.TestCase):
         facts = {i.key(): extract_facts(i) for i in negative}
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
         self.assertFalse(any(f.rule_id == "DN_STEP" for f in flags))
+
+    def test_dn_step_on_two_material_free_positions(self):
+        positions = [
+            item("87", "Trinkwasserleitung DN50 verlegen"),
+            item("88", "Trinkwasserleitung DN200 verlegen"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in positions}
+        flags = check_cluster_rules(
+            cluster_for(positions, facts),
+            positions,
+            facts,
+        )
+        self.assertTrue(any(flag.rule_id == "DN_STEP" for flag in flags))
 
     def test_site_setup_positive_and_negative(self):
         positive = [item("91", "Rohr DN63")]

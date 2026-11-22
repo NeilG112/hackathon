@@ -74,6 +74,21 @@ class ExportRfiClusterTests(unittest.TestCase):
         self.assertIn("Fragen zu Bauabschnitten", markdown)
         self.assertIn("Fragen zu Einzelpositionen", markdown)
 
+    def test_markdown_export_renders_nu_requests_separately(self):
+        markdown = export_rfi.to_markdown([{
+            "nr": 1,
+            "oz": "1.0003",
+            "kurztext": "Schacht setzen",
+            "menge": "1",
+            "einheit": "St",
+            "frage": "Bitte bieten Sie das Setzen des Schachts an.",
+            "group": "rfq",
+        }], {"title": "Export"})
+
+        self.assertIn("## Nachunternehmer-Anfragen", markdown)
+        self.assertIn("Anfrage an Nachunternehmer", markdown)
+        self.assertIn("Bitte bieten Sie das Setzen des Schachts an.", markdown)
+
 
 if __name__ == "__main__":
     unittest.main()
