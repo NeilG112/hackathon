@@ -161,6 +161,48 @@ class Stammdaten:
     def is_synthetic(self) -> bool:
         return "synthet" in json.dumps(self.meta, ensure_ascii=False).lower()
 
+    def integrity(self) -> list[str]:
+        """Problems that would otherwise be absorbed in silence.
+
+        A missing rate table does not raise — `machine_rate` returns 0.0 and
+        the bid simply comes out smaller. That already happened once:
+        `geraete.json` disappeared, 89 Leistungen kept referencing machine
+        codes, and EUR 67,451 of machine cost silently became zero. Nothing
+        errored. Call this at startup and show the result.
+        """
+        problems: list[str] = []
+        if not self.leistungen:
+            problems.append("Keine Leistungen geladen — Kalkulation unmöglich.")
+        if not self.geraete:
+            problems.append("Gerätetabelle fehlt (Database/data/geraete.json).")
+        if not self.materialien:
+            problems.append("Materialtabelle fehlt (Database/data/materialien.json).")
+
+        missing_machine = {
+            entry.get("code")
+            for leistung in self.leistungen.values()
+            for entry in leistung.geraet
+            if entry.get("code") and self.machine_rate(entry["code"]) <= 0.0
+        }
+        if missing_machine:
+            problems.append(
+                f"{len(missing_machine)} Gerätecodes ohne Stundensatz "
+                f"({', '.join(sorted(missing_machine)[:5])}…) — diese Kosten "
+                "fallen stillschweigend auf 0 €."
+            )
+        missing_material = {
+            entry.get("code")
+            for leistung in self.leistungen.values()
+            for entry in leistung.material
+            if entry.get("code") and self.material_price(entry["code"]) <= 0.0
+        }
+        if missing_material:
+            problems.append(
+                f"{len(missing_material)} Materialcodes ohne Preis "
+                f"({', '.join(sorted(missing_material)[:5])}…)."
+            )
+        return problems
+
     def describe(self) -> str:
         return (f"{len(self.leistungen)} Leistungen, {len(self.materialien)} "
                 f"Materialien, {len(self.geraete)} Geräte")

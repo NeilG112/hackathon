@@ -38,6 +38,7 @@ real classifier replaces the keywords.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Iterable, Sequence
@@ -92,19 +93,56 @@ class ObjectRow:
         return f"{self.obj} [{self.unit or '—'}] in {self.location}"
 
 
+# German compounds break naive substring matching, and the failures are not
+# obvious: "Suchschachtung" contains "schacht", "Warnleuchte" contains
+# "leuchte", "Schachtabdeckung" on a Hahnkasten is a valve box and not a
+# manhole cover. Six of nine cluster findings on the demo tender came from
+# exactly this. A term therefore has to sit on a word boundary, and the
+# compounds that are known to lie get excluded outright.
+FALSE_COMPOUNDS: tuple[str, ...] = (
+    "suchschachtung",      # exploratory dig, not a shaft
+    "schachtung",          # ditto, any form
+    "hahnkasten",          # valve box, not a manhole cover
+    "brunnenring",         # concrete ring, not a pipe DN
+    "behelfsbrücke",       # H is clearance height, not trench depth
+    "behelfsueberfahrt",
+)
+
+_WORD_CACHE: dict[str, re.Pattern] = {}
+
+
+def _term_matches(term: str, text: str) -> bool:
+    """Word-boundary match, so a term never fires inside a longer compound.
+
+    German compounds are written closed ("Leitungsgraben"), so a plain
+    boundary test would miss real hits. The compromise: the term must start
+    at a word boundary, but may be followed by more letters — "graben" hits
+    "Grabenverbau" but not "ausgraben"-style suffix positions, and crucially
+    "schacht" no longer hits "Suchschachtung".
+    """
+    pattern = _WORD_CACHE.get(term)
+    if pattern is None:
+        pattern = re.compile(r"(?<![a-zäöüß])" + re.escape(term), re.IGNORECASE)
+        _WORD_CACHE[term] = pattern
+    return bool(pattern.search(text))
+
+
 def tag_of(item: NormalizedItem) -> str:
     """Which physical object this position acts on.
 
-    Keyword matching with disqualifiers, most-specific rule first. Returns
-    `UNKNOWN_TAG` rather than guessing — see the module docstring on why a
-    wrong tag is worse than no tag.
+    Word-boundary keyword matching with disqualifiers, most-specific rule
+    first. Returns `UNKNOWN_TAG` rather than guessing — a wrong tag does not
+    produce a missing finding, it produces a confident false one.
 
     **This is the swap point for a real classifier.** Replace the body, keep
     the signature, and everything downstream improves at once.
     """
     text = f"{item.short_text} {item.long_text}".lower()
+    for bad in FALSE_COMPOUNDS:
+        text = text.replace(bad, " ")
     for tag, terms, blockers in OBJECT_RULES:
-        if any(t in text for t in terms) and not any(b in text for b in blockers):
+        if (any(_term_matches(t, text) for t in terms)
+                and not any(_term_matches(b, text) for b in blockers)):
             return tag
     return UNKNOWN_TAG
 

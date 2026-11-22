@@ -31,16 +31,25 @@ from difflib import SequenceMatcher
 import pandas as pd
 import streamlit as st
 
-from core import (classify, clusters, constants, deep_logic, domain, facts,
+from core import (angebotstexte, classify, clusters, constants, deep_logic,
+                  exporter, parser_pdf,
+                  domain, facts,
                   kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
                   risk_engine, session_store, stammdaten, vergabe)
 from views import vergabe as vergabe_view
 
 SAMPLE = constants.REVEAL["blank_boq"]
 PAGES = ("Tender", "Gruppen & Angebot", "Vergabe", "Logik", "Heikle Positionen")
+# Kept as an argument to analyze_hybrid_cached so its signature stays stable.
+# The Streamlit memo layer is gone: it kept serving results from before a
+# slider moved or a rate table changed, and tracking down "why did the number
+# not update" cost more than re-running costs. The on-disk caches
+# (classification, judgments, deep logic) stay — they are what keeps the demo
+# offline and free.
 HYBRID_ANALYSIS_CACHE_VERSION = "item-rfi-v1"
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
+PDF_SUFFIXES = (".pdf",)
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
 
 _SEVERITY_LABELS = {
@@ -79,16 +88,23 @@ def parse_path(path: str):
         return parser_x83.parse(path), parser_x83.parse_remarks(path)
     if suffix in GAEB90_SUFFIXES:
         return parser_gaeb90.parse(path), []
+    if suffix in PDF_SUFFIXES:
+        # A PDF is a picture of a table, so this is recovery rather than
+        # reading. parse_with_stats reports the yield and the UI shows it —
+        # a tender where only a third of the positions came through must not
+        # look like a clean import.
+        items, stats = parser_pdf.parse_with_stats(path)
+        confidence = parser_pdf.confidence(items, stats)
+        st.session_state["pdf_confidence"] = confidence
+        return items, []
     raise ValueError(f"unsupported format: {suffix or path}")
 
 
-@st.cache_data(show_spinner=False)
 def load_from_disk(path: str):
     items, remarks = parse_path(path)
     return [i.as_dict() for i in items], remarks
 
 
-@st.cache_data(show_spinner=False)
 def load_from_upload(name: str, payload: bytes):
     """Parse uploaded bytes. Cached on content, so sliders don't re-parse."""
     suffix = os.path.splitext(name)[1] or ".x83"
@@ -102,7 +118,6 @@ def load_from_upload(name: str, payload: bytes):
         os.unlink(temp)
 
 
-@st.cache_data(show_spinner=False)
 def load_reference():
     return pricer.load_reference_prices()
 
@@ -112,7 +127,6 @@ def rehydrate(dicts: list[dict]):
     return [NormalizedItem.from_dict(d) for d in dicts]
 
 
-@st.cache_data(show_spinner=False)
 def analyze_hybrid_cached(
     item_dicts: list[dict],
     remarks: list[str],
@@ -166,7 +180,6 @@ def analyze_hybrid_cached(
     )
 
 
-@st.cache_data(show_spinner=False)
 def evaluate_cluster_deep_cached(
     filename: str,
     rules_version: str,
@@ -243,11 +256,14 @@ def linked_slider(
     slider_column, number_column = st.sidebar.columns([3, 1])
 
     with slider_column:
+        # No `value=` here. The key is already seeded in session_state above,
+        # and passing both makes Streamlit warn and silently prefer the
+        # session value — the slider then appears stuck, because the value you
+        # pass is discarded on every rerun.
         value = st.slider(
             label,
             min_value=min_value,
             max_value=max_value,
-            value=float(st.session_state[slider_key]),
             step=step,
             format=slider_format,
             key=slider_key,
@@ -259,7 +275,6 @@ def linked_slider(
             f"{label} eingeben",
             min_value=min_value,
             max_value=max_value,
-            value=float(st.session_state[number_key]),
             step=step,
             format=number_format,
             key=number_key,
@@ -335,7 +350,8 @@ def section_upload(show_controls: bool = True):
         def upload_controls():
             upload = st.file_uploader(
                 "Tender-Datei hochladen",
-                type=[s.lstrip(".") for s in XML_SUFFIXES + GAEB90_SUFFIXES],
+                type=[s.lstrip(".") for s in
+                  XML_SUFFIXES + GAEB90_SUFFIXES + PDF_SUFFIXES],
             )
             if st.button("Beispiel-LV laden", type="primary"):
                 st.session_state["source"] = ("disk", SAMPLE)
@@ -466,7 +482,6 @@ def source_document(source):
         return os.path.basename(path), handle.read()
 
 
-@st.cache_data(show_spinner=False)
 def source_location(filename: str, payload: bytes, source_ref: str) -> tuple[str, bool]:
     """Locate a source item without exposing its raw XML or fixed-width record."""
     suffix = os.path.splitext(filename)[1].lower()
@@ -1141,11 +1156,88 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
             )
 
 
+def section_angebot_export(items, calculated, label):
+    """Hand the priced tender back as a file, not as a screenshot."""
+    st.subheader("Angebot exportieren")
+    stats = exporter.summarize(calculated)
+    st.caption(
+        f"{stats['priced']} von {stats['positions']} Positionen bepreist · "
+        f"Angebotssumme €{stats['total']:,.2f}. Nicht kalkulierte Positionen "
+        "bleiben im Export leer — das ist in einem Angebot zulässig und "
+        "ehrlicher als eine erfundene Zahl."
+    )
+
+    source = st.session_state.get("source")
+    csv_column, x84_column = st.columns(2)
+    with csv_column:
+        st.download_button(
+            "Angebot als CSV",
+            data=exporter.export_csv(calculated),
+            file_name=f"{os.path.splitext(label)[0]}_Angebot.csv",
+            mime="text/csv",
+            width="stretch",
+        )
+        st.caption("Semikolon und Komma-Dezimal — öffnet in Excel ohne Assistent.")
+
+    with x84_column:
+        # X84 is written INTO the uploaded X83, so it needs that file. A PDF
+        # or GAEB-90 source has no XML skeleton to stamp prices into.
+        xml_source = (
+            source[1] if source and source[0] == "disk"
+            and source[1].lower().endswith(tuple(XML_SUFFIXES)) else None
+        )
+        if xml_source:
+            payload, report = exporter.export_x84(xml_source, calculated)
+            st.download_button(
+                "Angebot als GAEB X84",
+                data=payload,
+                file_name=f"{os.path.splitext(label)[0]}_Angebot.x84",
+                mime="application/xml",
+                width="stretch",
+            )
+            if report["complete"]:
+                st.caption(f"{report['written']} Positionen mit Preis geschrieben.")
+            else:
+                st.caption(
+                    f"{report['written']} Positionen geschrieben, "
+                    f"{report['unmatched_in_file']} ohne Preis "
+                    f"(z. B. {', '.join(report['unmatched_examples'][:3])}). "
+                    "Zuordnung über die Ordnungszahl, nie über die Reihenfolge."
+                )
+        else:
+            st.button("Angebot als GAEB X84", disabled=True, width="stretch")
+            st.caption(
+                "X84 entsteht aus der hochgeladenen X83-Datei. Für PDF- oder "
+                "GAEB-90-Quellen gibt es kein XML-Gerüst, in das Preise "
+                "geschrieben werden könnten — bitte CSV verwenden."
+            )
+
+
+def section_position_table(items, assignments, calculated, data, company):
+    """The full per-position cost breakdown.
+
+    Lives on the Tender page, next to the positions it describes. On
+    "Gruppen & Angebot" it buried the group overview — that page answers
+    "where is the money and the risk", and a 248-row table pushed the answer
+    below the fold.
+    """
+    st.subheader("Positionskalkulation")
+    st.caption(
+        "Jede Position mit allen Kostenbestandteilen. Die Zusammenfassung "
+        "nach Gewerken steht unter „Gruppen & Angebot“."
+    )
+    st.caption(
+        "Kosten und Arbeitsstunden gelten je Einheit; der Gesamtpreis ergibt "
+        "sich aus Menge × Einheitspreis."
+    )
+    _render_position_table(items, assignments, calculated, data, company)
+
+
 def section_kalkulation(
     items, assignments, calculated, cov, data, company, vergabe_ergebnis=None,
 ):
     """Show each cost component that makes up the position price."""
-    st.subheader("Positionskalkulation")
+    st.subheader("Angebotssumme")
     stats = kalkulation.summarize(calculated)
     offer_total = (
         vergabe_ergebnis.angebotssumme
@@ -1184,11 +1276,11 @@ def section_kalkulation(
             "ARH-Größenordnung, keine Marktabfrage). Das Verfahren ist echt, "
             "die Zahlen sind Platzhalter, bis echte Firmenwerte hinterlegt sind."
         )
-    st.caption(
-        "Kosten und Arbeitsstunden gelten je Einheit; der Gesamtpreis ergibt "
-        "sich aus Menge × Einheitspreis."
-    )
+    return calculated
 
+
+def _render_position_table(items, assignments, calculated, data, company):
+    """Build and render the per-position breakdown table."""
     trade_by_key = {
         key: row.obj
         for row in objects.by_trade(items, assignments, data, calculated)
@@ -1797,6 +1889,98 @@ def section_logic(
     render_position_findings()
 
 
+def _render_risk_entry(item, result, calculated_item, items, remarks,
+                       filename, calculated_by_key):
+    """One flagged position: why it is flagged, what to price, what to send."""
+    badge = {"high": "hoch", "medium": "mittel"}.get(result.risk_level, "—")
+    header = (f"{badge.upper()} · OZ {item.display_oz} · "
+              f"€{result.euro_exposure:,.0f} · {item.short_text[:60]}")
+
+    with st.expander(header):
+        reasons = list(result.reasons)
+        if result.judgments and result.judgments.reasons:
+            reasons += list(result.judgments.reasons.values())
+
+        st.markdown("**Warum diese Position auffällt**")
+        if reasons:
+            for reason in dict.fromkeys(reasons):
+                st.markdown(f"- {reason}")
+        else:
+            st.caption("Keine Einzelbegründung — allein durch Wert priorisiert.")
+
+        quantity = f"{item.quantity:,.3f}".replace(",", "X").replace(".", ",")
+        st.caption(
+            f"Menge {quantity.replace('X', '.')} {item.unit or '—'} · "
+            f"vorläufiger EP €{result.pre_unit_price:,.2f} · "
+            f"{result.strategy}"
+        )
+
+        nachtrag = (
+            float(getattr(result.judgments, "nachtragspotenzial", 0.0) or 0.0)
+            if result.judgments else 0.0
+        )
+        optionen = angebotstexte.preisoptionen(calculated_item, nachtrag)
+        if optionen:
+            st.markdown("**Preisvorschläge**")
+            for option, column in zip(optionen, st.columns(len(optionen))):
+                with column:
+                    st.metric(
+                        option.label + (" ✓" if option.empfohlen else ""),
+                        f"€{option.ep:,.2f}",
+                        f"GP €{option.gp:,.0f}",
+                    )
+                    st.caption(option.begruendung)
+        else:
+            st.caption(
+                "Keine Preisvorschläge: Die Position konnte keiner Leistung "
+                "zugeordnet werden."
+            )
+
+        st.markdown("**Anschreiben**")
+        rfi_tab, rfq_tab = st.tabs(["An den Auftraggeber", "An Nachunternehmer"])
+        for tab, builder, key in (
+            (rfi_tab, angebotstexte.rfi_mail, "rfi"),
+            (rfq_tab, angebotstexte.rfq_mail, "rfq"),
+        ):
+            with tab:
+                mail = builder(item, calculated_item, reasons, filename)
+                link = angebotstexte.mailto_link(mail)
+                st.caption(f"Betreff: {mail['betreff']}")
+                # st.code gives a copy button for free; the mailto link opens
+                # the default client with everything prefilled.
+                st.code(mail["body"], language=None)
+                if link:
+                    st.link_button("In E-Mail-Programm öffnen", link)
+                else:
+                    st.caption(
+                        "Zu lang für einen Mail-Link — bitte den Text oben "
+                        "kopieren."
+                    )
+
+        rfi_column, rfq_column = st.columns(2)
+        reason_line = " | ".join(reasons)
+        with rfi_column:
+            _render_action_button(
+                "selected_rfis",
+                _position_action_entry(item, "RFI", reason_line,
+                                       "Heikle Positionen",
+                                       _severity_label(result.risk_level)),
+                "Als Bieterfrage übernehmen", "✓ Als Bieterfrage übernommen",
+                "Bieterfrage wurde für den Export vorgemerkt.",
+                f"risk_entry_rfi_{item.key()}",
+            )
+        with rfq_column:
+            _render_action_button(
+                "selected_rfqs",
+                _position_action_entry(item, "RFQ", reason_line,
+                                       "Heikle Positionen",
+                                       _severity_label(result.risk_level)),
+                "Als NU-Anfrage vormerken", "✓ Für NU-Anfrage vorgemerkt",
+                "Position wurde für die Nachunternehmer-Anfrage vorgemerkt.",
+                f"risk_entry_rfq_{item.key()}",
+            )
+
+
 def section_hybrid_risky(
     items, hybrid_results, findings, remarks, filename, calculated,
 ):
@@ -1841,6 +2025,53 @@ def section_hybrid_risky(
         key=lambda r: (0 if r.risk_level == "high" else 1, -r.euro_exposure)
     )
     item_by_key = {item.key(): item for item in items}
+    calculated_by_key = {c.item.key(): c for c in calculated}
+
+    # One flat list of every flagged position is unreadable: the reason a
+    # position is on it matters more than its rank. Group by the action the
+    # estimator has to take, so each block is one decision he can work
+    # through and close.
+    groups: list[tuple[str, str, list]] = [
+        ("Rückfrage an den Auftraggeber", "RFI",
+         [r for r in filtered if r.action_type == "RFI"]),
+        ("Anfrage an Nachunternehmer", "RFQ",
+         [r for r in filtered if r.action_type == "RFQ"]),
+        ("Nachtragspotenzial — bewusst bepreisen", "SPECULATE",
+         [r for r in filtered
+          if r.action_type in ("SPECULATE_UP", "SPECULATE_DOWN")]),
+        ("Intern gegenprüfen", "CHECK",
+         [r for r in filtered if r.action_type == "CHECK"]),
+    ]
+    tab_labels = [
+        f"{title} ({len(entries)})" for title, _kind, entries in groups
+    ]
+    for tab, (title, _kind, entries) in zip(st.tabs(tab_labels), groups):
+        with tab:
+            if not entries:
+                st.caption("Keine Position in dieser Gruppe.")
+                continue
+            summe = sum(r.euro_exposure for r in entries)
+            st.caption(
+                f"{len(entries)} Positionen · €{summe:,.0f} betroffen. "
+                "Position anklicken für Begründung, Preisvorschläge und "
+                "fertige Anschreiben."
+            )
+            for result in entries[:40]:
+                item = item_by_key.get(result.key)
+                if item is None:
+                    continue
+                _render_risk_entry(
+                    item, result, calculated_by_key.get(result.key),
+                    items, remarks, filename, calculated_by_key,
+                )
+    st.divider()
+    # The flat table stays available — some people want to scan or sort all
+    # of it — but collapsed and at a fixed height. Left open with
+    # height="stretch" it grew into the expanders above and overlapped them.
+    table_box = st.expander(
+        f"Vollständige Tabelle aller {len(filtered)} bewerteten Positionen",
+        expanded=False,
+    )
     rows = []
     row_items = []
     row_results = []
@@ -1864,15 +2095,16 @@ def section_hybrid_risky(
         row_results.append(result)
 
     if rows:
-        event = st.dataframe(
-            pd.DataFrame(rows),
-            width="stretch",
-            hide_index=True,
-            height="stretch",
-            key="risky_items_table",
-            on_select="rerun",
-            selection_mode="single-row",
-        )
+        with table_box:
+            event = st.dataframe(
+                pd.DataFrame(rows),
+                width="stretch",
+                hide_index=True,
+                height=420,
+                key="risky_items_table",
+                on_select="rerun",
+                selection_mode="single-row",
+            )
         selected_rows = list(event.selection.rows)
         previous_selection = st.session_state.get(
             "_risky_table_selection", []
@@ -2321,13 +2553,6 @@ def main():
     )
     st.sidebar.markdown("### Bid & Risk Assistant")
     st.sidebar.caption("Benutzermodus")
-    st.sidebar.checkbox(
-        "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
-        key="use_jev",
-        help="Jev priorisiert die 60 risikoreichsten Positionen. "
-             "Die Offline-Risikobewertung läuft unabhängig davon.",
-    )
-    use_jev = st.session_state["use_jev"]
     active_page = st.session_state.get("active_page", PAGES[0])
     if active_page in ("Groups", "Das Angebot"):
         active_page = "Gruppen & Angebot"
@@ -2347,11 +2572,34 @@ def main():
         page = "Logik"
         st.session_state["active_page"] = page
     st.title(page)
+
+    # The Jev deep check belongs on the page it affects, not in a global
+    # sidebar: it only changes "Heikle Positionen" and "Logik", and a control
+    # that does nothing on three of five pages reads as broken.
+    # Streamlit drops widget state for any widget not rendered in a run, so a
+    # page-local toggle would forget the choice the moment you navigate away.
+    # The durable value lives in `use_jev`, which is never a widget key; the
+    # toggle writes into it on change.
+    st.session_state.setdefault("use_jev", False)
+    if page == "Heikle Positionen":
+        def _remember_jev() -> None:
+            st.session_state["use_jev"] = st.session_state["use_jev_toggle"]
+
+        st.toggle(
+            "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
+            value=bool(st.session_state["use_jev"]),
+            key="use_jev_toggle",
+            on_change=_remember_jev,
+            help="Jev beurteilt die 60 risikoreichsten Positionen in fünf "
+                 "Einzelfragen. Die deterministische Risikobewertung läuft "
+                 "unabhängig davon und bleibt unverändert.",
+        )
+    use_jev = bool(st.session_state.get("use_jev", False))
     use_deep_logic = False
     if page == "Logik":
-        use_deep_logic = st.sidebar.checkbox(
+        st.session_state.setdefault("use_deep_logic", False)
+        use_deep_logic = st.sidebar.toggle(
             "Cluster-Tiefenprüfung (Gemma 4)",
-            value=False,
             help="Prüft Cluster optional mit gemma-4-31B-it (deep_logic). "
                  "Deterministische Regeln laufen unabhängig davon.",
             key="use_deep_logic",
@@ -2361,11 +2609,38 @@ def main():
         return
     items, remarks, label = loaded
 
+    company = sidebar_kalkulation()
+    data = stammdaten.load()
+
     if page == "Tender":
+        # The per-position breakdown lives here, beside the positions it
+        # describes, so the group overview stays readable.
+        assignments = classify.classify(items, data)
+        calculated = kalkulation.calculate(items, assignments, company, data)
+        pdf_confidence = st.session_state.get("pdf_confidence")
+        if pdf_confidence and label.lower().endswith(".pdf"):
+            if pdf_confidence["usable"]:
+                st.info(
+                    f"PDF gelesen: {pdf_confidence['positions']} Positionen aus "
+                    f"{pdf_confidence['oz_lines_seen']} Ordnungszahl-Zeilen "
+                    f"({pdf_confidence['yield_pct']:.0f} % Ausbeute). "
+                    "Mengen und Texte stammen aus der Druckdarstellung — "
+                    "Preise im PDF werden bewusst ignoriert."
+                )
+            else:
+                st.warning(
+                    f"**Nur {pdf_confidence['positions']} von "
+                    f"{pdf_confidence['oz_lines_seen']} Ordnungszahl-Zeilen "
+                    f"wurden zu Positionen ({pdf_confidence['yield_pct']:.0f} % "
+                    "Ausbeute).** Die Mengenspalte dieses PDFs ließ sich nicht "
+                    "zuverlässig lesen. Das Angebot deckt damit nur einen Teil "
+                    "des Leistungsverzeichnisses ab — bitte die GAEB-Datei "
+                    "verwenden, falls vorhanden."
+                )
         section_items(items, remarks, label)
+        section_position_table(items, assignments, calculated, data, company)
+        section_angebot_export(items, calculated, label)
     else:
-        company = sidebar_kalkulation()
-        data = stammdaten.load()
         # No use_jev=False here: the cache still answers the prepared tender
         # offline, but an uploaded file is not in it and the keyword fallback
         # scores near zero on real wording — that is the 3% coverage bug.

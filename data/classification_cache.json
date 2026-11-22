@@ -11,17 +11,41 @@
   "source": "none",
   "text": "Steigeisen [PERSON_089] niro kunststoffummantelt Steigmaß 250mm Form B"
  },
+ "006659f63e26a137": {
+  "code": null,
+  "confidence": 0.095,
+  "source": "none",
+  "text": "Rasen ansäen Landschaftsrasen RSM7.1.2 5g/m2"
+ },
  "00bc1e2cac5db20d": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "Reduzierung DN 150 / DN 100"
  },
+ "00efe12c7fbeba30": {
+  "code": "ZTB1D0C",
+  "confidence": 0.82,
+  "source": "jev",
+  "text": "wie vor, jedoch MMK 300/22°"
+ },
  "00effe395a4bcb56": {
   "code": null,
   "confidence": 0.024,
   "source": "none",
   "text": "Einweisung des Betriebspersonals"
+ },
+ "011d90c508df3d03": {
+  "code": "F27",
+  "confidence": 0.66,
+  "source": "jev",
+  "text": "wie vor, jedoch Hinweisschild [PERSON_017]"
+ },
+ "011e6f4e5893d775": {
+  "code": "K09-M",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Druckprüfung"
  },
  "02180150ec7437b9": {
   "code": "F27",
@@ -35,17 +59,47 @@
   "source": "none",
   "text": "Zeit-, Montage- und [PERSON_118]"
  },
+ "030662844f0d932b": {
+  "code": "ZTB8CAB",
+  "confidence": 0.78,
+  "source": "jev",
+  "text": "wie vor jedoch Zuschlag Kanalkreuzung größer D = 70"
+ },
  "034d6bcbbdcd5a37": {
   "code": null,
   "confidence": 0.029,
   "source": "none",
   "text": "Pilotbohrung 1 Rohre PE DA 355."
  },
+ "03587bb3ed4aed6b": {
+  "code": "F03",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Muffe PE DN/OD63 SDR11"
+ },
+ "037ab1371b08d64c": {
+  "code": "ZELE27E",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor, jedoch Längskreuzung Drainageleitung"
+ },
+ "039f99e3cff2fae1": {
+  "code": "ZSO1110",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Ausbaustücke DN 250 liefern und montieren"
+ },
  "03a3d88130907b99": {
   "code": "X02",
   "confidence": 0.98,
   "source": "jev",
   "text": "Wandblende für Wanddurchführungen bis D 200 mm"
+ },
+ "03e97953246f389d": {
+  "code": "ZSO352F",
+  "confidence": 0.9,
+  "source": "jev",
+  "text": "Pumpe 10 l/s pro h"
  },
  "0401f4ba60c61fcf": {
   "code": null,
@@ -59,17 +113,41 @@
   "source": "none",
   "text": "Wartungsvertrag"
  },
+ "04454cf9f27f05c4": {
+  "code": "ZSOC15C",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor, jedoch Steuerkabel A2Y-F (L) 20 x 2 x 0,8"
+ },
  "0445c49fcaa34762": {
   "code": "B03",
   "confidence": 0.71,
   "source": "jev",
   "text": "Schweißgerät Elektro mit Bedienung"
  },
+ "044d8f924246b16a": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 250/45°"
+ },
  "045c73c41cc6fd7a": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Rückschlagklappe DN 100 PN10 ohne Gewichtshebel"
+ },
+ "0494469be20962c1": {
+  "code": "T09",
+  "confidence": 0.133,
+  "source": "keyword",
+  "text": "Betonpflaster ausbauen zur Wiederverwendung, Reihen, D 100mm"
+ },
+ "054fa6b797f705e4": {
+  "code": "ZTB5069",
+  "confidence": 0.82,
+  "source": "jev",
+  "text": "wie vor, jedoch Muffendruckrohre TYT DN 250 (C50)"
  },
  "0567d2088ba660a3": {
   "code": "F25",
@@ -107,11 +185,23 @@
   "source": "jev",
   "text": "Kombi als Werkzeug- und Materialwagen"
  },
+ "066b883e23a02a92": {
+  "code": "ZTB9B93",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "[PERSON_0000121] lösen lagern verfüllen verdichten Sohlen-B 1-1,5m T b"
+ },
  "068fd70677965cef": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Erdverbindungskabel NYY 7 x 1,5 mm²"
+ },
+ "06f3c51da5a1bba5": {
+  "code": "ZTBA91C",
+  "confidence": 0.326,
+  "source": "keyword",
+  "text": "Bordstein Beton abbrechen TB10/25 24kN/m3 Geräteeinsatz mgl. laden tra"
  },
  "078fdba68450f23e": {
   "code": null,
@@ -124,6 +214,18 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Bauhelfer bzw. Hilfsarbeiterstunden"
+ },
+ "07abd46902723bac": {
+  "code": "ZPDB89A",
+  "confidence": 0.929,
+  "source": "keyword",
+  "text": "Einweisung Bedien- und Wartungspersonal"
+ },
+ "07e8889ba65e76ad": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "B 2,1m Standplatz herrichten räumen, Benutzung mit Drittfirma"
  },
  "07f64a2a838aa9e8": {
   "code": "F28",
@@ -149,6 +251,18 @@
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "08c7ef96a4222766": {
+  "code": "ZTB8CAB",
+  "confidence": 0.83,
+  "source": "jev",
+  "text": "Zulage Einbindung DN 300"
+ },
+ "08fbf57e95258a81": {
+  "code": "ZPDFA4E",
+  "confidence": 0.833,
+  "source": "keyword",
+  "text": "Abstecken vor Installation"
+ },
  "093095ce6581be81": {
   "code": "X02",
   "confidence": 0.78,
@@ -161,6 +275,12 @@
   "source": "jev",
   "text": "Zulage zur Bodenbewegung der Positionen Bodenaushub Wasserleitung"
  },
+ "09c600322322d72c": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Asphaltbelag schneiden bis 15 cm"
+ },
  "09c87bebbeebadd4": {
   "code": "T02-M3",
   "confidence": 0.97,
@@ -172,6 +292,12 @@
   "confidence": 0.97,
   "source": "jev",
   "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2-4m vorhalten"
+ },
+ "09f2e76ccf7a8163": {
+  "code": "B13",
+  "confidence": 0.13,
+  "source": "keyword",
+  "text": "Anschlussltg Entwässerung DN100 vorhalten"
  },
  "0a06bd77e4e24857": {
   "code": null,
@@ -221,6 +347,18 @@
   "source": "jev",
   "text": "Anzeige Betriebsunterbrechung Brunnenwasser Referat G2 - Anlagen- und Maschinentechnik"
  },
+ "0b353af07f22ea21": {
+  "code": null,
+  "confidence": 0.045,
+  "source": "none",
+  "text": "Material auf Nachweis zzgl. 18% GK"
+ },
+ "0b9c8513f8642a76": {
+  "code": "E01-M3",
+  "confidence": 0.154,
+  "source": "keyword",
+  "text": "Oberboden abtragen seitlich lagern BG1 Abtrag-H 10-20cm"
+ },
  "0bcb47b9c54ff4f0": {
   "code": null,
   "confidence": 0.057,
@@ -257,11 +395,29 @@
   "source": "none",
   "text": "Treibpumpe PER00110"
  },
+ "0e1beeb4e64e39ff": {
+  "code": "ZDAE307",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bitumenemulsion aufsprühen"
+ },
  "0e3022041fba40b1": {
   "code": null,
   "confidence": 0.033,
   "source": "none",
   "text": "Über-/Unterdrucksicherung Gebäude"
+ },
+ "0e41f56fd096fe16": {
+  "code": "S10",
+  "confidence": 0.267,
+  "source": "keyword",
+  "text": "Kabelbündel unter Spannung Niederspannungskabel T bis 1,25m sichern"
+ },
+ "0eb04d5bcef49df5": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "[PERSON_093] aufnehmen, transportieren und abladen"
  },
  "0ebf2e46f670bf31": {
   "code": null,
@@ -275,11 +431,23 @@
   "source": "jev",
   "text": "[PERSON_015] Bk1,0 AC8DN D 4cm Bindem. 50/70"
  },
+ "0f2325a40891dc71": {
+  "code": null,
+  "confidence": 0.08,
+  "source": "none",
+  "text": "Rammsondierung DPH"
+ },
  "0f41e869445007f1": {
   "code": "B02",
   "confidence": 0.69,
   "source": "jev",
   "text": "Einrichtungen zur Verkehrssicherung und Verkehrsregelung nach StVO bei Bauarbeiten auf ein"
+ },
+ "0f589219d052aaf6": {
+  "code": null,
+  "confidence": 0.056,
+  "source": "none",
+  "text": "wie vor, jedoch Umpflasterung [PERSON_017]"
  },
  "0f987dba546d8744": {
   "code": "F22",
@@ -298,6 +466,12 @@
   "confidence": 0.87,
   "source": "jev",
   "text": "[PERSON_115]-Bogen DN 65, 45 - 90 Grad"
+ },
+ "102134c14054f65d": {
+  "code": "ZTBE76A",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Überfahrten 40 t, schwerer Fahrverkehr"
  },
  "1086ee0bf16d4292": {
   "code": null,
@@ -329,6 +503,24 @@
   "source": "jev",
   "text": "Winkel 90Grad PE DN/OD63 SDR11"
  },
+ "11802133e03ede4b": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Rohrpfosten"
+ },
+ "11a3e438c4b28ad0": {
+  "code": "ZOB3538",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "wie vor, jedoch Auffüllsand"
+ },
+ "11f0219f3f7a6e79": {
+  "code": null,
+  "confidence": 0.05,
+  "source": "none",
+  "text": "Verschlußmuffen PE 100 DN/OD 63"
+ },
  "120d506d4d2a3e61": {
   "code": null,
   "confidence": 0.1,
@@ -353,11 +545,35 @@
   "source": "jev",
   "text": "[PERSON_020]/-in sämtliche Kosten/Zuschläge"
  },
+ "135c1de153b438ca": {
+  "code": null,
+  "confidence": 0.041,
+  "source": "none",
+  "text": "Wasserschieber m. HRD MDP 16, DN 100 Kurzbaul."
+ },
+ "1377105944937d24": {
+  "code": "S11",
+  "confidence": 0.143,
+  "source": "keyword",
+  "text": "Schutzrohr Kunststoff DN150-200 T bis 1,25m sichern"
+ },
  "139342f212b169bc": {
   "code": "K12",
   "confidence": 0.98,
   "source": "jev",
   "text": "[PERSON_089] geschweißt [PERSON_044] [PERSON_052] AD 273mm AD 400mm T 1,75-2,5m Messltg"
+ },
+ "13a7aed4351d015e": {
+  "code": "ZSO817F",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "BGr.VI,Baufachwerker"
+ },
+ "13aad24815f0a8e2": {
+  "code": "ZTBDA31",
+  "confidence": 0.67,
+  "source": "jev",
+  "text": "wie vor, jedoch Mineralbeton 0/32"
  },
  "13bffa5a09397874": {
   "code": null,
@@ -370,6 +586,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Bauzaun H 2m vorhalten"
+ },
+ "14441076291b0f05": {
+  "code": "ZPD5148",
+  "confidence": 0.73,
+  "source": "jev",
+  "text": "BGr. VII,Bauwerker"
  },
  "14be245dd98f506a": {
   "code": null,
@@ -389,6 +611,12 @@
   "source": "jev",
   "text": "Unterquerung bestehender Leitungen und Kabel"
  },
+ "1558af40885216f4": {
+  "code": "ZSO85AE",
+  "confidence": 0.51,
+  "source": "jev",
+  "text": "wie vor, jedoch Rohrgrabenaushub HB 2 - Tone, Lehm,"
+ },
  "15c14921f3ea0224": {
   "code": null,
   "confidence": 0.059,
@@ -400,6 +628,12 @@
   "confidence": 0.93,
   "source": "jev",
   "text": "Gartenhydrant DN50 Teleskop-Einbaugarnitur 0,94 - 1,60m"
+ },
+ "1659377024b0b28d": {
+  "code": "ZEL42DA",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "PE-HD Rohre 2 x da 50 x 4,6 mm (Leerrohr - zum"
  },
  "169ba1cbe7ce3d0b": {
   "code": null,
@@ -431,11 +665,29 @@
   "source": "jev",
   "text": "Planum Leitungsgraben, Abweichung +/-2cm EV2 45MPa"
  },
+ "17af9d2d4fc12c9b": {
+  "code": "ZTB9B93",
+  "confidence": 0.833,
+  "source": "keyword",
+  "text": "Boden Graben Ver-/Entsorgungsltg von Hand T bis 1,75m lösen, seitl. la"
+ },
+ "17b0c2864fe7a856": {
+  "code": "ZEL0658",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "wie vor, jedoch Längskreuzung Wasserleitung > DN 50"
+ },
  "17e17b792330a9fd": {
   "code": "E03",
   "confidence": 0.84,
   "source": "jev",
   "text": "Boden Graben Versorgungsltg von Hand inkl. Aushubkontrolle Fachkundiger AG, T bis 3m lösen"
+ },
+ "185c6ed18add6eee": {
+  "code": "ZTBD630",
+  "confidence": 0.94,
+  "source": "jev",
+  "text": "wie vor, jedoch [PERSON_093] DK0 (einschließlich [KENNZEICHEN_004]"
  },
  "18920cacfadd0de0": {
   "code": "V02-M2D",
@@ -455,6 +707,12 @@
   "source": "jev",
   "text": "Druckrohr PE100-RC TW Graben verbaut T 1,25-1,75m"
  },
+ "18e1b937e4eca09c": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch T DN 200/100"
+ },
  "1905a13130b70515": {
   "code": null,
   "confidence": 0.0,
@@ -467,11 +725,35 @@
   "source": "jev",
   "text": "Zulage Horizontale Spülbohrung PE DA 355 für"
  },
+ "19516110da2571c9": {
+  "code": null,
+  "confidence": 0.097,
+  "source": "none",
+  "text": "Leitpfosten ausbauen und wieder einbauen"
+ },
  "1977aec1333085a6": {
   "code": null,
   "confidence": 0.1,
   "source": "none",
   "text": "Zulage fachgerechte Entsorgung für vorbeschriebenen Wurzelstock."
+ },
+ "198ad5e1977fe549": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Bauwerker/-in"
+ },
+ "199400d02b770706": {
+  "code": "ZSOEDE1",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Mischbinder liefern"
+ },
+ "19d764158c2f1507": {
+  "code": null,
+  "confidence": 0.079,
+  "source": "none",
+  "text": "Humus abschieben und andecken (Baufeldbreite bis 14"
  },
  "19dfaf7c88659887": {
   "code": null,
@@ -485,11 +767,23 @@
   "source": "jev",
   "text": "Wurzelbeh. T 150cm Wurzeln nachschneiden Durchm. >2 cm bis 4 cm"
  },
+ "1a263dc7c23f03e0": {
+  "code": "A07-V",
+  "confidence": 0.182,
+  "source": "keyword",
+  "text": "Warnleuchte WL1 vorhalten"
+ },
  "1aa6b9a0b9edac82": {
   "code": "E04",
   "confidence": 0.94,
   "source": "jev",
   "text": "Zulage zur Position Grabenaushub und Verlegung der Wasserleitung"
+ },
+ "1ac187bea983dbca": {
+  "code": "ZOB5BBD",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zulage Sockelausbildung"
  },
  "1ac7ae3310c5e195": {
   "code": null,
@@ -521,6 +815,12 @@
   "source": "jev",
   "text": "Reduzierung DN 65 / DN 50"
  },
+ "1b342dab96ed2162": {
+  "code": "ZTB3631",
+  "confidence": 0.154,
+  "source": "keyword",
+  "text": "STS Bk1,0 DPr1 EV2 150MPa 0/32 D 12-15cm"
+ },
  "1b3cd0b7ae8c8f68": {
   "code": null,
   "confidence": 0.083,
@@ -532,6 +832,12 @@
   "confidence": 0.143,
   "source": "keyword",
   "text": "Zulage zur Position Schweißverbindung Heizelement - Stumpfschweißung"
+ },
+ "1b7b6155603c9e07": {
+  "code": "ZSO6A24",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Mehrpreis Dunstkamin DN 150"
  },
  "1bd17bd97e1efc2e": {
   "code": "B14",
@@ -551,17 +857,53 @@
   "source": "none",
   "text": "Desinfektion Entarsenierungsfilter"
  },
+ "1c69b975ff7c9c8a": {
+  "code": "ZTBFC89",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Klemmring DN 300 mit 2 Bohrungen 1\" liefern und"
+ },
+ "1c80de4c284148b9": {
+  "code": "ZTB1D0C",
+  "confidence": 0.89,
+  "source": "jev",
+  "text": "MMK 300/11°"
+ },
  "1c817ba461a43f2c": {
   "code": "F22",
   "confidence": 0.65,
   "source": "jev",
   "text": "Absperrschieber mit Elektroantrieb versetzen, DN 150"
  },
+ "1cbef57987a1bad5": {
+  "code": "ZTB3631",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "Boden außerhalb Baustelle gelagert einbauen 3km SU verdichten Einbau-H"
+ },
+ "1ce10937cbddb5f3": {
+  "code": null,
+  "confidence": 0.078,
+  "source": "none",
+  "text": "Bestands-Dokumentation erstellen"
+ },
  "1d01c6eca601c413": {
   "code": "B04-KP",
   "confidence": 0.95,
   "source": "jev",
   "text": "[PERSON_127] Brunnenwasserleitung"
+ },
+ "1d0a43de6daa63ad": {
+  "code": "ZSO51B0",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Kiesfilter einbauen"
+ },
+ "1d504cc3f4cf7901": {
+  "code": "ZSO66DB",
+  "confidence": 0.96,
+  "source": "jev",
+  "text": "Hinweissäule, [PERSON_095]"
  },
  "1d52611639eb3e3a": {
   "code": "F03",
@@ -574,6 +916,18 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Pass- und Ausbaustück DN 65 PN 10"
+ },
+ "1db1b7c1ca662c7e": {
+  "code": "ZELA7EF",
+  "confidence": 0.675,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg mit Gerät lösen laden fördern lagern 3km m"
+ },
+ "1ded51a00fe421a3": {
+  "code": "ZSO1EC6",
+  "confidence": 0.75,
+  "source": "keyword",
+  "text": "[PERSON_000167], für Vorlauf, Kennzeichnung Kälteverbund"
  },
  "1e2384ec97b3eb1a": {
   "code": null,
@@ -599,11 +953,29 @@
   "source": "jev",
   "text": "Kernbohrung Stahlbeton/Mauerwerk Durchm. 400 bis 500mm T 25-30cm nicht schadstoffbelastet"
  },
+ "1eacadf503a3bdc4": {
+  "code": null,
+  "confidence": 0.073,
+  "source": "none",
+  "text": "PP DN 300 SN 8"
+ },
+ "1ef510266e7f6329": {
+  "code": "ZTBD8F7",
+  "confidence": 0.917,
+  "source": "keyword",
+  "text": "Kies-Sand-Gemisch Einbettung Rohr DN300-400 einbauen verdichten D 15-2"
+ },
  "1f18344d21c4df95": {
   "code": "E06",
   "confidence": 0.85,
   "source": "jev",
   "text": "Zulage zu der Position Kies- und Schottertragschicht für Feinplanum einschl."
+ },
+ "1f52e84c199fd45d": {
+  "code": "F12",
+  "confidence": 0.68,
+  "source": "jev",
+  "text": "wie vor, jedoch T DN 250/250"
  },
  "1f626682aacc1148": {
   "code": "K09",
@@ -622,6 +994,12 @@
   "confidence": 0.045,
   "source": "none",
   "text": "Hosenbogen/ Hosen-T-Stück DN 300 mit Sattelstutzen DN 80"
+ },
+ "1fb1c91c59a1ce2e": {
+  "code": "ZDAD643",
+  "confidence": 0.276,
+  "source": "keyword",
+  "text": "Straßenkappe höhenverstellbar Wasserltg Absperrarmatur Gr.2"
  },
  "1fc1907f4f36e393": {
   "code": "B04-ST",
@@ -647,6 +1025,12 @@
   "source": "none",
   "text": "Absperrschieber DN 80, PN 16"
  },
+ "2116e6edb1b66c8d": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "Formstücke aus GGG liefern und einbauen - FF DN"
+ },
  "2119d2d09a0a788f": {
   "code": "V01",
   "confidence": 0.46,
@@ -658,6 +1042,12 @@
   "confidence": 0.037,
   "source": "none",
   "text": "Desinfektion Entarsenierungsfilter"
+ },
+ "21704a1349db8bff": {
+  "code": "S03",
+  "confidence": 0.86,
+  "source": "jev",
+  "text": "Begu-Schachtabdeckung Klasse D mit"
  },
  "21df84b458905f4b": {
   "code": "B04",
@@ -695,6 +1085,12 @@
   "source": "jev",
   "text": "Absperrschieber handbetätigt versetzen, DN 200"
  },
+ "2312b446abf3f605": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "BGr.V, Baufacharbeiter"
+ },
  "232e6b1aa80fc67d": {
   "code": "K09-M",
   "confidence": 0.92,
@@ -713,17 +1109,59 @@
   "source": "jev",
   "text": "[PERSON_121] lösen lagern verfüllen verdichten Sohlen-B 1-1,5m T bis 3m SU"
  },
+ "23618154765a73c7": {
+  "code": "B04-ST",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bauwerksplan Abzweigschacht"
+ },
  "23e2a7bb906dde69": {
   "code": "A06-H",
   "confidence": 0.98,
   "source": "jev",
   "text": "Verkehrszeichen Vorschriftzeichen 250 Gr.1 aufbauen abbauen"
  },
+ "23e6a5ccd7207a93": {
+  "code": null,
+  "confidence": 0.081,
+  "source": "none",
+  "text": "oval, mit Rahmen und Deckel, Steg zur Befestigung des"
+ },
+ "247c20272b768b07": {
+  "code": "ZTBE8F2",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Suchschlitze"
+ },
  "248dab427eae183d": {
   "code": "E06",
   "confidence": 0.63,
   "source": "jev",
   "text": "Walze Bedienungspersonal Glattmantel 5-10t"
+ },
+ "24e736f54000ee4c": {
+  "code": "ZSL64E8",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Radlader ca. 2,0 m³"
+ },
+ "258cb0264a1cb11f": {
+  "code": "ZOBA573",
+  "confidence": 0.73,
+  "source": "jev",
+  "text": "wie vor, jedoch T DN 300/300 mit einem Abgang DN 100"
+ },
+ "259eaa8aa242b395": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch FF DN 100 / 200 mm lg."
+ },
+ "266109a6b77a3852": {
+  "code": "ZSOE838",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Lastplattendruckversuche"
  },
  "2661dfe5b9901766": {
   "code": null,
@@ -736,6 +1174,18 @@
   "confidence": 0.053,
   "source": "none",
   "text": "FF-Stück DN 300 PN 16, L: ca. 300mm"
+ },
+ "26ddc06f847f6660": {
+  "code": "ZSODE9E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "wie vor, jedoch Bögen aus PP DN 300"
+ },
+ "270016735a0f656c": {
+  "code": "ZTB6255",
+  "confidence": 0.5,
+  "source": "keyword",
+  "text": "wie vor, jedoch Bäume fällen - Durchmesser 21 - 30 cm"
  },
  "2750668f69c80612": {
   "code": "B10",
@@ -785,11 +1235,35 @@
   "source": "none",
   "text": "Zulage für Mehraufwand Abstimmung Betreiber von Medienleitungen"
  },
+ "2928e24476c9f175": {
+  "code": "ZTB8511",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Mineralbeton 0/32 liefern und einbauen"
+ },
+ "295b2b56c803f373": {
+  "code": null,
+  "confidence": 0.109,
+  "source": "none",
+  "text": "400-500mm AD 350-400mm geschlossen"
+ },
  "29c45c55185e233d": {
   "code": "F25",
   "confidence": 0.61,
   "source": "jev",
   "text": "X-Stück dukt.Guss PN16 DN300"
+ },
+ "2a60f0cd27b4cebd": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Winkel PE 45Grad DN/OD63 SDR11"
+ },
+ "2a69e3e9b0065a0d": {
+  "code": "ZSO019B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Umwickeln erdberührten [PERSON_076] DN 250"
  },
  "2aba4ba0ecb6ced2": {
   "code": null,
@@ -809,6 +1283,12 @@
   "source": "none",
   "text": "Absperrschieber handbetätigt versetzen, DN 200"
  },
+ "2ba8950423024f12": {
+  "code": "ZDAA98D",
+  "confidence": 0.293,
+  "source": "keyword",
+  "text": "Asphalttragschicht PERSON_015 Bk1,0 AC22TN Bindem. 50/70 D 10cm"
+ },
  "2bbc45d86a792359": {
   "code": "F28",
   "confidence": 0.98,
@@ -826,6 +1306,12 @@
   "confidence": 0.97,
   "source": "jev",
   "text": "Schachtabdeckung Klasse B 125 liefern und versetzen"
+ },
+ "2dc86c11f3d353b2": {
+  "code": "ZSOB75A",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Filterkies 16/32 liefern und als Filterpackung einbauen"
  },
  "2df6e0f6e227f1d1": {
   "code": null,
@@ -863,6 +1349,12 @@
   "source": "none",
   "text": "Formstahl"
  },
+ "2e9419b70c74d7ba": {
+  "code": null,
+  "confidence": 0.061,
+  "source": "none",
+  "text": "herstellen"
+ },
  "2eabe9263465887a": {
   "code": null,
   "confidence": 0.083,
@@ -874,6 +1366,24 @@
   "confidence": 0.083,
   "source": "none",
   "text": "[PERSON_115]-Blindflansch DN 65"
+ },
+ "2ed8be25cd862093": {
+  "code": "ZTB3D8A",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "Zulage Rohrgrabenaushub am Wasserwerk - Abbau /"
+ },
+ "2ef39196876000f8": {
+  "code": "ZSO6E85",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Einbindung an bestehende Installation Wasserwerk"
+ },
+ "2f10323c44aa6bb0": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Rohrleitung markieren Wasserltg [PERSON_000167] Ortungsdraht Beschrift"
  },
  "2f47bb6c8a52b139": {
   "code": null,
@@ -887,6 +1397,18 @@
   "source": "jev",
   "text": "Boden Graben Kabel BK3+4 lösen lagern verfüllen verdichten T bis 0,7m Sohlen-B bis 0,3m"
  },
+ "2f60efef3ad96248": {
+  "code": "A04-V",
+  "confidence": 0.143,
+  "source": "keyword",
+  "text": "Behelfsüberfahrt 16,7kN/m2 L 2-4m B 3-3,75m Stahlbeton vorhalten"
+ },
+ "2f63bfb97133d058": {
+  "code": null,
+  "confidence": 0.065,
+  "source": "none",
+  "text": "[PERSON_000000000000000000127] [PERSON_132]"
+ },
  "2f63d72a69c1a191": {
   "code": "F21",
   "confidence": 0.97,
@@ -898,6 +1420,12 @@
   "confidence": 0.053,
   "source": "none",
   "text": "Ein- und Wiederausgraben,"
+ },
+ "2f9678e02f8e5c59": {
+  "code": "ZTB14B6",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "Verfugung, dauerelastisch ( Acryl )"
  },
  "2f9cda8c1a5820b1": {
   "code": "E02",
@@ -917,11 +1445,23 @@
   "source": "jev",
   "text": "Mediendurchführung einfach Außenwand D 25-40cm Durchm. 400-500mm AD 350-400mm geschlossen"
  },
+ "2ff3f1802933e01e": {
+  "code": "ZTB9B93",
+  "confidence": 0.737,
+  "source": "keyword",
+  "text": "Boden Graben Ver-/Entsorgungsltg mit Gerät T bis 1,75m lösen laden för"
+ },
  "2ffb47f7f96ea6c7": {
   "code": null,
   "confidence": 0.027,
   "source": "none",
   "text": "Zulage - Position für alle Rohrverlege- und Montagearbeiten"
+ },
+ "300c9ee7f8139516": {
+  "code": null,
+  "confidence": 0.074,
+  "source": "none",
+  "text": "Schweißnahtprüfung"
  },
  "301353403dcc1493": {
   "code": null,
@@ -935,6 +1475,12 @@
   "source": "none",
   "text": "Grader Fahrer-in B 2,5-3m"
  },
+ "30cc1e30857036fa": {
+  "code": "ZSOC1E2",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Verpackungsmaterial sammeln und rückliefern"
+ },
  "30d8268b00f3b126": {
   "code": null,
   "confidence": 0.0,
@@ -946,6 +1492,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Maschinenführer-in Fahrer-in sämtliche Kosten/Zuschläge"
+ },
+ "3109018f971de556": {
+  "code": "A06-U",
+  "confidence": 0.73,
+  "source": "jev",
+  "text": "Verkehrszeichen ausbauen, aufstellen"
  },
  "31a2939c9c14e1f0": {
   "code": "F11",
@@ -971,6 +1523,12 @@
   "source": "none",
   "text": "Pass- und Ausbaustück DN 100 PN 10"
  },
+ "31d0a142baeb8564": {
+  "code": null,
+  "confidence": 0.105,
+  "source": "none",
+  "text": "Absperrklappe Endarmatur EN-GJS DN250 PN16 PER029"
+ },
  "324b1e4d8db568d3": {
   "code": "F04",
   "confidence": 0.97,
@@ -982,6 +1540,12 @@
   "confidence": 0.79,
   "source": "jev",
   "text": "Membrangesteuertes 3 - Wege Be- und Entlüftungsventil"
+ },
+ "3314081577b13b25": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "abbauen"
  },
  "336675bac4ca84bd": {
   "code": null,
@@ -995,6 +1559,12 @@
   "source": "jev",
   "text": "Kompressor Bedienungspersonal 5-10m3/min"
  },
+ "339bb91548980845": {
+  "code": "W03",
+  "confidence": 0.167,
+  "source": "keyword",
+  "text": "Pumpensumpf herstellen räumen Betonbrunnenring DN1000 T bis 1m"
+ },
  "33e7d213b24b5d0c": {
   "code": "A01-U",
   "confidence": 1.0,
@@ -1006,6 +1576,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Zerstörungsfreie Schweißnahtprüfung"
+ },
+ "346ffee829876cb5": {
+  "code": "ZSO5DFE",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Böschungsköpfe für PP DN 300 herstellen und einbauen"
  },
  "3473333e1d3be712": {
   "code": null,
@@ -1109,17 +1685,41 @@
   "source": "jev",
   "text": "Sickerschacht für Entwässerungsleitung von Wasserleitungsschächten"
  },
+ "3787ac4e7b50b98c": {
+  "code": "ZEL54A8",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Leerrohre in die Bauwerke einführen"
+ },
  "37e42dbffe91ec4f": {
   "code": null,
   "confidence": 0.053,
   "source": "none",
   "text": "Zulage zum Grabenaushub für das Herstellen von Kopfloch zum Trennen der vorhandenen Hauptw"
  },
+ "3837e53c6c1c705b": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "T-Stück PE DN/OD63 SDR11"
+ },
+ "383d15bf015dd6fd": {
+  "code": "ZTB0A5E",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Sandbettung und Umhüllung"
+ },
  "3850357ae59671fc": {
   "code": "F11",
   "confidence": 1.0,
   "source": "jev",
   "text": "Bogen Kohlenstoffstahl Schweißen 45-90Grad [PERSON_044] AD 273mm"
+ },
+ "388cf47cbcdf3052": {
+  "code": "ZMA8DA7",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Dispersionsfarbe,Treppenwangen,NAB3"
  },
  "3891d098e7cc5b52": {
   "code": null,
@@ -1139,11 +1739,23 @@
   "source": "none",
   "text": "Kugelhahn DN 25, PN 16"
  },
+ "3902b1d1f6f5754f": {
+  "code": "ZTB8D74",
+  "confidence": 0.89,
+  "source": "jev",
+  "text": "Erdaushubmaterial zu Deponie [KENNZEICHEN_001] transportieren und"
+ },
  "3924221629ee308b": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Lüftungsjalousie aus [PERSON_115] Zuluft/Abluft Reinwasserkammern"
+ },
+ "39940b615fd2d595": {
+  "code": "ZBS1095",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Verkehrssicherung Arbeitsstelle"
  },
  "39d55fc6acf64aa0": {
   "code": "K09-M",
@@ -1157,17 +1769,35 @@
   "source": "none",
   "text": "Wasserstrahlventilator 60 m3/h"
  },
+ "3a28794b3b155e59": {
+  "code": "B10",
+  "confidence": 0.375,
+  "source": "keyword",
+  "text": "Bauwasseranschluss einrichten räumen"
+ },
  "3a371c74771cc375": {
   "code": "P05",
   "confidence": 0.91,
   "source": "jev",
   "text": "Druckrohr aus duktilem Gusseisen, innen zementiert"
  },
+ "3a77d93e6c8d0687": {
+  "code": "ZTB4949",
+  "confidence": 0.889,
+  "source": "keyword",
+  "text": "Vegetationstragschicht Schotterrasen Gemisch D 20cm"
+ },
  "3aa6bfcf296e49f3": {
   "code": null,
   "confidence": 0.053,
   "source": "none",
   "text": "Kleinleitungen DN 20"
+ },
+ "3ab36fffc068b35b": {
+  "code": "ZDAD643",
+  "confidence": 0.733,
+  "source": "keyword",
+  "text": "Straßenkappe höhenverstellbar Fernkälteltg Absperrschieber oder Entlee"
  },
  "3ad8e25c9bb09d8a": {
   "code": "F21",
@@ -1199,6 +1829,12 @@
   "source": "jev",
   "text": "[PERSON_115]-Bogen DN 80, 45 - 90 Grad"
  },
+ "3badbdd854517c75": {
+  "code": "F22",
+  "confidence": 0.95,
+  "source": "jev",
+  "text": "[PERSON_017] DN 200 weich-dichtend"
+ },
  "3c549da5abbaff25": {
   "code": null,
   "confidence": 0.043,
@@ -1217,11 +1853,23 @@
   "source": "jev",
   "text": "Planum Leitungsgraben, Abweichung +/-2cm EV2 45MPa"
  },
+ "3d0fe985f001adb3": {
+  "code": null,
+  "confidence": 0.056,
+  "source": "none",
+  "text": "witterungsbeständigem"
+ },
  "3d314706b1b9debc": {
   "code": null,
   "confidence": 0.115,
   "source": "none",
   "text": "Zulage zur Bodenbewegung der Position Bodenaushub Wasserleitungen"
+ },
+ "3d9108c65fc58f02": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Rammsondierung DPH"
  },
  "3df6b22805b7d216": {
   "code": "B13",
@@ -1265,17 +1913,35 @@
   "source": "none",
   "text": "Lüftungsjalousie aus [PERSON_115] Zuluft/Abluft [PERSON_066]"
  },
+ "3f5132d634d653a8": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Gartenhydrant DN50 Teleskop-Einbaugarnitur 0,94 - 1,60m"
+ },
  "3f6f2d2971e64ee2": {
   "code": "B04-ST",
   "confidence": 0.68,
   "source": "jev",
   "text": "Einweisung des Betriebspersonals"
  },
+ "3f97e0008b24bae5": {
+  "code": "ZDA4E44",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "[PERSON_074] entfernen"
+ },
  "3fed5226b02471a2": {
   "code": null,
   "confidence": 0.043,
   "source": "none",
   "text": "Filterfüllung Entarsenierungsfilter"
+ },
+ "400fd9bdab9caccc": {
+  "code": "ZTB3631",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "Boden außerhalb Baustelle gelagert einbauen 3km SU verdichten Einbau-H"
  },
  "409ee18f3b769897": {
   "code": null,
@@ -1289,11 +1955,41 @@
   "source": "jev",
   "text": "Liefern und Einbauen einer kombinierten Frostschutz-, Kiestragschicht,"
  },
+ "40c66c79b6a209be": {
+  "code": "ZOBFFDC",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "wie vor, jedoch Kies 8/16"
+ },
  "40cd2f08e109ca9c": {
   "code": null,
   "confidence": 0.1,
   "source": "none",
   "text": "PER000115-Rohr DN 80"
+ },
+ "411eb7d3fbe8c6be": {
+  "code": "ZSO99B9",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Froschklappe DN 100 liefern und einbauen"
+ },
+ "413b5c233a642262": {
+  "code": "ZTBCCE0",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bodenaustausch mit Vorabsiebung"
+ },
+ "41c466b2a705cf73": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 250/22°"
+ },
+ "41c7ea2b11ac3e21": {
+  "code": "ZSO13C6",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Edelstahlleiter liefern und montieren"
  },
  "41e94c1ac240cca8": {
   "code": "W01",
@@ -1312,6 +2008,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Leitungsbehelfsbrücke L 10-15m H 4,5-5m B 4,5-6m aufbauen abbauen"
+ },
+ "42e8a452b4bb18e0": {
+  "code": "ZSO4C1D",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Wasserleitung aus AZ DN 300 ausbauen und fachgerecht"
  },
  "42f8edfc9fded556": {
   "code": "K04",
@@ -1343,11 +2045,35 @@
   "source": "jev",
   "text": "Witterungsschutz-Zelt 10GradC aufstellen räumen"
  },
+ "43bfe5239a2765e3": {
+  "code": "ZSOCB1B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Tagesunterkünfte für die eigene Belegschaft"
+ },
+ "43d5541a0ee4e6be": {
+  "code": null,
+  "confidence": 0.043,
+  "source": "none",
+  "text": "Stromkabel vorhalten"
+ },
  "43dcac8286c78fe2": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "PER000115-Blindflansch DN 150, PN 10"
+ },
+ "4425161f66cade3b": {
+  "code": "F04",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Endkappe für PE-Rohr da 50 (Leerrohr) liefern und"
+ },
+ "446fdc828a2be88f": {
+  "code": "ZTB9B93",
+  "confidence": 0.553,
+  "source": "keyword",
+  "text": "Boden Baugrube UFH lösen lagern verfüllen verdichten, B 4-5m L 5-6m, T"
  },
  "451d3cd91dccc52e": {
   "code": "W01",
@@ -1397,17 +2123,59 @@
   "source": "jev",
   "text": "Tangentialschacht 2, Tiefe bis 1,65 m"
  },
+ "46b273556086bd07": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "Druckanbohrarmatur PE DN/OD160"
+ },
  "46bd31ef21dd7983": {
   "code": "F22",
   "confidence": 0.72,
   "source": "jev",
   "text": "Absperrschieber handbetätigt versetzen, DN 150"
  },
+ "4757450376d57d37": {
+  "code": "ZTB268F",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "wie vor, jedoch Asphaltbetonmischgut 0/8"
+ },
+ "4785a8387c696a07": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Abschrumpfmuffe Da 400 mm"
+ },
+ "47c01199ffabed52": {
+  "code": null,
+  "confidence": 0.054,
+  "source": "none",
+  "text": "Flansch zugfest DN50/ PN10/16"
+ },
+ "4843a24489418cc7": {
+  "code": "ZTBA91C",
+  "confidence": 0.629,
+  "source": "keyword",
+  "text": "Rückbau Bordstein Beton zur Wiederverwendung TB10/25 24kN/m3 Geräteein"
+ },
  "4887e71700db1c19": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "[PERSON_0000068] aus PER000115 Zuluft/Abluft [PERSON_00000066]"
+ },
+ "489f0dff0cf67e3b": {
+  "code": "ZTB24CD",
+  "confidence": 0.94,
+  "source": "jev",
+  "text": "wie vor, jedoch Zulage Deckbeschichtung (ZMU) DN 200"
+ },
+ "48d8457fce155bac": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch EU DN 200"
  },
  "48e2ad6751318c98": {
   "code": "F25",
@@ -1420,6 +2188,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Manometer bis 1 bar"
+ },
+ "4996e495d22f5869": {
+  "code": "ZMA290E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lackierung,Eckzargen/Blockzarge"
  },
  "49a7f376d4f2b702": {
   "code": null,
@@ -1439,6 +2213,12 @@
   "source": "jev",
   "text": "Schutz Mastleuchte Bestand H 2m herstellen"
  },
+ "4a9f5f0d2a41460d": {
+  "code": "ZSOECC4",
+  "confidence": 0.75,
+  "source": "keyword",
+  "text": "[PERSON_000167], für Rücklauf, Kennzeichnung Kälteverbund"
+ },
  "4aa24039de0f3684": {
   "code": "F17",
   "confidence": 0.77,
@@ -1451,11 +2231,35 @@
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "4b06e9a90b550c65": {
+  "code": "L03",
+  "confidence": 0.136,
+  "source": "keyword",
+  "text": "Wurzelbeh. T 150cm Wurzeln nachschneiden Durchm. >2 cm bis 4 cm"
+ },
+ "4b2f4e089434d986": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Verkehrszeichen Richtzeichen 454-20 Gr.1 aufbauen abbauen"
+ },
  "4b5b60696cb5a420": {
   "code": "B01",
   "confidence": 0.53,
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
+ },
+ "4bc2d10b4457c2f1": {
+  "code": "ZDA2088",
+  "confidence": 0.267,
+  "source": "keyword",
+  "text": "Befestigung ohne PERSON_0147 Schotter-Splitt-Brechsand-Gemisch Fahrbah"
+ },
+ "4bc568a7955e75e0": {
+  "code": "ZTB47C4",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Naht in Asphaltschicht herstellen"
  },
  "4bc6e16453434210": {
   "code": "T08",
@@ -1475,17 +2279,59 @@
   "source": "jev",
   "text": "Oberboden abtragen seitlich lagern BG1 Abtrag-H 10-20cm"
  },
+ "4c112bd5f155325b": {
+  "code": "A01-H",
+  "confidence": 0.273,
+  "source": "keyword",
+  "text": "Bauzaun H 2m aufstellen räumen"
+ },
+ "4c16254bb4e90146": {
+  "code": "ZPDA020",
+  "confidence": 0.378,
+  "source": "keyword",
+  "text": "Dichtheit aller Schweißnähte"
+ },
+ "4c9c7e8bda340700": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "wie vor, jedoch U DN 300"
+ },
  "4d48625e4f4b0277": {
   "code": "P03",
   "confidence": 0.89,
   "source": "jev",
   "text": "Zulage zu den Positionen Druckprüfung für:"
  },
+ "4d6332b212bf377d": {
+  "code": "ZELDA8C",
+  "confidence": 0.75,
+  "source": "keyword",
+  "text": "Messdose"
+ },
  "4d860cf4165f6437": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Demontage, Ausbringen und Entsorgung der bestehenden Rohrleitungen"
+ },
+ "4dba64d0f36f584c": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 300/45°"
+ },
+ "4ddbcfcc3a4790f5": {
+  "code": null,
+  "confidence": 0.095,
+  "source": "none",
+  "text": "Rasen ansäen Parkplatzrasen RSM5.1 25g/m2"
+ },
+ "4e1006437aa8cdb5": {
+  "code": "ZSO0691",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Böschung profilieren"
  },
  "4e17b4e4f4139c91": {
   "code": "F25",
@@ -1499,11 +2345,41 @@
   "source": "none",
   "text": "[PERSON_00000066] inkl. Verdichtereinheit"
  },
+ "4e226cfdc685b447": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "wie vor, jedoch MMK 100/30°"
+ },
  "4e3d611c62771c1e": {
   "code": "T02",
   "confidence": 0.99,
   "source": "jev",
   "text": "[FIRMA_101] fräsen Fahrbahn B 50cm T 3-3,5cm laden transp. LKW AN entsorgen bis 20km nicht"
+ },
+ "4e7f50ad52f5192b": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Schlauchleitung für Bauwasseranschluss L ca. 50 m vorhalten"
+ },
+ "4e8e95490c924f93": {
+  "code": null,
+  "confidence": 0.105,
+  "source": "none",
+  "text": "Verkehrszeichen Vorschriftzeichen 250 RA1 Gr.1 vorhalten"
+ },
+ "4ea3a84aa49f822d": {
+  "code": "A04-H",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "herstellen räumen"
+ },
+ "4ea6a8cbb4bf97ef": {
+  "code": "ZTB1480",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Schotterstraße wiederherstellen"
  },
  "4eededbcdb2640fd": {
   "code": "P03",
@@ -1523,11 +2399,23 @@
   "source": "none",
   "text": "Formstahl"
  },
+ "5032a8b765500071": {
+  "code": "ZTB3D5D",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Wiesen- und Ackerflächen herrichten (Baufeldbreite 12 m"
+ },
  "507adc7237d429e3": {
   "code": "S01",
   "confidence": 0.99,
   "source": "jev",
   "text": "[PERSON_006] eckig"
+ },
+ "507bd26c6d1d348f": {
+  "code": "T01",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Strassendecke schneiden"
  },
  "509474add17408f1": {
   "code": null,
@@ -1547,6 +2435,12 @@
   "source": "jev",
   "text": "Bauzaun H 2m aufstellen räumen"
  },
+ "51278bb45dbe6e2f": {
+  "code": "B04-ST",
+  "confidence": 0.192,
+  "source": "keyword",
+  "text": "Anlagen-Dokumentation und Revisionsunterlagen erstellen"
+ },
  "514a88405a8d88ff": {
   "code": "F11",
   "confidence": 0.98,
@@ -1558,6 +2452,12 @@
   "confidence": 0.77,
   "source": "jev",
   "text": "Luftfiltereinheit [PERSON_066]"
+ },
+ "51baa09fef796106": {
+  "code": "ZTB8418",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Muffendruckrohr TYT DN 300 (C50) mit integrierter"
  },
  "5239665700261aec": {
   "code": "B04",
@@ -1571,6 +2471,12 @@
   "source": "none",
   "text": "Erdaushub geböscht für neuen [PERSON_006] DN 1200"
  },
+ "52daa36b5531ad59": {
+  "code": "ZPD8A9E",
+  "confidence": 0.219,
+  "source": "keyword",
+  "text": "Bestands-Dokumentation auf Datenträger liefern CD"
+ },
  "52eaba90b6901df5": {
   "code": null,
   "confidence": 0.083,
@@ -1583,11 +2489,23 @@
   "source": "jev",
   "text": "Liefern Kies 16/32"
  },
+ "5334ce6e75ad42a7": {
+  "code": "ZSOB579",
+  "confidence": 0.91,
+  "source": "jev",
+  "text": "Wasserhaltung ganze Tage (24 h) bis 10 l/s"
+ },
  "5342bf0e312575a0": {
   "code": "F21",
   "confidence": 0.99,
   "source": "jev",
   "text": "Regelklappe DN 100"
+ },
+ "53525873faacb4ab": {
+  "code": "ZPD70C1",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Beweissicherung durchführen"
  },
  "53633d584f813775": {
   "code": "E07-M3",
@@ -1619,6 +2537,12 @@
   "source": "jev",
   "text": "Liefern und einbauen von Trassenband Breite 40 mm,"
  },
+ "54734950befeab4e": {
+  "code": null,
+  "confidence": 0.081,
+  "source": "none",
+  "text": "Druckrohr spülen PER029 bis DN65"
+ },
  "5475a8dad1fdb3ec": {
   "code": null,
   "confidence": 0.083,
@@ -1636,6 +2560,12 @@
   "confidence": 0.81,
   "source": "jev",
   "text": "LKW Fahrer-in 8-12t"
+ },
+ "55645514b819a1ea": {
+  "code": "ZTB7C1C",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor jedoch längkraftschlüssige"
  },
  "556842202bd3ff7a": {
   "code": null,
@@ -1655,11 +2585,53 @@
   "source": "none",
   "text": "PER000115-Bogen DN 65, 45 - 90 Grad"
  },
+ "55d78e481f9babd3": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMA DN 300/80"
+ },
+ "55e56a9e38135efe": {
+  "code": "A02-V",
+  "confidence": 0.143,
+  "source": "keyword",
+  "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2-4m vorhalten"
+ },
+ "55fb65d5bda4c539": {
+  "code": "ZTB1D0C",
+  "confidence": 0.95,
+  "source": "jev",
+  "text": "wie vor, jedoch Mehrbereichsklemmverbinder GGG/AZ"
+ },
+ "560ab0dde18905fd": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "bituminöse"
+ },
  "56173bfca722ac93": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Zulage zu Pilotbohrung 2 für Fehlbohrung PE DA 355,"
+ },
+ "5652efee012ce1f5": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Q DN 100 mit 1 Bohrung 1\" [PERSON_115]"
+ },
+ "56e906c576d41afa": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Muffenschutz DN 250 liefern und"
+ },
+ "571029f64cd1d8e1": {
+  "code": "ZTB2788",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Geotextil (b = 12 m) liefern und verlegen"
  },
  "57caaea24f40d64c": {
   "code": "F03",
@@ -1667,11 +2639,29 @@
   "source": "jev",
   "text": "Muffe aus PE, zum Heizelementmuffenschweißen, für Druckrohrleitung aus PE, für Trinkwasser"
  },
+ "57d226287319ac39": {
+  "code": "ZEL8BBB",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "wie vor, jedoch Steuerkabel A2Y-F (L) 20 x 2 x 0,8"
+ },
  "57ee1927fde7992a": {
   "code": "S02",
   "confidence": 0.125,
   "source": "keyword",
   "text": "Zulage Rohr OD 110 für Froschklappe liefern und einbauen."
+ },
+ "58365834f65a3c7b": {
+  "code": "ZSOC15C",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Liefern eines Steuerkabels A2Y-F (L) 20 x 2 x 0,8 mm"
+ },
+ "58dc90010667c296": {
+  "code": "ZTB6003",
+  "confidence": 0.85,
+  "source": "jev",
+  "text": "Zulage Rohrgrabenaushub am Wasserwerk -"
  },
  "593d4c746b4970bc": {
   "code": "E09",
@@ -1690,6 +2680,12 @@
   "confidence": 0.69,
   "source": "jev",
   "text": "[PERSON_115]-Losflansch DN 80, PN 10"
+ },
+ "59d026a436c5fe84": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Anschluss für SW-Leitung DN100 an vorhand. SW-Leitung herstellen und v"
  },
  "5a28249c03dcf510": {
   "code": "S02",
@@ -1745,11 +2741,35 @@
   "source": "none",
   "text": "Zustandsprüfung Einbindung Bestand"
  },
+ "5cc730df8b1fe43d": {
+  "code": "ZTBED6B",
+  "confidence": 0.889,
+  "source": "keyword",
+  "text": "Stirnverbau Grabenverbaugerät H 2-2,5m Sohlen-B 2,5-3m vorhalten"
+ },
+ "5cf8c546aba8b862": {
+  "code": "F22",
+  "confidence": 0.73,
+  "source": "jev",
+  "text": "wie vor, jedoch FFR DN 300/250 [PERSON_115] V4A)"
+ },
  "5d09dddd84729c4e": {
   "code": null,
   "confidence": 0.118,
   "source": "none",
   "text": "Schneiden von Asbestzementrohr DN 100 als Zulage zur Pos. Abbruch"
+ },
+ "5d294e8259a80698": {
+  "code": null,
+  "confidence": 0.105,
+  "source": "none",
+  "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2 bis 4m aufbauen entfern"
+ },
+ "5d59894a863aa818": {
+  "code": null,
+  "confidence": 0.043,
+  "source": "none",
+  "text": "Buschwerk entfernen und entsorgen"
  },
  "5da2a0237462a651": {
   "code": null,
@@ -1757,11 +2777,23 @@
   "source": "none",
   "text": "Freilegen von Leitungen aller Art, bis zum Erdplanum der Straße als"
  },
+ "5dcb20b80a736aee": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Pflasterdecke gebraucht seitl.lagernd L/B 200/100mm D 100mm"
+ },
  "5df9e0bea41c2a49": {
   "code": "T08",
   "confidence": 0.65,
   "source": "jev",
   "text": "Ausbau und Entsorgung Filterfüllung"
+ },
+ "5e4904a922f7e711": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "1,25m sichern"
  },
  "5e7f148378546249": {
   "code": null,
@@ -1781,6 +2813,18 @@
   "source": "jev",
   "text": "[PERSON_115]-Flansch DN 80, PN 10"
  },
+ "5ed3dd2d5e926610": {
+  "code": "ZTB365B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bodenverbesserung durchführen"
+ },
+ "5eedf1230eb58332": {
+  "code": "ZDA2088",
+  "confidence": 0.25,
+  "source": "keyword",
+  "text": "wiederverwendb Stoffe lagern nicht schadstoffbelastet"
+ },
  "5ef1e6fab01ce989": {
   "code": "F25",
   "confidence": 0.93,
@@ -1799,6 +2843,12 @@
   "source": "jev",
   "text": "[PERSON_092]"
  },
+ "5fc155c5cf636032": {
+  "code": "S02",
+  "confidence": 0.154,
+  "source": "keyword",
+  "text": "wie vor, jedoch Zulage Einbindung DN 200"
+ },
  "5ff96c12db32d362": {
   "code": null,
   "confidence": 0.083,
@@ -1810,6 +2860,18 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Fels Homogenbereich X1 lösen laden fördern lagern 3km T bis 3m 1Gesteinsart Sandstein"
+ },
+ "605fd79d7e24353f": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Anschluss an Rohrltg [PERSON_000044] DN250"
+ },
+ "607daaee6716b65a": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "Planum Leitungsgraben, Abweichung +/-2cm EV2 45MPa"
  },
  "60d58561f4d36553": {
   "code": "F11",
@@ -1829,17 +2891,35 @@
   "source": "none",
   "text": "[PERSON_0000000000000000000000110]"
  },
+ "6116b0feae7a2bc6": {
+  "code": "A07-U",
+  "confidence": 0.286,
+  "source": "keyword",
+  "text": "Warnleuchte WL1 umsetzen"
+ },
  "611be6d8d366dd33": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Storz-C-Kupplung (Niro)"
  },
+ "6136f6d4f867fa43": {
+  "code": null,
+  "confidence": 0.118,
+  "source": "none",
+  "text": "Untersuchung Abfalldeklaration Boden"
+ },
  "613ac782b795d7a3": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "PER000115-Bogen DN 80, 45 - 90 Grad"
+ },
+ "61814e061094083a": {
+  "code": null,
+  "confidence": 0.05,
+  "source": "none",
+  "text": "PER89"
  },
  "618a1059283c4462": {
   "code": null,
@@ -1864,6 +2944,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Druckrohr PE100RC TW AD/WD 355/32,2 mm PAS 1075 [PERSON_129] 3"
+ },
+ "62ef932f3a345237": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch [PERSON_017] DN 250"
  },
  "62fd30249cecf7d5": {
   "code": null,
@@ -1895,6 +2981,12 @@
   "source": "none",
   "text": "Edelstahl-Abgang 90 Grad DN 200"
  },
+ "640804b8a174b411": {
+  "code": "ZTB0262",
+  "confidence": 0.824,
+  "source": "keyword",
+  "text": "Stirnverbau Grabenverbaugerät H 2-2,5m Sohlen-B 2,5-3m SU herstellen r"
+ },
  "6435c49e29463828": {
   "code": "F22",
   "confidence": 1.0,
@@ -1913,6 +3005,12 @@
   "source": "none",
   "text": "Regelklappe DN 100"
  },
+ "65382a79a2b39701": {
+  "code": "ZTB3B41",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Schachtdeckel [PERSON_115] 1000/1000 mm liefern und"
+ },
  "653ca5ba62eb2712": {
   "code": "F18",
   "confidence": 0.74,
@@ -1924,6 +3022,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Wurzelbeh. T 150cm Wurzeln nachschneiden Durchm. >4 cm bis 10 cm"
+ },
+ "658d755773fe0764": {
+  "code": "ZSOF6F7",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Ringraumdichtung (Mediumrohr da 50) liefern und"
  },
  "65ae3719ae08cb16": {
   "code": null,
@@ -1937,6 +3041,12 @@
   "source": "none",
   "text": "Pass- und Ausbaustück DN 200 PN 10"
  },
+ "65f2ad2577ce9f71": {
+  "code": "ZELA7EF",
+  "confidence": 0.634,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km von Hand So"
+ },
  "6666f3984e0ac955": {
   "code": null,
   "confidence": 0.1,
@@ -1948,6 +3058,12 @@
   "confidence": 0.85,
   "source": "jev",
   "text": "Verschlussstopfen PE Heizwendelschweißen DN/OD355 SDR11"
+ },
+ "66ad4b4b58adced5": {
+  "code": "ZTB0FE6",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "Bagger (25 to) mit Humusschaufel (b = 2,0 m)"
  },
  "66bacacc26b15e97": {
   "code": "P05",
@@ -1961,11 +3077,23 @@
   "source": "none",
   "text": "Messdose"
  },
+ "6709eaca1c9698ea": {
+  "code": "ZOB515E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Krümmerbeton C 12/15"
+ },
  "671aca5437f01794": {
   "code": null,
   "confidence": 0.036,
   "source": "none",
   "text": "PER000115-Flansch DN 125, PN 10"
+ },
+ "6728015ecc970879": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Kappe PE DN/OD63 SDR11"
  },
  "675bdff7966194d2": {
   "code": "B03",
@@ -1985,11 +3113,47 @@
   "source": "none",
   "text": "Magnetventil DN 50"
  },
+ "67f5c770acd6ac2f": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Muffenschutz DN 100 liefern und"
+ },
+ "6811fa71888840e5": {
+  "code": "ZTB7C1C",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor, jedoch längkraftschlüssige"
+ },
+ "6818f4d42049e703": {
+  "code": "ZTB1D0C",
+  "confidence": 0.67,
+  "source": "jev",
+  "text": "wie vor, jedoch MMK 200/11°"
+ },
+ "684feeb35c7b00ab": {
+  "code": null,
+  "confidence": 0.059,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000000083] neu L/B 200/100mm D 100mm"
+ },
+ "6850574981d63774": {
+  "code": "ZSO3135",
+  "confidence": 0.76,
+  "source": "jev",
+  "text": "Storzkupplung / Storzübergangstück D 110 (A) mit"
+ },
  "691c78b92b02df3a": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Absperrschieber DN 150, PN 16"
+ },
+ "692989e7a33b3cd8": {
+  "code": "ZTB4C9B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Aufbereiteten Boden in Lagen einbauen, profilieren und"
  },
  "6943c294161ec971": {
   "code": "T03",
@@ -2015,6 +3179,12 @@
   "source": "none",
   "text": "PER000115-Flansch DN 50, PN 10/16"
  },
+ "6a86270b2fe62f74": {
+  "code": "ZPDA020",
+  "confidence": 0.929,
+  "source": "keyword",
+  "text": "Dichtheit aller Schweißnähte"
+ },
  "6ad96e3a152aaf02": {
   "code": null,
   "confidence": 0.0,
@@ -2038,6 +3208,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Warnleuchte WL1 aufbauen abbauen"
+ },
+ "6b619711bd2d6dcc": {
+  "code": null,
+  "confidence": 0.105,
+  "source": "none",
+  "text": "Verkehrszeichen Richtzeichen 454-20 RA1 Gr.1 vorhalten"
  },
  "6b72622491699eb7": {
   "code": "P05-ST",
@@ -2117,6 +3293,12 @@
   "source": "none",
   "text": "Flexible Rohrkupplung, zugfest, DN 200"
  },
+ "6d96b73805359fc5": {
+  "code": "ZELA7EF",
+  "confidence": 0.838,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg mit Gerät, inkl. [PERSON_0000000000000036]"
+ },
  "6dc8f36307f01667": {
   "code": "W03",
   "confidence": 1.0,
@@ -2129,11 +3311,23 @@
   "source": "jev",
   "text": "Sand Einbettung Rohr AD bis 100mm einbauen verdichten D 15-20cm"
  },
+ "6ddee5dbb41fd0e3": {
+  "code": "ZTB1D0C",
+  "confidence": 0.65,
+  "source": "jev",
+  "text": "wie vor, jedoch Mehrbereichsklemmverbinder GGG/AZ"
+ },
  "6e09d06ca2d51324": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
+ },
+ "6e529bee34f9a6bf": {
+  "code": "ZSOE3E5",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Baugrubenverbau, Spundwandprofil"
  },
  "6e5c057e5857b90a": {
   "code": null,
@@ -2141,11 +3335,23 @@
   "source": "none",
   "text": "Sickerpackung zur Wasserleitungsschachtentwässerung wie folgt:"
  },
+ "6e7953d8e3601f82": {
+  "code": "ZBSCE2C",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Verkehrssicherung Umleitung"
+ },
  "6e7a7810dfbe1862": {
   "code": "F03",
   "confidence": 0.68,
   "source": "jev",
   "text": "Kupplung PP DN40 PN16"
+ },
+ "6e8c9aab97239c20": {
+  "code": "A02-U",
+  "confidence": 0.158,
+  "source": "keyword",
+  "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2-4m umsetzen"
  },
  "6ec2d0db6e93140d": {
   "code": null,
@@ -2159,11 +3365,23 @@
   "source": "jev",
   "text": "Kugelhahn DN 65, PN 16"
  },
+ "6ef3010810cd0ae3": {
+  "code": null,
+  "confidence": 0.056,
+  "source": "none",
+  "text": "Kabelortung Nieder- und Mittelspannung, Markierung"
+ },
  "6f05455abd58768f": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Anschlussdose"
+ },
+ "6f13095644fa3c15": {
+  "code": "ZELA7EF",
+  "confidence": 0.634,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km von Hand So"
  },
  "6f514ea1ebaf3dea": {
   "code": "V02-M2D",
@@ -2183,6 +3401,30 @@
   "source": "jev",
   "text": "Provisorische Überfahrten/Durchfahrten im Ausführungsbereich für Anlieger und oder Waldarb"
  },
+ "6fa06f0a132d2fae": {
+  "code": "L02",
+  "confidence": 0.214,
+  "source": "keyword",
+  "text": "Grunddüngen Rasenfläche organ.Dünger 8+4+2(+0) Langzeit-N 100% ausbrin"
+ },
+ "6fca9e4fe19e4056": {
+  "code": "ZTB9FC5",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Ansaat Wiesenflächen"
+ },
+ "6feebd72a25d7fed": {
+  "code": "F21",
+  "confidence": 0.7,
+  "source": "jev",
+  "text": "Kugelhahn 1\" aus [PERSON_115] MDP 16"
+ },
+ "6ffbe35a0bb31649": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000177]"
+ },
  "70150683eaa610f3": {
   "code": null,
   "confidence": 0.083,
@@ -2194,6 +3436,12 @@
   "confidence": 0.72,
   "source": "jev",
   "text": "Pflanzl.Bodendecke abräumen aufnehmen fördern auf LKW AN laden D 5-10cm Gras-Kraut-Aufwuch"
+ },
+ "70354849f02f0468": {
+  "code": "ZTB5F63",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Sandbettung Rohrleitung"
  },
  "706451beaaead962": {
   "code": "P02",
@@ -2219,11 +3467,23 @@
   "source": "jev",
   "text": "[PERSON_163] neu, schwere Ausführung aus verzinktem [PERSON_089],"
  },
+ "7186552f6cbb03e7": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Unterlage reinigen"
+ },
  "718b911b97f1fdb1": {
   "code": "P05",
   "confidence": 0.99,
   "source": "jev",
   "text": "Druckrohr spülen desinfizieren TW [PERSON_029] Wasserstoffperoxid Desinfektionsm. bis DN65"
+ },
+ "719b019ffc19b3b1": {
+  "code": "B01",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Baustelleneinrichtung herstellen"
  },
  "71a66d419b49b655": {
   "code": "K12",
@@ -2231,11 +3491,23 @@
   "source": "jev",
   "text": "Rohr Stahlrohr geschweißt Korrosionsschutz [PERSON_044] AD 273mm Schweißen"
  },
+ "71ca8c1dec72cb05": {
+  "code": "ZELA7EF",
+  "confidence": 0.13,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg von Hand inkl. Aushubkontrolle Fachkundige"
+ },
  "71d49a727a883aca": {
   "code": "T12",
   "confidence": 0.9,
   "source": "jev",
   "text": "Betonbord TB10/25 grau gebraucht seitl. lagernd Fundament Rückenstütze C20/25 D 20cm"
+ },
+ "72162180f287fdae": {
+  "code": "ZPD795F",
+  "confidence": 0.943,
+  "source": "keyword",
+  "text": "Inbetriebnahme Stationäres Überwachungsgerät"
  },
  "72757ceaf1ae00df": {
   "code": "P02",
@@ -2254,6 +3526,12 @@
   "confidence": 0.95,
   "source": "jev",
   "text": "Flansch zugfest DN50/ PN10/16"
+ },
+ "7438e6472707f52c": {
+  "code": "A01-VD",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Bauzaun H 2m vorhalten"
  },
  "745c5c5cb1b7ae18": {
   "code": "P01",
@@ -2278,6 +3556,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Asphaltbetondeckschicht ländl. Weg AC8DN D 3cm Bindem. 70/100"
+ },
+ "75ddee36061e4d7e": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch [PERSON_017] DN 300 (weichdichtend) liefern"
  },
  "75f91bff221038b8": {
   "code": "E03-ST",
@@ -2321,6 +3605,12 @@
   "source": "none",
   "text": "Schubsicherung Eingangsflansch DN 300 PN 16"
  },
+ "7773026cda18d702": {
+  "code": "ZTB8585",
+  "confidence": 0.882,
+  "source": "keyword",
+  "text": "bestehend aus einem einteiligen wasserdurchlässigen"
+ },
  "7794cbe7ec9e2598": {
   "code": "L01",
   "confidence": 1.0,
@@ -2332,6 +3622,12 @@
   "confidence": 0.086,
   "source": "none",
   "text": "Wiederherstellung von Felddrainagen"
+ },
+ "77ac575389541dfc": {
+  "code": null,
+  "confidence": 0.036,
+  "source": "none",
+  "text": "Umpflasterung Be-/Entlüftergarnitur"
  },
  "77e3d17497221f02": {
   "code": "E11",
@@ -2345,17 +3641,65 @@
   "source": "jev",
   "text": "Kabelbündel unter Spannung Fernmeldekabel T bis 1,25m sichern"
  },
+ "77f2edb257358238": {
+  "code": "ZSO28C3",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lkw-Kipper 7 t NL"
+ },
+ "7805aa78d0053251": {
+  "code": "ZELDA8C",
+  "confidence": 0.4,
+  "source": "keyword",
+  "text": "Anschlussdose"
+ },
  "78cf4508ff867b33": {
   "code": "B02",
   "confidence": 0.51,
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "78d7c41ce063ba23": {
+  "code": null,
+  "confidence": 0.061,
+  "source": "none",
+  "text": "Ansaat Ökofläche Regiosaatgut"
+ },
+ "792a54cb22007e17": {
+  "code": "ZBSB9DB",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Chemo-Toilette"
+ },
+ "796c23e93869ef81": {
+  "code": null,
+  "confidence": 0.056,
+  "source": "none",
+  "text": "F0101 fräsen Fahrbahn B 50cm T 3-3,5cm laden transp. LKW AN entsorgen"
+ },
  "796f9cf1eb70e8e1": {
   "code": "B04-ST",
   "confidence": 1.0,
   "source": "jev",
   "text": "Anlagen-Dokumentation auf Datenträger liefern CD"
+ },
+ "799f9a7ddb420393": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Muffenschutz DN 200 liefern und"
+ },
+ "79ab1a38eff92c5d": {
+  "code": "ZTB9B93",
+  "confidence": 0.196,
+  "source": "keyword",
+  "text": "[PERSON_0000121] lösen lagern verfüllen verdichten Sohlen-B 1-1,5m T b"
+ },
+ "79c93d3c98c73719": {
+  "code": "ZTB8294",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "GGG DN 300 verlegen"
  },
  "7a0e295104796d40": {
   "code": null,
@@ -2375,11 +3719,35 @@
   "source": "none",
   "text": "Rohrauflager und -einbettung, Feinkies 0/32 mm, bis DN 900 mm"
  },
+ "7a3dae07bfc6ce79": {
+  "code": "ZELB532",
+  "confidence": 0.167,
+  "source": "keyword",
+  "text": "wie vor, jedoch Zuschlag Kanalkreuzung bis D = 40 cm"
+ },
+ "7ac9ed82b2b9052c": {
+  "code": "ZELB532",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zuschlag Kabelquerung und Erdungsbänder"
+ },
  "7ada3bc339ba12f2": {
   "code": "E07-M3",
   "confidence": 0.96,
   "source": "jev",
   "text": "FSS Bk1,0 DPr1,03 EV2 120MPa 0/45 D 20-30cm"
+ },
+ "7b1297191e682eb7": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "wie vor, jedoch Frostschutzschicht für Feldwege"
+ },
+ "7b26b7e33d129139": {
+  "code": "W02",
+  "confidence": 0.85,
+  "source": "jev",
+  "text": "Pumpe 10 l/s pro Tag"
  },
  "7b4c87a3bd6e83e6": {
   "code": "A02-H",
@@ -2387,11 +3755,29 @@
   "source": "jev",
   "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2 bis 4m aufbauen entfernen"
  },
+ "7b543e90bda5aab1": {
+  "code": "ZSO8DA0",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lkw-Kipper mit Allradantrieb, 15 t NL"
+ },
  "7b6011a6e593c3d0": {
   "code": null,
   "confidence": 0.032,
   "source": "none",
   "text": "Probennahmeventil DN 15"
+ },
+ "7bcadeaaa25825cc": {
+  "code": "ZBS49EA",
+  "confidence": 0.931,
+  "source": "keyword",
+  "text": "Anlagen- und Maschinentechnik"
+ },
+ "7c18c2112667860b": {
+  "code": null,
+  "confidence": 0.115,
+  "source": "none",
+  "text": "Behelfsüberfahrt 16,7kN/m2 L 2-4m B 3-3,75m Stahlbeton umsetzen"
  },
  "7c2fa5d019b63889": {
   "code": "F11",
@@ -2399,11 +3785,35 @@
   "source": "jev",
   "text": "[PERSON_115]-Bogen DN 125, 45 - 90 Grad"
  },
+ "7c32ce8482057a7a": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "Spülen von Rohrleitungen, aus Stahlrohr, PER0031, Nennweite DN 250"
+ },
  "7c68d91f58344223": {
   "code": null,
   "confidence": 0.045,
   "source": "none",
   "text": "Schweißverbindung Heizelement - Stumpfschweißung PE AD/WD 355/32,2 mm"
+ },
+ "7c947c4e4a1ef97c": {
+  "code": "ZSOE487",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Notstromaggregat (transportabel)"
+ },
+ "7c96747f1791577d": {
+  "code": "ZTB13F6",
+  "confidence": 0.92,
+  "source": "jev",
+  "text": "Verlegen der PE-Rohre 2 x da 50 x 4,6 mm im"
+ },
+ "7cca76bce7676fe6": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch U DN 250"
  },
  "7d2f3b3bccce69c3": {
   "code": null,
@@ -2441,6 +3851,12 @@
   "source": "none",
   "text": "[PERSON_0000068] aus PER000115 Zuluft/Abluft Reinwasserkammern"
  },
+ "7e4defb06a218d4e": {
+  "code": "ZBS57FD",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Verkehrsrechtliche Anordnung einholen"
+ },
  "7f26237134c13db7": {
   "code": null,
   "confidence": 0.048,
@@ -2452,6 +3868,12 @@
   "confidence": 0.038,
   "source": "none",
   "text": "Grabenaushub Neubau [PROJEKT_001]"
+ },
+ "7faf864d7006f2b2": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "einarbeiten T 10cm BG3a"
  },
  "8012cb166512e696": {
   "code": "F18",
@@ -2470,6 +3892,12 @@
   "confidence": 0.86,
   "source": "jev",
   "text": "Abschlussmuffe AD 400mm AD 400mm [PERSON_052] AD 273mm [PERSON_044] 25bar"
+ },
+ "80833105174f8d16": {
+  "code": null,
+  "confidence": 0.053,
+  "source": "none",
+  "text": "Untersuchung [PERSON_000000000000000047]"
  },
  "8095c74698006509": {
   "code": null,
@@ -2501,6 +3929,12 @@
   "source": "none",
   "text": "Über-/Unterdrucksicherung Gebäude"
  },
+ "8173049042f7fdda": {
+  "code": null,
+  "confidence": 0.074,
+  "source": "none",
+  "text": "Zerstörungsfreie Schweißnahtprüfung"
+ },
  "81e962c432641dd1": {
   "code": "T07",
   "confidence": 1.0,
@@ -2525,11 +3959,23 @@
   "source": "jev",
   "text": "Hausanschlussgarnitur 1 1/4\" - da 40"
  },
+ "822d887463a20bd7": {
+  "code": "T09",
+  "confidence": 0.138,
+  "source": "keyword",
+  "text": "[PERSON_00000000083] ausbauen zur Wiederverwendung, Reihen, D 100mm"
+ },
  "823359b60aa6c04c": {
   "code": "F01",
   "confidence": 1.0,
   "source": "jev",
   "text": "Winkel PE 45Grad DN/OD63 SDR11"
+ },
+ "824cc4f2fe4a3fa5": {
+  "code": "ZMA86CB",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Dispersionsfarbe,Leibungen,NAB3"
  },
  "826ff606dc8c3426": {
   "code": null,
@@ -2542,6 +3988,12 @@
   "confidence": 0.84,
   "source": "jev",
   "text": "Reduzierung DN 100 / DN 65, exzentrisch"
+ },
+ "827c8b7f6ce3f8a5": {
+  "code": "B12",
+  "confidence": 0.15,
+  "source": "keyword",
+  "text": "Schlauchleitung für Bauwasseranschluss einrichten räumen"
  },
  "82862a8107035972": {
   "code": null,
@@ -2567,6 +4019,12 @@
   "source": "jev",
   "text": "Facharbeiterstunde"
  },
+ "83ab9a34138147e7": {
+  "code": "ZTB4816",
+  "confidence": 0.8,
+  "source": "keyword",
+  "text": "Grabenverbaugerät H 2-2,5m Sohlen-B 2,5-3m SU herstellen rückbauen"
+ },
  "83af08f60b18dccb": {
   "code": null,
   "confidence": 0.045,
@@ -2579,11 +4037,35 @@
   "source": "none",
   "text": "Mikrobiologische Trinkwasseruntersuchung nach der Trinkwasserverordnung V, Anlage 1,2,5 (E"
  },
+ "84bda82f4a32b983": {
+  "code": "ZTB5989",
+  "confidence": 0.424,
+  "source": "keyword",
+  "text": "Witterungsschutz-Zelt 10GradC aufstellen räumen"
+ },
+ "84ccdc2614b6e8e2": {
+  "code": null,
+  "confidence": 0.05,
+  "source": "none",
+  "text": "Fertigbogen DIN EN 448, 45 Grad, Schenkellänge 1,5 x 1,5m"
+ },
+ "85426f423d23fbb5": {
+  "code": "ZSO7A82",
+  "confidence": 0.333,
+  "source": "keyword",
+  "text": "wie vor jedoch, GGG DN 250 verlegen"
+ },
  "85743f31ccffccbe": {
   "code": null,
   "confidence": 0.045,
   "source": "none",
   "text": "Doppelmuffenbogen dukt.Guss 11Grad MMK-Stück Steckmuffe 16bar DN300"
+ },
+ "857c5742e2b59f08": {
+  "code": "ZTBABB1",
+  "confidence": 0.941,
+  "source": "keyword",
+  "text": "Betonbord TB10/25 grau Fundament Rückenstütze C20/25 D 20cm"
  },
  "85a6a090b68b629a": {
   "code": null,
@@ -2597,11 +4079,29 @@
   "source": "jev",
   "text": "Vermessungstechnische Leistungen - Bestand Wasserleitung"
  },
+ "86393af01551a365": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Kabelkreuzung unter Spannung Mittelspannungskabel T bis 1,25m sichern"
+ },
+ "863e112934c7798d": {
+  "code": "ZDAF829",
+  "confidence": 0.893,
+  "source": "keyword",
+  "text": "PER16 mit Dichtungsband"
+ },
  "8640f4000fb136cc": {
   "code": "B01",
   "confidence": 1.0,
   "source": "jev",
   "text": "Einrichten und Räumen der Baustelle für Spülbohrarbeiten PE DA = 355 mm"
+ },
+ "864364dac87fe580": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Kabelausführung aus PE-Verbindungsmuffe"
  },
  "869adfb1c6b3d40d": {
   "code": null,
@@ -2609,17 +4109,53 @@
   "source": "none",
   "text": "U-Stück dukt.Guss 16bar DN300"
  },
+ "86a4d925670d4a93": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Verkehrszeichen Vorschriftzeichen 250 Gr.1 aufbauen abbauen"
+ },
  "86c0a0717ed7f403": {
   "code": "F25",
   "confidence": 0.71,
   "source": "jev",
   "text": "X-Stück dukt.Guss PN16 DN100"
  },
+ "86c3b9c8b1bdd161": {
+  "code": "ZOBF979",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Liefern von Beton C 25/30 (wu)"
+ },
+ "86ea9932c27ac08a": {
+  "code": null,
+  "confidence": 0.039,
+  "source": "none",
+  "text": "Bauwerker/-in"
+ },
+ "87303d9ec11c3324": {
+  "code": "ZTB8D74",
+  "confidence": 0.91,
+  "source": "jev",
+  "text": "Erdaushubmaterial zu Deponie [KENNZEICHEN_001] transportieren und"
+ },
  "879c19497e73697f": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Flanschnachumhüllung mit Schrumpfmanschette, konfektioniert wie folgt:"
+ },
+ "87bab2bdde7c4c46": {
+  "code": "ZPD87A5",
+  "confidence": 0.667,
+  "source": "keyword",
+  "text": "Leitungsbehelfsbrücke L 10-15m H 4,5-5m B 4,5-6m aufbauen abbauen"
+ },
+ "88517f8df36ebcde": {
+  "code": "L03",
+  "confidence": 0.154,
+  "source": "keyword",
+  "text": "Wurzelbeh. T 150cm Wurzeln nachschneiden Durchm. >4 cm bis 10 cm"
  },
  "8875dd5acebbc84e": {
   "code": null,
@@ -2657,6 +4193,12 @@
   "source": "jev",
   "text": "Radlader Fahrer-in 37-55kW"
  },
+ "89a03ee259a5f030": {
+  "code": "E08",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Humus liefern und andecken"
+ },
  "8a022c5a2b32767e": {
   "code": "F16",
   "confidence": 1.0,
@@ -2674,6 +4216,12 @@
   "confidence": 0.99,
   "source": "jev",
   "text": "Hinweisschild \"Hydrant Brunnenwasser\" , Grundfarbe weiß mit schwarzem Rahmen , 250x200 mm\""
+ },
+ "8a40cabea928c726": {
+  "code": "ZPD6336",
+  "confidence": 0.826,
+  "source": "keyword",
+  "text": "Zustandsprüfung Einbindung Bestand"
  },
  "8a4d5fca0fed7605": {
   "code": "B04-ST",
@@ -2693,6 +4241,12 @@
   "source": "jev",
   "text": "Vegetationstragschicht lockern Bodenverbess.-/Düngem. einarbeiten T 10cm BG3a"
  },
+ "8abc5708d3e50a85": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch Q DN 100 [PERSON_115] V4A)"
+ },
  "8ad86d15af43b917": {
   "code": "F25",
   "confidence": 0.79,
@@ -2704,6 +4258,12 @@
   "confidence": 0.067,
   "source": "none",
   "text": "Probennahmestation"
+ },
+ "8b1cab94c5048962": {
+  "code": "ZTBABB1",
+  "confidence": 0.37,
+  "source": "keyword",
+  "text": "Rückenstütze C20/25 D 20cm"
  },
  "8b5cc65ef96e4697": {
   "code": null,
@@ -2723,17 +4283,65 @@
   "source": "jev",
   "text": "Anlagen-Dokumentation in [PERSON_097] liefern"
  },
+ "8c3bc93317b7fb90": {
+  "code": "ZTBFC89",
+  "confidence": 0.84,
+  "source": "jev",
+  "text": "wie vor, jedoch Klemmring DN 250 mit 2 Bohrungen 1\""
+ },
  "8c637f0f0555d7e2": {
   "code": "E10",
   "confidence": 0.67,
   "source": "jev",
   "text": "Boden Graben Ver-/Entsorgungsltg von Hand T bis 1,75m lösen, seitl. lagern, einbauen, verd"
  },
+ "8c707eb5008b8a25": {
+  "code": "ZSO4C1D",
+  "confidence": 0.78,
+  "source": "jev",
+  "text": "wie vor, jedoch Wasserleitung aus AZ DN 200 ausbauen"
+ },
+ "8cab3889a66a51eb": {
+  "code": null,
+  "confidence": 0.051,
+  "source": "none",
+  "text": "Foto-Dokumentation erstellen"
+ },
+ "8d34ac435496c84b": {
+  "code": "A07-H",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Warnleuchte WL1 aufbauen abbauen"
+ },
  "8d3b2efba402fc61": {
   "code": null,
   "confidence": 0.111,
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben, jedoch nur Zulage zur Positi"
+ },
+ "8d41fe963aa71198": {
+  "code": null,
+  "confidence": 0.074,
+  "source": "none",
+  "text": "Kennscheibe aus"
+ },
+ "8d81d0051bdc73ec": {
+  "code": "ZPD4EE2",
+  "confidence": 0.182,
+  "source": "keyword",
+  "text": "Anlagen-Dokumentation auf Datenträger liefern CD"
+ },
+ "8d827c4b8d54206e": {
+  "code": "ZPD8A9E",
+  "confidence": 0.828,
+  "source": "keyword",
+  "text": "Foto-Dokumentation in PERSON_097 liefern"
+ },
+ "8d83212bd346ddab": {
+  "code": "ZBS4EAB",
+  "confidence": 0.9,
+  "source": "keyword",
+  "text": "Laufsteg beidseit.Schutzwand Holz B 1-1,5m L 2-4m vorhalten"
  },
  "8d92b6f8bcbe2303": {
   "code": null,
@@ -2759,11 +4367,35 @@
   "source": "none",
   "text": "Storz-C-Kupplung (Niro)"
  },
+ "8db6da60cffc9c54": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Winkel 90Grad PE DN/OD63 SDR11"
+ },
+ "8de55de0f4743b24": {
+  "code": "ZTB8BDC",
+  "confidence": 0.76,
+  "source": "jev",
+  "text": "wie vor, jedoch Bagger zum Verfüllen einschließlich"
+ },
+ "8dfcc0ad46cc3f5e": {
+  "code": "ZEL9447",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zuschlag Längskreuzung Kabel / Erdungsbänder"
+ },
  "8e2c92e81558cbfa": {
   "code": "F18",
   "confidence": 0.99,
   "source": "jev",
   "text": "Ablängung DN250"
+ },
+ "8e357b95a7315fbe": {
+  "code": "ZSO9872",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Zuschlag Handschacht"
  },
  "8e50f706c834cbe8": {
   "code": null,
@@ -2776,6 +4408,12 @@
   "confidence": 0.96,
   "source": "jev",
   "text": "Bestands-Dokumentation in [PERSON_097] liefern"
+ },
+ "8f1855fa01ae948a": {
+  "code": null,
+  "confidence": 0.095,
+  "source": "none",
+  "text": "herstellen"
  },
  "8f58e4cc4ab875a1": {
   "code": null,
@@ -2801,6 +4439,24 @@
   "source": "jev",
   "text": "Datenlogger zur Datenübertragung der Messwerte"
  },
+ "8fcfe093b3ef3c4d": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 250/30°"
+ },
+ "8fd71f4280af3460": {
+  "code": null,
+  "confidence": 0.038,
+  "source": "none",
+  "text": "Pflanzl.Bodendecke abräumen aufnehmen fördern auf LKW AN laden D 5-10c"
+ },
+ "908017d42dd53967": {
+  "code": "ZBS7A8D",
+  "confidence": 0.8,
+  "source": "keyword",
+  "text": "Warnleuchte WL1 vorhalten"
+ },
  "9099ca0613bd3516": {
   "code": null,
   "confidence": 0.031,
@@ -2812,6 +4468,42 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Kontrollprüfung Unterbau/Planum Verformungsmodul dynamischer Lastplattendruckversuch"
+ },
+ "90ebed24efa730a9": {
+  "code": "ZPD4EE2",
+  "confidence": 0.955,
+  "source": "keyword",
+  "text": "Anlagen-Dokumentation in PERSON_097 liefern"
+ },
+ "91030f6089544f45": {
+  "code": "ZDAD643",
+  "confidence": 0.96,
+  "source": "jev",
+  "text": "Höhenverstellbare Straßenkappe W1 DIN 4056 KOS"
+ },
+ "9165682ff928fd35": {
+  "code": "ZSOF9EF",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Regiearbeiten für Einbindung Wasserwerk"
+ },
+ "91c081d6e46bec82": {
+  "code": "ZTB8418",
+  "confidence": 0.62,
+  "source": "jev",
+  "text": "wie vor, jedoch Muffendruckrohre TYT DN 200 (C64)"
+ },
+ "91f9ec7f6a39b5a1": {
+  "code": "ZSO4582",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Kalibrieren der Rohrstrecke"
+ },
+ "926fdd8882a15a35": {
+  "code": "ZEL9447",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zuschlag Längskreuzung Kabel / Erdungsbänder"
  },
  "927c9e33965827f3": {
   "code": "B12",
@@ -2837,6 +4529,24 @@
   "source": "none",
   "text": "Zulage zur Bodenbewegung der Position Bodenaushub Wasserleitungen"
  },
+ "92f463d00bccd011": {
+  "code": "ZPDC38F",
+  "confidence": 0.931,
+  "source": "keyword",
+  "text": "Messprotokoll je Messschleife (VL + RL),"
+ },
+ "92f5cec5449e1bae": {
+  "code": "ZPD3381",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Nachweis Verdichtung"
+ },
+ "92fb2a912f5c934c": {
+  "code": "ZTB0262",
+  "confidence": 0.824,
+  "source": "keyword",
+  "text": "Stirnverbau Grabenverbaugerät H 3-3,5m Sohlen-B 2,5-3m SU herstellen r"
+ },
  "935e356b8f36c910": {
   "code": "E11",
   "confidence": 0.99,
@@ -2849,6 +4559,12 @@
   "source": "jev",
   "text": "Asphaltbelag schneiden bis 15 cm"
  },
+ "93965e6ddb5bbbc3": {
+  "code": "ZSOC254",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "[PERSON_017] DN 100 weich-dichtend"
+ },
  "93cf869d0d8aec96": {
   "code": "K05",
   "confidence": 0.62,
@@ -2860,6 +4576,24 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Übergangsflansch PN 10/16, DN 32"
+ },
+ "941352298f3a4189": {
+  "code": "ZTBC6D0",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Schachthals 1,00 / 0,625 m liefern und einbauen"
+ },
+ "946536eb01a153a4": {
+  "code": "ZTB9001",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lehmschürzen einbauen"
+ },
+ "94730a3e55d0ed37": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "wie vor, jedoch EU DN 300"
  },
  "948291cdab1d8b09": {
   "code": "A04-U",
@@ -2903,6 +4637,18 @@
   "source": "none",
   "text": "Anschlusstrommel 1 1/4\" aus Gusseisen, Epoxy-Pulverbeschichtung"
  },
+ "9520b4ac9455afb3": {
+  "code": "ZTB8CAB",
+  "confidence": 0.68,
+  "source": "jev",
+  "text": "wie vor, jedoch Umpflasterung Schächte"
+ },
+ "9548a4b6a704bbb8": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch EU DN 100"
+ },
  "958d8eed568ed8f4": {
   "code": "F17",
   "confidence": 0.93,
@@ -2914,6 +4660,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Filterfüllung Entarsenierungsfilter"
+ },
+ "95cc910744041614": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Rohr markieren Trinkwasserltg [PERSON_000167] liefern"
  },
  "967aac5cb6a870e1": {
   "code": "F25",
@@ -2927,17 +4679,35 @@
   "source": "jev",
   "text": "Straßenkappe, bestehend aus Kappe, Deckel mit Dämpfungsring und Haltestift, geeignet für d"
  },
+ "96a6c6e3f973c560": {
+  "code": null,
+  "confidence": 0.071,
+  "source": "none",
+  "text": "wie vor, jedoch Lkw-Kipper (4-Achser) mit Allradantrieb,"
+ },
  "96ab1549f1a6401d": {
   "code": null,
   "confidence": 0.029,
   "source": "none",
   "text": "Erschwerniszulage zur Position Spülbohrung 1 und 2 PE DA 355 für:"
  },
+ "971a2a92968231f5": {
+  "code": "ZELB938",
+  "confidence": 0.75,
+  "source": "keyword",
+  "text": "Erdverbindungskabel NYY 7 x 1,5 mm²"
+ },
  "972840827669f86c": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Storz-B-Kupplung (Niro)"
+ },
+ "9771dd143e6a7ccb": {
+  "code": "ZTB24CD",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor, jedoch Zulage Deckbeschichtung (ZMU) DN 250"
  },
  "97e49e39e53d98f7": {
   "code": null,
@@ -2969,11 +4739,29 @@
   "source": "jev",
   "text": "Luftfiltereinheit Zuluft/Abluft Reinwasserkammern"
  },
+ "998f19dcee2ee42c": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch EU DN 250"
+ },
  "99de0aeaa649b5dd": {
   "code": "B03",
   "confidence": 1.0,
   "source": "jev",
   "text": "Obermonteur-in sämtliche Kosten/Zuschläge"
+ },
+ "99f51516834a670c": {
+  "code": "ZTB8418",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Muffendruckrohre TYT DN 300 (C50)"
+ },
+ "9a3a1a7f45aad7da": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 200/22°"
  },
  "9a7e03077986ea80": {
   "code": "K09-M",
@@ -2986,6 +4774,36 @@
   "confidence": 0.99,
   "source": "jev",
   "text": "Übergangsflansch PN 10/16, DN 25"
+ },
+ "9b21baff5f8be7f6": {
+  "code": "ZTB9775",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Liefern und Montieren von Muffen zum Verbinden des"
+ },
+ "9b277c7611742cd2": {
+  "code": null,
+  "confidence": 0.081,
+  "source": "none",
+  "text": "Humus abschieben und andecken"
+ },
+ "9c1eb19ac99dfe34": {
+  "code": "ZMAC971",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lackierung,Umfassungszarge,<0,175m"
+ },
+ "9c32dd715d67c856": {
+  "code": "ZDAD643",
+  "confidence": 0.296,
+  "source": "keyword",
+  "text": "DN80"
+ },
+ "9c98c7480c254059": {
+  "code": "ZSLFBB8",
+  "confidence": 0.87,
+  "source": "keyword",
+  "text": "Baufacharbeiter/-in sämtliche Kosten/Zuschläge"
  },
  "9ca1088682a4dd82": {
   "code": "V01-M2D",
@@ -3011,11 +4829,47 @@
   "source": "none",
   "text": "Wandblende für Wanddurchführungen bis D 200 mm"
  },
+ "9d232501bf922163": {
+  "code": "ZSO85AE",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Baugrubenaushub HB 2 - Tone, Lehm, [PERSON_033] Sand"
+ },
+ "9d370766a6031894": {
+  "code": "ZSO5DFE",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "wie vor, jedoch Umpflasterung Böschungskopf DN 300"
+ },
+ "9d3fe8c66cdb2200": {
+  "code": "ZTB6003",
+  "confidence": 0.93,
+  "source": "jev",
+  "text": "Zulage Rohrgrabenaushub am Wasserwerk -"
+ },
+ "9e4dce9bbb27a895": {
+  "code": "W01",
+  "confidence": 0.4,
+  "source": "keyword",
+  "text": "Pumpe E-Motor 10-30m3/h h bis 5m aufstellen, räumen, Schlauchleitung 1"
+ },
  "9e59a338d899c178": {
   "code": "B03",
   "confidence": 1.0,
   "source": "jev",
   "text": "Bauhelfer bzw. Hilfsarbeiterstunden"
+ },
+ "9e6b717f6b55d8e6": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "BGr.III, Spezialbaufacharbeiter"
+ },
+ "9efd0e795486981f": {
+  "code": "A04-U",
+  "confidence": 0.158,
+  "source": "keyword",
+  "text": "Behelfsüberfahrt 16,7kN/m2 L 2-4m B 3-3,75m Stahlbeton umsetzen"
  },
  "9f2494c08af64562": {
   "code": null,
@@ -3041,6 +4895,12 @@
   "source": "jev",
   "text": "Tangentialschacht 1, Tiefe bis 1,50 m"
  },
+ "9f8744686f9217e1": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "Stromkabel verlegen räumen"
+ },
  "9f91c7ee3b38e4d7": {
   "code": "F12",
   "confidence": 0.76,
@@ -3059,11 +4919,23 @@
   "source": "none",
   "text": "PER000115-Flansch DN 200, PN 10"
  },
+ "9fc9ce99185d6fca": {
+  "code": "ZSOEAB0",
+  "confidence": 0.75,
+  "source": "jev",
+  "text": "wie vor, jedoch Bäume fällen - Durchmesser 31 - 50 cm"
+ },
  "a0158ff2a46e99cc": {
   "code": "S03",
   "confidence": 0.99,
   "source": "jev",
   "text": "Schachtabdeckung Klasse D 400 MEILEVEL®-A"
+ },
+ "a04765502ad2fc3d": {
+  "code": null,
+  "confidence": 0.118,
+  "source": "none",
+  "text": "Planum Leitungsgraben, Abweichung +/-2cm EV2 45MPa"
  },
  "a0518c6f049dcf83": {
   "code": "A05-V",
@@ -3088,6 +4960,18 @@
   "confidence": 0.99,
   "source": "jev",
   "text": "Warnleuchte WL1 vorhalten"
+ },
+ "a0d364586e92d57e": {
+  "code": "ZSO019B",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "wie vor, jedoch Umwickeln erdberührten [PERSON_076] DN"
+ },
+ "a0efd21b66358862": {
+  "code": "ZMA8DA7",
+  "confidence": 0.136,
+  "source": "keyword",
+  "text": "*** Bedarfsposition mit GB"
  },
  "a100c9774eb7e6af": {
   "code": null,
@@ -3149,6 +5033,12 @@
   "source": "none",
   "text": "Edelstahl-Abgang 90 Grad DN 100"
  },
+ "a2fc6abe10d199df": {
+  "code": "ZPDBCC4",
+  "confidence": 0.781,
+  "source": "keyword",
+  "text": "Füllen, Entlüften/Entgasen und Inbetriebnahme Rohrleitungen"
+ },
  "a358da3cd93fe424": {
   "code": "B04-ST",
   "confidence": 0.8,
@@ -3184,6 +5074,12 @@
   "confidence": 0.067,
   "source": "none",
   "text": "Edelstahl-Abgang 90 Grad DN 65"
+ },
+ "a545e55c06c9c5c9": {
+  "code": "ZSOCBDF",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Hydraulikbagger 1,0 m³"
  },
  "a5496a731c6cab17": {
   "code": "V01",
@@ -3251,6 +5147,12 @@
   "source": "jev",
   "text": "[PERSON_117] OD 110 (110 x 3,6 mm),"
  },
+ "a6e4fd56e9492ddf": {
+  "code": "S10",
+  "confidence": 0.267,
+  "source": "keyword",
+  "text": "Kabelbündel unter Spannung Fernmeldekabel T bis 1,25m sichern"
+ },
  "a7015f5863f96b2f": {
   "code": null,
   "confidence": 0.0,
@@ -3268,6 +5170,12 @@
   "confidence": 0.99,
   "source": "jev",
   "text": "Druckrohr spülen [PERSON_029] bis DN65"
+ },
+ "a8849a2ec6bbe0f9": {
+  "code": "ZTB1E2B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Überfahrten 15 t, mittelschwerer Fahrverkehr"
  },
  "a8eadd6955195ab0": {
   "code": "F22",
@@ -3293,6 +5201,12 @@
   "source": "none",
   "text": "Formstück T - Stück DN 80/65/80 mm"
  },
+ "a935f86278ccb801": {
+  "code": "ZSO352F",
+  "confidence": 0.73,
+  "source": "jev",
+  "text": "Pumpe 20 l/s pro h"
+ },
  "a9364f32620d4f96": {
   "code": null,
   "confidence": 0.043,
@@ -3304,6 +5218,18 @@
   "confidence": 0.032,
   "source": "none",
   "text": "Zulage zur Rohrposition GGG ZMU DN 300, Muffenverbindung für Rohre mit ZM - Umhüllung hers"
+ },
+ "a984651d378808bc": {
+  "code": "K09-M",
+  "confidence": 0.133,
+  "source": "keyword",
+  "text": "Druckprobe Kälteversorgung, in Teilabschnitten 75 bis 100 m"
+ },
+ "a98fc9c1338022aa": {
+  "code": "ZEL3314",
+  "confidence": 0.89,
+  "source": "jev",
+  "text": "Kabelschacht liefern und einbauen"
  },
  "aa2a0417a435a02f": {
   "code": null,
@@ -3317,6 +5243,12 @@
   "source": "jev",
   "text": "Liefern von Stoffen, frei Baustelle,"
  },
+ "aa7ca216b84dcf37": {
+  "code": "ZSOAD77",
+  "confidence": 0.8,
+  "source": "keyword",
+  "text": "Verdrahtung und Anschweißen."
+ },
  "aab039590b0dd860": {
   "code": null,
   "confidence": 0.043,
@@ -3329,11 +5261,41 @@
   "source": "jev",
   "text": "Betonpflaster ausbauen zur Wiederverwendung, Reihen, D 100mm"
  },
+ "ab019f9a41072922": {
+  "code": "ZSAA765",
+  "confidence": 0.89,
+  "source": "jev",
+  "text": "wie vor jedoch, GGG DN 100 verlegen"
+ },
+ "ab2955484341341c": {
+  "code": "ZTBE513",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Schachtringe DN 1000 - Höhe 50 cm liefern und setzen"
+ },
+ "ab6524fb35b3a467": {
+  "code": "ZSO54F5",
+  "confidence": 0.909,
+  "source": "keyword",
+  "text": "Schutzgas, Stickstoff, Fülldruck 1 bar Überdruck zur Atmosphäre"
+ },
  "ab75f85d0dd5956c": {
   "code": "F22",
   "confidence": 0.53,
   "source": "jev",
   "text": "Absperrschieber DN 150, PN 16"
+ },
+ "ab80c2e9743868e5": {
+  "code": "ZTBED6B",
+  "confidence": 0.889,
+  "source": "keyword",
+  "text": "Stirnverbau Grabenverbaugerät H 3-3,5m Sohlen-B 2,5-3m vorhalten"
+ },
+ "aba1f3705b638008": {
+  "code": "ZTB3631",
+  "confidence": 0.211,
+  "source": "keyword",
+  "text": "FSS Bk1,0 DPr1,03 EV2 120MPa 0/45 D 20-30cm"
  },
  "abbefe8343ebf8f1": {
   "code": null,
@@ -3341,17 +5303,65 @@
   "source": "none",
   "text": "Rückschlagklappe DN 65 PN10 mit Gewichtshebel"
  },
+ "ac116c87278d0036": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "[PERSON_0000000000000000052]"
+ },
+ "ac2ecfa21b039d28": {
+  "code": "ZEL8BBB",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "wie vor, jedoch Steuerkabel A2Y-F (L) 20 x 2 x 0,8"
+ },
+ "ac7068dd48c50fc3": {
+  "code": "ZELA7EF",
+  "confidence": 0.659,
+  "source": "keyword",
+  "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km mit Gerät S"
+ },
  "acfe54485fcfb26f": {
   "code": "B15",
   "confidence": 1.0,
   "source": "jev",
   "text": "Stromkabel vorhalten"
  },
+ "ad0861be3c6459df": {
+  "code": "ZTB005C",
+  "confidence": 0.83,
+  "source": "jev",
+  "text": "wie vor, jedoch Isolierflanschenpaar DN 250 MDP 10/16"
+ },
+ "ad22c32a02a7b9e9": {
+  "code": "W02",
+  "confidence": 0.211,
+  "source": "keyword",
+  "text": "Pumpe E-Motor 10-30m3/h h bis 5m vorhalten, betreiben"
+ },
+ "ad26aeee3f86fa8b": {
+  "code": null,
+  "confidence": 0.042,
+  "source": "none",
+  "text": "Absperrschieber mit beidseitigem PE-Rohrstutzen d63"
+ },
+ "ad8e0a0ddc79c72c": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "Kommas,"
+ },
  "addbcf8deae6c866": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "VPC-Kupplung 995"
+ },
+ "adf286e1d2898f2e": {
+  "code": "ZEL8173",
+  "confidence": 0.88,
+  "source": "jev",
+  "text": "wie vor, jedoch Längskreuzung Kanalleitung größer D ="
  },
  "adff6e6c2314eb15": {
   "code": "A04-V",
@@ -3365,6 +5375,18 @@
   "source": "jev",
   "text": "Liefern Kies"
  },
+ "ae4431301fdb4c81": {
+  "code": null,
+  "confidence": 0.118,
+  "source": "none",
+  "text": "Oberboden auftragen BG1 D 10-20cm"
+ },
+ "ae66cb0687f16e18": {
+  "code": "ZSO2B20",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Spartenpläne"
+ },
  "ae90abc2d46e92dd": {
   "code": "E10",
   "confidence": 0.85,
@@ -3376,6 +5398,12 @@
   "confidence": 0.67,
   "source": "jev",
   "text": "Statische Berechnung"
+ },
+ "aff60d6a3fa75817": {
+  "code": "ZSO5FD8",
+  "confidence": 0.91,
+  "source": "jev",
+  "text": "wie vor, jedoch [PERSON_115] R 1\" V4A"
  },
  "b00937d786328b07": {
   "code": "K11",
@@ -3419,11 +5447,23 @@
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "b1c1290d6560fa5f": {
+  "code": "ZSOBEAE",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "BGr. IV, Gehobener [PERSON_020]"
+ },
  "b1d4780ca9eaa3c9": {
   "code": "T08",
   "confidence": 1.0,
   "source": "jev",
   "text": "Befestigung ohne [PERSON_147] Schotter-Splitt-Brechsand-Gemisch Fahrbahnnebenfläche abbrec"
+ },
+ "b23e45faf5d70a68": {
+  "code": "ZPD8A9E",
+  "confidence": 0.171,
+  "source": "keyword",
+  "text": "Foto-Dokumentation auf Datenträger liefern CD"
  },
  "b244f4de5a85fb83": {
   "code": "B04-ST",
@@ -3443,17 +5483,41 @@
   "source": "none",
   "text": "Absperrklappe Zwischenflanschausführung DN 150 PN 10/16"
  },
+ "b29b0f86cc6f9e5f": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "[PERSON_093] aufnehmen, transportieren und abladen"
+ },
+ "b2af850bf882e1d8": {
+  "code": "ZTB3225",
+  "confidence": 0.714,
+  "source": "keyword",
+  "text": "Spülen Hydrant DN50"
+ },
  "b2ca71dc40524d79": {
   "code": null,
   "confidence": 0.115,
   "source": "none",
   "text": "Zulage zur Bodenbewegung der Position Bodenaushub Wasserleitungen"
  },
+ "b3105076d838efde": {
+  "code": "S03",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Schachtabdeckung liefern/aufsetzen Größe 1200/800mm"
+ },
  "b3625f29866de6f0": {
   "code": null,
   "confidence": 0.026,
   "source": "none",
   "text": "Zulage - Position für alle Tiefbauarbeiten im Anschlussbereich neue Leitung/"
+ },
+ "b3872fa015d1fcdf": {
+  "code": null,
+  "confidence": 0.047,
+  "source": "none",
+  "text": "Hinweisschild Entlüfterventile"
  },
  "b3a3c029590b7b03": {
   "code": "F15",
@@ -3467,6 +5531,12 @@
   "source": "jev",
   "text": "Bodenaustausch Rohrgraben - Rollkies 16/32 mm"
  },
+ "b3c307f4596ef9a3": {
+  "code": "F29",
+  "confidence": 0.278,
+  "source": "keyword",
+  "text": "Zwischenlage, für Bereiche mit Leitungskreuzungen"
+ },
  "b3cea9037fafa5f1": {
   "code": "P02",
   "confidence": 0.97,
@@ -3478,6 +5548,12 @@
   "confidence": 0.47,
   "source": "jev",
   "text": "Boden Graben Versorgungsltg lösen laden fördern lagern 2km von Hand Sohlen-B 2,5-3m T bis "
+ },
+ "b43c77be837ea9be": {
+  "code": null,
+  "confidence": 0.083,
+  "source": "none",
+  "text": "Abschlussmuffe"
  },
  "b46a54ad5b2f42cc": {
   "code": null,
@@ -3496,6 +5572,12 @@
   "confidence": 0.9,
   "source": "jev",
   "text": "Wandblende für Wanddurchführungen bis D 400 mm"
+ },
+ "b548fcf1b8b9625e": {
+  "code": "ZSO7A82",
+  "confidence": 0.62,
+  "source": "jev",
+  "text": "wie vor, jedoch [PERSON_167] für Datenkabel /"
  },
  "b5981da6ed591cb0": {
   "code": null,
@@ -3527,17 +5609,59 @@
   "source": "jev",
   "text": "Verkehrszeichen Zusatzzeichen 1000-22 RA1 Gr.1 vorhalten"
  },
+ "b70687eb269fe35f": {
+  "code": "ZTBD8F7",
+  "confidence": 0.548,
+  "source": "keyword",
+  "text": "Sand Einbettung Rohr AD bis 100mm einbauen verdichten D 15-20cm"
+ },
+ "b71cbe006f1f7873": {
+  "code": null,
+  "confidence": 0.059,
+  "source": "none",
+  "text": "Verdrahtungsplan"
+ },
+ "b72953d5efbdfe7c": {
+  "code": null,
+  "confidence": 0.081,
+  "source": "none",
+  "text": "Foto-Dokumentation Suchschachtung erstellen"
+ },
+ "b742e4a7795c6474": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Messltg"
+ },
+ "b7cb8edcab33eb51": {
+  "code": "ZDAA98D",
+  "confidence": 0.926,
+  "source": "keyword",
+  "text": "[PERSON_0000000000000000000000015] Bk1,0 AC8DN D 4cm Bindem. 50/70"
+ },
  "b7d65e4ac92822ed": {
   "code": null,
   "confidence": 0.036,
   "source": "none",
   "text": "PER000115-Flansch DN 80, PN 10"
  },
+ "b7e1c7b6f6082742": {
+  "code": "ZTBAEFC",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "Geotextil ausbauen"
+ },
  "b7eafd296c08c37c": {
   "code": null,
   "confidence": 0.067,
   "source": "none",
   "text": "[PERSON_070]"
+ },
+ "b7f122d8101a9647": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Rohr Kunststoff abwasserführend DN150-200 T bis 3m sichern"
  },
  "b826aeca5b6c9cf5": {
   "code": "T02-M3",
@@ -3550,6 +5674,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Kabelbündel unter Spannung Mittelspannungskabel T bis 1,25m sichern"
+ },
+ "b86f71f86cf04d6b": {
+  "code": "ZSO21E8",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Sickerung aus Grobschotter 40/60 mm herstellen"
  },
  "b88c4737baade46b": {
   "code": null,
@@ -3568,6 +5698,12 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Stammschutz Ummantelung Bohlen Polsterung U 0,5-1m H 2m herstellen"
+ },
+ "b916942431401e0c": {
+  "code": "ZTB6255",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bäume fällen - Durchmesser 10 - 20 cm"
  },
  "b920c499ab71bdc5": {
   "code": "F25",
@@ -3599,6 +5735,18 @@
   "source": "none",
   "text": "Edelstahl-Rohr DN 200"
  },
+ "ba2bcd8a8ff61fc1": {
+  "code": "ZSOD547",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "BGr. II, Bauvorarbeiter"
+ },
+ "ba4e8dbf2688f000": {
+  "code": null,
+  "confidence": 0.105,
+  "source": "none",
+  "text": "Verkehrszeichen Zusatzzeichen 1000-22 RA1 Gr.1 vorhalten"
+ },
  "ba96b25587b359ba": {
   "code": null,
   "confidence": 0.083,
@@ -3610,6 +5758,48 @@
   "confidence": 0.98,
   "source": "jev",
   "text": "Zulage zur Position Rohre PE AD/WD 355/32,2 mm für:"
+ },
+ "bb767600aff95f12": {
+  "code": "ZSLFBB8",
+  "confidence": 0.909,
+  "source": "keyword",
+  "text": "[PERSON_020]/-in sämtliche Kosten/Zuschläge"
+ },
+ "bb94d34a3a3c7bc6": {
+  "code": "ZSO822E",
+  "confidence": 0.885,
+  "source": "keyword",
+  "text": "Stationäres Überwachungsgerät"
+ },
+ "bbca503e268d5266": {
+  "code": "ZTB3A1F",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Wiederherstellen Wiesen- und Schotterwege"
+ },
+ "bc4f75abacf5c758": {
+  "code": "ZPD8A9E",
+  "confidence": 0.893,
+  "source": "keyword",
+  "text": "Bestands-Dokumentation in PERSON_097 liefern"
+ },
+ "bcb9756206b782d6": {
+  "code": "W03",
+  "confidence": 0.71,
+  "source": "jev",
+  "text": "Pumpensumpf"
+ },
+ "bccd07422e2c7b4b": {
+  "code": "ZSO7FC3",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Vorhandene Wurzelstöcke ausbauen, laden, abfahren"
+ },
+ "bcf0aa3fa5ad5227": {
+  "code": "ZSO7A82",
+  "confidence": 0.95,
+  "source": "jev",
+  "text": "[PERSON_167] liefern und verlegen"
  },
  "bcf85b6ebd74b9b0": {
   "code": null,
@@ -3623,17 +5813,41 @@
   "source": "jev",
   "text": "Zulage zur Position Membrangesteuertes 3 - Wege Be- und Entlüftungsventil"
  },
+ "bd6c20400b81b73a": {
+  "code": "ZSO57C8",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Kleintransporter, -bus"
+ },
+ "bda1e9aa2d00761e": {
+  "code": "ZELA7EF",
+  "confidence": 0.362,
+  "source": "keyword",
+  "text": "Fels Homogenbereich X1 lösen laden fördern lagern 3km T bis 3m 1Gestei"
+ },
  "bda5a259ac94325a": {
   "code": "F25",
   "confidence": 1.0,
   "source": "jev",
   "text": "Zulage Rohr OD 110 für Übergangsstück PE DA 110 und PVC DA 110 wasserdichte Ausführung, li"
  },
+ "be362ce996705a9c": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "[PERSON_000044] AD 273mm"
+ },
  "be669c4bde684095": {
   "code": "L01",
   "confidence": 0.9,
   "source": "jev",
   "text": "Begrünungsarbeiten"
+ },
+ "beca6894e5bfc4f5": {
+  "code": "ZDA2088",
+  "confidence": 0.289,
+  "source": "keyword",
+  "text": "Schicht Gemisch Schotterrasen Fahrbahnnebenfläche abbrechen 20kN/m3 D"
  },
  "bee5aeae0e68f6e7": {
   "code": null,
@@ -3653,6 +5867,18 @@
   "source": "none",
   "text": "Zulage zur Position Grabenaushub Wasserleitung Hauptleitung"
  },
+ "c02d7e6e329fd3f1": {
+  "code": "ZSO5D1D",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bankette"
+ },
+ "c031a145c00c52d2": {
+  "code": "F17",
+  "confidence": 0.167,
+  "source": "keyword",
+  "text": "Vorschweißflansch PN16 PER89 PER029 DN250"
+ },
  "c0989d6c601928da": {
   "code": null,
   "confidence": 0.0,
@@ -3670,6 +5896,12 @@
   "confidence": 0.86,
   "source": "jev",
   "text": "Zulage zu allen Rohrverlegepositionen für die maßgenaue Rohrverlegung für die Gussrohr- un"
+ },
+ "c0fdfbe8ed94ab46": {
+  "code": "ZTBE8F2",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Suchschlitze"
  },
  "c101fde4f36c2e69": {
   "code": null,
@@ -3767,11 +5999,29 @@
   "source": "jev",
   "text": "Gewölbter Boden Klöpperform Kohlenstoffstahl Schweißen [PERSON_044] AD 273mm"
  },
+ "c38cc4f5f6f1fa47": {
+  "code": "P05",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Spülen, Entkeimen Gussrohrleitung bis DN 300"
+ },
  "c3a370a327a7bbd1": {
   "code": null,
   "confidence": 0.0,
   "source": "none",
   "text": "Rohrleitungs- und Instrumentierungsfließbild"
+ },
+ "c3b607fa69554cf1": {
+  "code": "ZTBAEFC",
+  "confidence": 0.88,
+  "source": "jev",
+  "text": "Geotextil"
+ },
+ "c3dbd6cc110ee666": {
+  "code": "ZTB357D",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Baugrubenaushub (HB 3)"
  },
  "c3e7224064d25676": {
   "code": null,
@@ -3785,6 +6035,30 @@
   "source": "jev",
   "text": "Baustelle räumen Dies. LV-Abschn."
  },
+ "c442d1ba406e1734": {
+  "code": "ZTB946B",
+  "confidence": 0.2,
+  "source": "keyword",
+  "text": "wie vor, jedoch Höhe = 10 cm"
+ },
+ "c44a15b03367bb2b": {
+  "code": "W02",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Pumpe 20 l/s pro Tag"
+ },
+ "c48938f96025f30e": {
+  "code": "ZELFA2E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "wie vor, jedoch Längskreuzung Kanalleitung bis D = 40"
+ },
+ "c4b482f8a8843eaa": {
+  "code": "ZSO02B2",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Sandüberdeckung / Rohrumhüllung"
+ },
  "c4bd3aab5c0e5097": {
   "code": null,
   "confidence": 0.045,
@@ -3796,6 +6070,12 @@
   "confidence": 0.71,
   "source": "jev",
   "text": "[PERSON_090] / [PERSON_066]"
+ },
+ "c52a3fa971e79e16": {
+  "code": "A03-V",
+  "confidence": 0.12,
+  "source": "keyword",
+  "text": "Witterungsschutz-Zelt 5GradC vorhalten 20 Wo"
  },
  "c53c07cf9f2c420b": {
   "code": "B01",
@@ -3815,6 +6095,12 @@
   "source": "none",
   "text": "Bagger bis 1 m3"
  },
+ "c5880f0a7e9c2a8b": {
+  "code": null,
+  "confidence": 0.087,
+  "source": "none",
+  "text": "Leitungsbehelfsbrücke L 10-15m H 4-4,5m B 4,5-6m vorhalten"
+ },
  "c5f1d25564374dd4": {
   "code": "F24",
   "confidence": 1.0,
@@ -3826,6 +6112,12 @@
   "confidence": 0.7,
   "source": "jev",
   "text": "Rüttelpl. Bedienungspersonal 10-12kN"
+ },
+ "c60c79849c18a521": {
+  "code": "K02",
+  "confidence": 0.66,
+  "source": "jev",
+  "text": "wie vor jedoch, GGG DN 200 verlegen"
  },
  "c62fa2c7a5d576b3": {
   "code": "W01",
@@ -3844,6 +6136,24 @@
   "confidence": 0.0,
   "source": "none",
   "text": "[PERSON_000000000000000000000000090] / [PERSON_00000066]"
+ },
+ "c698dfe3b4504671": {
+  "code": "ZOB0B08",
+  "confidence": 0.714,
+  "source": "keyword",
+  "text": "Fundament-Sickerstein"
+ },
+ "c6acd2638e4f0377": {
+  "code": "ZSO254A",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Strassenaufbruch bituminöser Oberbau"
+ },
+ "c6df9a5969261c09": {
+  "code": "ZTB93CC",
+  "confidence": 0.91,
+  "source": "jev",
+  "text": "wie vor, jedoch Schachtring DN 1000 Höhe 100 cm"
  },
  "c6eafb550bf1b949": {
   "code": null,
@@ -3869,11 +6179,23 @@
   "source": "none",
   "text": "Kugelhahn DN 20, PN 16"
  },
+ "c71dfae25b30e4b8": {
+  "code": null,
+  "confidence": 0.0,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000177]"
+ },
  "c751529dca7e9c50": {
   "code": "T11",
   "confidence": 0.97,
   "source": "jev",
   "text": "Pflasterdecke gebraucht seitl.lagernd L/B 200/100mm D 100mm"
+ },
+ "c7772fe13452a03f": {
+  "code": "ZTBEC9E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Überfahrten 5 t, leichter Fahrverkehr"
  },
  "c7caeccb89bae380": {
   "code": null,
@@ -3892,6 +6214,12 @@
   "confidence": 0.083,
   "source": "none",
   "text": "PER000115-Blindflansch DN 200, PN 10"
+ },
+ "c863a8d9fd8aea1b": {
+  "code": "ZMA33DA",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Grundierung Leibungen"
  },
  "c87989536948d277": {
   "code": "A07-U",
@@ -3917,11 +6245,23 @@
   "source": "none",
   "text": "Flexible Rohrkupplung, zugfest, DN 100"
  },
+ "c89df8aaf3986895": {
+  "code": "ZSO01D1",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "BG I, Werkpolier"
+ },
  "c8ae605f4df49fbc": {
   "code": "F25",
   "confidence": 0.81,
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
+ },
+ "c8bce32e174af04a": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Universal-Tragplatte für Schieberkappe"
  },
  "c8c7cb67ee2ac07a": {
   "code": "W02",
@@ -3929,11 +6269,23 @@
   "source": "jev",
   "text": "Pumpe E-Motor 10-30m3/h h bis 5m vorhalten, betreiben"
  },
+ "c8d02a9a33a66ca8": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "wie vor, jedoch Kreuzung Wasserleitungen Ortsnetz DN"
+ },
  "c94800cd06ba21af": {
   "code": "F22",
   "confidence": 0.55,
   "source": "jev",
   "text": "Absperrklappe Zwischenflanschausführung DN 150 PN 10/16"
+ },
+ "c984da836ab4927e": {
+  "code": "ZTB8CAB",
+  "confidence": 0.75,
+  "source": "jev",
+  "text": "wie vor, jedoch Zuschlag Kanalkreuzung größer D = 70"
  },
  "c9ebb3dd9494ca59": {
   "code": null,
@@ -3989,6 +6341,12 @@
   "source": "keyword",
   "text": "Baustelleneinrichtung und -räumung"
  },
+ "cb2fb5486fee2892": {
+  "code": null,
+  "confidence": 0.065,
+  "source": "none",
+  "text": "[PERSON_000000000000000000127] Brunnenwasserleitung"
+ },
  "cb4fe4ee8dc049a9": {
   "code": null,
   "confidence": 0.038,
@@ -4037,6 +6395,24 @@
   "source": "none",
   "text": "Entwässerungscontainer und Beprobung nach DepV"
  },
+ "cc7264759c732c2f": {
+  "code": "ZTB24CD",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zulage Deckbeschichtung (ZMU) DN 300"
+ },
+ "ccc3f998a288d263": {
+  "code": "ZTB1D0C",
+  "confidence": 0.6,
+  "source": "jev",
+  "text": "wie vor, jedoch MMK 300/30°"
+ },
+ "ccf59217ae79d3ed": {
+  "code": "P01",
+  "confidence": 0.2,
+  "source": "keyword",
+  "text": "dynamischer Lastplattendruckversuch"
+ },
  "cdb7bfb44b48970f": {
   "code": "X02",
   "confidence": 0.77,
@@ -4048,6 +6424,12 @@
   "confidence": 0.067,
   "source": "none",
   "text": "Halbe Anschweissmuffe 1/2\""
+ },
+ "cdfd0568cb0d4a87": {
+  "code": null,
+  "confidence": 0.077,
+  "source": "none",
+  "text": "[PERSON_0000000000000000000000083] gebraucht seitl.lagernd L/B 200/100"
  },
  "ce2c70c2cf518778": {
   "code": "T06",
@@ -4067,11 +6449,23 @@
   "source": "jev",
   "text": "Bauwerk abbrechen, Schutt zwischenlagern"
  },
+ "ce62dee13fc8c0f7": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "wie vor, jedoch FFR DN 250/200"
+ },
  "ce9723bef54b8f10": {
   "code": "B03",
   "confidence": 0.83,
   "source": "jev",
   "text": "LKW Fahrer-in 1-3,5t"
+ },
+ "cf03b11d52198541": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Isolierschaum"
  },
  "cf0a588b2713c225": {
   "code": null,
@@ -4084,6 +6478,12 @@
   "confidence": 0.027,
   "source": "none",
   "text": "Zulage - Position für alle Tiefbauarbeiten im Anschlussbereich neue Leitung/"
+ },
+ "cf4689b037756c8d": {
+  "code": "E10",
+  "confidence": 0.62,
+  "source": "jev",
+  "text": "Seitlich gelagerten Schotter profilgerecht wieder"
  },
  "cf79cb65ac4b9d6c": {
   "code": null,
@@ -4121,6 +6521,12 @@
   "source": "none",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "d08b82195e2a63e1": {
+  "code": "ZFT50EB",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lackierung Stahlgel.,Handlauf,Füllst.,Eingangsb. außen"
+ },
  "d0ab961c5e73a8b2": {
   "code": "F03",
   "confidence": 1.0,
@@ -4139,11 +6545,23 @@
   "source": "none",
   "text": "Zulage Grabenaushub Hauptwasserleitung für Erdaushub und Verbau für [PERSON_006] DN 2500 b"
  },
+ "d1103a4bce5ee948": {
+  "code": "ZTB9F37",
+  "confidence": 0.9,
+  "source": "keyword",
+  "text": "Behelfsüberfahrt 16,7kN/m2 L 2-4m B 3-3,75m Stahlbeton vorhalten"
+ },
  "d14076daa8329a9e": {
   "code": "A03-V",
   "confidence": 1.0,
   "source": "jev",
   "text": "Witterungsschutz-Zelt 5GradC vorhalten 20 Wo"
+ },
+ "d156a7aecf558b56": {
+  "code": "P01",
+  "confidence": 0.174,
+  "source": "keyword",
+  "text": "dynamischer Lastplattendruckversuch"
  },
  "d1c6ea81095c183e": {
   "code": "T01",
@@ -4151,17 +6569,35 @@
   "source": "jev",
   "text": "Asphaltoberbau schneiden D 5-10cm T 100mm"
  },
+ "d21e7c18519fa435": {
+  "code": "ZSO36BD",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Hydraulikbagger 0,5 m³"
+ },
  "d28f642647cee1af": {
   "code": null,
   "confidence": 0.067,
   "source": "none",
   "text": "Wandblende für Wanddurchführungen bis D 300 mm"
  },
+ "d341f5c63a4be703": {
+  "code": "ZTB946B",
+  "confidence": 0.2,
+  "source": "keyword",
+  "text": "wie vor, jedoch Höhe = 6 cm"
+ },
  "d3a7b9ad8ee8bd2f": {
   "code": "S10",
   "confidence": 1.0,
   "source": "jev",
   "text": "Kabelbündel unter Spannung Niederspannungskabel T bis 1,25m sichern"
+ },
+ "d3ae0cd205694aca": {
+  "code": null,
+  "confidence": 0.049,
+  "source": "none",
+  "text": "Fertigbogen DIN EN 448, 90 Grad, Schenkellänge 1,0 x 1,0m"
  },
  "d3b38ab0bd7507a1": {
   "code": "E06",
@@ -4174,6 +6610,36 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Warnleuchte WL1 vorhalten"
+ },
+ "d3c391e4efe7d300": {
+  "code": "ZSO98A0",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Spülschächte ausbauen und entsorgen"
+ },
+ "d3cddf20bf9eeb85": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Kies 16/32"
+ },
+ "d3f13e19d7808d3a": {
+  "code": "ZTB9DDA",
+  "confidence": 0.889,
+  "source": "keyword",
+  "text": "Druckrohr PE100 TW DN/OD63 SDR11 Graben verbaut T 1,25-1,75m"
+ },
+ "d42835a2d5883787": {
+  "code": "ZSO9872",
+  "confidence": 0.9,
+  "source": "jev",
+  "text": "Handschachtung"
+ },
+ "d4406dba10ef59eb": {
+  "code": "ZELB532",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Zuschlag Kabelquerung und Erdungsbänder"
  },
  "d446f3a9cd4cbeda": {
   "code": null,
@@ -4192,6 +6658,12 @@
   "confidence": 0.72,
   "source": "jev",
   "text": "Zulage zur Schachtabdeckung DN 800 mit Flanschrahmen,"
+ },
+ "d4f23c8d6f96919d": {
+  "code": "ZSO0022",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Bestandvermessung und -pläne"
  },
  "d51de58905cd43e0": {
   "code": null,
@@ -4247,6 +6719,24 @@
   "source": "jev",
   "text": "Druckrohr PE100-RC Abwasser DN/OD110 SDR11 Graben abgeböscht Heizwendelschweißen"
  },
+ "d71a3d9c8b6e8f06": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Zusatzausstattung"
+ },
+ "d72c3b719a1b81e8": {
+  "code": "ZTB0126",
+  "confidence": 0.905,
+  "source": "keyword",
+  "text": "Grabenverbaugerät H 2-2,5m Sohlen-B 2,5-3m vorhalten"
+ },
+ "d7977830804e62f8": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 100/45°"
+ },
  "d7a352a76cce0ac1": {
   "code": null,
   "confidence": 0.0,
@@ -4258,6 +6748,12 @@
   "confidence": 0.0,
   "source": "none",
   "text": "Flüssigkeitsstrahl-Feststoffpumpe"
+ },
+ "d7ba29190ae07cf1": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "Abschrumpfmuffe Da 125 mm"
  },
  "d7d96fabfcc4b9f3": {
   "code": null,
@@ -4283,11 +6779,23 @@
   "source": "jev",
   "text": "Druckprüfung [PERSON_029] bis DN/OD63 Rohr-L 250 m [PERSON_029] beigestellt ableiten"
  },
+ "d84af0a504e9976e": {
+  "code": "ZSO5B8E",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Belüftungskamin DN 150, l = ca. 3.50 m liefern und"
+ },
  "d8aa54718b662b89": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "[PERSON_115]-Losflansch DN 125, PN 10"
+ },
+ "d8e4ef9f6255fc1d": {
+  "code": "F15",
+  "confidence": 0.16,
+  "source": "keyword",
+  "text": "Anschlussrohrleitung"
  },
  "d911ba075a5a78c7": {
   "code": "K09-M",
@@ -4319,6 +6827,24 @@
   "source": "jev",
   "text": "Wasserbausteine C 200/400 liefern und versetzen"
  },
+ "da0a9b6953fdc6e5": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Steuerkabel"
+ },
+ "da9838b71b4ecf34": {
+  "code": "ZTB7A6A",
+  "confidence": 0.92,
+  "source": "jev",
+  "text": "Asphaltdeckschicht aus AC 11 DN herstellen (4 cm stark)"
+ },
+ "da9abb13778564a8": {
+  "code": "ZMA2265",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lackierung Stahltüren"
+ },
  "dad5657e124feff7": {
   "code": "A04-V",
   "confidence": 1.0,
@@ -4331,11 +6857,47 @@
   "source": "jev",
   "text": "Verdrahtungsplan"
  },
+ "db1779a5b7769cde": {
+  "code": "E07-M3",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Frostschutzschicht herstellen (t = 0,50 m)"
+ },
+ "db1decba4cf41702": {
+  "code": "ZTB8CAB",
+  "confidence": 0.66,
+  "source": "jev",
+  "text": "wie vor, jedoch Zuschlag Kanalkreuzung größer D = 40"
+ },
+ "db2053d489849939": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "AD 273mm Schweißen"
+ },
+ "db55771acc8a57f8": {
+  "code": "ZTB8ADF",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Schottertragschicht inklusive Filtervlies"
+ },
  "dba90ad023df995a": {
   "code": null,
   "confidence": 0.1,
   "source": "none",
   "text": "Kugelhahn DN 50, PN 16"
+ },
+ "dbff77533dc4411a": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "Bogen Kohlenstoffstahl Schweißen 45-90Grad [PERSON_000044] AD 273mm"
+ },
+ "dc07f3a9ba875bf6": {
+  "code": "ZMADE39",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Lackierung Ankerpunkte Diagonalstreben"
  },
  "dc205892940b1dfa": {
   "code": "B01",
@@ -4355,11 +6917,29 @@
   "source": "jev",
   "text": "Flexible Rohrkupplung, zugfest, DN 150"
  },
+ "dd66f45b60b2606c": {
+  "code": "ZELE27E",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "wie vor, jedoch Längskreuzung Drainageleitung"
+ },
+ "dd8454376c369596": {
+  "code": "ZSO09C3",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Kompressor 7 m³ / min. einschl. Hammer"
+ },
  "dd90cae46bbd868c": {
   "code": "F21",
   "confidence": 0.98,
   "source": "jev",
   "text": "Kugelrückschlagventil DN 50"
+ },
+ "ddb497eedd4b88eb": {
+  "code": "ZSO09C3",
+  "confidence": 0.97,
+  "source": "jev",
+  "text": "wie vor, jedoch Kompressor, ca. 3 m³ / min. mit 1"
  },
  "ddb8ae12d1ae8940": {
   "code": "F22",
@@ -4373,6 +6953,12 @@
   "source": "none",
   "text": "[PERSON_115]-Losflansch DN 150, PN 10"
  },
+ "de768c12c7d1a596": {
+  "code": "ZSO944A",
+  "confidence": 0.68,
+  "source": "jev",
+  "text": "Beton abbrechen und entsorgen"
+ },
  "de8e808040247c63": {
   "code": null,
   "confidence": 0.043,
@@ -4384,6 +6970,24 @@
   "confidence": 0.94,
   "source": "jev",
   "text": "Bodenaustausch Rohrgraben - Grubenkies"
+ },
+ "deec9839ed73d16b": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "DN/OD63 Rohr-L 250 m PER029 beigestellt ableiten"
+ },
+ "deecc309b3e246a6": {
+  "code": "ZSO00E5",
+  "confidence": 0.84,
+  "source": "jev",
+  "text": "wie vor, jedoch [PERSON_017] DN 100 metallisch dichtend"
+ },
+ "df53593e30e48921": {
+  "code": "A01-U",
+  "confidence": 0.143,
+  "source": "keyword",
+  "text": "Bauzaun H 2m umsetzen"
  },
  "df674b99fa635edc": {
   "code": null,
@@ -4397,11 +7001,29 @@
   "source": "none",
   "text": "Wasserhaltung Bach bis 150 l/s"
  },
+ "dfbff4bcc9f4e05d": {
+  "code": "ZPDA8E6",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Ausbesserungsarbeiten vor Abnahme"
+ },
  "dfdba3aaf9c53120": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "PER000115-Losflansch DN 150, PN 10"
+ },
+ "e007d9c971a7223f": {
+  "code": "B01",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Baustelle räumen"
+ },
+ "e024cf5dcde3c36a": {
+  "code": "A01-V",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Bauzaun H 2m vorhalten"
  },
  "e041735a1f9a0ff9": {
   "code": "B01",
@@ -4421,6 +7043,12 @@
   "source": "none",
   "text": "Übergangsflansch PN 10/16, DN 25"
  },
+ "e0cef29c0722c6ff": {
+  "code": "ZTBCCBA",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Schachtvierungen i.L. 1,00/1,00 m liefern und montieren"
+ },
  "e0d4b0baaa926470": {
   "code": null,
   "confidence": 0.067,
@@ -4438,6 +7066,12 @@
   "confidence": 0.94,
   "source": "jev",
   "text": "Zulage zu allen Grabenpositionen der Wasserleitung DN 300"
+ },
+ "e16261a4a31ae98a": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 200/45°"
  },
  "e16cd7a11e6608d4": {
   "code": null,
@@ -4463,6 +7097,12 @@
   "source": "jev",
   "text": "Rohrgrabenaushub, Z0, auf AN-Kippe abfahren"
  },
+ "e29c60713417ebea": {
+  "code": "B05",
+  "confidence": 0.158,
+  "source": "keyword",
+  "text": "wöchentlich"
+ },
  "e2c7f2b085c08677": {
   "code": null,
   "confidence": 0.034,
@@ -4481,6 +7121,12 @@
   "source": "none",
   "text": "Bagger Horizontale Spülbohrung PE DA 355,"
  },
+ "e3c708478109fbba": {
+  "code": "ZSOB579",
+  "confidence": 0.98,
+  "source": "jev",
+  "text": "Wasserhaltung bis 10 l/s"
+ },
  "e3e71f503fd0ed1a": {
   "code": "E03",
   "confidence": 0.69,
@@ -4493,11 +7139,23 @@
   "source": "none",
   "text": "PER000115-Blindflansch DN 100"
  },
+ "e490a8cff6460fb9": {
+  "code": "ZTB4816",
+  "confidence": 0.862,
+  "source": "keyword",
+  "text": "Grabenverbaugerät H 3-3,5m Sohlen-B 2,5-3m SU herstellen rückbauen"
+ },
  "e49c2f992374114b": {
   "code": "F15",
   "confidence": 0.84,
   "source": "jev",
   "text": "Be-/Entlüfter G 3/4 x 1/2, PN 10"
+ },
+ "e4afc069ba11bd90": {
+  "code": "K09-M",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Innendruckprüfung GGG DN 300 und DN 250"
  },
  "e4e1244fac73726d": {
   "code": null,
@@ -4516,6 +7174,12 @@
   "confidence": 0.036,
   "source": "none",
   "text": "Absperrschieber DN 200, PN 10, mit E-Antrieb"
+ },
+ "e573a15534d4b027": {
+  "code": "ZBS6207",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Ortsfesten Schutzzaun (h = 2,00 m)"
  },
  "e596c14e6d384aa5": {
   "code": "F11",
@@ -4547,6 +7211,12 @@
   "source": "jev",
   "text": "Flexible Rohrkupplung, zugfest, DN 200"
  },
+ "e6b08ba9b344123c": {
+  "code": "F13",
+  "confidence": 0.136,
+  "source": "keyword",
+  "text": "Leckageanzeige"
+ },
  "e6f4ab0a9d56ba89": {
   "code": "S01",
   "confidence": 0.97,
@@ -4565,6 +7235,18 @@
   "source": "jev",
   "text": "Verkehrszeichen Vorschriftzeichen 250 RA1 Gr.1 vorhalten"
  },
+ "e734f52d8fd70154": {
+  "code": "ZTB0126",
+  "confidence": 0.905,
+  "source": "keyword",
+  "text": "Grabenverbaugerät H 3-3,5m Sohlen-B 2,5-3m vorhalten"
+ },
+ "e7d8bfee01b296f6": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "Rohr markieren Kältefernltg [PERSON_000167] Ortungsdraht Beschriftung"
+ },
  "e7f8f01bc88f6180": {
   "code": "F29",
   "confidence": 1.0,
@@ -4577,11 +7259,23 @@
   "source": "none",
   "text": "[PERSON_016] mit Dichtungsband"
  },
+ "e828b6ee9cb40283": {
+  "code": "B14",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Anschlussltg Entwässerung DN100 verlegen räumen"
+ },
  "e83b2e218ed7edde": {
   "code": null,
   "confidence": 0.1,
   "source": "none",
   "text": "Kugelhahn DN 65, PN 16"
+ },
+ "e89dd45755b0cbc6": {
+  "code": "ZTB4C9B",
+  "confidence": 0.79,
+  "source": "jev",
+  "text": "[PERSON_093] aufnehmen, transporieren, in Lagen"
  },
  "e8a23aca578600d5": {
   "code": null,
@@ -4594,6 +7288,12 @@
   "confidence": 0.96,
   "source": "jev",
   "text": "Pflichtenheft und Übergabe elektrotechnische Unterlagen"
+ },
+ "e8f1bfb6cd525a18": {
+  "code": "ZHK75ED",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "wie vor, jedoch MMK 250/11°"
  },
  "e908f2ee05a3df44": {
   "code": "S03",
@@ -4619,6 +7319,12 @@
   "source": "jev",
   "text": "Inbetriebnahme Stationäres Überwachungsgerät"
  },
+ "e9db1c6794e22867": {
+  "code": "B11",
+  "confidence": 0.2,
+  "source": "keyword",
+  "text": "Bauwasseranschluss vorhalten"
+ },
  "e9e1ca88839b528f": {
   "code": "B04",
   "confidence": 1.0,
@@ -4630,6 +7336,12 @@
   "confidence": 0.069,
   "source": "none",
   "text": "Glasrohranzeiger Siphon"
+ },
+ "e9f8b4b54badbc41": {
+  "code": "ZMAC971",
+  "confidence": 0.92,
+  "source": "jev",
+  "text": "Lackierung,Umfassungszarge,<0,210m"
  },
  "ea1c9f7e6c404a21": {
   "code": "F21",
@@ -4643,11 +7355,23 @@
   "source": "jev",
   "text": "Bohrspülungskonzept für die geplanten Spülbohrungen erstellen,"
  },
+ "ea7615e9206b4a77": {
+  "code": "ZTBD147",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Rohrgrabenaushub HB 1 - Schotter"
+ },
  "eae3d9b83b69431a": {
   "code": "T10",
   "confidence": 1.0,
   "source": "jev",
   "text": "Bordstein Beton abbrechen TB10/25 24kN/m3 Geräteeinsatz mgl. laden transp. LKW AN entsorge"
+ },
+ "eaff6bf4d55d401f": {
+  "code": "ZTB8CAB",
+  "confidence": 0.72,
+  "source": "jev",
+  "text": "Zuschlag Kreuzung, Drainageleitung"
  },
  "eb027f21b1b18050": {
   "code": "F21",
@@ -4661,11 +7385,29 @@
   "source": "none",
   "text": "Erneuerung Filterdüsen (inkl. Ausbau vorh. Düsen)"
  },
+ "ebb818f01af5d881": {
+  "code": null,
+  "confidence": 0.061,
+  "source": "none",
+  "text": "Herstellen Foto-Dokumentation Suchschachtung"
+ },
+ "ebcb0d6d79368629": {
+  "code": null,
+  "confidence": 0.045,
+  "source": "none",
+  "text": "Grenzsteine sichern"
+ },
  "ebd07a0582635385": {
   "code": "P05-ST",
   "confidence": 0.97,
   "source": "jev",
   "text": "Spülen von Rohrleitungen, aus Stahlrohr, [PERSON_031], Nennweite DN 250"
+ },
+ "ebe4d8c6428224c2": {
+  "code": "ZTB8AC1",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Offenen Graben räumen und profilieren"
  },
  "ebe9e50cc382e1ad": {
   "code": "K03",
@@ -4679,11 +7421,23 @@
   "source": "none",
   "text": "Über-/Unterdrucksicherung Gebäude"
  },
+ "ec645a7b4649f37a": {
+  "code": "ZOB1020",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Kernbohrungen (t = 30 cm / Durchmesser 70 - 100 mm)"
+ },
  "ec7c060e0f3d58e8": {
   "code": "F23",
   "confidence": 1.0,
   "source": "jev",
   "text": "Druckanbohrarmatur PE DN/OD160"
+ },
+ "ec9b162bda0c6a09": {
+  "code": "ZBS1C37",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Baustelleneinrichtung vorhalten"
  },
  "ed0e0688823e748d": {
   "code": null,
@@ -4697,6 +7451,12 @@
   "source": "none",
   "text": "Übergangsflansch PN 10/16, DN 50"
  },
+ "ed73907b532da056": {
+  "code": null,
+  "confidence": 0.1,
+  "source": "none",
+  "text": "Asphalttragschicht AC 32 T N herstellen (14 cm stark)"
+ },
  "ed87b435957581ae": {
   "code": "E08",
   "confidence": 0.47,
@@ -4708,6 +7468,12 @@
   "confidence": 0.083,
   "source": "none",
   "text": "[PERSON_115]-Blindflansch DN 200, PN 10"
+ },
+ "eda6c1cffdc94504": {
+  "code": "ZTB946B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Ausgleichsring liefern und einbauen / Höhe = 4 cm"
  },
  "edc93345f154c47f": {
   "code": "P03",
@@ -4763,6 +7529,12 @@
   "source": "none",
   "text": "Notleitungen (Notversorgung) mit PE - Rohren DN 32 - 40 aufbauen,"
  },
+ "ef076d77ab498719": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch Überschiebmuffe DN 300"
+ },
  "ef0a61a2f7625fb5": {
   "code": "A01-VD",
   "confidence": 0.94,
@@ -4781,11 +7553,23 @@
   "source": "none",
   "text": "Glasrohranzeiger Siphon"
  },
+ "efa899f4d1237d4a": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch [PERSON_017] DN 250 (weichdichtend) liefern"
+ },
  "efc101852248a27d": {
   "code": null,
   "confidence": 0.029,
   "source": "none",
   "text": "Demontage und Wiedermontage Überlaufrinne Filterbecken"
+ },
+ "efd9c9468977b95f": {
+  "code": "E11",
+  "confidence": 0.12,
+  "source": "keyword",
+  "text": "Boden laden transp. LKW AN bis 3km, SU"
  },
  "f0104bb819ba87d5": {
   "code": null,
@@ -4811,6 +7595,12 @@
   "source": "jev",
   "text": "Leistung wie Position zuletzt in vollem Wortlaut beschrieben,"
  },
+ "f0ac01c9fc692d1c": {
+  "code": "ZTB3631",
+  "confidence": 0.852,
+  "source": "keyword",
+  "text": "Kies-Sand-Gemisch Einbettung Rohr DN300-400 einbauen verdichten D 15-2"
+ },
  "f0b5e29128f74fce": {
   "code": null,
   "confidence": 0.065,
@@ -4822,6 +7612,12 @@
   "confidence": 0.5,
   "source": "jev",
   "text": "Dichtheit aller Schweißnähte"
+ },
+ "f10d7c2b834f90d1": {
+  "code": "ZTB8B88",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "wie vor, jedoch Asphalttragschichtmischgut 0/32"
  },
  "f155de79e28941ff": {
   "code": null,
@@ -4853,11 +7649,23 @@
   "source": "none",
   "text": "Reduzierung DN 100 / DN 65"
  },
+ "f27c294d0054428a": {
+  "code": "ZSO3255",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Be- und Entlüftungsventil DN 80"
+ },
  "f27c8d3667167e48": {
   "code": "B03",
   "confidence": 0.87,
   "source": "jev",
   "text": "Kleintransporter Nutzlast 1,0 to mit Bedienung"
+ },
+ "f285a1b8ec9628ab": {
+  "code": null,
+  "confidence": 0.091,
+  "source": "none",
+  "text": "Abschlussmuffe"
  },
  "f2c077e9d09dea2c": {
   "code": "E08",
@@ -4907,6 +7715,12 @@
   "source": "none",
   "text": "Explosionsstampfer Bedienungspersonal"
  },
+ "f3fd3153a04a5411": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "Muffenschutz aus Gummi DN 300 liefern und einbauen"
+ },
  "f400fcdbf3af13f7": {
   "code": null,
   "confidence": 0.0,
@@ -4925,6 +7739,12 @@
   "source": "jev",
   "text": "Zulage zur Position Leerrohrleitung DN/OD 110 mm für Liefern und Einziehen"
  },
+ "f42c18752f0bbf08": {
+  "code": "ZSO8B6B",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Profilstahlkonstruktionen aus [PERSON_115] h bis 60 cm, bis"
+ },
  "f446f4e90b321d32": {
   "code": "F14",
   "confidence": 0.89,
@@ -4937,17 +7757,53 @@
   "source": "none",
   "text": "Absetzbecken Container bis 5m3 ein- ausbauen"
  },
+ "f4993cb39d097544": {
+  "code": "ZSO1D71",
+  "confidence": 0.95,
+  "source": "keyword",
+  "text": "Entleerung + Außerbetriebnahme + Wiederinbetriebnahme"
+ },
+ "f4a020d9eb0b1319": {
+  "code": "ZTB7C1C",
+  "confidence": 0.99,
+  "source": "jev",
+  "text": "Montage längkraftschlüssige Steckmuffenverbindung"
+ },
  "f4d6cb43faf1c936": {
   "code": null,
   "confidence": 0.043,
   "source": "none",
   "text": "Muffenbogen dukt.Guss 22Grad MK-Stück Steckmuffe 16bar DN300"
  },
+ "f4d850c92c056af9": {
+  "code": null,
+  "confidence": 0.048,
+  "source": "none",
+  "text": "Schutzrohr für Absperrarmatur"
+ },
  "f57ae978e02e14c5": {
   "code": "B04-ST",
   "confidence": 0.62,
   "source": "jev",
   "text": "Änderungen Fertigungszeichnungen, etc."
+ },
+ "f58d8330577a4856": {
+  "code": "ZSOAB76",
+  "confidence": 0.9,
+  "source": "jev",
+  "text": "Befestigung, [PERSON_013]"
+ },
+ "f58dc3ef7bac4dbd": {
+  "code": null,
+  "confidence": 0.062,
+  "source": "none",
+  "text": "Ablängung DN250"
+ },
+ "f59903811d9c49fd": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "Abzweigschacht"
  },
  "f5e30140460cc156": {
   "code": null,
@@ -4985,11 +7841,23 @@
   "source": "jev",
   "text": "Angenommene Stundenlohnarbeiten pauschal."
  },
+ "f6864ec7f832a15f": {
+  "code": null,
+  "confidence": 0.065,
+  "source": "none",
+  "text": "Rohrverbinder für PE-Rohr da 50 (Leerrohr) liefern und"
+ },
  "f6ebc8d304b07e57": {
   "code": "K11",
   "confidence": 0.81,
   "source": "jev",
   "text": "Zulage zu den Leistungspositionen Hausanschlüsse für"
+ },
+ "f6f5a43aff7158cc": {
+  "code": "ZTB946B",
+  "confidence": 0.2,
+  "source": "keyword",
+  "text": "wie vor, jedoch Höhe = 8 cm"
  },
  "f70452e96d6b48bd": {
   "code": null,
@@ -4997,11 +7865,23 @@
   "source": "none",
   "text": "Entleerung + Außerbetriebnahme + Wiederinbetriebnahme"
  },
+ "f707f10b227d70db": {
+  "code": "ZEL55F3",
+  "confidence": 0.63,
+  "source": "jev",
+  "text": "wie vor, jedoch Längeskreuzung Kanalleitung größer D ="
+ },
  "f70fc875bb3e8767": {
   "code": "K01",
   "confidence": 0.73,
   "source": "jev",
   "text": "Edelstahl-Rohr DN 150"
+ },
+ "f736f652b7625111": {
+  "code": "ZTB005C",
+  "confidence": 0.76,
+  "source": "jev",
+  "text": "wie vor, jedoch Isolierflanschenpaar DN 300 MDP 10/16"
  },
  "f79b074cfcc8f1ae": {
   "code": "P01",
@@ -5027,6 +7907,12 @@
   "source": "jev",
   "text": "Zulage zur Bodenbewegung den Positionen Bodenaushub mit Wiederverfüllung"
  },
+ "f81c055e4be62fe2": {
+  "code": "ZEL60D4",
+  "confidence": 0.667,
+  "source": "keyword",
+  "text": "Erdungsbandschelle"
+ },
  "f889d375d0f40cb9": {
   "code": null,
   "confidence": 0.056,
@@ -5039,6 +7925,12 @@
   "source": "none",
   "text": "Sickerpackung zur Wasserleitungsschachtentwässerung wie folgt:"
  },
+ "f904c80778d12430": {
+  "code": "ZSO8DFE",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Walzen-Verdichtungsgerät"
+ },
  "f90a389a6132b042": {
   "code": null,
   "confidence": 0.083,
@@ -5050,6 +7942,12 @@
   "confidence": 0.069,
   "source": "none",
   "text": "Siphon aus Kleinleitung DN 15 mit Schauglas"
+ },
+ "f960ec7a7ab8ce06": {
+  "code": "ZSOB96C",
+  "confidence": 0.889,
+  "source": "keyword",
+  "text": "Ablassen Schutzgas aus Rohrleitungssystem"
  },
  "f99826f4e6a75451": {
   "code": "B03",
@@ -5075,6 +7973,12 @@
   "source": "jev",
   "text": "Wurzelstock roden fräsen T 50-100cm Durchm. 30-40cm Direktbeladung laden transp. LKW AN"
  },
+ "f9bd82689a852682": {
+  "code": "F23",
+  "confidence": 0.125,
+  "source": "keyword",
+  "text": "Rohr anbohren PE Anbohrung d63"
+ },
  "f9c2f14eaaed7b4c": {
   "code": "F17",
   "confidence": 0.78,
@@ -5093,11 +7997,23 @@
   "source": "none",
   "text": "Manometer bis 1 bar"
  },
+ "fa33abb1c8093b2e": {
+  "code": null,
+  "confidence": 0.08,
+  "source": "none",
+  "text": "und Deckel mit Haltestift, für den Einbau in bituminöse"
+ },
  "fa59425296aefb4a": {
   "code": null,
   "confidence": 0.083,
   "source": "none",
   "text": "Edelstahl-Rohr DN 80"
+ },
+ "faa170839d6f4e04": {
+  "code": "ZSO9744",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Ansaat Feuchtwiesenmischung"
  },
  "faf80111965347e7": {
   "code": "P05",
@@ -5105,11 +8021,47 @@
   "source": "jev",
   "text": "Druckrohr spülen desinfizieren TW [PERSON_029] Wasserstoffperoxid Desinfektionsm. DN355"
  },
+ "fb03908889a7c13c": {
+  "code": "S10",
+  "confidence": 0.267,
+  "source": "keyword",
+  "text": "Kabelbündel unter Spannung Mittelspannungskabel T bis 1,25m sichern"
+ },
  "fb8125b3bf0afd9a": {
   "code": "E08",
   "confidence": 0.99,
   "source": "jev",
   "text": "Mutterboden, Bodengruppe 1 DIN 18915, liefern und auftragen,"
+ },
+ "fc0ef7e9600a16f3": {
+  "code": null,
+  "confidence": 0.067,
+  "source": "none",
+  "text": "25-30cm nicht schadstoffbelastet"
+ },
+ "fc5031a65a22096a": {
+  "code": "ZTB005C",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Isolierflanschenpaar DN 100 MDP 10/16"
+ },
+ "fcc90f6f618cc86f": {
+  "code": "ZTB8418",
+  "confidence": 0.77,
+  "source": "jev",
+  "text": "wie vor, jedoch Muffendruckrohre TYT DN 100 (C64)"
+ },
+ "fd35764050132953": {
+  "code": null,
+  "confidence": 0.111,
+  "source": "none",
+  "text": "wie vor, jedoch FF DN 250 / 1000 mm lg mit Mauerflansch"
+ },
+ "fd48685daa65b10e": {
+  "code": "ZDA2088",
+  "confidence": 0.794,
+  "source": "keyword",
+  "text": "Asphaltschicht Fahrbahn abbrechen D 10-20cm Geräteeinsatz mgl. laden t"
  },
  "fda3a7be6468bd26": {
   "code": "B03",
@@ -5122,6 +8074,18 @@
   "confidence": 1.0,
   "source": "jev",
   "text": "Baufacharbeiter-in sämtliche Kosten/Zuschläge"
+ },
+ "fdbb60a87f0a364f": {
+  "code": "ZSO54D2",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Wasserbausteine liefern und einbauen"
+ },
+ "fdc1586e15b47f77": {
+  "code": "ZEL94FE",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "wie vor, jedoch in bestehendes Futterrohr DN 100"
  },
  "fdfa8d54e2c3a696": {
   "code": null,
@@ -5165,6 +8129,12 @@
   "source": "jev",
   "text": "Universal-Tragplatte für Schieberkappe"
  },
+ "ff28cb993aaa8fe1": {
+  "code": "ZSO6FD2",
+  "confidence": 1.0,
+  "source": "jev",
+  "text": "Anschluss als Fuge mit Fugenmasse herstellen"
+ },
  "ff44d005f8f3c2fe": {
   "code": null,
   "confidence": 0.0,
@@ -5176,6 +8146,12 @@
   "confidence": 0.053,
   "source": "none",
   "text": "Nach Abbau der Notversorgungen/Überleitungen und wieder Inbetriebnahme"
+ },
+ "ff83487b9338d9d4": {
+  "code": "ZTB8CAB",
+  "confidence": 0.63,
+  "source": "jev",
+  "text": "wie vor, jedoch Zuschlag Kreuzung, Drainageleitung"
  },
  "ff9077b9d74f7f93": {
   "code": "T05",

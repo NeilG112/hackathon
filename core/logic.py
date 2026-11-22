@@ -600,7 +600,21 @@ def _domain_rule_finding(
         missing = ["Erstprüfung/Messprotokoll"]
 
     elif rule.id == "ELECTRO_LIGHTING_CONNECTION":
-        subjects = matching(lambda text: _contains_any(text, ("leuchte", "aktor")))
+        # A Warnleuchte / Blitzleuchte on a building site is battery-powered
+        # traffic safety equipment with no electrical connection to install.
+        # Matching bare "leuchte" made this rule fire on all three sections
+        # that mention one, and on two of them the section contained no
+        # lighting at all. Mains-connected luminaires only.
+        TRAFFIC_LAMPS = ("warnleuchte", "blitzleuchte", "rundumleuchte",
+                         "signalleuchte", "bakenleuchte", "taktleuchte")
+
+        def _is_mains_luminaire(text: str) -> bool:
+            stripped = text
+            for lamp in TRAFFIC_LAMPS:
+                stripped = stripped.replace(lamp, " ")
+            return _contains_any(stripped, ("leuchte", "aktor"))
+
+        subjects = matching(_is_mains_luminaire)
         if not subjects or _contains_any(
             section_text, ("montage", "anschluss", "anschliessen"),
         ):
@@ -658,6 +672,33 @@ def _domain_rule_finding(
     return subjects, {"missing": missing}, f"Fehlende Signale: {', '.join(missing)}."
 
 
+# Rules switched off because every finding they produced on the only tender we
+# can check by hand was wrong. Each failed the same way: a keyword matched a
+# German compound whose meaning is the opposite of what the rule assumes.
+#
+#   DN_STEP          read DN from a *bedding* position ("Einbettung Rohr
+#                    DN300-400"), a protective conduit and a concrete manhole
+#                    ring, then demanded a reducer between them. None of the
+#                    three is part of a flow system.
+#   SHAFT_COVER_CARD counted Strassenkappe and Hahnkasten — valve surface
+#                    boxes — as manhole covers, giving 6 covers to 2 shafts
+#                    where the tender has neither.
+#   ELECTRO_LIGHTING "Schutz Mastleuchte Bestand" protects an existing lamp
+#                    post during the works; the rule read it as a luminaire
+#                    waiting to be wired up.
+#
+# They are kept rather than deleted because the rule shapes are sound — they
+# need a classifier that understands the position, not more keyword patches.
+# Re-enable one only together with a test case from a real tender that it gets
+# right. Precision first: three correct findings earn trust, six wrong ones
+# destroy it and the estimator never opens the fourth screen.
+DISABLED_RULES: frozenset[str] = frozenset({
+    "DN_STEP",
+    "SHAFT_COVER_CARD",
+    "ELECTRO_LIGHTING_CONNECTION",
+})
+
+
 def check_cluster_rules(
     clusters,
     items,
@@ -666,7 +707,10 @@ def check_cluster_rules(
     remarks=None,
     domains=None,
 ) -> list[ClusterFlag]:
-    """Evaluate catalogue rules across section, system and frame clusters."""
+    """Evaluate catalogue rules across section, system and frame clusters.
+
+    Rules in `DISABLED_RULES` are skipped — see the note there.
+    """
     clusters = list(clusters)
     items = list(items)
     active_domains = (
@@ -676,7 +720,8 @@ def check_cluster_rules(
     )
     active_rules = (
         rule for rule in RULES
-        if "COMMON" in rule.domains or active_domains.intersection(rule.domains)
+        if rule.id not in DISABLED_RULES
+        and ("COMMON" in rule.domains or active_domains.intersection(rule.domains))
     )
     item_by_key = {item.key(): item for item in items}
     by_cluster_positions: dict[str, list[NormalizedItem]] = {}

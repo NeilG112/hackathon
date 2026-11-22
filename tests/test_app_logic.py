@@ -106,8 +106,22 @@ class AppLogicTests(unittest.TestCase):
             )
             self.assertEqual(set(risk_table["Risiko"]), {"hoch"})
 
-    def test_groups_page_shows_position_calculation_without_benchmark_or_reveal(self):
-        app = self._app_for_page("Gruppen & Angebot")
+    def test_position_table_lives_on_tender_not_on_groups(self):
+        """The per-position breakdown moved to Tender.
+
+        "Gruppen & Angebot" answers where the money and the risk sit; a
+        248-row table pushed that answer below the fold. The table itself is
+        unchanged and still has to add up — asserted below on Tender.
+        """
+        groups = self._app_for_page("Gruppen & Angebot")
+        groups.run()
+        self.assertFalse(groups.exception)
+        self.assertNotIn(
+            "Positionskalkulation",
+            [element.value for element in groups.subheader],
+        )
+
+        app = self._app_for_page("Tender")
         app.run()
 
         self.assertFalse(app.exception)
@@ -155,6 +169,12 @@ class AppLogicTests(unittest.TestCase):
         )
         self.assertNotIn("Benchmark-Quercheck", [tab.label for tab in app.tabs])
 
+        # The groups page keeps the summary metrics, just not the table.
+        self.assertIn(
+            "Angebotssumme",
+            [element.value for element in groups.subheader],
+        )
+
     def test_group_overview_has_clickable_section_subgroups(self):
         with patch.dict(os.environ, {
             "LOGIC_LLM_PROVIDER": "offline",
@@ -187,13 +207,15 @@ class AppLogicTests(unittest.TestCase):
         logic_app = self._app_for_page("Logik")
         logic_app.run()
         self.assertFalse(logic_app.exception)
+        # The Jev control lives on the page it affects ("Heikle Positionen"),
+        # not in the sidebar: a global control that changes nothing on three
+        # of five pages reads as broken. Logik keeps only its own.
         self.assertEqual(
-            [checkbox.label for checkbox in logic_app.sidebar.checkbox],
-            [
-                "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
-                "Cluster-Tiefenprüfung (Gemma 4)",
-            ],
+            [toggle.label for toggle in logic_app.sidebar.toggle],
+            ["Cluster-Tiefenprüfung (Gemma 4)"],
         )
+        self.assertEqual([t.label for t in logic_app.toggle
+                          if "KI-Tiefenprüfung" in t.label], [])
         self.assertEqual(
             [
                 "Cluster- & Systemprüfungen",
@@ -230,12 +252,12 @@ class AppLogicTests(unittest.TestCase):
         tricky_app.run()
         self.assertFalse(tricky_app.exception)
         self.assertEqual(
-            [checkbox.label for checkbox in tricky_app.sidebar.checkbox],
+            [toggle.label for toggle in tricky_app.toggle],
             ["KI-Tiefenprüfung (Top 60 Risiko-Positionen)"],
         )
 
-    def test_jev_checkbox_is_visible_and_retains_state_across_pages(self):
-        app = self._app_for_page("Logik")
+    def test_jev_toggle_lives_on_the_risk_page_and_retains_state(self):
+        app = self._app_for_page("Heikle Positionen")
         with (
             patch.dict(os.environ, {
                 "LOGIC_LLM_PROVIDER": "offline",
@@ -244,25 +266,32 @@ class AppLogicTests(unittest.TestCase):
             patch.object(risk_engine, "analyze_tender_hybrid", return_value=([], [])),
         ):
             app.run()
-            app.sidebar.checkbox[0].set_value(True).run()
+            toggle = next(t for t in app.toggle
+                          if "KI-Tiefenprüfung" in t.label)
+            toggle.set_value(True).run()
+            self.assertTrue(app.session_state["use_jev"])
             self.assertTrue(app.session_state["use_jev"])
 
+            # The toggle is only rendered on the risk page, but the choice
+            # must survive navigating away and back.
             for page in (
                 "Tender",
                 "Gruppen & Angebot",
-                "Heikle Positionen",
                 "Logik",
+                "Heikle Positionen",
             ):
                 app.session_state["active_page"] = page
                 st.cache_data.clear()
                 app.run()
                 self.assertFalse(app.exception)
-                self.assertEqual(
-                    app.sidebar.checkbox[0].label,
-                    "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
-                )
-                self.assertTrue(app.sidebar.checkbox[0].value)
                 self.assertTrue(app.session_state["use_jev"])
+                visible = [t for t in app.toggle
+                           if "KI-Tiefenprüfung" in t.label]
+                if page == "Heikle Positionen":
+                    self.assertEqual(len(visible), 1)
+                    self.assertTrue(visible[0].value)
+                else:
+                    self.assertEqual(visible, [])
 
     def test_cluster_questions_export_without_position_findings(self):
         st.cache_data.clear()

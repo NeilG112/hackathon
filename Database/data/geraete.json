@@ -1,0 +1,82 @@
+{
+ "geraete": {
+  "BAG14": {
+   "bezeichnung": "Mobilbagger 14 t",
+   "kosten_eur_h": 68.0
+  },
+  "BAG25": {
+   "bezeichnung": "Kettenbagger 25 t",
+   "kosten_eur_h": 98.0
+  },
+  "FER": {
+   "bezeichnung": "Asphaltfertiger",
+   "kosten_eur_h": 185.0
+  },
+  "KERNB": {
+   "bezeichnung": "Kernbohrgerät bis DN 500",
+   "kosten_eur_h": 25.0
+  },
+  "KLG": {
+   "bezeichnung": "Kleingerät / Handwerkzeug",
+   "kosten_eur_h": 4.0
+  },
+  "KRAN": {
+   "bezeichnung": "Autokran 40 t",
+   "kosten_eur_h": 120.0
+  },
+  "LKW": {
+   "bezeichnung": "LKW 3-Achs-Kipper",
+   "kosten_eur_h": 72.0
+  },
+  "MEISSEL": {
+   "bezeichnung": "Hydraulikhammer am Bagger",
+   "kosten_eur_h": 35.0
+  },
+  "ORT": {
+   "bezeichnung": "Kabelortungsgerät",
+   "kosten_eur_h": 8.0
+  },
+  "PLATTE": {
+   "bezeichnung": "Lastplattengerät dynamisch",
+   "kosten_eur_h": 15.0
+  },
+  "PUMPE": {
+   "bezeichnung": "Tauchpumpe E-Motor 10–30 m³/h",
+   "kosten_eur_h": 1.5
+  },
+  "RAMM": {
+   "bezeichnung": "Rammsonde DPH",
+   "kosten_eur_h": 18.0
+  },
+  "RLD": {
+   "bezeichnung": "Radlader 2 m³",
+   "kosten_eur_h": 58.0
+  },
+  "RUE": {
+   "bezeichnung": "Rüttelplatte 400 kg",
+   "kosten_eur_h": 9.5
+  },
+  "SAEG": {
+   "bezeichnung": "Fugenschneider",
+   "kosten_eur_h": 12.0
+  },
+  "SCHW": {
+   "bezeichnung": "Schweißgerät / Heizwendelschweißgerät",
+   "kosten_eur_h": 6.0
+  },
+  "VBG": {
+   "bezeichnung": "Grabenverbaugerät (Vorhaltung)",
+   "kosten_eur_h": 14.0
+  },
+  "WAL": {
+   "bezeichnung": "Tandemwalze 3 t",
+   "kosten_eur_h": 31.0
+  }
+ },
+ "meta": {
+  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
+  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage.",
+  "hinweis_ergaenzung": "MEISSEL aus der vorherigen Fassung uebernommen: wird von Leistungen referenziert, fehlte in der neu generierten Datei. Ohne Satz faellt die Geraetekost dieser Positionen stillschweigend auf 0 EUR.",
+  "seed": 2026
+ }
+}

@@ -1,122 +1,202 @@
 # Bid & Risk Assistant
 
-> It reads a construction tender file, finds the line items that will cost the contractor
-> money, and writes the clarification letter he'd otherwise spend four hours on.
+> It reads a construction tender, prices it from the contractor's own rate
+> tables, and tells him which positions will cost him money.
 
-Lead with that sentence. No German, no file extensions, no vocabulary lesson — German
-belongs in the *artifact* (the Bieterfragen-Katalog, in correct VOB phrasing), plain
-English in the *narration*.
+German construction tenders (GAEB Leistungsverzeichnisse) arrive as a few
+hundred — on a real job, a few thousand — line items that a contractor must
+price. This reads the file, builds a bid bottom-up, and triages the positions
+worth a human's attention.
 
-Full reasoning, verified data facts and the demo script live in [PLAN.md](PLAN.md).
-**Read it before writing code.** Everything in this repo exists because of a fact checked
-directly against `Dataset/`.
+Every number below is measured against the files in `Dataset/` and
+reproducible with the commands given. Where something does not work, it says
+so.
 
 ---
 
-## Setup
+## Quick start
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+streamlit run app.py
 ```
-
-`core/` and `utils/` are **standard library only** — no pandas, no lxml. The parsers must
-run anywhere, because `validate_gate.py` is the gate. Dependencies are for the UI and the
-.docx export only.
-
-## Commands
 
 ```bash
-python3 validate_gate.py                        # THE GATE — must be green first
-python3 scripts/build_reference_prices.py       # data/reference_prices.json from real bids
-python3 scripts/dump_golden.py                  # data/golden/ — the on-stage fallback
-python3 validate.py                             # comparable-price engine vs. a real bid
-streamlit run app.py                            # the demo
+python3 validate_gate.py              # parser equivalence — must be green
+python3 -m unittest discover tests    # 25 tests
+python3 scripts/show_clusters.py      # the cluster view on the demo tender
 ```
 
-`Dataset/` is **read-only**. Never write to it.
+`Dataset/` is read-only. Never write to it.
+
+## What it does, in five stages
+
+```
+GAEB file ──► parse ──► classify ──► price ──► judge risk ──► hand back
+```
+
+**1 · Parse.** Four GAEB formats (X83 XML, D83/D84/D86 fixed-width). The same
+tender in two different formats produces byte-identical output, asserted on
+every run by `validate_gate.py`. Section labels and the item hierarchy come
+out with it — the risk checks need them.
+
+**2 · Classify.** Each position is matched to a work type in the rate
+catalogue. TypeSafe **Jev** does this: a Choice over the catalogue paired with
+a companion Noul asking whether the catalogue covers this work at all. Without
+that Noul a Choice always returns *something*, and positions from trades the
+catalogue doesn't contain get confidently mis-assigned.
+
+**3 · Price.** Textbook Aufschlagskalkulation:
+
+```
+EKT = hours × Mittellohn + machine hours × rate + material
+EP  = EKT × (1 + AGK×Bauzeit/12 + BGK + W&G)
+```
+
+It produces a **range**, not a point, because the rate table carries
+fastest/typical/slowest times. AGK is prorated over the build time — a
+ten-month job carries ten twelfths of the firm's annual overhead.
+
+**4 · Judge risk.** Three layers, each doing what it is good at:
+
+- *Arithmetic* — deterministic rules over clusters of positions: containment,
+  cardinality, DIN 4124 trench depth, missing follow-up work.
+- *Money* — only the top 10 % by euro exposure and the specialist-looking
+  positions go further. 35 of 248 on the demo tender.
+- *Judgement* — Jev answers five independent yes/no questions per selected
+  position (ambiguous scope, implausible quantity, implausible price,
+  specialist trade, likely to grow after award). **Code combines them**;
+  the model never returns the risk class itself.
+
+**5 · Hand back.** A Bieterfragen-Katalog as .docx. A GAEB X84 bid file is not
+implemented.
+
+## Measured results
+
+On `Dataset/[NUMMER_001]_leer.X83`, 248 positions:
+
+| | |
+|---|---|
+| Classified | **89.5 %** |
+| Calculated (after unit check) | **86.3 %** |
+| Cluster findings | **4**, all defensible |
+| Bid | **€505,953 – 584,830 – 663,403** |
+| A real contractor bid for this BoQ | **€897,305** |
+| High risk | 32 positions = **75 % of the money in 13 % of the lines** |
+
+Component accuracy, measured separately:
+
+```
+classifier    94 % correct on 2,496 labelled positions in Database/
+calculation   5.3 % median error against 2,459 real prices in Database/
+```
+
+**The bid is low and the reason is known.** The engine reproduces the
+database's own prices to 5.3 %, so the arithmetic is right; the rate tables
+are synthetic and sit below market. `Database/` says so in its own metadata:
+*"Preise plausibel Stand 2026, keine Marktabfrage."* Show the range and name
+the reason — do not quote the midpoint as a bid.
+
+## Speed
+
+248 positions, everything from cache (the demo path, no network):
+
+```
+GAEB parsen               108 ms
+Fakten extrahieren         63 ms
+Klassifizierung (Cache)    15 ms
+Kalkulation                 7 ms
+Vergleichspreise          135 ms
+Clustering                154 ms
+Regel-Engine              264 ms
+Risiko-Pipeline           761 ms
+GESAMT                  1,507 ms      6.1 ms / position
+```
+
+Extrapolated to 9,000 positions: **~55 s**. A cold run adds the Jev calls —
+248 positions classify in about 9 s at 8 parallel workers.
+
+## Cost per tender
+
+Jev is $0.084 per million input tokens. The catalogue is sent with every
+classification call, which dominates everything else:
+
+| | 248 positions | 9,000 positions |
+|---|---|---|
+| before | $1.16 | $42.47 |
+| **now** (slim criteria, 180-option shortlist) | **$0.18** | **$6.70** |
+| possible: 10 positions per call | $0.02 | $0.67 |
+
+The catalogue carried a 170-character `bemerkung` for all 939 Leistungen on
+every call — 84 % of the tokens, for prose that never helped tell two
+Leistungen apart. Batching several positions into one call is the remaining
+factor of ten and has not been done.
+
+Risk judgements are negligible — capped at 60 calls, about $0.002 per tender.
+
+## Known problems
+
+**Three cluster rules are switched off.** `DN_STEP`, `SHAFT_COVER_CARD` and
+`ELECTRO_LIGHTING_CONNECTION` produced six findings on the demo tender and
+every one was wrong — keyword matches inside German compounds whose meaning
+is the opposite of the assumption (`Suchschachtung` is not a shaft,
+`Strassenkappe` is not a manhole cover, `Schutz Mastleuchte Bestand` protects
+an existing lamp rather than installing one). See `logic.DISABLED_RULES`. The
+rule shapes are sound; they need a classifier that understands the position,
+not more keyword patches.
+
+The four that remain all hold up: a 1.75 m trench with no shoring (DIN 4124),
+two drinking-water lines with no pressure test or hygiene certificate
+(DIN EN 806), and demolished paving with no restoration position.
+
+**`TRENCH_VOLUME` never fires.** The rule compares `Leitungsgraben[m]` against
+`Bodenaushub[m³]`, but in this tender the m³ excavation quantities are tagged
+`Leitungsgraben` and `Bodenaushub` has exactly one position, in `St`. The rule
+and the tag vocabulary disagree.
+
+**Comparing the two pricing engines is switched off.** See
+`HYBRID_DIVERGENCE_THRESH` in `core/constants.py` — the comparable-price engine
+is −50 % with 91 % median per-position error, so disagreement with it was
+noise, and it was consuming 57 of 60 LLM slots.
 
 ## Layout
 
 ```
-app.py                      Streamlit — the demo surface
-validate_gate.py            twin-pair parser equivalence (run before every push)
-validate.py                 comparable-price engine vs. a real bid (dev instrument)
-export_rfi.py               Bieterfragen-Katalog -> .docx
+app.py                     Streamlit UI, page-based
+validate_gate.py           parser equivalence — run before every push
+export_rfi.py              Bieterfragen-Katalog → .docx
 core/
-  models.py                 NormalizedItem — the shared contract
-  parser_x83.py             GAEB XML; namespace-agnostic, OZ + section from the tree
-  parser_gaeb90.py          GAEB 90 fixed-width; per-file calibrated column slices
-  stammdaten.py             the rate tables (Database/) + cost-base presets
-  classify.py               position -> Leistung code; Jev, cache, keyword fallback
-  kalkulation.py            Aufschlagskalkulation — the bid, as a price range
-  objects.py                the object table: (section, object, unit) + roll-up
-  logic.py                  cross-position contradictions, deterministic
-  detectors.py              price / scope / quantity risk findings
-  pricer.py                 comparable-price engine — cross-check only
-  constants.py              tunables, inline
-utils/text_cleaning.py      strip the HTML wrapper out of item text
-views/reveal.py             the comparison against a real submitted bid
-Database/                   rate tables + labelled test data (synthetic)
-data/reference_prices.json  720 real unit prices from three submitted bids
-data/classification_cache.json   pre-computed Jev answers — the demo runs offline
-data/golden/                pre-parsed fixtures (fallback if a live parse dies)
+  parser_x83 / parser_gaeb90   GAEB readers, namespace-agnostic
+  facts.py                 DN, PN, depth, material, inkl-exclusions
+  clusters.py              section / system / frame clusters
+  logic.py                 declarative RuleSpec catalogue
+  classify.py              position → Leistung, Jev + cache + keyword fallback
+  kalkulation.py           Aufschlagskalkulation, price ranges
+  stammdaten.py            rate tables + cost-base presets
+  risk_engine.py           deterministic + LLM hybrid risk
+  judgments.py             the five atomic Jev questions
+  deep_logic.py            provider-agnostic cluster evaluation
+  pricer.py                comparable-price engine — cross-check only
+Database/                  rate tables + 2,496 labelled test positions
+data/*.json                caches: classification, judgments, deep logic
 ```
-
-## Where it stands
-
-Every number below is measured, and reproducible with the commands above.
-
-| Stage | What it does | State |
-|---|---|---|
-| Read | 4 GAEB formats, two formats byte-identical | **gate green** |
-| Classify | position -> Leistung, via Jev | **90 %** of the real tender |
-| Calculate | hours x wage + machine + material + markup | **84.7 %** coverage |
-| Check | risk / logic / comparable cross-check | 59 findings / quiet / labelled |
-| Hand back | Bieterfragen letter | done; **GAEB X84 bid file missing** |
-
-```
-classifier   94 % correct on 2,496 labelled positions
-calculation  5.3 % median error against 2,459 real prices in Database/
-real tender  248 positions -> EUR 477,304 – 557,063 – 636,732
-             a contractor actually bid EUR 897,305 for this BoQ
-```
-
-**The 38 % gap is not a calculation error.** The engine reproduces the database's own
-prices to 5.3 %. The synthetic rates simply sit below market — `Database/` says so
-itself ("Preise plausibel Stand 2026, keine Marktabfrage"). Reaching the real bid would
-need a factor of 1.61 on everything. Either calibrate and say you calibrated, or show
-the range and name the reason. Do not quote the midpoint as a bid.
-
-### Two engines, deliberately
-
-The **calculation** (`core/kalkulation.py`) is the bid: bottom-up from the rate tables,
-works on a position nobody has ever quoted, auditable line by line.
-
-The **comparable-price engine** (`core/pricer.py`) is an independent second opinion from
-720 real prices. On its own it is -50 % with 91 % median per-position error, because two
-unrelated reference projects cannot carry a third. It stays as a cross-check — where the
-two agree, confidence is higher — and it is never the headline.
 
 ## Rules that are not negotiable
 
-- **Never hardcode an XML namespace URI.** Two namespaces appear in the dataset; match on
-  `local-name()`. A 3.2-keyed XPath silently returns zero nodes on the 296-item file.
-- **Join on OZ, never on list index** — and use `NormalizedItem.padded_key((2,2,4))`, not
-  `key()`. The blank BoQ stores hierarchy levels unpadded (`1,1,1`) while the priced files
-  pad them (`01,01,0001`), so a naive key join matches **zero** of 248 items and looks like
-  a pricing failure. Padded, it matches 247. (PLAN.md's stated join is wrong on this file.)
-- **No comparable → print `kein Vergleichswert`.** An honest blank beats an invented euro.
-  20 of the 248 demo positions are rental/time units (`Wo`, `mWo`, `m2d`) with no
-  comparable anywhere in the benchmark. The contractor charged €10,336 for them. Say so;
-  don't fill the hole.
-- **Never measure against a bid that is in the benchmark.** Use
-  `pricer.without_source(ref, answer_key)`. Worth €6.2k here today, €251k before the
-  pricer improved — the magnitude is not the point, the circularity is.
-- **No live LLM in the demo path.** Pre-generate, cache to disk, ship the JSON.
-- **Changed the rate catalogue? Delete `data/classification_cache.json`.** The cache is
-  keyed on position text only, not on the catalogue version. Leaving it in place after an
-  extension keeps the old assignments and the new Leistungen are never found — coverage
-  stays flat and it looks like the extension did nothing. (It cost us exactly that once.)
-- **Don't loosen the gate to make it pass.** A real failure is useful; a gate that passes
-  by weakened comparison is worse than no gate.
+- **Run `python3 validate_gate.py` before every push.** Red means something
+  upstream broke and nothing downstream is trustworthy. Never loosen the
+  assertion to make it pass.
+- **Changed the rate catalogue? Delete `data/classification_cache.json`.** It
+  is keyed on position text only, not on the catalogue version. A stale cache
+  silently swallows a catalogue extension — this already cost us one round.
+- **Never hardcode an XML namespace.** Two appear in the dataset; match on
+  `local-name()`. A wrong-namespace XPath returns zero nodes *silently*.
+- **Check units before multiplying.** An Aufwandswert is hours per unit *of the
+  Leistung*. Without that guard the tender priced at €2.9M against a real
+  €897k, because metre-week positions were costed at per-m² labour rates.
+- **Never measure against a bid that is in your benchmark.** That once showed
+  "+6.3 % accurate" where the honest figure was −50 %.
+- **No live API call on the prepared demo path.** Pre-generate, cache to disk,
+  commit the JSON. Uploaded files do call out — that is deliberate, the
+  alternative is 3 % coverage and a broken-looking demo.

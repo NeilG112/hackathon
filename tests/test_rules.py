@@ -270,6 +270,7 @@ class ClusterRuleTests(unittest.TestCase):
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
         self.assertFalse(any(f.rule_id == "SURFACE_RESTORE" for f in flags))
 
+    @unittest.skipIf(True, 'rule disabled: see logic.DISABLED_RULES')
     def test_shaft_cardinality_positive_and_negative(self):
         positive = [
             item("71", "Schacht", "A"),
@@ -295,6 +296,7 @@ class ClusterRuleTests(unittest.TestCase):
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
         self.assertFalse(any(f.rule_id == "SHAFT_COVER_CARD" for f in flags))
 
+    @unittest.skipIf(True, 'rule disabled: see logic.DISABLED_RULES')
     def test_dn_step_positive_and_negative(self):
         positive = [
             item("81", "Trinkwasser Druckrohr PE100 DN63"),
@@ -315,6 +317,7 @@ class ClusterRuleTests(unittest.TestCase):
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
         self.assertFalse(any(f.rule_id == "DN_STEP" for f in flags))
 
+    @unittest.skipIf(True, 'rule disabled: see logic.DISABLED_RULES')
     def test_dn_step_on_two_material_free_positions(self):
         positions = [
             item("87", "Trinkwasserleitung DN50 verlegen"),
@@ -351,3 +354,22 @@ class ClusterRuleTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DisabledRuleTests(unittest.TestCase):
+    """The three rules switched off after every finding proved false.
+
+    This test exists so the decision is visible in the suite rather than only
+    in a comment: if someone re-enables one, they must also delete it here and
+    add a real test case from a tender the rule gets right.
+    """
+
+    def test_disabled_rules_do_not_fire(self):
+        from core import logic
+        self.assertEqual(
+            logic.DISABLED_RULES,
+            frozenset({"DN_STEP", "SHAFT_COVER_CARD",
+                       "ELECTRO_LIGHTING_CONNECTION"}),
+        )
+        active = {r.id for r in logic.RULES} - logic.DISABLED_RULES
+        self.assertNotIn("DN_STEP", active)

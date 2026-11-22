@@ -1,0 +1,142 @@
+{
+ "0cbede838475db4753b944b9a3c4ec1e7fb89e4cd11da21b03963cab64bc62d1": {
+  "bidder_question_de": "In der Position 114 wird einerseits ein Schmutzwasseranschluss DN 150 erwähnt, im weiteren Text sowie im Kurztext jedoch ein Anschluss für eine SW-Leitung DN 100. Bitte präzisieren Sie, welcher Nennweiten-Durchmesser für die auszuführende Leitung und den Anschluss an die vorhandene Stichleitung maßgebend ist.",
+  "commercial_reason_de": "Die Position enthält widersprüchliche Angaben zum Nennweiten-Durchmesser (DN 150 vs. DN 100) der zu installierenden bzw. vorhandenen Schmutzwasserleitung. Da die Materialwahl und die Ausführung des Anschlussstücks vom Durchmesser abhängen, führt diese Unklarheit zu Kalkulationsrisiken und potenziellem Nachtragsbedarf."
+ },
+ "0e2587a813417ede0d082fe576648424a2806188455fcf72d32ad3de1594fccd": {
+  "bidder_question_de": "Bezüglich der Position 827 (Druckrohr spülen) bitten wir um Mitteilung, mit welchem Spüldruck und welcher Mindestmenge die Leitung zu spülen ist sowie wohin das anfallende Spülwasser abgeleitet werden soll.",
+  "commercial_reason_de": "Die Position fordert das Spülen der Leitung sowie die Bereitstellung von 200 m Schlauchmaterial. Es fehlen jedoch Angaben zum erforderlichen Spüldruck, der notwendigen Spülmenge sowie zur Entsorgung bzw. Ableitung des Spülwassers, was zu unkalkulierbaren Kosten für Pumptechnik und Entsorgungsgebühren führen kann."
+ },
+ "0ebb7ba0abe2cff267c28ccdd5c5be4d273b2b6bcf9bfedd9944b92b50829545": {
+  "bidder_question_de": "Bezüglich der Position 213 'Foto-Dokumentation' bitten wir um Mitteilung, welcher Umfang an Dokumentationsleistungen (z. B. Anzahl der Fotos pro Bauabschnitt oder spezifische Vorgaben zur Dokumentationstiefe) gefordert ist, um eine kalkulationsfähige Grundlage zu schaffen.",
+  "commercial_reason_de": "Die Position beschreibt lediglich die Lieferung und Übergabe der Fotodokumentation in Ordnern. Es fehlen jedoch Angaben zum Umfang der zu erbringenden Dokumentationsleistung (z. B. geforderte Anzahl an Fotos, Intervalle der Aufnahme oder spezifische Dokumentationspflichten), was zu einer unkalkulierbaren Aufwandshöhe führt."
+ },
+ "1ba2a2f854c67676ee77cd43434270fca312f309809722444d61aec17e8eb9ba": {
+  "bidder_question_de": "Bezüglich Position 714 (Verbindungsmuffe) bitten wir um Prüfung und Bestätigung der Menge von 42 Stück, da diese im Vergleich zu ähnlichen Positionen ungewöhnlich hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 42 Stück weicht massiv vom Median vergleichbarer Positionen ab und erscheint für die beschriebene Leistung unplausibel. Es besteht ein hohes Risiko für Mengenfehler oder ein erhebliches Mindermengenrisiko, was die Kalkulationsgrundlage und die Preisgestaltung (Fixkostenverteilung) verfälscht."
+ },
+ "1fc805dd62e1bf372d8214da5c95fb58a642a184351c29bfc13be164c13d0175": {
+  "bidder_question_de": "Bezüglich Position 0526 wird um Prüfung der Menge (2 m³) gebeten, da diese in Relation zur beschriebenen Grabengeometrie (Sohlbreite 2,5-3 m, Tiefe bis 2 m) unplausibel erscheint. Bitte bestätigen Sie die korrekte Menge.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 2 m³ ist im Vergleich zu vergleichbaren Leitungsgraben-Positionen (Median 65 m³) extrem niedrig und erscheint für die beschriebene Leistung (Grabenbreite 2,5-3 m, Tiefe bis 2 m) unplausibel. Es besteht der Verdacht eines Übertragungs- oder Dezimalfehlers, was zu erheblichen Kalkulationsrisiken oder späteren Mengenmehrungen führt."
+ },
+ "2201a4ae8f9859eb1d6e79080d07708d493e026730e6adc4b4080ae66540fbeb": {
+  "bidder_question_de": "Bezüglich Position 1110 wird in der Leistungsbeschreibung angegeben, dass der Anschluss bauseits zur Verfügung gestellt wird, während in den Vorbemerkungen die Beistellung von Elt-Kabeln durch den Auftragnehmer gefordert wird. Bitte klären Sie, ob die Kabel für die Stromversorgung der Baustelleneinrichtung bauseits gestellt werden oder vom Bieter beizustellen sind.",
+  "commercial_reason_de": "Es besteht eine Widersprüchlichkeit bezüglich der Materialbereitstellung: Während die Positionsbeschreibung besagt, dass der Anschluss bauseits zur Verfügung gestellt wird, verpflichten die Vorbemerkungen den Auftragnehmer zur Beistellung von Elektrokabeln für den Anschluss der Baustelleneinrichtung. Dies führt zu einer Unsicherheit bei der Kalkulation der Materialkosten."
+ },
+ "2b25f48d2c40a0d0d45695277902ac2782e785954cd5ef7320e721388d418980": {
+  "bidder_question_de": "Bezüglich Position 324 (Wurzelbehandlung) bitten wir um Prüfung und Bestätigung der Menge von 20 Stück, da diese im Vergleich zu den anderen Grabenarbeiten ungewöhnlich hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 20 Stück weicht signifikant vom Durchschnitt vergleichbarer Positionen ab. Es besteht ein hohes Risiko für Mindermengen, da die tatsächliche Anzahl der zu schneidenden Wurzeln stark vom Baugrund und dem tatsächlichen Bewuchs abhängt und die Menge unplausibel erscheint."
+ },
+ "34d394922f5f050b72f96e85f5f969361d840092e756e5f8c643bc7a98ce6b42": {
+  "bidder_question_de": "Bezüglich Position 02050034 bitten wir um Klärung, ob die Abrechnung tatsächlich in lfm erfolgt oder ob die Einheit m³ korrekt ist. Bitte bestätigen Sie zudem, ob die im Text beschriebene Rohrumhüllung (mit anstehendem Bodenmaterial oder Kiesverfüllung) Teil dieser Position ist oder separat vergütet wird.",
+  "commercial_reason_de": "Die Position wird in lfm abgerechnet, beschreibt jedoch einen Grabenaushub, der üblicherweise in m³ bewertet wird. Zudem ist unklar, ob die im Text genannten Anforderungen an die Rohrumhüllung (anstehender Boden oder Kies) bereits in der Position enthalten sind oder gesondert vergütet werden, was zu erheblichen Kalkulationsrisiken und Nachtragsforderungen führen kann."
+ },
+ "3be9cf415c9f74b419978569161356873d1a8ac75959ee5a505a6d7c4fbeda9a": {
+  "bidder_question_de": "Bezüglich Position 02020003 'Vermessungstechnische Leistungen - Bestand Wasserleitung' bitten wir um Klärung der ausgeschriebenen Menge von 150 St, da diese im Verhältnis zum beschriebenen Leistungsumfang unplausibel erscheint. Bitte bestätigen Sie die korrekte Menge und die dazugehörige Abrechnungseinheit.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 150 Stück für die vermessungstechnischen Leistungen ist im Vergleich zu vergleichbaren Positionen extrem hoch und erscheint für die Dokumentation einer Wasserleitung unplausibel. Es besteht das Risiko eines massiven Kalkulationsfehlers durch einen Komma- oder Zehnerpotenzfehler sowie ein erhebliches Mindermengenrisiko bei der Abrechnung."
+ },
+ "458d079ba0e1e44cd00d8fc0b04eee7f3eeca512d0f4fe005c65ff74c5c7ccd3": {
+  "bidder_question_de": "Bezüglich Position 827 'Druckrohr spülen' bitten wir um Klärung, ob die Vergütung für die Spülleistung sowie die Lieferung und Montage des geforderten Hilfsmaterials (200 m Schlauch inkl. Verschraubungen) linear pro Meter Leitungslänge oder als Pauschale erfolgt.",
+  "commercial_reason_de": "Die Position fordert das Spülen der Leitung sowie die Bereitstellung von 200 m Schlauchmaterial, wird jedoch mit einer Menge von 220 m (Einheit: m) ausgeschrieben. Es ist unklar, ob die Spülleistung pauschal oder linear pro Leitungsmeter vergütet wird und ob die Schlauchlieferung bereits in diesem Einheitspreis enthalten sein muss, was zu einer massiven Fehlkalkulation führen kann."
+ },
+ "463021d4ac139eead7900e66e017fa05d8a0ae5b2d8189bb2a76f37f1e384bea": {
+  "bidder_question_de": "Bezüglich Position 03020009 (Zulage zur Position GGG Rohr DN 300) bitten wir um Prüfung und Bestätigung der Menge von 160 St., da diese im Verhältnis zur Trassenführung unplausibel erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 160 Stück für die Zulage zu längskraftschlüssigen Muffenverbindungen weicht massiv vom statistischen Durchschnitt vergleichbarer Positionen ab und erscheint im Verhältnis zur Gesamtlänge der GGG-Rohrleitung unplausibel. Es besteht ein hohes Risiko für Mengenfehler oder eine Fehlinterpretation des Leistungsumfangs (z. B. Verwechslung von Stück und Meter), was zu erheblichen Kalkulationsfehlern oder Mindermengenrisiken führen kann."
+ },
+ "5a52bebd72e73b539ca295a55e09aa004dd82164bc124d9231d93c643772fa3f": {
+  "bidder_question_de": "In Position 02030018 wird die Zulage für das Aussortieren und Beseitigen von Verfüllmaterial mit einer Korngröße > 100 mm als Pauschale gefordert. Da die Menge des zu entnehmenden Materials von der tatsächlichen Bodenbeschaffenheit abhängt, bitten wir um Mitteilung, auf welcher kalkulatorischen Menge (m³) diese Pauschale basiert oder um Umstellung der Abrechnung auf eine entsprechende Mengeneinheit.",
+  "commercial_reason_de": "Die Position ist als Pauschale (psch) ausgeschrieben, obwohl sie sich auf die Bodenbewegung (Aussortieren/Beseitigen von Material > 100 mm) bezieht, deren tatsächlicher Umfang direkt vom anstehenden Bodenmaterial und den geotechnischen Homogenbereichen abhängt. Da die genaue Menge des zu aussortierenden Materials nicht definiert ist, besteht ein hohes Risiko für unkalkulierbare Mehraufwendungen und spätere Nachtragsforderungen."
+ },
+ "5e32f6ab1e80483309d5ac53cc7acd5d8bfd1f9cfde7a7bb1d5ecfaa60b593cc": {
+  "bidder_question_de": "Bezüglich Position 714 (Verbindungsmuffe) bitten wir um Prüfung und Bestätigung der Menge von 42 Stück, da diese im Vergleich zu ähnlichen Positionen ungewöhnlich hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 42 Stück weicht signifikant vom Median vergleichbarer Positionen ab (Faktor 21), was auf einen Übertragungsfehler oder eine Fehlkalkulation der benötigten Stückzahl hindeutet. Es besteht ein hohes Risiko für Mindermengen bei gleichzeitigem Preisdruck durch Spezialgewerk-Charakteristik."
+ },
+ "652a1529c942997d9d6083a3754de829b727e3342b40cdd457c91f8b34949108": {
+  "bidder_question_de": "Bezieht sich die Position 416 ausschließlich auf die Lieferung der Markierungsmaterialien oder sind die Leistungen für das Verlegen und Einbauen der Markierung inkl. Ortungsdraht in dieser Position enthalten?",
+  "commercial_reason_de": "Die Position beschreibt lediglich die Lieferung der Markierung (inkl. Ortungsdraht und Beschriftung), lässt jedoch die notwendigen Montageleistungen (Verlegen/Einbau im Graben) im Leistungstext offen. Dies führt zu einer Lücke im Leistungsumfang (Scope Gap) und birgt ein hohes Nachtragspotenzial."
+ },
+ "65e3267477f9e13a403d7561bd23cc17e0d95482d0b37998453e3df9ff83fabe": {
+  "bidder_question_de": "Unter der Position 03060008 wird die Kalkulation von Kosten für stufenweise Teilinbetriebnahmen gefordert. Bitte präzisieren Sie die zu erwartende Anzahl sowie den Umfang dieser Teilinbetriebnahmen oder geben Sie an, auf welcher Grundlage diese zu kalkulieren sind.",
+  "commercial_reason_de": "Die Position ist als Pauschale ausgeschrieben, fordert jedoch die Kalkulation von Kosten für nicht näher definierte Teilinbetriebnahmen nach Baufortschritt. Da die Anzahl, der Umfang und die zeitliche Abfolge dieser stufenweisen Inbetriebnahmen nicht spezifiziert sind, besteht ein hohes Risiko für unvorhersehbare Mehraufwendungen und Nachtragsforderungen."
+ },
+ "7e2908827f69858f8076aca35c38f5cc49c7420d23ba8c9ffd2614f1dcb905ad": {
+  "bidder_question_de": "Bezüglich der Position 1110 'Stromkabel verlegen und räumen' bitten wir um Klärung, ob die Kabel zur Versorgung der Baustellencontainer bauseits gestellt werden oder ob diese, wie in den Vorbemerkungen zur Baustelleneinrichtung gefordert, vom Auftragnehmer beizustellen sind.",
+  "commercial_reason_de": "Es besteht eine Widersprüchlichkeit bezüglich der Materialbereitstellung: Während die Position besagt, dass der Anschluss bauseits zur Verfügung gestellt wird, verpflichten die Vorbemerkungen den Auftragnehmer zur Beistellung von Elektrokabeln für den Anschluss der Baustelleneinrichtung. Dies führt zu einer Unsicherheit bei der Kalkulation der Materialkosten."
+ },
+ "84bf503dba2342ccd2ebc3c9bf85bd3d9fe1f412918872c66b3c5b63e7055aa0": {
+  "bidder_question_de": "In der Position 114 wird einerseits ein Schmutzwasseranschluss DN 150 und im weiteren Text sowie im Kurztext ein Anschluss DN 100 gefordert. Welcher Nenndurchmesser ist für die Ausführung maßgeblich?",
+  "commercial_reason_de": "Die Position enthält widersprüchliche Angaben zum Nenndurchmesser der Leitung (DN 150 vs. DN 100). Da der Durchmesser maßgeblich für die Materialwahl und die Ausführung des Anschlusses an die Bestandsleitung ist, führt diese Unklarheit zu einem Kalkulationsrisiko und potenziellem Nachtragspotenzial."
+ },
+ "8b0883204d3eaea1bb2ab984b75c9d92e9e1895c509b6b69de6ecafe4b99b97d": {
+  "bidder_question_de": "Bitte präzisieren Sie die Anforderungen an die Befestigung des Bauzauns auf unbefestigtem Untergrund sowie die einzuhaltenden Anforderungen an die Standfestigkeit.",
+  "commercial_reason_de": "Die Position beschreibt den Bauzaun auf unbefestigtem Untergrund, es fehlen jedoch Angaben zur erforderlichen Standfestigkeit (z. B. Windlastzone) sowie zur Art der Befestigung (z. B. Standfüße oder Einrammen), was zu erheblichen Kostenunterschieden bei Material und Montage führt."
+ },
+ "8e5f9b1761d22a69917ff84982f36b7e26e666913d971752ee2d032f6886082d": {
+  "bidder_question_de": "Bezüglich Position 02020001 (Absteckung der Wasserleitung) bitten wir um Prüfung und Bestätigung der Menge von 55 St, da diese im Verhältnis zur beschriebenen Leistung unplausibel erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 55 Stück für die Absteckung der Wasserleitung ist im Vergleich zu marktüblichen Positionen dieser Art extrem hoch und wirkt unplausibel. Es besteht das Risiko eines massiven Kalkulationsfehlers durch einen möglichen Komma- oder Zehnerpotenzfehler in der Mengenangabe, was zu erheblichen Preisabweichungen oder Mindermengenrisiken führen kann."
+ },
+ "939d8c91d4a32dc38024f5f158400c80ad1cec65b14e9ce925b7152e8b726f4f": {
+  "bidder_question_de": "Bezüglich Position 131 'Warnleuchte WL1 aufbauen abbauen': Bitte geben Sie an, über welchen Zeitraum die Warnleuchten vorzuhalten sind und ob die Stromversorgung der Leuchten in dieser Position oder in einer anderen Position enthalten ist.",
+  "commercial_reason_de": "Die Position beschreibt lediglich das Auf- und Abbauen der Warnleuchte. Es fehlen Angaben zur Vorhaltung (Mietdauer/Zeitraum) sowie zur Stromversorgung der Leuchten, was zu einer unvollständigen Kalkulation der Betriebskosten führt."
+ },
+ "948788e275827712c7a9101ed20476758d059ee62224293c3a1a6474dd07ddee": {
+  "bidder_question_de": "Bezüglich Position 0526 wird um Prüfung der Menge (2 m³) gebeten, da diese in Relation zur beschriebenen Grabengeometrie (Sohlbreite 2,5-3 m, Tiefe bis 2 m) unplausibel erscheint. Bitte bestätigen Sie die korrekte Menge.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 2 m³ ist im Vergleich zu vergleichbaren Leitungsgraben-Positionen (Median 65 m³) extrem niedrig und erscheint für die beschriebene Leistung (Sohlbreite 2,5-3 m, Tiefe bis 2 m) unplausibel. Es besteht das Risiko eines Übertragungs- oder Dezimalfehlers, was zu erheblichen Mengenabweichungen und Nachtragsforderungen führen kann."
+ },
+ "94d70da9aa894cd4c77fec4e7104f8d3c53994d80c316d2aedc7612a208eb344": {
+  "bidder_question_de": "Bezüglich Position 03020011 (Zulage zur Rohrposition GGG ZMU DN 300) bitten wir um Prüfung und Bestätigung der Menge von 55 St., da diese im Verhältnis zur beschriebenen Leistung an zusätzlichen Verbindungen ungewöhnlich hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 55 Stück für die Zulage zur Bearbeitung der ZM-Umhüllung an zusätzlichen Verbindungen ist im Vergleich zu vergleichbaren Positionen extrem hoch und wirkt unplausibel. Es besteht ein signifikantes Risiko für Mindermengen, da die Position nur an tatsächlich zu bearbeitenden Spitzenden (z. B. Bögen, Einbauten) abrechnet und die Menge nicht mit der Trassenführung korrespondiert."
+ },
+ "99677e23ae23c251bf14efdf260090b88eedc71aaaed0d9e204d3b6ea3f8af77": {
+  "bidder_question_de": "Bezüglich Position 02030022 bitten wir um Konkretisierung der geforderten Leistungen für die Zulage 'Erschwertes Arbeiten im Bereich von Starkstrom-Oberleitung'. Welche spezifischen Sicherheitsvorgaben oder technischen Anforderungen des Stromversorgers sind für die Kalkulation des Mehraufwands zwingend zu berücksichtigen?",
+  "commercial_reason_de": "Die Position ist als Pauschalzulage (Einheit 'St') für erschwerte Bedingungen bei Grabenaushub und Rohrverlegung im Bereich einer Starkstrom-Oberleitung ausgeschrieben. Da der konkrete Mehraufwand (z. B. erforderliche Sicherungsmaßnahmen, spezifische Vorgaben des Stromversorgers oder zeitliche Einschränkungen) nicht definiert ist, besteht ein hohes Risiko für unvorhersehbare Kostensteigerungen und spätere Nachtragsforderungen."
+ },
+ "a11cc6793575fc63f67ddb6166d7daf8abc5a3db1df6c78c7dd2fbd96ed2b245": {
+  "bidder_question_de": "Bezüglich Position 122 'Bauzaun H 2m umsetzen': Bitte geben Sie an, wie viele Umsetzvorgänge im Durchschnitt pro Laufmeter Bauzaun kalkuliert werden sollen und welche Distanzen für die Versetzung anzunehmen sind.",
+  "commercial_reason_de": "Die Position beschreibt das Umsetzen des Bauzauns, lässt jedoch die Anzahl der Umsetzvorgänge sowie die jeweiligen Distanzen offen. Da die Kosten für den Abbau, Transport und Neuaufbau stark von der Häufigkeit und dem Umfang der Versetzung abhängen, ist eine präzise Kalkulation auf Basis der aktuellen Leistungsbeschreibung nicht möglich."
+ },
+ "a3db5e0107bbf0fb4aea054db8c1c74019686be197eecd8f3b345dc4e6e33ecf": {
+  "bidder_question_de": "Bezüglich Position 04030019 wird um Angabe des kalkulatorischen Zeitraums (geschätzte Gesamtdauer in Arbeitstagen/Wochen) für die Vorhaltung und den Betrieb des Baggers gebeten, insbesondere im Hinblick auf die mögliche Ausführung in zwei Durchgängen über die Jahre 2025 und 2026.",
+  "commercial_reason_de": "Die Position ist als Pauschale für zwei räumlich getrennte Abschnitte ausgeschrieben, wobei die Vorhalte- und Betriebszeit des Baggers an die gesamte Dauer der HDD-Arbeiten gekoppelt ist. Da der genaue Zeitrahmen der Ausführung (jahresübergreifend 2025/2026, 1 oder 2 Durchgänge) nicht definiert ist, besteht ein erhebliches Risiko für unkalkulierbare Standzeiten und Vorhaltekosten."
+ },
+ "a44256df3805415407dcc1e8101b87d9239a25ca8e230a6efc5dbdb5fd8a7d03": {
+  "bidder_question_de": "Bezüglich der Position 214 'Bestands-Dokumentation erstellen' bitten wir um Mitteilung, ob es eine Abschätzung zum Umfang der im Zuge der Grabarbeiten zu vermessenden Bestandsleitungen und Bauwerke gibt oder ob diese Leistungen bei Überschreitung eines bestimmten Umfangs gesondert vergütet werden.",
+  "commercial_reason_de": "Die Position umfasst die laufende digitale Vermessung aller verlegten sowie vorgefundenen Leitungen und Bauwerke inklusive der Erstellung einer detaillierten Bestandsdokumentation (UTM-Koordinaten, Layerstrukturen, CAD-Formate). Da der Umfang der im Zuge der Grabarbeiten 'vorgefundenen' Bestandsleitungen nicht bekannt ist, besteht ein erhebliches Risiko für unkalkulierbare Mehraufwände bei der Vermessung und Dokumentation."
+ },
+ "ba4188762b3b5ba45055052179f448f35736d342de81f5bff5c4af422f2df3c6": {
+  "bidder_question_de": "Bezüglich der Position 04010002 und der naturschutzrechtlichen Vorgaben bitten wir um Klärung, ob für die geforderte Spülbohranlage (min. 28 to Zugkraft) aufgrund des Verbots von Baustelleneinrichtungen innerhalb des FFH-Gebietes spezifische, vom AG freigegebene Standorte außerhalb des Schutzgebietes zur Verfügung gestellt werden oder ob die Suche und Sicherung dieser Flächen vollständig in den Leistungsumfang des AN fällt.",
+  "commercial_reason_de": "Die Position ist als Spezialgewerk mit hohem Risiko eingestuft. Es besteht eine potenzielle Kostenfalle durch die strikten naturschutzrechtlichen Vorgaben (FFH-Gebiet, Verbot von Baustelleneinrichtungen und Beleuchtung im Schutzgebiet, Tageslichtpflicht), die den Logistikaufwand und die Zeitplanung massiv beeinflussen, jedoch pauschal in die Baustellengemeinkosten einzukalkulieren sind."
+ },
+ "c5c76999f5d004fc9757364412a626f973e2d98677b13313cd992a6bef285031": {
+  "bidder_question_de": "Bezüglich Position 05010025 'Angenommene Stundenlohnarbeiten pauschal' bitten wir um Mitteilung, welche spezifischen Leistungen in diese Position einfließen sollen und welche geschätzte Stundenmenge als Kalkulationsgrundlage für die Pauschale heranzuziehen ist.",
+  "commercial_reason_de": "Die Position ist als Pauschale ausgeschrieben, wird jedoch nach tatsächlich anfallendem Stundenaufwand abgerechnet. Da keine Mengenschätzung (geschätzte Stunden) oder eine Definition der zu erbringenden Leistungen vorliegt, ist eine kalkulatorische Bemessung der Pauschale nicht möglich, was zu erheblichen Preisrisiken führt."
+ },
+ "ca0341d70ec5c14e8b7b7bdab807f52db4400463930aa481ca5cfe8f0a4aa11c": {
+  "bidder_question_de": "Bezüglich Position 7114 (Rohrunterlage, Polysterol) bitten wir um Bestätigung der Menge von 80 Stück, da diese im Vergleich zu den übrigen Leitungspositionen ungewöhnlich hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 80 Stück weicht massiv vom Median vergleichbarer Rohrleitungspositionen ab (Faktor 27). Es besteht ein hohes Risiko für einen Mengenfehler (Kommafehler) oder ein erhebliches Mindermengenrisiko, was die Kalkulation der Fixkostenanteile und die Angebotsbewertung verfälscht."
+ },
+ "ccfab0f0948dffea0eddb95856b6388e568ff42bf052d7b495e9a20cc46b4148": {
+  "bidder_question_de": "Bezüglich Position 122 'Bauzaun H 2m umsetzen': Bitte präzisieren Sie, wie viele Umsetzvorgänge im Preis enthalten sein sollen und welche Distanzen bzw. welche Kriterien für die Umsetzung maßgeblich sind.",
+  "commercial_reason_de": "Die Position beschreibt lediglich das 'Umsetzen' des Bauzauns, ohne die Anzahl der Umsetzvorgänge oder die jeweiligen Distanzen zu definieren. Da die Menge mit 200 m angegeben ist, bleibt unklar, ob die Einheit die Gesamtlänge des Zauns pro Umsetzvorgang oder die kumulierte Länge über mehrere Umsetzungen hinweg beschreibt. Dies führt zu einer erheblichen Unsicherheit bei der Kalkulation des Zeit- und Personalaufwands."
+ },
+ "d565992399ae6dec6fd19322e4d8b4d3e26d115677bec1b3e64694af73aea302": {
+  "bidder_question_de": "Bezüglich Position 121 (Bauzaun) bitten wir um Mitteilung, welche Anforderungen an die Standfestigkeit und die Art der Befestigung auf dem unbefestigten Untergrund zu stellen sind.",
+  "commercial_reason_de": "Die Position umfasst die Sicherung des Baufeldes sowie die zusätzliche Sicherung des Grabens. Es fehlen jedoch Angaben zur erforderlichen Standfestigkeit (z. B. Windlasten, Stützmaßnahmen) und zur genauen Art der Befestigung auf dem unbefestigten Untergrund, was zu unvorhersehbaren Mehrkosten bei der Materialwahl und Montage führen kann."
+ },
+ "dfd3d7c86f0cfc12d717ec42a76de51189a43ee22ed035312bf58f085342ba5c": {
+  "bidder_question_de": "Bezüglich Position 131 'Warnleuchte WL1 aufbauen abbauen': Bitte geben Sie an, über welchen Zeitraum die Warnleuchten vorzuhalten sind und ob die Stromversorgung sowie die technische Spezifikation der Leuchten bauseits gestellt oder vom Bieter zu kalkulieren sind.",
+  "commercial_reason_de": "Die Position beschreibt lediglich das Auf- und Abbauen der Warnleuchte. Es fehlen Angaben zur Vorhaltezeit sowie zur technischen Ausführung (z. B. Stromversorgung, benötigte Befestigung oder spezifische Anforderungen an die Leuchte), was zu einer unvollständigen Kalkulation der Betriebskosten führt."
+ },
+ "e5b0ae299b1f02f5dfa5b0cadc75756f81b081e7411b59eaadbe95e560c68640": {
+  "bidder_question_de": "Bezüglich der Position 214 'Bestands-Dokumentation erstellen' bitten wir um Mitteilung, ob es eine Abschätzung zum Umfang der im Zuge der Grabarbeiten zu vermessenden Bestandsleitungen und Bauwerke gibt oder ob diese Leistungen bei Überschreitung eines bestimmten Umfangs gesondert vergütet werden.",
+  "commercial_reason_de": "Die Position umfasst die laufende digitale Vermessung aller verlegten sowie vorgefundenen Leitungen und Bauwerke inklusive der Erstellung einer detaillierten Bestandsdokumentation (UTM-Koordinaten, Layerstrukturen, CAD-Formate). Da der Umfang der im Zuge der Grabarbeiten 'vorgefundenen' Bestandsleitungen nicht bekannt ist, besteht ein erhebliches Risiko für unkalkulierbare Mehraufwände bei der Vermessung und Dokumentation."
+ },
+ "e8fd89f189500594940b0cf6d65248873b0fc5e24aa360663b8b225a2dcde097": {
+  "bidder_question_de": "Bezüglich Position 7114 (Rohrunterlage, Polysterol) bitten wir um Prüfung und Bestätigung der Menge von 80 Stück, da diese im Vergleich zum üblichen Bedarf für diese Leistung sehr hoch erscheint.",
+  "commercial_reason_de": "Die ausgeschriebene Menge von 80 Stück weicht massiv vom Median vergleichbarer Rohrleitungspositionen ab und erscheint für die beschriebene Leistung unplausibel. Es besteht ein hohes Risiko für einen Mengenfehler (Kommafehler) oder ein erhebliches Mindermengenrisiko, was die Kalkulationsbasis verfälscht."
+ },
+ "fd6b757830d6ea56a735862d434f615d267127f95bc945f59f6be6ba4b2fae10": {
+  "bidder_question_de": "Bitte präzisieren Sie den Leistungsumfang der Position 03040006: Für welchen Zeitraum (Anzahl der Jahre) ist die Software-Update-Pauschale zu kalkulieren und welche spezifischen Leistungen sind in dieser Pauschale enthalten?",
+  "commercial_reason_de": "Die Position ist als Pauschale für Software-Updates ausgeschrieben, ohne die Laufzeit (Anzahl der Jahre) oder den konkreten Leistungsumfang der Updates zu definieren. Da es sich um ein spezialisiertes IT-Gewerk handelt, führt diese Unklarheit zu erheblichen Kalkulationsrisiken und Preisunterschieden zwischen den Bietern."
+ }
+}

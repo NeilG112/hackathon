@@ -36,6 +36,11 @@ from typing import Iterable, Optional, Sequence
 from core.models import NormalizedItem
 from core.stammdaten import Leistung, Stammdaten
 
+
+def constants_normalize(unit: str) -> str:
+    from core import constants
+    return constants.normalize_unit(unit)
+
 CACHE_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "data", "classification_cache.json",
@@ -166,6 +171,12 @@ JEV_MODEL = os.getenv("JEV_MODEL", "jev-latest")
 #
 # `confidence` is deliberately unused: it measures how peaked the distribution
 # is, not how likely the answer is to be correct.
+# Jev rejects a Choice with too many options: 200 is accepted, 400 returns
+# HTTP 422. The catalogue grew from 124 to 939 Leistungen, which silently
+# broke every uncached classification — the demo tender only kept working
+# because its answers were already on disk. Shortlist before sending.
+MAX_JEV_OPTIONS = 180
+
 STRONG_OPTION_PROB = 0.60
 WEAK_OPTION_PROB = 0.45
 MIN_MATCH_NOUL = 0.60
@@ -228,16 +239,37 @@ def classify_jev(
     if not shortlist:
         return Assignment(None, 0.0, "none")
 
+    if len(shortlist) > MAX_JEV_OPTIONS:
+        # Pre-rank with the free keyword scorer and send only the plausible
+        # candidates. Positions billed in the same unit are kept first — the
+        # unit is the strongest signal and costs nothing — then the best
+        # token-overlap matches fill the rest. This preserves recall far
+        # better than a hard unit filter, which was measured to HIDE the
+        # right answer ("Sanitaercontainer" is billed in St but belongs to
+        # Baustelleneinrichtung, billed psch).
+        item_tokens = tokens(f"{item.short_text} {item.long_text[:400]}")
+
+        def _rank(leistung: Leistung) -> tuple[int, float]:
+            same_unit = constants_normalize(leistung.einheit) == unit
+            ref = tokens(f"{leistung.taetigkeit} {leistung.gewerk}")
+            overlap = (len(item_tokens & ref) / len(item_tokens | ref)
+                       if item_tokens and ref else 0.0)
+            return (0 if same_unit else 1, -overlap)
+
+        shortlist = sorted(shortlist, key=_rank)[:MAX_JEV_OPTIONS]
+
     criteria, back = {}, {}
     for leistung in shortlist:
         name = _slug(leistung.taetigkeit)
         while name in back:                       # keep option names unique
             name = f"{name}_{leistung.code.lower()}"
         back[name] = leistung.code
-        criteria[name] = (
-            f"{leistung.taetigkeit}. Abgerechnet in {leistung.einheit}."
-            + (f" {leistung.bemerkung}" if leistung.bemerkung else "")
-        )
+        # Taetigkeit and unit only. The `bemerkung` field averages ~170
+        # characters and is sent for all 939 Leistungen on every single call:
+        # 44,680 tokens per position, 33 USD on a 9,000-position tender, for
+        # prose that describes execution detail the classifier does not need
+        # to tell two Leistungen apart.
+        criteria[name] = f"{leistung.taetigkeit} [{leistung.einheit}]"
 
     payload = {
         "model": JEV_MODEL,
@@ -252,7 +284,11 @@ def classify_jev(
                 "einheit": unit,
                 "menge": item.quantity,
             },
-            "katalog": [f"{l.taetigkeit} [{l.einheit}]" for l in shortlist],
+            # The Noul needs to know what "the catalogue" is — it cannot see
+            # the Choice's criteria. Trades only, not the full list: naming
+            # the 15 Gewerke costs ~60 tokens instead of 11,000 and answers
+            # the same question ("is this kind of work in scope at all?").
+            "katalog_gewerke": sorted({l.gewerk for l in shortlist if l.gewerk}),
         },
         "questions": {
             "passt": {
