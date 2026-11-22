@@ -271,3 +271,11 @@ REVEAL = {
 
 GOLDEN_DIR = "data/golden"
 REFERENCE_PRICES = "data/reference_prices.json"
+
+
+# --- Vergabe (make-or-buy) ----------------------------------------------------
+# Trades that a civil-engineering contractor commonly subcontracts (CCTV sewer
+# inspection, pressure testing, landscaping). Shown as a hint on the Vergabe
+# page only — it never changes the default decision, so the bid does not move
+# until the user decides. UNGEPRÜFT: not yet confirmed by the team's estimator.
+NU_TYPISCHE_GEWERKE = frozenset({"Prüfung", "Landschaftsbau"})

@@ -36,12 +36,13 @@ import streamlit as st
 
 from core import (classify, clusters, constants, deep_logic, detectors, facts,
                   kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
-                  risk_engine, stammdaten)
+                  risk_engine, stammdaten, vergabe)
 from views import reveal
+from views import vergabe as vergabe_view
 
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
-PAGES = ("Tender", "Gruppen & Angebot", "Logik", "Heikle Positionen")
+PAGES = ("Tender", "Gruppen & Angebot", "Vergabe", "Logik", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
@@ -704,7 +705,7 @@ def show_position_details(
 
 
 def section_groups(items, assignments, data, filename: str, remarks: list[str],
-                   calculated=None):
+                   calculated=None, vergabe_ergebnis=None):
     """List trade groups; opening one shows the positions in that trade."""
     if "manual_prices" not in st.session_state:
         st.session_state["manual_prices"] = {}
@@ -716,8 +717,14 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
     if calculated:
         stats = kalkulation.summarize(calculated)
         a, b, c = st.columns(3)
-        a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
-                 help="Mittelwert der Spanne")
+        if vergabe_ergebnis is not None:
+            a.metric("Angebotssumme", f"€{vergabe_ergebnis.angebotssumme:,.0f}",
+                     help="Inklusive der Entscheidungen auf der Seite Vergabe "
+                          "(Nachunternehmerangebote ersetzen die eigene "
+                          "Kalkulation des Gewerks).")
+        else:
+            a.metric("Angebotssumme", f"€{stats['total_mid']:,.0f}",
+                     help="Mittelwert der Spanne")
         b.metric("Spanne", f"€{stats['total_low']:,.0f} – "
                  f"{stats['total_high']:,.0f}")
         c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
@@ -1665,6 +1672,7 @@ def main():
                     f"Nur {cov['pct']}% der Positionen konnten einer Leistung "
                     "zugeordnet werden."
                 )
+            entscheidungen = vergabe_view.gespeicherte_entscheidungen(label)
             section_groups(
                 items,
                 assignments,
@@ -1672,6 +1680,16 @@ def main():
                 label,
                 remarks,
                 calculated,
+                vergabe.auswerten(items, assignments, data, calculated,
+                                  company, entscheidungen)
+                if entscheidungen else None,
+            )
+        elif page == "Vergabe":
+            vergabe_view.render(
+                label,
+                lambda entscheidungen: vergabe.auswerten(
+                    items, assignments, data, calculated, company,
+                    entscheidungen),
             )
         elif page == "Logik":
             section_logic(
