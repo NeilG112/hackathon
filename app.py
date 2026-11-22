@@ -24,6 +24,7 @@ rather than fabricating output.
 from __future__ import annotations
 
 import html
+import json
 import os
 import re
 import tempfile
@@ -33,13 +34,14 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
 
-from core import (classify, constants, detectors, kalkulation, logic, objects,
-                  parser_gaeb90, parser_x83, pricer, risk_engine, stammdaten)
+from core import (classify, clusters, constants, deep_logic, detectors, facts,
+                  kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
+                  risk_engine, stammdaten)
 from views import reveal
 
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
-PAGES = ("Tender", "Gruppen & Angebot", "Logic", "Heikle Positionen")
+PAGES = ("Tender", "Gruppen & Angebot", "Logik", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
@@ -145,22 +147,50 @@ def analyze_hybrid_cached(
     )
 
 
+@st.cache_data(show_spinner=False)
+def evaluate_cluster_deep_cached(
+    filename: str,
+    rules_version: str,
+    payloads: dict[str, str],
+) -> dict[str, dict]:
+    """Deep cluster cache key: filename + rule catalogue version + payload."""
+    del filename
+    adapter = deep_logic.get_adapter()
+    model = adapter.name
+    from types import SimpleNamespace
+
+    cluster_objects = [
+        SimpleNamespace(cluster_id=cluster_id)
+        for cluster_id in payloads
+    ]
+    evaluations = deep_logic.evaluate_clusters(
+        cluster_objects,
+        payloads,
+        use_llm=None,
+        max_clusters=12,
+        write_cache=True,
+    )
+    return {
+        cluster_id: {
+            **evaluation.as_dict(),
+            "model": model,
+        }
+        for cluster_id, evaluation in evaluations.items()
+    }
+
+
 # --- sections --------------------------------------------------------------
 
 def sidebar_kalkulation() -> stammdaten.Company:
-    """The cost base the bottom-up calculation uses.
-
-    These are the parameters the client said a contractor must bring himself:
-    *"Maschinenstundensätze hast du aus der Firma gegeben"*. Presets come from
-    the bidder profiles in the test database.
-    """
+    """The cost base the bottom-up calculation uses."""
     st.sidebar.header("Kalkulationsgrundlage")
-    presets = stammdaten.companies()
-    names = [c.name for c in presets]
-    chosen = presets[names.index(st.sidebar.selectbox("Profil", names))]
-
+    defaults = stammdaten.Company()
+    st.sidebar.caption(
+        "Neutrale Startwerte, keine Firmenprofile. Passe sie an deine "
+        "Kalkulationsgrundlage an."
+    )
     wage = st.sidebar.slider("Mittellohn (€/h)", 35.0, 95.0,
-                             float(chosen.mittellohn_eur_h), 0.5)
+                             float(defaults.mittellohn_eur_h), 0.5)
 
     # The markup, split into its three parts. Arithmetically a combined number
     # is identical — 15 + 5 is always 20 — but split, the estimator can see
@@ -169,22 +199,24 @@ def sidebar_kalkulation() -> stammdaten.Company:
     st.sidebar.markdown("**Zuschläge**")
     agk = st.sidebar.slider(
         "AGK — Allgemeine Geschäftskosten (%)", 0.0, 30.0,
-        float(chosen.agk_pct), 0.5,
+        float(defaults.agk_pct), 0.5,
         help="Kosten des Unternehmens außerhalb der Baustelle, auf ein "
              "ganzes Jahr gerechnet.")
-    bgk = st.sidebar.slider("BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
-                            float(chosen.bgk_pct), 0.5)
-    wg = st.sidebar.slider("W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
-                           float(chosen.wg_pct), 0.5)
+    bgk = st.sidebar.slider(
+        "BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
+        float(defaults.bgk_pct), 0.5)
+    wg = st.sidebar.slider(
+        "W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
+        float(defaults.wg_pct), 0.5)
 
     # AGK is an annual figure. A ten-month job carries ten twelfths of it.
     months = st.sidebar.slider(
-        "Bauzeit (Monate)", 1.0, 24.0, float(chosen.bauzeit_monate), 1.0,
+        "Bauzeit (Monate)", 1.0, 24.0, float(defaults.bauzeit_monate), 1.0,
         help="Nur die AGK werden anteilig umgelegt — BGK und W&G nicht.")
 
     company = stammdaten.Company(
-        chosen.name, wage, chosen.zuschlag_pct, chosen.leistungsfaktor,
-        chosen.materialfaktor, chosen.profil,
+        "Eigene Kalkulation", wage, defaults.zuschlag_pct,
+        defaults.leistungsfaktor, defaults.materialfaktor, "",
         agk_pct=agk, bgk_pct=bgk, wg_pct=wg, bauzeit_monate=months,
     )
     st.sidebar.metric("Zuschlag gesamt", f"{company.total_markup_pct:.1f} %")
@@ -195,14 +227,12 @@ def sidebar_kalkulation() -> stammdaten.Company:
         )
 
     perf = st.sidebar.slider("Leistungsfaktor", 0.6, 1.6,
-                             float(chosen.leistungsfaktor), 0.05,
+                             float(defaults.leistungsfaktor), 0.05,
                              help=">1 = langsamer als die Richtwerte")
     mat = st.sidebar.slider("Materialfaktor", 0.6, 1.6,
-                            float(chosen.materialfaktor), 0.05)
+                            float(defaults.materialfaktor), 0.05)
     company.leistungsfaktor = perf
     company.materialfaktor = mat
-    if chosen.profil:
-        st.sidebar.caption(chosen.profil)
     return company
 
 
@@ -292,14 +322,36 @@ def section_upload(show_controls: bool = True):
 def section_items(items):
     """The parsed bill of quantities."""
     st.subheader("Ausgelesene Positionen")
+    priced_in_lv = any(
+        item.unit_price is not None or item.total_price is not None
+        for item in items
+    )
+    st.caption(
+        "EP und Gesamt zeigen nur Preise, die bereits in der Datei stehen. "
+        "„Pauschalposition“ bezeichnet die Abrechnungsart, keinen Preis."
+        if priced_in_lv else
+        "Diese LV-Datei enthält noch keine Positionspreise. "
+        "„Pauschalposition“ bezeichnet die Abrechnungsart, keinen Preis."
+    )
     frame = pd.DataFrame([{
         "OZ": i.key(),
         "Position": i.short_text,
         "Menge": i.quantity,
         "Einheit": constants.normalize_unit(i.unit),
-        "Pauschal": "ja" if i.is_lump_sum else "",
+        "Abrechnung": "Pauschal" if i.is_lump_sum else "Menge × Einheit",
+        "EP (€)": i.unit_price,
+        "GP (€)": i.total_price,
     } for i in items])
-    st.dataframe(frame, width="stretch", hide_index=True, height="stretch")
+    st.dataframe(
+        frame,
+        column_config={
+            "EP (€)": st.column_config.NumberColumn(format="€ %.2f"),
+            "GP (€)": st.column_config.NumberColumn(format="€ %.2f"),
+        },
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+    )
 
 
 def source_document(source):
@@ -639,93 +691,252 @@ def section_kalkulation(calculated, cov, data):
     return calculated
 
 
-def section_logic(items, remarks, hybrid_results, findings):
-    """Deterministic logic overview with direct drill-down."""
-    high = sum(1 for r in hybrid_results if r.risk_level == "high")
-    medium = sum(1 for r in hybrid_results if r.risk_level == "medium")
-    exposure = sum(r.euro_exposure for r in hybrid_results
-                   if r.risk_level in ("high", "medium"))
-
-    a, b, c = st.columns(3)
-    a.metric("Regelverstöße High", high)
-    b.metric("Hinweise Medium", medium)
-    c.metric("Betroffenes €-Exposure", f"€{exposure:,.0f}")
-
-    remark_findings = [
-        finding for finding in findings
-        if finding.detector == "vague_scope"
-        and finding.item.key().startswith("VORB-")
-    ]
-    if remark_findings:
-        st.subheader("Vertragsvorbemerkungen")
-        st.dataframe(pd.DataFrame([{
-            "Referenz": finding.item.key(),
-            "Hinweis": finding.rationale,
-            "Schweregrad": finding.severity,
-        } for finding in remark_findings]),
-            width="stretch", hide_index=True)
-
-    item_by_key = {item.key(): item for item in items}
-    known_flags = (
-        "META_MISMATCH", "ZERO_QTY", "MISSING_SPEC", "SCOPE_GAP",
-        "CATEGORY_MISMATCH", "QTY_OUTLIER", "MISSING_FOLLOW_UP",
+def section_logic(
+    items,
+    remarks,
+    hybrid_results,
+    findings,
+    calculated=None,
+    filename: str = "",
+):
+    """Cluster logic findings with deterministic and optional LLM evaluations."""
+    del hybrid_results, findings
+    facts_by_key = {item.key(): facts.extract_facts(item) for item in items}
+    cluster_list = clusters.build_clusters(
+        items,
+        facts_by_key,
+        calculated=calculated,
     )
-    rows = []
-    for result in hybrid_results:
-        item = item_by_key.get(result.key)
-        if item is None:
-            continue
-        logic_flags = [
-            detail for detail in result.reasons
-            if any(flag in detail for flag in known_flags)
-        ]
-        if not logic_flags and result.risk_level == "low":
-            continue
-        rows.append({
-            "OZ": item.key(),
-            "Position": item.short_text[:58],
-            "Menge": item.quantity,
-            "Einheit": constants.normalize_unit(item.unit),
-            "Regel-Flags": ", ".join(logic_flags) if logic_flags else "—",
-            "Schweregrad": result.risk_level,
-            "€-Exposure": round(result.euro_exposure, 2),
-            "Begründung": " | ".join(result.reasons),
+
+    cluster_flags = logic.check_cluster_rules(
+        cluster_list,
+        items,
+        facts_by_key,
+        calculated=calculated,
+        remarks=remarks,
+    )
+
+    payloads = {}
+    cluster_by_id = {cluster.cluster_id: cluster for cluster in cluster_list}
+    item_by_key = {item.key(): item for item in items}
+    for cluster in cluster_list:
+        payload = {
+            "cluster_id": cluster.cluster_id,
+            "kind": cluster.kind,
+            "title": cluster.title,
+            "positions": [
+                {
+                    "oz": oz,
+                    "short_text": item_by_key[oz].short_text if oz in item_by_key else "",
+                    "facts": (
+                        {
+                            "object_tag": facts_by_key[oz].object_tag,
+                            "phase": facts_by_key[oz].phase,
+                            "dn": facts_by_key[oz].dn,
+                            "pn": facts_by_key[oz].pn,
+                            "depth_m": facts_by_key[oz].depth_m,
+                            "thickness_cm": facts_by_key[oz].thickness_cm,
+                            "material": facts_by_key[oz].material,
+                            "inclusive_terms": facts_by_key[oz].inclusive_terms,
+                        }
+                        if oz in facts_by_key
+                        else {}
+                    ),
+                }
+                for oz in cluster.positions
+                if oz in item_by_key
+            ],
+        }
+        payloads[cluster.cluster_id] = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+    raw_evaluations = evaluate_cluster_deep_cached(
+        filename or "uploaded-tender",
+        logic.RULES_VERSION,
+        payloads,
+    )
+
+    rule_by_id = {rule.id: rule for rule in logic.RULES}
+    cards = []
+    for flag in cluster_flags:
+        cluster = cluster_by_id.get(flag.cluster_id)
+        rule = rule_by_id.get(flag.rule_id)
+        cards.append({
+            "source": "deterministic",
+            "category": flag.rule_id,
+            "title": flag.cluster_title,
+            "analysis": flag.reason_de,
+            "confidence": 1.0,
+            "model": None,
+            "computed": dict(flag.computed),
+            "affected_ozs": list(flag.affected_positions),
+            "euro_exposure_estimate": (
+                cluster.euro_exposure if cluster is not None else 0.0
+            ),
+            "din_ref": rule.din_ref if rule is not None else "",
+            "cluster_id": flag.cluster_id,
         })
 
-    if not rows:
-        st.success("Keine deterministischen Regelverstöße erkannt.")
+    for cluster_id, evaluation in raw_evaluations.items():
+        if evaluation.get("offline") is True:
+            continue
+        if evaluation.get("contradiction_category") in (None, "", "NONE"):
+            continue
+        cluster = cluster_by_id.get(cluster_id)
+        affected = evaluation.get("affected_positions") or (
+            cluster.positions if cluster is not None else []
+        )
+        cards.append({
+            "source": "llm",
+            "category": evaluation.get("contradiction_category", "UNKNOWN"),
+            "title": cluster.title if cluster is not None else cluster_id,
+            "analysis": evaluation.get("reason_de") or "",
+            "confidence": float(evaluation.get("confidence") or 0.0),
+            "model": evaluation.get("model") or "LLM",
+            "computed": {},
+            "affected_ozs": list(affected),
+            "euro_exposure_estimate": (
+                cluster.euro_exposure if cluster is not None else 0.0
+            ),
+            "din_ref": "",
+            "cluster_id": cluster_id,
+        })
+
+    cards.sort(
+        key=lambda card: (
+            -float(card["euro_exposure_estimate"]),
+            card["title"],
+        )
+    )
+    deterministic_count = sum(
+        1 for card in cards if card["source"] == "deterministic"
+    )
+    llm_count = sum(
+        1 for card in cards if card["source"] == "llm"
+    )
+
+    calculated_by_key = {
+        calculated_item.item.key(): calculated_item
+        for calculated_item in (calculated or [])
+    }
+    affected_ozs = {
+        oz for card in cards for oz in card["affected_ozs"]
+    }
+    unique_position_exposure = sum(
+        float(calculated_by_key[oz].total or 0.0)
+        for oz in affected_ozs
+        if oz in calculated_by_key
+    )
+
+    a, b = st.columns(2)
+    a.metric("Cluster-Befunde", len(cards))
+    b.metric(
+        "Summe EUR",
+        f"€{unique_position_exposure:,.0f}",
+        help="Kalkulationswert der betroffenen Positionen; jede OZ wird nur "
+             "einmal gezählt.",
+    )
+    c, d = st.columns(2)
+    c.metric("Deterministisch vs. LLM", f"{deterministic_count} vs. {llm_count}")
+    d.metric("Geprüfte Cluster", len(cluster_list))
+
+    if not cards:
+        st.success(
+            f"Keine Cluster-Widersprueche gefunden. "
+            f"{len(cluster_list)} Cluster wurden geprueft."
+        )
         return
 
-    frame = pd.DataFrame(rows)
-    severity_rank = {"low": 0, "medium": 1, "high": 2}
-    frame["_rank"] = frame["Schweregrad"].map(severity_rank)
-    frame = frame.sort_values(["_rank", "€-Exposure"], ascending=[False, False])
-    event = st.dataframe(
-        frame.drop(columns=["_rank"]),
-        width="stretch",
-        hide_index=True,
-        height="stretch",
-        key="logic_result_table",
-        on_select="rerun",
-        selection_mode="single-row",
-    )
-    selected_rows = event.selection.rows
-    if selected_rows:
-        row_index = selected_rows[0]
-        if 0 <= row_index < len(frame):
-            oz = frame.iloc[row_index]["OZ"]
-            item = item_by_key.get(oz)
-            if item is not None:
-                source = st.session_state.get("source")
-                filename = item.source_file or "Quelldokument"
-                payload = None
-                source_error = None
-                if source:
-                    try:
-                        filename, payload = source_document(source)
-                    except OSError as exc:
-                        source_error = str(exc)
-                show_position_details(item, items, remarks, filename, payload, source_error)
+    if "rfi_cluster_questions" not in st.session_state:
+        st.session_state["rfi_cluster_questions"] = []
+
+    for index, card in enumerate(cards):
+        with st.container(border=True):
+            top_left, top_right = st.columns([5, 2])
+            top_left.markdown(f"**{card['title']}**")
+            top_right.caption(f"€ {card['euro_exposure_estimate']:,.2f}")
+            st.badge(card["category"], icon="⚠️")
+
+            if card["source"] == "deterministic":
+                st.caption("🔒 Deterministisch")
+            else:
+                confidence = card["confidence"]
+                st.caption(
+                    f"{card['model']} · Confidence {confidence:.0%}"
+                )
+
+            st.write(card["analysis"])
+            with st.expander("Analyse und betroffene Positionen"):
+                st.markdown("**Technische Einordnung**")
+                st.write(card["analysis"])
+
+                st.markdown("**Rechenweg**")
+                computed = card["computed"]
+                if computed:
+                    st.dataframe(
+                        pd.DataFrame([
+                            {"Kennzahl": str(key), "Wert": str(value)}
+                            for key, value in computed.items()
+                        ]),
+                        width="stretch",
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("Keine deterministische Zwischenrechnung vorhanden.")
+
+                st.markdown("**Kaufmännische Bedeutung**")
+                st.write(
+                    f"Geschätzter Wert des betroffenen Clusters: "
+                    f"€ {card['euro_exposure_estimate']:,.2f}"
+                    + (
+                        f" · {card['din_ref']}"
+                        if card["din_ref"]
+                        else ""
+                    )
+                )
+
+                affected_rows = []
+                for oz in card["affected_ozs"]:
+                    item = item_by_key.get(oz)
+                    if item is None:
+                        continue
+                    calculated_item = calculated_by_key.get(oz)
+                    euro = (
+                        float(calculated_item.total or 0.0)
+                        if calculated_item is not None
+                        else 0.0
+                    )
+                    affected_rows.append({
+                        "OZ": item.key(),
+                        "Kurztext": item.short_text,
+                        "Menge": item.quantity,
+                        "Einheit": constants.normalize_unit(item.unit),
+                        "EUR": round(euro, 2),
+                    })
+                if affected_rows:
+                    st.dataframe(
+                        pd.DataFrame(affected_rows),
+                        width="stretch",
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("Keine betroffenen OZ hinterlegt.")
+
+            if st.button(
+                "Als Bieterfrage uebernehmen",
+                key=f"rfi_cluster_{card['cluster_id']}_{index}",
+            ):
+                question = dict(card)
+                question["affected_ozs"] = list(card["affected_ozs"])
+                existing_ids = {
+                    entry.get("cluster_id")
+                    for entry in st.session_state["rfi_cluster_questions"]
+                }
+                if card["cluster_id"] not in existing_ids:
+                    st.session_state["rfi_cluster_questions"].append(question)
 
 
 def section_hybrid_risky(items, hybrid_results, findings):
@@ -795,7 +1006,10 @@ def section_hybrid_risky(items, hybrid_results, findings):
         st.success("Keine Position im gewählten Risiko-Filter.")
 
     st.divider()
-    section_export(findings)
+    section_export(
+        findings,
+        cluster_evaluations=st.session_state.get("rfi_cluster_questions"),
+    )
 
 
 def section_tricky(calculated):
@@ -960,7 +1174,7 @@ def constants_sources() -> list[str]:
     return load_reference().get("meta", {}).get("sources", [])
 
 
-def section_export(findings):
+def section_export(findings, cluster_evaluations=None):
     """Bieterfragen-Katalog download. Lights up when task 006 lands."""
     st.subheader("10 · The letter")
     if not findings:
@@ -970,7 +1184,11 @@ def section_export(findings):
 
     import export_rfi
     project = {"title": "Bieterfragen-Katalog"}
-    catalog = export_rfi.build_catalog(findings, project)
+    catalog = export_rfi.build_catalog(
+        findings,
+        project,
+        cluster_evaluations=cluster_evaluations,
+    )
     if not catalog:
         st.button("Export clarification letter (.docx)", disabled=True)
         st.caption("No findings are available for export.")
@@ -1158,12 +1376,17 @@ def main():
             st.rerun()
 
     page = st.session_state.get("active_page", PAGES[0])
-    st.title("Logik" if page == "Logic" else page)
+    if page == "Logic":
+        page = "Logik"
+        st.session_state["active_page"] = page
+    st.title(page)
     use_jev = False
-    if page in ("Logic", "Heikle Positionen"):
+    if page in ("Logik", "Heikle Positionen"):
         use_jev = st.sidebar.checkbox(
             "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
-            value=classify.jev_available(),
+            value=False,
+            help="Startet nur nach Aktivierung eine externe Modellprüfung. "
+                 "Deterministische Regeln laufen unabhängig davon.",
         )
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
@@ -1225,8 +1448,15 @@ def main():
                 remarks,
                 calculated,
             )
-        elif page == "Logic":
-            section_logic(items, remarks, hybrid_results, findings)
+        elif page == "Logik":
+            section_logic(
+                items,
+                remarks,
+                hybrid_results,
+                findings,
+                calculated=calculated,
+                filename=label,
+            )
         elif page == "Heikle Positionen":
             section_hybrid_risky(items, hybrid_results, findings)
 

@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from core import constants
-from core.models import Finding, LogicResult, NormalizedItem
+from core.models import ClusterFlag, Finding, LogicResult, NormalizedItem
 from core.objects import UNKNOWN_TAG, ObjectRow, build, tag_of
 from utils.text_cleaning import clean_item_text, compare_key
 
@@ -81,6 +81,620 @@ MAX_PEER_SPREAD = 10.0      # p75/p25 above this -> group too heterogeneous
 DUPLICATE_MIN_VALUE = 500.0  # ignore trivial repeats
 
 
+@dataclass(frozen=True)
+class UnitBridge:
+    """A permitted conversion corridor between two normalized units."""
+
+    from_unit: str
+    to_unit: str
+    factor_min: float
+    factor_max: float
+    basis: str
+
+    def corridor(self, qty: float) -> tuple[float, float]:
+        """Return the lower and upper conversion corridor for a quantity."""
+        return (self.factor_min * qty, self.factor_max * qty)
+
+
+@dataclass(frozen=True)
+class RuleSpec:
+    """Editable definition of one cluster-level construction rule."""
+
+    id: str
+    kind: str
+    subject: str
+    object: str
+    phase_subject: str
+    scope: str
+    bounds: tuple[float, float]
+    bridge: UnitBridge | None
+    tolerance: float
+    min_exposure_eur: float
+    suppress_if_inclusive: bool
+    din_ref: str
+    severity: str
+    reason_de: str
+
+
+RULES_VERSION = "1"
+
+# Civil engineers may maintain this catalogue. Bounds are factor corridors,
+# bridges are explicit conversions, and every rule has an exposure threshold.
+TRENCH_BRIDGE = UnitBridge(
+    from_unit="m",
+    to_unit="m3",
+    factor_min=0.8,
+    factor_max=1.2,
+    basis="breite_m_x_tiefe_m",
+)
+RULES: tuple[RuleSpec, ...] = (
+    RuleSpec(
+        "TRENCH_VOLUME", "ratio", "Leitungsgraben", "Bodenaushub", "",
+        "section", (0.8, 1.2), TRENCH_BRIDGE, 0.20, 5000.0, True, "",
+        "high",
+        "Leitungsgraben und Bodenaushub weichen vom plausiblen Tiefen-Breiten-Korridor ab.",
+    ),
+    RuleSpec(
+        "BEDDING_IN_TRENCH", "containment", "Bettung", "Bodenaushub", "",
+        "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
+        "high",
+        "Bettungsmenge liegt oberhalb der enthaltenen Erd-/Grabenaushubmenge.",
+    ),
+    RuleSpec(
+        "BACKFILL_BALANCE", "containment", "Verfuellung", "Bodenaushub", "",
+        "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
+        "high",
+        "Verfuellmenge liegt oberhalb der Bodenaushubmenge.",
+    ),
+    RuleSpec(
+        "DIN4124_VERBAU", "requires", "Grabenverbau", "Aboeschung", "",
+        "section", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN 4124",
+        "high",
+        "Tiefe ueber 1,25 m verlangt Grabenverbau oder Aboeschung.",
+    ),
+    RuleSpec(
+        "PRESSURE_TEST", "requires", "phase pruefung", "montage_trinkwasser_druckrohr", "",
+        "system", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN EN 805",
+        "high",
+        "Montiertes Trink-/Druckrohr aus PE, Guss oder Stahl benoetigt eine Pruefposition.",
+    ),
+    RuleSpec(
+        "SURFACE_RESTORE", "requires", "phase wiederherstellung", "abbruch_oberflaeche", "",
+        "section", (1.0, 1.0), None, 0.0, 2000.0, True, "",
+        "high",
+        "Abbruch von Asphalt, Pflaster oder Decke verlangt eine Wiederherstellung.",
+    ),
+    RuleSpec(
+        "SHAFT_COVER_CARD", "cardinality", "Schachtabdeckungen", "Schaechte", "",
+        "section", (0.8, 1.2), None, 0.20, 1000.0, True, "",
+        "medium",
+        "Anzahl der Schachtabdeckungen und Schaechte liegt ausserhalb 0,8 bis 1,2.",
+    ),
+    RuleSpec(
+        "DN_STEP", "spec_consistency", "DN-Sprung", "reduzier|uebergang|adapter", "",
+        "system", (2.0, 2.0), None, 0.0, 2000.0, True, "",
+        "medium",
+        "Im System liegt ein Sprung von mindestens zwei Normstufen ohne Ausgleichselement.",
+    ),
+    RuleSpec(
+        "SITE_SETUP", "presence", "Baustelleneinrichtung", "", "",
+        "frame", (1.0, 1.0), None, 0.0, 1000.0, True, "",
+        "medium",
+        "Im Projekt fehlt ein Frame-Cluster zur Baustelleneinrichtung.",
+    ),
+)
+
+
+def _rule_by_id(rule_id: str) -> RuleSpec:
+    for rule in RULES:
+        if rule.id == rule_id:
+            return rule
+    raise KeyError(f"Unbekannte Regel {rule_id}")
+
+
+def _item_text(item: NormalizedItem) -> str:
+    return clean_item_text(f"{item.short_text} {item.long_text}".lower())
+
+
+def _subject_suppressed(
+    rule: RuleSpec,
+    subject_items: Sequence[NormalizedItem],
+    facts: dict[str, object],
+) -> bool:
+    if not rule.suppress_if_inclusive:
+        return False
+
+    object_terms: tuple[str, ...]
+    if rule.id == "DIN4124_VERBAU":
+        object_terms = ("verbau", "aussteif", "aboeschung", "abschung")
+    elif rule.id == "PRESSURE_TEST":
+        object_terms = ("pruefung", "dichtheit", "druckpruefung")
+    elif rule.id == "SURFACE_RESTORE":
+        object_terms = ("wiederherstell", "instandsetz", "decke schliessen")
+    elif rule.id == "BEDDING_IN_TRENCH":
+        object_terms = ("bodenaushub", "aushub")
+    elif rule.id == "BACKFILL_BALANCE":
+        object_terms = ("bodenaushub", "aushub")
+    elif rule.id == "TRENCH_VOLUME":
+        object_terms = ("bodenaushub", "aushub")
+    else:
+        object_terms = tuple(
+            term.strip().lower()
+            for term in rule.object.replace("|", " ").split()
+            if term.strip()
+        )
+        if rule.id == "SHAFT_COVER_CARD":
+            object_terms = ("schachtabdeckung", "abdeckung", "deckel", "schacht")
+
+    for item in subject_items:
+        position_facts = facts.get(item.key())
+        if position_facts is None:
+            raise KeyError(f"PositionFacts fehlen fuer Position {item.key()}")
+        for inclusive in position_facts.inclusive_terms:
+            if any(term in inclusive for term in object_terms):
+                return True
+    return False
+
+
+def suppressed_by_remarks(remarks: Sequence[str] | None, rule: RuleSpec | str) -> bool:
+    """Project-wide remark suppression for a rule.
+
+    A remark suppresses only when an object term and one of
+    ``nebenleistung``, ``bauseits`` or ``gesondert`` occur near one another.
+    """
+    if not remarks:
+        return False
+    spec = _rule_by_id(rule) if isinstance(rule, str) else rule
+
+    terms: tuple[str, ...]
+    if spec.id == "DIN4124_VERBAU":
+        terms = ("verbau", "aussteifung", "aboeschung", "abschung")
+    elif spec.id == "PRESSURE_TEST":
+        terms = ("pruefung", "dichtheit", "druckpruefung")
+    elif spec.id == "SURFACE_RESTORE":
+        terms = ("wiederherstellung", "instandsetzung")
+    elif spec.id in ("BEDDING_IN_TRENCH", "BACKFILL_BALANCE", "TRENCH_VOLUME"):
+        terms = ("bodenaushub", "aushub", "graben")
+    elif spec.id == "SHAFT_COVER_CARD":
+        terms = ("schachtabdeckung", "abdeckung", "schacht")
+    elif spec.id == "DN_STEP":
+        terms = ("reduzier", "uebergang", "adapter")
+    elif spec.id == "SITE_SETUP":
+        terms = ("baustelleneinrichtung",)
+    else:
+        terms = tuple(term for term in spec.object.lower().replace("|", " ").split() if term)
+
+    markers = ("nebenleistung", "bauseits", "gesondert")
+    for remark in remarks:
+        text = clean_item_text(str(remark)).lower()
+        for term in terms:
+            start = text.find(term)
+            if start < 0:
+                continue
+            window = text[max(0, start - 80):start + 120]
+            if any(marker in window for marker in markers):
+                return True
+    return False
+
+
+def _sum_tag_quantities(
+    positions: Sequence[NormalizedItem],
+    facts: dict[str, object],
+    object_tag: str,
+    allowed_units: set[str] | None = None,
+) -> float:
+    total = 0.0
+    for item in positions:
+        position_facts = facts.get(item.key())
+        if position_facts is None:
+            raise KeyError(f"PositionFacts fehlen fuer Position {item.key()}")
+        if position_facts.object_tag != object_tag:
+            continue
+        unit = constants.normalize_unit(item.unit)
+        if allowed_units is not None and unit not in allowed_units:
+            continue
+        total += item.quantity
+    return total
+
+
+def _sum_text_quantities(
+    positions: Sequence[NormalizedItem],
+    unit: str,
+    terms: tuple[str, ...],
+) -> float:
+    normalized_unit = constants.normalize_unit(unit)
+    total = 0.0
+    for item in positions:
+        if constants.normalize_unit(item.unit) != normalized_unit:
+            continue
+        text = _item_text(item)
+        if any(term in text for term in terms):
+            total += item.quantity
+    return total
+
+
+def _make_flag(
+    rule: RuleSpec,
+    cluster,
+    reason: str,
+    computed: dict,
+    affected_positions: Sequence[str],
+) -> ClusterFlag:
+    return ClusterFlag(
+        rule_id=rule.id,
+        kind=rule.kind,
+        cluster_id=cluster.cluster_id,
+        cluster_title=cluster.title,
+        severity=rule.severity,
+        reason_de=reason,
+        computed=computed,
+        affected_positions=list(dict.fromkeys(affected_positions)),
+    )
+
+
+def check_cluster_rules(
+    clusters,
+    items,
+    facts,
+    calculated=None,
+    remarks=None,
+) -> list[ClusterFlag]:
+    """Evaluate catalogue rules across section, system and frame clusters."""
+    item_by_key = {item.key(): item for item in items}
+    by_cluster_positions: dict[str, list[NormalizedItem]] = {}
+    for cluster in clusters:
+        by_cluster_positions[cluster.cluster_id] = [
+            item_by_key[key]
+            for key in cluster.positions
+            if key in item_by_key
+        ]
+
+    flags: list[ClusterFlag] = []
+
+    def exposure_ok(cluster, rule: RuleSpec) -> bool:
+        return cluster.euro_exposure >= rule.min_exposure_eur
+
+    def remark_reason(rule: RuleSpec) -> str:
+        return f"{rule.reason_de} Projektweit durch Vorbemerkung ausgeschlossen."
+
+    for rule in RULES:
+        if suppressed_by_remarks(remarks, rule):
+            # Projektweite Vorbemerkung: keine Regel- und keine False-Positive-Findung.
+            continue
+
+        if rule.id == "TRENCH_VOLUME":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].object_tag == "Leitungsgraben"
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                trench_m = _sum_tag_quantities(
+                    positions, facts, "Leitungsgraben", {"m"},
+                )
+                excavation_m3 = _sum_tag_quantities(
+                    positions, facts, "Leitungsgraben", {"m3"},
+                )
+                if excavation_m3 <= 0:
+                    excavation_m3 = _sum_tag_quantities(
+                        positions, facts, "Bodenaushub", {"m3"},
+                    )
+                if trench_m <= 0 or excavation_m3 <= 0:
+                    continue
+
+                depths: list[tuple[float, float]] = []
+                for item in subject_items:
+                    if constants.normalize_unit(item.unit) == "m":
+                        depth = facts[item.key()].depth_m
+                        depths.append((item.quantity, depth if depth is not None else 1.5))
+                weighted_depth = (
+                    sum(qty * depth for qty, depth in depths) / sum(qty for qty, _ in depths)
+                    if depths and sum(qty for qty, _ in depths) > 0
+                    else 1.5
+                )
+                low_raw = TRENCH_BRIDGE.factor_min * weighted_depth
+                high_raw = TRENCH_BRIDGE.factor_max * weighted_depth
+                low = low_raw * (1.0 - rule.tolerance)
+                high = high_raw * (1.0 + rule.tolerance)
+                actual = excavation_m3 / trench_m
+                if low <= actual <= high:
+                    continue
+                computed = {
+                    "aushub_m3": round(excavation_m3, 3),
+                    "graben_m": round(trench_m, 3),
+                    "je_m": round(actual, 3),
+                    "korridor": [round(low, 3), round(high, 3)],
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id in ("BEDDING_IN_TRENCH", "BACKFILL_BALANCE"):
+            subject_tag = "Bettung" if rule.id == "BEDDING_IN_TRENCH" else "Verfuellung"
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].object_tag == subject_tag
+                    or (
+                        rule.id == "BACKFILL_BALANCE"
+                        and any(
+                            term in _item_text(item)
+                            for term in ("verfuell", "verfüll", "hinterfuell", "hinterfüll", "auffuell", "auffüll")
+                        )
+                    )
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                subject_units = {
+                    constants.normalize_unit(item.unit) for item in subject_items
+                }
+                if len(subject_units) != 1:
+                    continue
+                unit = next(iter(subject_units))
+                if unit != "m3":
+                    continue
+                subject_qty = sum(item.quantity for item in subject_items)
+                object_qty = sum(
+                    item.quantity for item in positions
+                    if facts[item.key()].object_tag == rule.object
+                    and constants.normalize_unit(item.unit) == unit
+                )
+                if object_qty <= 0:
+                    continue
+                if subject_qty <= object_qty * (1.0 + rule.tolerance):
+                    continue
+                ratio = subject_qty / object_qty
+                computed = {
+                    "subject_qty": round(subject_qty, 3),
+                    "object_qty": round(object_qty, 3),
+                    "unit": unit,
+                    "ratio": round(ratio, 3),
+                    "tolerance": rule.tolerance,
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "DIN4124_VERBAU":
+            aggregate_subjects: list[NormalizedItem] = []
+            candidate_clusters = []
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].depth_m is not None
+                    and facts[item.key()].depth_m > 1.25
+                    and facts[item.key()].object_tag != "Grabenverbau"
+                    and not any(
+                        term in _item_text(item)
+                        for term in ("verbau", "verbauen", "verbaut")
+                    )
+                ]
+                if not subject_items:
+                    continue
+                has_object = any(
+                    facts[item.key()].object_tag == "Grabenverbau"
+                    or "aboeschung" in _item_text(item)
+                    or "ab\u00f6schung" in _item_text(item)
+                    for item in positions
+                )
+                if has_object:
+                    continue
+                aggregate_subjects.extend(subject_items)
+                if cluster not in candidate_clusters:
+                    candidate_clusters.append(cluster)
+            if aggregate_subjects and not _subject_suppressed(
+                rule, aggregate_subjects, facts
+            ):
+                cluster = candidate_clusters[0]
+                computed = {
+                    "depth_m_max": round(
+                        max(
+                            facts[item.key()].depth_m
+                            for item in aggregate_subjects
+                        ),
+                        3,
+                    ),
+                    "schwelle_m": 1.25,
+                    "objekt": "Grabenverbau oder Aboeschung",
+                }
+                reason = f"{rule.reason_de} ({rule.din_ref})."
+                flags.append(_make_flag(
+                    rule, cluster, reason, computed,
+                    [item.key() for item in aggregate_subjects],
+                ))
+
+        elif rule.id == "PRESSURE_TEST":
+            for cluster in (c for c in clusters if c.kind == "SYSTEM"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = []
+                for item in positions:
+                    position_facts = facts[item.key()]
+                    text = _item_text(item)
+                    material = (position_facts.material or "").lower()
+                    is_pressure_material = any(
+                        term in material for term in ("pe", "guss", "ggg", "stahl")
+                    )
+                    if (
+                        is_pressure_material
+                        and position_facts.phase == "montage"
+                        and ("trinkwasser" in text or "druckrohr" in text)
+                    ):
+                        subject_items.append(item)
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                has_test = any(
+                    facts[item.key()].phase == "pruefung"
+                    for item in positions
+                )
+                if has_test:
+                    continue
+                computed = {
+                    "subject_count": len(subject_items),
+                    "material": sorted({
+                        facts[item.key()].material
+                        for item in subject_items
+                        if facts[item.key()].material
+                    }),
+                }
+                reason = f"{rule.reason_de} ({rule.din_ref})."
+                flags.append(_make_flag(
+                    rule, cluster, reason, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SURFACE_RESTORE":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].phase == "abbruch"
+                    and any(term in _item_text(item) for term in ("asphalt", "pflaster", "decke"))
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                has_restore = any(
+                    facts[item.key()].phase == "wiederherstellung"
+                    for item in positions
+                )
+                if has_restore:
+                    continue
+                computed = {
+                    "abbruch_count": len(subject_items),
+                    "oberflaechen": sorted({
+                        term
+                        for item in subject_items
+                        for term in ("asphalt", "pflaster", "decke")
+                        if term in _item_text(item)
+                    }),
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SHAFT_COVER_CARD":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                shafts = _sum_text_quantities(
+                    positions, "St", ("schacht",),
+                )
+                covers = _sum_text_quantities(
+                    positions, "St", ("schachtabdeckung", "abdeckung", "deckel"),
+                )
+                if shafts <= 0 or covers <= 0:
+                    continue
+                low = rule.bounds[0] * (1.0 - rule.tolerance)
+                high = rule.bounds[1] * (1.0 + rule.tolerance)
+                if low <= covers / shafts <= high:
+                    continue
+                subject_items = [
+                    item for item in positions
+                    if "schacht" in _item_text(item)
+                    or "abdeckung" in _item_text(item)
+                    or "deckel" in _item_text(item)
+                ]
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
+                computed = {
+                    "abdeckungen": round(covers, 3),
+                    "schaechte": round(shafts, 3),
+                    "ratio": round(covers / shafts, 3),
+                    "korridor": [round(low, 3), round(high, 3)],
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "DN_STEP":
+            dn_norms = (
+                50, 63, 80, 100, 125, 150, 200, 250, 300, 400, 500,
+            )
+            for cluster in (c for c in clusters if c.kind == "SYSTEM"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                dns = [
+                    facts[item.key()].dn
+                    for item in positions
+                    if facts[item.key()].dn is not None
+                ]
+                if len(dns) < 2:
+                    continue
+                indexes = [
+                    dn_norms.index(dn) for dn in dns
+                    if dn in dn_norms
+                ]
+                if len(indexes) < 2 or max(indexes) - min(indexes) < 2:
+                    continue
+                if any(
+                    any(term in _item_text(item) for term in ("reduzier", "uebergang", "adapter"))
+                    for item in positions
+                ):
+                    continue
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].dn is not None
+                ]
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
+                computed = {
+                    "dn_min": min(dns),
+                    "dn_max": max(dns),
+                    "normstufen_sprung": max(indexes) - min(indexes),
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SITE_SETUP":
+            frame_present = False
+            for cluster in clusters:
+                if cluster.kind == "FRAME" and cluster.title == "Baustelleneinrichtung":
+                    frame_present = len(cluster.positions) > 0
+                    if frame_present:
+                        break
+            if not frame_present:
+                site_subject = [
+                    item for item in items
+                    if "baustelleneinrichtung" in _item_text(item)
+                ]
+                if _subject_suppressed(rule, site_subject, facts):
+                    continue
+                affected = [item.key() for item in site_subject]
+                dummy = next(
+                    (c for c in clusters if c.kind == "SECTION"),
+                    None,
+                )
+                if dummy is None:
+                    continue
+                if dummy.euro_exposure < rule.min_exposure_eur:
+                    continue
+                flags.append(_make_flag(
+                    rule, dummy, rule.reason_de,
+                    {"frame_present": False}, affected,
+                ))
+
+    return flags
 @dataclass
 class Relation:
     """One evaluated rule, kept so the UI can show the arithmetic."""
@@ -315,6 +929,8 @@ def run_logic_engine(
     items: Sequence[NormalizedItem],
     rows: Sequence[ObjectRow] | None = None,
     pre_prices: dict[str, float] | None = None,
+    clusters=None,
+    facts=None,
 ) -> dict[str, LogicResult]:
     """Run deterministic, per-position rules for a tender of any practical size."""
 
@@ -450,6 +1066,22 @@ def run_logic_engine(
                 add(item, "MISSING_FOLLOW_UP", "medium",
                     f"Bodenaushub in Abschnitt {location!r}, aber keine "
                     "Verfüllungsposition gefunden.")
+
+    if clusters is not None and facts is not None:
+        for cluster_flag in check_cluster_rules(clusters, items, facts):
+            for position_key in cluster_flag.affected_positions:
+                if position_key not in results:
+                    continue
+                detail = (
+                    f"{cluster_flag.rule_id}: {cluster_flag.reason_de} "
+                    f"Rechnung={cluster_flag.computed}"
+                )
+                add(
+                    next(item for item in items if item.key() == position_key),
+                    cluster_flag.rule_id,
+                    cluster_flag.severity,
+                    detail,
+                )
 
     return results
 

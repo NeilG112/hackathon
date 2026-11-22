@@ -1,0 +1,839 @@
+{
+ "015da67f1b2a35b0e26542813dad784935c46478": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "02f3066a27e6338e2ef7ba439ae6ea6fafdd66c3": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "054bc5a465700081cbc8abe9fa05dffbbf47e87a": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "09191861110088972ffc2616395ed91841f4bde9": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "0922830e490e74f6ec2ff5f455842d146034f785": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Der angeforderte Text wurde nicht bereitgestellt. Bitte stellen Sie eine Frage zu den bereitgestellten Daten.",
+  "severity": "low"
+ },
+ "0b45c46f7677f324482262b28bf0e556c8c8a369": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Daten basieren ausschließlich auf dem bereitgestellten Cluster-Payload.",
+  "severity": "low"
+ },
+ "0c897ced599827e33b16e92c1839f245ff075bbc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "0ccbad4f3ece950f7cdbc5a5b6ccd9316bff31c7": {
+  "affected_positions": [
+   "03010001",
+   "03010002"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "In dem vorliegenden Cluster-Payload sind zwei Positionen aufgeführt: 'Baustelle einrichten' (OZ 03010001) und 'Baustelle räumen' (OZ 03010002). Bei der Baustelleneinrichtung umfasst die Pauschale unter anderem das Beseitigen von Aufwuchs und die erforderlichen festen Arbeiten; Mieten, Pacht und Gebühren sind nicht enthalten.",
+  "severity": "low"
+ },
+ "10e6f443d95868abeb2bb3ebfcd63cee3425ba95": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Informationen zu den Kosten oder Mengen in den bereitgestellten Daten vorhanden.",
+  "severity": "low"
+ },
+ "122a93c75e88e9173d3e80581f2fc026d72d5c14": {
+  "affected_positions": [
+   "811",
+   "813",
+   "814",
+   "815",
+   "816",
+   "817"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Basierend auf dem bereitgestellten Payload wird ein Druckrohr aus PE100 mit einer Nennweite (dn) von 63 in einem Leitungsgraben mit einer Tiefe von 1,5 m verbaut (oz 811). Weitere Formstücke wie Muffen, Winkel (45° und 90°), Kappen und T-Stücke für PE DN/OD63 SDR11 sind ebenfalls aufgeführt (oz 813-817).",
+  "severity": "low"
+ },
+ "14a465fd27dfafa17264665375f2adf7f13e6191": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "160c5c672204bc334619f9073f93e45a61c3a9c5": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "174e7076b12c64b5624b1b0d9594bb104c59f91f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "198088ef425597c0587d1f314a48c238b9182cae": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Widersprüche gefunden.",
+  "severity": "low"
+ },
+ "1d31f9a848cc9ad2d9bd48045cdcac218e8efdd7": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "1e5df39b16917ea0f6b085fbb79d477ab01b9775": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "2b77d67bac4a59e0f23f9fc10b9ac7b69b9339a1": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Stundenlöhnen (Baufacharbeiter/-in, Bauwerker/-in), Pumpen (aufstellen, räumen, vorhalten, betreiben), einem Pumpensumpf aus Beton (DN1000), einer Kontrollprüfung des Unterbaus/Planums sowie Rammsondierungen DPH.",
+  "severity": "low"
+ },
+ "2c9afb1d0fb62bd1421dbc2a382374066e498cfd": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "31748153482b40344ef8ed8a690a487cb0275ede": {
+  "affected_positions": [
+   "02040001",
+   "02040002",
+   "02040003",
+   "02040004",
+   "02040005",
+   "02040006",
+   "02040007",
+   "02040008",
+   "02040009",
+   "02040010",
+   "02040011",
+   "02040012"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Wasserhaltungsarbeiten, einschließlich eines Pumpensumpfs mit einem Filterrohr DN400, dem Ein- und Ausbau von Pumpen mit Elektromotoren, Absetzbecken-Containern bis 5m3 sowie der Herstellung einer Sickermulde.",
+  "severity": "low"
+ },
+ "32baea3d9950497f02c9f195a18e41bde609dc69": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "34ffe04f3e923250175a6168010cb9802c01e32f": {
+  "affected_positions": [
+   "211",
+   "212",
+   "213",
+   "214",
+   "215",
+   "216"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zur Erstellung und Lieferung von Foto- und Bestands-Dokumentationen.",
+  "severity": "low"
+ },
+ "36e4f58e6ec2299d221014d4a46971ae89448a55": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "36fb975da109acf30391897cfa6fe83fb48ee49f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "3b1d356ac4025ac8c93d729b158f37a30ef79b23": {
+  "affected_positions": [
+   "421",
+   "422"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Basierend auf dem Payload gibt es zwei Positionen: Eine höhenverstellbare Straßenkappe für eine Wasserltg Absperrarmatur Gr.2 (oz 421) sowie eine höhenverstellbare Straßenkappe für eine Wasserltg Unterflurhydrant DN80 (oz 422). Beide bestehen aus Guss.",
+  "severity": "low"
+ },
+ "3c0851e183988905d2b1eec07c48ef93d724aed9": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu verschiedenen Bauteilen und Materialien (z. B. Beton, Schotterrasen, Verfüllmaterialien für Leitungsgräben) sowie deren Dicken und Phasen, jedoch keine widersprüchlichen Angaben innerhalb des Datensatzes.",
+  "severity": "low"
+ },
+ "46000e9c46f8749840136a47499af4b6cbb71cec": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4689c65eb5389687d8dde4fcf2e91da55c77ac3f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4a6cad57ab384eab35d386a4c0a627239445aa05": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "4ccf8a297021b6baeb0e610c5d6b90b730cc536f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4dae8915d5abd57c740b5d194cb28355318e521c": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "4e8eff6be7b0e7358d3fe80141c55f1832155d6a": {
+  "affected_positions": [
+   "511",
+   "512",
+   "513",
+   "514",
+   "515",
+   "516"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu verschiedenen Abbruch- und Rückbauarbeiten (Bordstein Beton, Asphaltbelag, Befestigung), aber keine Informationen zu spezifischen statischen Berechnungen oder Lasten, die eine bauingenieurtechnische Bewertung über die reine Auflistung der Positionen hinaus zulassen.",
+  "severity": "low"
+ },
+ "4fb3312efc2aeffba80444630a73ff262bbcda0b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5027ddd99e9ef2d8982bc9c0710514896ab1dff0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "51f94dbdee1bf01282f83e955cbf11c6fbf25168": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "521c919f7ef1ea7b7a2c2e5a48e03aaa4a23fe32": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "586fde127be3b932b0455a9292ade63b5ae963ff": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5b5f2015f33b2c9c8454625f192bd8c4f99a7e89": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5b6f8ade6e73986e5976a02e5a2f3d2787ae099e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "5bc70cf184a07599399c59ad60f274abffc71dfb": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "60de3689c1088044b0aecce7acc84d346aed572b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "6169836d5e01aee3789c15bc8a8a387284b02aba": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "6a73c01d31990943361c95e1fa9fb48bba165de4": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "6e0dde1f83a6aabee4a962911c18ca120b3c035d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "713ff3dfef9760ade994bda57ab7fd2b1d813d46": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "73645837dfcbb257b31ffeee28a79ecfc0a46160": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "7a255ec9487e29ce1b2779f679b902e933547663": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine widersprüchlichen Angaben im Payload gefunden.",
+  "severity": "low"
+ },
+ "7e218169ee90f6540118ed1076dee20aebff2f91": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7ef8fea760c1e2cd2cb7323700fa2a6abb0b0032": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7f7056ba6419c900e6bc9e00b82c00cf2c997694": {
+  "affected_positions": [
+   "341",
+   "342"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu zwei Arten von Rasansaaten: Landschaftsrasen RSM7.1.2 (5g/m2) und Parkplatzrasen RSM5.1 (25g/m2). Weitere technische Details wie Material oder Tiefe sind nicht spezifiziert.",
+  "severity": "low"
+ },
+ "7f9dd5efc785de6a4c5b3d500bef2649bd8ef26c": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7fb045e0fd274e54e38892e283336a0483366402": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "8068c5f5a21f6f2eaf8331ef269123c2e6127aee": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "812df2ae514f40e06c7a44481c31e7634018d9e0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "81870536ad78b8656d0fd9e9152b0e6f84420f25": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "87c633c3c9e6a2bf9783317199ddce063efef6a6": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Daten aus dem Payload wurden präzise wiedergegeben.",
+  "severity": "low"
+ },
+ "8ee0632ba5d1f80218de5e22d674feccc911d4cd": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "906268fe135f19a450b198038be21f22b5a8dc23": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "955e2ceb998b4ccd7808fc61271de30fc158dcd8": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "984f9d49cac3a8f39765ff9ace9fbb9df7e12dbe": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "9c18c1331f3f2fe4953a46e8940e37b734bd8f7e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "9db9e12fd0a624569afe0f8ff992e05752a472d0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "9e8c93a7a993ab12eb3d8322a5bbe482b609dec5": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "9f9e49a90371b062f3dc3c5482d22bd3f1ef55fc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "a11a1e724524ac67afaa8469a764c082ff47209d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "a1f667a33b4cbad73606440412d4f6c94669004b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "a33b666c2a137b6ef40ff45a942c03ff3fb7474d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ad28e06796ead4ca559e289f620d3a6f6377735f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "b25f100bcbe1bfd0e0ced7278377d0500ba35ef3": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "babc277f47c380ec827f9bc0a7cdd191b63e7fa9": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "c360309470b43eb3c98318438f493a82b40312ca": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "c650a2da0d7b38d529ccb1381827c6ca759b756e": {
+  "affected_positions": [
+   "01010001",
+   "01010002",
+   "01010003",
+   "01010004",
+   "01010005",
+   "01010006"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine spezifischen Mengenangaben, Maße (außer der Bauzaunhöhe von 2,0 m) oder Zeiträume für die genannten Positionen.",
+  "severity": "low"
+ },
+ "c70a1b9c419db2274913b529c49a314f3c07ad8d": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine Informationen zu einem konkreten Baufortschritt oder einer Abweichung, sondern eine Liste von Leistungspositionen für den Rohrleitungsbau (DN 300/DA 355) aus GGG/Guss und PE100, einschließlich Zulagen und Formstücken.",
+  "severity": "low"
+ },
+ "c886f98486cd6513ea4a914aeed10cf9993b3505": {
+  "affected_positions": [
+   "02020001",
+   "02020002",
+   "02020003"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die verfügbaren Daten enthalten keine technischen Spezifikationen zu Material, Nennweite (dn), Tiefe oder Wandstärke, sondern beschränken sich auf vermessungstechnische Leistungen (Absteckung und Bestand).",
+  "severity": "low"
+ },
+ "cb83f99ca22b0f367c12cf7b08bd07cb51dfc3cc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "cbb16f017b653efaa86f875887830fa4e00ad550": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "d0508db1efcd2241b6b9c3f1b5ecf3adb18ad76b": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Aushubarbeiten (Baugrube, Gräben), Sandeinbettung und Rohrleitungsmarkierung.",
+  "severity": "low"
+ },
+ "d47fac0c108d09de02b96112ad38724516050e87": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "d4895afc1c2b33f5a4990882ca57bb180e611752": {
+  "affected_positions": [
+   "02010001",
+   "02010002"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zur Baustelleneinrichtung (OZ 02010001), einschließlich des Beseitigens von Aufwuchs, sowie zum Räumen der Baustelle (OZ 02010002). Weitere technische Details wie Tiefen oder Materialien sind nicht im Payload enthalten.",
+  "severity": "low"
+ },
+ "d83b8799fe6b69c462f94acef5c03c7d0c862365": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "d88189b76a87112ec403d12d493430078dc08ceb": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "dacb23519c896ed75905711397eb71768d0c9396": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "e182f3d6edf7569cbfe41e6a15933d0a3f111963": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "e19504cc2097adc8a5241e95ae12ac3012ac7350": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine Informationen zu spezifischen Sicherheitsabständen oder statischen Berechnungen, sondern eine Liste von Leistungspositionen für Erdarbeiten, Grabenverbau und Sicherungsmaßnahmen.",
+  "severity": "low"
+ },
+ "e4bb821412ad4e8e8f881202e96f311c341bf51b": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine spezifischen Informationen zu einem konkreten Bauvorhaben außer dem Titel \"Tiefbau-[PERSON_132] [PERSON_151]. Ost - Haupttrasse 2023 > Herrichten und Erschließen\". Es werden lediglich verschiedene Abbruch- und sonstigen Leistungen (z.B. Bordstein Beton abbrechen, Betonpflaster ausbauen, Oberboden abtragen) mit entsprechenden Positionsnummern (oz) aufgelistet.",
+  "severity": "low"
+ },
+ "e672e2753216dcfb0cadfe490cd641f5187d5ed7": {
+  "affected_positions": [],
+  "confidence": 0.45,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Alle drei Positionen sind sachlich konsistent und beschreiben unterschiedliche Leistungstypen (Aufstellen/Räumen, Umsetzen, Vorhalten) desselben Bauzauns H 2m. Die Positionsmenge für das Vorhalten (500 m × 20 Wochen) ist explizit angegeben und widerspricht nicht den anderen Positionen.",
+  "severity": "low"
+ },
+ "e7208cf219fe61e0c536d73cf27901ee93932a71": {
+  "affected_positions": [
+   "121",
+   "122",
+   "123"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Im bereitgestellten Cluster-Payload sind folgende Positionen für den Bauzaun (H 2m) aufgeführt: das Aufstellen und Räumen (oz 121), das Umsetzen (oz 122) sowie das Vorhalten (oz 123).",
+  "severity": "low"
+ },
+ "e781281c27d90160d17f0837a538b189e978a7f1": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ea3f84b290c86f62819c4221f58b960959302f9f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "edd81f89cd6fcedb5801f3d5b16bd55482b05d92": {
+  "affected_positions": [],
+  "confidence": 0.95,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Beide Positionen (421 und 422) beschreiben höhenverstellbare Straßenkappen aus Gusseisen gemäß DIN 4055/4056 für unterschiedliche Einsatzzwecke (Absperrarmatur bzw. Unterflurhydrant DN 80). Es liegen keine widersprüchlichen Angaben vor. Die Confidence ist jeweils 1.0. Keine Material- oder Maßkonflikte erkennbar.",
+  "severity": "low"
+ },
+ "f5127ff2173d5210da9a1b976410cd1afd4a0b71": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "f88c764a4f9a4a45c5e9b44ffdcc9045ad60938e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "f925a32c62c747d131caad1439fa626b3ad63428": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "fbaf1bf5491fb748a3cd279cd7e6722c32e25eed": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Antwort basiert ausschließlich auf den bereitgestellten Daten des Cluster-Payloads.",
+  "severity": "low"
+ },
+ "fbf0dc3a1e38a2a115368e8aaef9ad2974d5626d": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Anfrage enthält keine spezifische Frage zu den Daten. Basierend auf dem Cluster-Payload sind folgende Informationen verfügbar: Es handelt sich um Liefer- und Verlegeleistungen für eine Wasserleitung (Schachtinstallationen, Armaturen, Formstücke). Es sind verschiedene Komponenten mit DN-Nennweiten von 40 bis 300 aufgeführt, unter anderem aus den Materialien Stahl, Guss, PE100 und PVC, wobei viele Komponenten die Druckstufe PN 16 aufweisen.",
+  "severity": "low"
+ },
+ "fcd37974cae7b30730678151f683bd5df83130ea": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ff084fcde98a32624725675be0f93b8e4665a93e": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Widersprüche gefunden.",
+  "severity": "low"
+ },
+ "ff65ccb47b3616a72087cc9a0da1319b0d9925ae": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ }
+}

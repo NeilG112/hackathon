@@ -146,6 +146,57 @@ class NormalizedItem:
 
 
 @dataclass
+class Cluster:
+    """A cross-cutting or section-level set of tender positions."""
+
+    cluster_id: str
+    kind: str
+    title: str
+    positions: list[str] = field(default_factory=list)
+    euro_exposure: float = 0.0
+    unknown_share: float = 0.0
+
+    def as_dict(self) -> dict:
+        """JSON-safe form of the cluster and its OZ back-pointers."""
+        return {
+            "cluster_id": self.cluster_id,
+            "kind": self.kind,
+            "title": self.title,
+            "positions": list(self.positions),
+            "euro_exposure": self.euro_exposure,
+            "unknown_share": self.unknown_share,
+        }
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "Cluster":
+        data = dict(raw)
+        data["positions"] = list(data.get("positions") or ())
+        return cls(**data)
+
+
+@dataclass
+class ClusterFlag:
+    """One rule finding attached to an overlapping cluster."""
+
+    rule_id: str
+    kind: str
+    cluster_id: str
+    cluster_title: str
+    severity: str
+    reason_de: str
+    computed: dict = field(default_factory=dict)
+    affected_positions: list[str] = field(default_factory=list)
+
+    @property
+    def id(self) -> str:
+        return self.rule_id
+
+    @property
+    def title(self) -> str:
+        return self.cluster_title
+
+
+@dataclass
 class Finding:
     """One detector hit, as rendered in the UI and the RFI export."""
 
