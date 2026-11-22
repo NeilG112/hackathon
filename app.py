@@ -181,6 +181,61 @@ def evaluate_cluster_deep_cached(
 
 # --- sections --------------------------------------------------------------
 
+def linked_slider(
+    label: str,
+    min_value: float,
+    max_value: float,
+    default: float,
+    step: float,
+    key: str,
+    *,
+    help: str | None = None,
+) -> float:
+    """Render a slider with a directly editable number input."""
+    slider_key = f"{key}_slider"
+    number_key = f"{key}_number"
+    if slider_key not in st.session_state:
+        st.session_state[slider_key] = float(default)
+    if number_key not in st.session_state:
+        st.session_state[number_key] = float(default)
+
+    def sync_number_from_slider() -> None:
+        st.session_state[number_key] = st.session_state[slider_key]
+
+    def sync_slider_from_number() -> None:
+        st.session_state[slider_key] = st.session_state[number_key]
+
+    number_format = "%.0f" if step >= 1.0 else "%.1f" if step == 0.5 else "%.2f"
+    slider_format = "%.0f" if step >= 1.0 else "%.1f" if step == 0.5 else "%.2f"
+    slider_column, number_column = st.sidebar.columns([3, 1])
+
+    with slider_column:
+        value = st.slider(
+            label,
+            min_value=min_value,
+            max_value=max_value,
+            value=float(st.session_state[slider_key]),
+            step=step,
+            format=slider_format,
+            key=slider_key,
+            help=help,
+            on_change=sync_number_from_slider,
+        )
+    with number_column:
+        st.number_input(
+            f"{label} eingeben",
+            min_value=min_value,
+            max_value=max_value,
+            value=float(st.session_state[number_key]),
+            step=step,
+            format=number_format,
+            key=number_key,
+            label_visibility="collapsed",
+            on_change=sync_slider_from_number,
+        )
+    return float(value)
+
+
 def sidebar_kalkulation() -> stammdaten.Company:
     """The cost base the bottom-up calculation uses."""
     st.sidebar.header("Kalkulationsgrundlage")
@@ -189,29 +244,33 @@ def sidebar_kalkulation() -> stammdaten.Company:
         "Neutrale Startwerte, keine Firmenprofile. Passe sie an deine "
         "Kalkulationsgrundlage an."
     )
-    wage = st.sidebar.slider("Mittellohn (€/h)", 35.0, 95.0,
-                             float(defaults.mittellohn_eur_h), 0.5)
+
+    wage = linked_slider(
+        "Mittellohn (€/h)", 35.0, 95.0,
+        float(defaults.mittellohn_eur_h), 0.5, "mittellohn",
+    )
 
     # The markup, split into its three parts. Arithmetically a combined number
     # is identical — 15 + 5 is always 20 — but split, the estimator can see
     # which decision costs what: keep the AGK, waive the BGK on a strategic
     # job, set W&G where he wants it.
     st.sidebar.markdown("**Zuschläge**")
-    agk = st.sidebar.slider(
+    agk = linked_slider(
         "AGK — Allgemeine Geschäftskosten (%)", 0.0, 30.0,
-        float(defaults.agk_pct), 0.5,
+        float(defaults.agk_pct), 0.5, "agk",
         help="Kosten des Unternehmens außerhalb der Baustelle, auf ein "
              "ganzes Jahr gerechnet.")
-    bgk = st.sidebar.slider(
+    bgk = linked_slider(
         "BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
-        float(defaults.bgk_pct), 0.5)
-    wg = st.sidebar.slider(
+        float(defaults.bgk_pct), 0.5, "bgk")
+    wg = linked_slider(
         "W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
-        float(defaults.wg_pct), 0.5)
+        float(defaults.wg_pct), 0.5, "wg")
 
     # AGK is an annual figure. A ten-month job carries ten twelfths of it.
-    months = st.sidebar.slider(
+    months = linked_slider(
         "Bauzeit (Monate)", 1.0, 24.0, float(defaults.bauzeit_monate), 1.0,
+        "bauzeit",
         help="Nur die AGK werden anteilig umgelegt — BGK und W&G nicht.")
 
     company = stammdaten.Company(
@@ -226,11 +285,12 @@ def sidebar_kalkulation() -> stammdaten.Company:
             f"— {12 - months:+.0f} Monate gegenüber dem Jahr."
         )
 
-    perf = st.sidebar.slider("Leistungsfaktor", 0.6, 1.6,
-                             float(defaults.leistungsfaktor), 0.05,
-                             help=">1 = langsamer als die Richtwerte")
-    mat = st.sidebar.slider("Materialfaktor", 0.6, 1.6,
-                            float(defaults.materialfaktor), 0.05)
+    perf = linked_slider("Leistungsfaktor", 0.6, 1.6,
+                         float(defaults.leistungsfaktor), 0.05,
+                         "leistungsfaktor",
+                         help=">1 = langsamer als die Richtwerte")
+    mat = linked_slider("Materialfaktor", 0.6, 1.6,
+                        float(defaults.materialfaktor), 0.05, "materialfaktor")
     company.leistungsfaktor = perf
     company.materialfaktor = mat
     return company
@@ -402,6 +462,8 @@ def tender_document_html(
     remarks: list[str],
     selected_key: str,
     filename: str,
+    overrides: dict | None = None,
+    calculated_by_key: dict | None = None,
 ) -> str:
     """Render the parsed source tender as a navigable, highlighted document table."""
     rows = []
@@ -439,16 +501,32 @@ def tender_document_html(
         if item.is_lump_sum:
             description += '<div class="flag">Pauschalposition</div>'
 
+        override = (overrides or {}).get(item.key())
+        if override:
+            display_unit_price = override["ep"]
+            display_total_price = override["gp"]
+        else:
+            display_unit_price = item.unit_price
+            display_total_price = item.total_price
+            estimate = (calculated_by_key or {}).get(item.key())
+            if display_unit_price is None and estimate is not None:
+                display_unit_price = estimate.ep_mid
+            if display_total_price is None and estimate is not None:
+                display_total_price = estimate.total
+            if display_total_price is None and display_unit_price is not None:
+                display_total_price = display_unit_price * item.quantity
+
         selected = " selected" if item.key() == selected_key else ""
         row_id = ' id="selected-position"' if selected else ""
+        changed = " changed" if override else ""
         rows.append(
             f'<tr class="position{selected}"{row_id}>'
             f'<td class="oz">{html.escape(item.oz)}</td>'
             f'<td class="description">{description}</td>'
             f'<td class="number">{item.quantity:g}</td>'
             f'<td>{html.escape(item.unit)}</td>'
-            f'<td class="number">{_price(item.unit_price)}</td>'
-            f'<td class="number">{_price(item.total_price)}</td>'
+            f'<td class="number{changed}">{_price(display_unit_price)}</td>'
+            f'<td class="number{changed}">{_price(display_total_price)}</td>'
             "</tr>"
         )
 
@@ -481,6 +559,11 @@ def tender_document_html(
           .position.selected td {{ background: #fff3bf; }}
           .position.selected td:first-child {{ border-left: 4px solid #d59b00;
                                                 font-weight: 700; }}
+          .position td.changed {{
+            background: #ffedd5;
+            color: #9a3412;
+            font-weight: 700;
+          }}
           .long-text {{ margin-top: 4px; white-space: pre-wrap; }}
           .number {{ text-align: right; white-space: nowrap; }}
           .flag {{ margin-top: 5px; font-size: 12px; color: #64748b; }}
@@ -517,8 +600,84 @@ def show_position_details(
     filename: str,
     payload: bytes | None,
     source_error: str | None,
+    calculated_by_key: dict | None = None,
 ):
     """Show the entire source tender with the matching position highlighted."""
+    if "manual_prices" not in st.session_state:
+        st.session_state["manual_prices"] = {}
+    manual_prices = st.session_state["manual_prices"]
+    item_key = item.key()
+    estimate = (calculated_by_key or {}).get(item_key)
+    override = manual_prices.get(item_key)
+
+    base_ep = item.unit_price
+    base_gp = item.total_price
+    if base_ep is None and estimate is not None:
+        base_ep = estimate.ep_mid
+    if base_gp is None and estimate is not None:
+        base_gp = estimate.total
+    if base_gp is None and base_ep is not None:
+        base_gp = base_ep * item.quantity
+    base_ep = float(base_ep or 0.0)
+    base_gp = float(base_gp or 0.0)
+    current_ep = float(override["ep"]) if override else base_ep
+    current_gp = float(override["gp"]) if override else base_gp
+
+    ep_key = f"dialog_ep_{item_key}"
+    gp_key = f"dialog_gp_{item_key}"
+    if ep_key not in st.session_state:
+        st.session_state[ep_key] = current_ep
+    if gp_key not in st.session_state:
+        st.session_state[gp_key] = current_gp
+    if override:
+        st.session_state[ep_key] = current_ep
+        st.session_state[gp_key] = current_gp
+
+    st.markdown("**Preise bearbeiten**")
+    reset_column, _ = st.columns([1, 3])
+    with reset_column:
+        if st.button("Zurücksetzen", disabled=override is None, width="stretch"):
+            manual_prices.pop(item_key, None)
+            st.session_state[ep_key] = base_ep
+            st.session_state[gp_key] = base_gp
+            st.rerun()
+
+    def sync_gp_from_ep() -> None:
+        ep = float(st.session_state[ep_key])
+        gp = round(ep * item.quantity, 2)
+        st.session_state[gp_key] = gp
+        manual_prices[item_key] = {"ep": ep, "gp": gp}
+
+    def sync_ep_from_gp() -> None:
+        gp = float(st.session_state[gp_key])
+        ep = round(gp / item.quantity, 2) if item.quantity else 0.0
+        st.session_state[ep_key] = ep
+        manual_prices[item_key] = {"ep": ep, "gp": gp}
+
+    ep_column, gp_column = st.columns([1, 1])
+    with ep_column:
+        st.number_input(
+            "EP (€)",
+            min_value=0.0,
+            step=0.01,
+            format="%.2f",
+            key=ep_key,
+            on_change=sync_gp_from_ep,
+        )
+    with gp_column:
+        st.number_input(
+            "GP (€)",
+            min_value=0.0,
+            step=0.01,
+            format="%.2f",
+            key=gp_key,
+            on_change=sync_ep_from_gp,
+        )
+    if override:
+        st.caption("Bearbeiteter Preis · GP = EP × Menge, oder EP = GP ÷ Menge.")
+    else:
+        st.caption("EP und GP sind noch nicht manuell verändert.")
+
     location = item.source_ref or "Keine Quellreferenz vorhanden."
     if source_error:
         st.warning(f"Quelldokument konnte nicht geöffnet werden: {source_error}")
@@ -531,7 +690,14 @@ def show_position_details(
         st.info("Für diese Position ist keine genaue Fundstelle verfügbar.")
     st.caption(f"{filename} · {len(items)} Positionen · Fundstelle: {location}")
     st.iframe(
-        tender_document_html(items, remarks, item.key(), filename),
+        tender_document_html(
+            items,
+            remarks,
+            item.key(),
+            filename,
+            manual_prices,
+            calculated_by_key,
+        ),
         height=600,
         alt=f"Leistungsverzeichnis aus {filename}, Position {item.oz} markiert",
     )
@@ -540,7 +706,13 @@ def show_position_details(
 def section_groups(items, assignments, data, filename: str, remarks: list[str],
                    calculated=None):
     """List trade groups; opening one shows the positions in that trade."""
-    rows = objects.by_trade(items, assignments, data)
+    if "manual_prices" not in st.session_state:
+        st.session_state["manual_prices"] = {}
+    manual_prices = st.session_state["manual_prices"]
+    calculated_by_key = {
+        c.item.key(): c for c in (calculated or [])
+    }
+    rows = objects.by_trade(items, assignments, data, calculated)
     if calculated:
         stats = kalkulation.summarize(calculated)
         a, b, c = st.columns(3)
@@ -550,6 +722,8 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
                  f"{stats['total_high']:,.0f}")
         c.metric("Kalkuliert", f"{stats['coverage_pct']:.0f}%",
                  help=f"{stats['unpriced']} Positionen ohne zugeordnete Leistung")
+
+    item_by_key = {item.key(): item for item in items}
 
     selected_key = st.session_state.get("selected_group_key")
     selected = next((row for row in rows if row.key == selected_key), None)
@@ -572,7 +746,25 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
                     )
                     name.markdown(f"**{row.obj}**")
                     name.caption(f"{len(row.positions)} Positionen")
-                    details.caption(f"Einheiten: {row.unit or '—'}")
+                    value = 0.0
+                    for position_key in row.positions:
+                        item = item_by_key.get(position_key)
+                        if item is None:
+                            continue
+                        override = manual_prices.get(position_key)
+                        if override:
+                            value += override["gp"]
+                        elif item.total_price is not None:
+                            value += item.total_price
+                        elif item.unit_price is not None:
+                            value += item.unit_price * item.quantity
+                        else:
+                            estimate = calculated_by_key.get(position_key)
+                            if estimate is not None:
+                                value += estimate.total or 0.0
+                    details.caption(
+                        f"{row.unit or '—'} · Gesamt: €{value:,.2f}"
+                    )
                     if action.button(
                         "Öffnen →",
                         key=f"open_group_{index}",
@@ -596,22 +788,57 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
     )
     item_by_key = {item.key(): item for item in items}
     group_items = [item_by_key[key] for key in selected.positions if key in item_by_key]
-    st.caption("Klicke auf eine Position, um alle Details und ihre Fundstelle zu öffnen.")
-    event = st.dataframe(pd.DataFrame([{
-        "OZ": item.key(),
-        "Position": item.short_text,
-        "Menge": item.quantity,
-        "Einheit": constants.normalize_unit(item.unit),
-        "Pauschal": "ja" if item.is_lump_sum else "",
-    } for item in group_items]),
+    st.caption(
+        "EP und GP zeigen Angebotspreise; bei einer unbepriessten LV-Datei "
+        "werden die kalkulierten Werte angezeigt. "
+        "Wähle eine Zeile, um das Bearbeitungs- und Detailpanel zu öffnen."
+    )
+
+    position_rows = []
+    for item in group_items:
+        estimate = calculated_by_key.get(item.key())
+        override = manual_prices.get(item.key())
+        unit_price = override["ep"] if override else item.unit_price
+        total_price = override["gp"] if override else item.total_price
+        if unit_price is None and estimate is not None:
+            unit_price = estimate.ep_mid
+        if total_price is None and estimate is not None:
+            total_price = estimate.total
+        if total_price is None and unit_price is not None:
+            total_price = unit_price * item.quantity
+
+        position_rows.append({
+            "OZ": item.key(),
+            "Position": item.short_text or item.long_text or "—",
+            "Menge": item.quantity,
+            "Einheit": constants.normalize_unit(item.unit) or "—",
+            "EP (€)": unit_price,
+            "GP (€)": total_price,
+            "Bearbeitet": "●" if override else "",
+            "Pauschal": "Ja" if item.is_lump_sum else "Nein",
+        })
+
+    event = st.dataframe(
+        pd.DataFrame(position_rows),
         width="stretch",
         hide_index=True,
         height="stretch",
         column_config={
             "OZ": st.column_config.TextColumn("OZ", width="small"),
             "Position": st.column_config.TextColumn("Position", width="large"),
-            "Menge": st.column_config.NumberColumn("Menge", width="small"),
+            "Menge": st.column_config.NumberColumn(
+                "Menge", width="small", format="%.3f"
+            ),
             "Einheit": st.column_config.TextColumn("Einheit", width="small"),
+            "EP (€)": st.column_config.NumberColumn(
+                "EP (€)", width="small", format="€ %.2f"
+            ),
+            "GP (€)": st.column_config.NumberColumn(
+                "GP (€)", width="small", format="€ %.2f"
+            ),
+            "Bearbeitet": st.column_config.TextColumn(
+                "Bearbeitet", width="small"
+            ),
             "Pauschal": st.column_config.TextColumn("Pauschal", width="small"),
         },
         key="group_positions",
@@ -623,30 +850,28 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
         row_index = selected_rows[0]
         if 0 <= row_index < len(group_items):
             item = group_items[row_index]
-            if st.session_state.get("opened_position_key") != item.key():
-                st.session_state["opened_position_key"] = item.key()
-                source = st.session_state.get("source")
-                payload = None
-                source_error = None
-                if source:
-                    try:
-                        filename, payload = source_document(source)
-                    except OSError as exc:
-                        filename = item.source_file or "Quelldokument"
-                        source_error = str(exc)
-                else:
+            st.session_state["opened_position_key"] = item.key()
+            source = st.session_state.get("source")
+            payload = None
+            source_error = None
+            if source:
+                try:
+                    filename, payload = source_document(source)
+                except OSError as exc:
                     filename = item.source_file or "Quelldokument"
-                    source_error = "Keine Quelldatei im aktuellen Sitzungskontext."
-                show_position_details(
-                    item,
-                    items,
-                    remarks,
-                    filename,
-                    payload,
-                    source_error,
-                )
-    else:
-        st.session_state.pop("opened_position_key", None)
+                    source_error = str(exc)
+            else:
+                filename = item.source_file or "Quelldokument"
+                source_error = "Keine Quelldatei im aktuellen Sitzungskontext."
+            show_position_details(
+                item,
+                items,
+                remarks,
+                filename,
+                payload,
+                source_error,
+                calculated_by_key,
+            )
 
 
 def section_kalkulation(calculated, cov, data):
