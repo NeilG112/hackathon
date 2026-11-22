@@ -5,6 +5,34 @@ from core.models import Finding, NormalizedItem
 
 
 class ExportRfiClusterTests(unittest.TestCase):
+    def test_position_export_prefers_generated_bidder_question(self):
+        item = NormalizedItem(
+            oz="10003",
+            oz_parts=("1", "0003"),
+            quantity=1,
+            unit="St",
+            short_text="Spezialposition",
+        )
+        finding = Finding(
+            item=item,
+            detector="hybrid_risk",
+            severity="high",
+            rationale="Statische Begründung",
+            evidence={
+                "bidder_question_de": (
+                    "Bitte konkretisieren Sie den Leistungsumfang der Position."
+                ),
+            },
+        )
+
+        catalog = export_rfi.build_catalog([finding], {"title": "Test"})
+
+        self.assertEqual(catalog[0]["oz"], "1.0003")
+        self.assertEqual(
+            catalog[0]["frage"],
+            "Bitte konkretisieren Sie den Leistungsumfang der Position.",
+        )
+
     def test_cluster_questions_precede_position_questions(self):
         item = NormalizedItem(
             oz="0101",

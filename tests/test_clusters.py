@@ -63,6 +63,49 @@ class ClusterTests(unittest.TestCase):
         ]
         self.assertEqual(systems, [])
 
+    def test_material_free_strand_keeps_large_dn_step_in_one_system(self):
+        items = [
+            item("0301", "Trinkwasserleitung DN50 verlegen"),
+            item("0302", "Trinkwasserleitung DN80 verlegen"),
+            item("0303", "Trinkwasserleitung DN200 verlegen"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+
+        self.assertEqual(len(systems), 1)
+        self.assertEqual(set(systems[0].positions), {position.key() for position in items})
+
+    def test_material_does_not_merge_unrelated_strands(self):
+        items = [
+            item("0401", "Trinkwasser Druckrohr PE100 DN50"),
+            item("0402", "Trinkwasser Druckrohr PE100 DN80"),
+            item("0403", "Trinkwasser Druckrohr PE100 DN100"),
+            item("0411", "Schmutzwasser Druckrohr PE100 DN50"),
+            item("0412", "Schmutzwasser Druckrohr PE100 DN80"),
+            item("0413", "Schmutzwasser Druckrohr PE100 DN100"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+
+        self.assertEqual(len(systems), 2)
+        self.assertEqual(
+            {frozenset(cluster.positions) for cluster in systems},
+            {
+                frozenset(position.key() for position in items[:3]),
+                frozenset(position.key() for position in items[3:]),
+            },
+        )
+
     def test_cluster_serialization_round_trip(self):
         cluster = Cluster(
             cluster_id="sec:12345678",

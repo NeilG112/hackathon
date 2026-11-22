@@ -5,9 +5,8 @@ Turns ranked findings into the formal clarification letter the estimator would
 otherwise spend four hours writing. The German goes HERE, in the artifact, with
 correct VOB phrasing. The narration elsewhere stays plain English.
 
-**No live LLM in the demo path.** RFI texts are pre-written templates with
-slots; pre-generate, cache to `data/rfi_templates.json`, ship the JSON. If you
-want model-generated phrasings, generate them offline and commit the result.
+The exporter itself makes no LLM calls. Position questions use the templates
+unless the risk pipeline supplies a cached, position-specific question.
 """
 
 from __future__ import annotations
@@ -46,13 +45,17 @@ def _item_text(item) -> str:
 def question_for(finding: Finding) -> str:
     """Render one Bieterfrage from a finding, in VOB-correct German.
 
-    Template chosen by `finding.detector`; slots filled from the item (OZ,
-    Kurztext, Menge, Einheit) and the finding's evidence.
+    Prefer an upstream position-specific question; otherwise use the template
+    chosen by `finding.detector` and fill it from the finding's item.
     """
+    generated_question = finding.evidence.get("bidder_question_de")
+    if isinstance(generated_question, str) and generated_question.strip():
+        return generated_question.strip()
+
     templates = _load_templates()
     template = templates.get(finding.detector, templates["qty_sanity"])
     values = {
-        "oz": finding.item.key() or "ohne OZ",
+        "oz": finding.item.display_oz or "ohne OZ",
         "kurztext": _item_text(finding.item),
         "menge": _format_quantity(finding.item.quantity),
         "einheit": normalize_unit(finding.item.unit) or "—",
@@ -143,8 +146,8 @@ def build_catalog(
 
     seen: set[tuple[str, str]] = set()
     for finding in findings:
-        oz = finding.item.key() or "ohne OZ"
-        key = (oz, finding.detector)
+        oz = finding.item.display_oz or "ohne OZ"
+        key = (finding.item.key(), finding.detector)
         if key in seen:
             continue
         seen.add(key)

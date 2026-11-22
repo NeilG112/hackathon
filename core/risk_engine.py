@@ -1,8 +1,9 @@
-"""Price-first triage for the hybrid risk pipeline.
+"""Price-first triage and two-stage LLM refinement for hybrid risk.
 
 Deterministic pre-calculation and candidate ranking happen here, before any
-LLM call. The module has no external dependencies and does not modify item or
-calculation objects.
+Jev call. Jev screens the bounded candidate set; Gemma refines only the
+highest-scoring actionable positions. Item and calculation objects are not
+modified.
 """
 
 from __future__ import annotations
@@ -21,6 +22,24 @@ from core.models import (
     NormalizedItem,
 )
 from core.pricer import PricedItem
+
+_CLUSTER_RULE_FLAGS = frozenset({
+    "TRENCH_VOLUME",
+    "BEDDING_IN_TRENCH",
+    "BACKFILL_BALANCE",
+    "DIN4124_VERBAU",
+    "PRESSURE_TEST",
+    "SURFACE_RESTORE",
+    "SHAFT_COVER_CARD",
+    "DN_STEP",
+    "SITE_SETUP",
+})
+_ITEM_RFI_SCORE_FIELDS = {
+    "RFI": "unklar_beschrieben",
+    "SPECULATE_UP": "nachtragspotenzial",
+    "SPECULATE_DOWN": "mindermengen_risiko",
+    "RFQ": "spezialgewerk",
+}
 
 
 def _text(item: NormalizedItem) -> str:
@@ -94,8 +113,12 @@ def build_item_states(
 
         engine_divergence = 0.0
         if (
-            ep_mid is not None
+            price_source == "kalkulation"
+            and ep_mid is not None
             and priced_item is not None
+            and priced_item.source == "benchmark_match"
+            and priced_item.similarity_score
+            >= constants.HYBRID_MIN_BENCHMARK_SIMILARITY
             and priced_item.unit_price is not None
             and ep_mid > 0.0
             and float(priced_item.unit_price) > 0.0
@@ -156,6 +179,8 @@ def compute_priority_weight(
         + 15.0 * len(state.logic_flags)
         + 20.0 * len(state.specialist_hits)
     )
+    if _CLUSTER_RULE_FLAGS.intersection(state.logic_flags):
+        score += 1000.0
 
     if state.engine_divergence >= constants.HYBRID_DIVERGENCE_THRESH:
         score += 25.0
@@ -209,6 +234,7 @@ def select_top_llm_keys(
         for state in states
         if (
             state.logic_severity == "high"
+            or bool(_CLUSTER_RULE_FLAGS.intersection(state.logic_flags))
             or state.is_specialist
             or state.engine_divergence >= constants.HYBRID_DIVERGENCE_THRESH
             or state.euro_exposure >= top_threshold
@@ -231,6 +257,33 @@ def select_top_llm_keys(
     limit = max(0, int(max_llm_items))
     selected = {state.key for state in ranked[:limit]}
     return selected, top_threshold
+
+
+def select_top_item_rfi_results(
+    results: Sequence[HybridRiskResult],
+    max_items: int = 12,
+) -> list[HybridRiskResult]:
+    """Rank Jev-scored actionable positions for the slower Gemma pass."""
+    candidates = []
+    for result in results:
+        score_field = _ITEM_RFI_SCORE_FIELDS.get(result.action_type)
+        if score_field is None or result.judgments is None:
+            continue
+        score = float(getattr(result.judgments, score_field, 0.0))
+        candidates.append((result, score))
+
+    candidates.sort(
+        key=lambda entry: (
+            -entry[1],
+            -{"high": 2, "medium": 1}.get(entry[0].risk_level, 0),
+            -entry[0].euro_exposure,
+            entry[0].key,
+        )
+    )
+    return [
+        result
+        for result, _score in candidates[:max(0, int(max_items))]
+    ]
 
 
 def classify_hybrid_risk(
@@ -364,6 +417,9 @@ def analyze_tender_hybrid(
 ) -> tuple[list[HybridRiskResult], list[Finding]]:
     """Run the complete deterministic/LLM hybrid tender analysis."""
 
+    from core import clusters as cluster_builder
+    from core import deep_logic
+    from core import facts as facts_module
     from core import judgments, logic, objects
     from core import detectors
 
@@ -389,10 +445,21 @@ def analyze_tender_hybrid(
                 pre_prices[key] = float(priced_item.unit_price)
 
     rows = objects.build(items, depth=2)
+    facts_by_key = {
+        item.key(): facts_module.extract_facts(item)
+        for item in items
+    }
+    clusters = cluster_builder.build_clusters(
+        items,
+        facts_by_key,
+        calculated=calculated,
+    )
     logic_results = logic.run_logic_engine(
         items,
         rows=rows,
         pre_prices=pre_prices,
+        clusters=clusters,
+        facts=facts_by_key,
     )
     states = build_item_states(
         items,
@@ -410,7 +477,6 @@ def analyze_tender_hybrid(
 
     item_by_key = {item.key(): item for item in items}
     hybrid_results: list[HybridRiskResult] = []
-    findings: list[Finding] = []
 
     for state in states:
         result = classify_hybrid_risk(
@@ -419,11 +485,122 @@ def analyze_tender_hybrid(
             top_threshold,
         )
         hybrid_results.append(result)
-        item = item_by_key.get(state.key)
-        if item is not None and result.risk_level in ("high", "medium"):
-            findings.append(result.to_finding(item))
 
-    findings.extend(detectors.vague_scope(priced, remarks))
+    state_by_key = {state.key: state for state in states}
+    result_by_key = {result.key: result for result in hybrid_results}
+    refinement_payloads: dict[str, dict] = {}
+    refinement_candidates = select_top_item_rfi_results(hybrid_results)
+    for result in refinement_candidates:
+        item = item_by_key.get(result.key)
+        state = state_by_key.get(result.key)
+        if item is None or state is None or result.judgments is None:
+            continue
+        score_field = _ITEM_RFI_SCORE_FIELDS[result.action_type]
+        risk_triggers = [
+            {"type": "action", "value": result.action_type},
+            {"type": "risk_level", "value": result.risk_level},
+            *(
+                {"type": "logic_rule", "value": flag}
+                for flag in state.logic_flags
+            ),
+            *(
+                {"type": "logic_detail", "value": detail}
+                for detail in state.logic_details
+            ),
+        ]
+        for dimension in (
+            "unklar_beschrieben",
+            "menge_unplausibel",
+            "preis_unplausibel",
+            "spezialgewerk",
+            "nachtragspotenzial",
+            "mindermengen_risiko",
+        ):
+            probability = float(getattr(result.judgments, dimension))
+            if probability <= constants.HYBRID_MED_SCORE_THRESH:
+                continue
+            risk_triggers.append({
+                "type": "jev_score",
+                "name": dimension,
+                "probability": probability,
+                "reason": result.judgments.reasons.get(dimension, ""),
+            })
+        risk_triggers.append({
+            "type": "primary_jev_score",
+            "name": score_field,
+            "probability": float(getattr(result.judgments, score_field)),
+        })
+        refinement_payloads[result.key] = {
+            "oz": item.oz,
+            "short_text": item.short_text,
+            "long_text": item.long_text,
+            "quantity": item.quantity,
+            "unit": item.unit,
+            "remarks": list(remarks),
+            "risk_triggers": risk_triggers,
+        }
+
+    refinements = (
+        deep_logic.evaluate_item_rfis(refinement_payloads)
+        if refinement_payloads
+        else {}
+    )
+    for key, refinement in refinements.items():
+        result = result_by_key.get(key)
+        if result is None:
+            continue
+        commercial_reason = refinement.get("commercial_reason_de", "").strip()
+        bidder_question = refinement.get("bidder_question_de", "").strip()
+        if not commercial_reason or not bidder_question:
+            continue
+        static_jev_reasons = (
+            set(result.judgments.reasons.values())
+            if result.judgments is not None
+            else set()
+        )
+        result.reasons = [
+            reason
+            for reason in result.reasons
+            if (
+                reason not in static_jev_reasons
+                and reason != "Keine Auffälligkeit über den Grenzwerten."
+            )
+        ]
+        if commercial_reason not in result.reasons:
+            result.reasons.append(commercial_reason)
+        if result.judgments is not None:
+            result.judgments.reasons = {}
+
+    findings: list[Finding] = []
+    for state in states:
+        result = result_by_key[state.key]
+        item = item_by_key.get(state.key)
+        if item is None or not (
+            result.risk_level in ("high", "medium")
+            or state.key in refinements
+        ):
+            continue
+        finding = result.to_finding(item)
+        refinement = refinements.get(state.key)
+        if refinement is not None:
+            finding.evidence["commercial_reason_de"] = (
+                refinement["commercial_reason_de"]
+            )
+            finding.evidence["bidder_question_de"] = (
+                refinement["bidder_question_de"]
+            )
+        findings.append(finding)
+
+    rfi_keys = {
+        result.key
+        for result in hybrid_results
+        if result.action_type == "RFI"
+    }
+    findings.extend(
+        finding
+        for finding in detectors.vague_scope(priced, remarks)
+        if finding.item.key() not in rfi_keys
+    )
     severity_index = {
         severity: index
         for index, severity in enumerate(constants.SEVERITY_ORDER)

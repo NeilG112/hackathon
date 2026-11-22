@@ -8,6 +8,7 @@ niemals spaeter durch Deduplication nach Position oder OZ verkleinert werden.
 from __future__ import annotations
 
 import hashlib
+import re
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -17,6 +18,15 @@ from core.facts import PositionFacts
 from core.models import Cluster, NormalizedItem
 
 DN_SERIES = (50, 63, 80, 100, 125, 150, 200, 250, 300, 400, 500)
+_SYSTEM_GENERIC_TERMS = {
+    "aus", "bau", "druck", "einbau", "einbauen", "herstellen", "im",
+    "leitung", "leitungen", "montage", "montieren", "nach", "rohr",
+    "rohre", "verlegen", "verlegung", "von", "zu",
+}
+_SYSTEM_MATERIAL_TERMS = {
+    "beton", "ggg", "guss", "pe", "pe100", "pehd", "pvc", "stahl",
+    "steinzeug",
+}
 
 FRAME_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Wasserhaltung", (
@@ -71,6 +81,22 @@ def _dn_related(left: int | None, right: int | None) -> bool:
 
 def _material_key(material: str | None) -> str:
     return (material or "").strip().lower()
+
+
+def _strand_context(item: NormalizedItem) -> set[str]:
+    """Return descriptive pipe-line terms, excluding DN, material and generic work words."""
+    text = f"{item.short_text} {item.long_text}".lower()
+    text = re.sub(r"\bdn(?:/od)?\s*\d+\b", " ", text)
+    text = re.sub(r"\b(?:pe\s*-?\s*hd|pe100|pvc|ggg|stahl|guss)\b", " ", text)
+    terms: set[str] = set()
+    for token in re.findall(r"[a-zäöüß]+", text):
+        for suffix in ("rohrleitung", "leitungen", "leitung", "rohre", "rohr"):
+            if token.endswith(suffix) and len(token) > len(suffix):
+                token = token[:-len(suffix)]
+                break
+        if token not in _SYSTEM_GENERIC_TERMS | _SYSTEM_MATERIAL_TERMS:
+            terms.add(token)
+    return terms
 
 
 def _facts_for(items: Iterable[NormalizedItem], facts: dict[str, PositionFacts]) -> dict[str, PositionFacts]:
@@ -145,7 +171,8 @@ def build_clusters(
             value_by_oz,
         ))
 
-    # System clusters. A functional edge is DN-adjacent/same or material-same.
+    # Adjacent DN positions can link unless their strand terms conflict.
+    # Larger DN jumps and equal material additionally need shared context.
     by_top_section: dict[str, list[int]] = defaultdict(list)
     for index, item in enumerate(item_list):
         position_facts = facts_by_key[item.key()]
@@ -154,16 +181,32 @@ def build_clusters(
 
     for top_section, indexes in by_top_section.items():
         union = _UnionFind.for_range(len(item_list))
+        contexts = {
+            index: _strand_context(item_list[index])
+            for index in indexes
+        }
         for left_pos, left_index in enumerate(indexes):
             left_facts = facts_by_key[item_list[left_index].key()]
             for right_index in indexes[left_pos + 1:]:
                 right_facts = facts_by_key[item_list[right_index].key()]
+                left_context = contexts[left_index]
+                right_context = contexts[right_index]
+                same_strand = bool(left_context & right_context)
+                if left_context and right_context and not same_strand:
+                    continue
                 shares_material = (
                     _material_key(left_facts.material) != ""
                     and _material_key(left_facts.material)
                     == _material_key(right_facts.material)
                 )
-                if _dn_related(left_facts.dn, right_facts.dn) or shares_material:
+                dn_related = _dn_related(left_facts.dn, right_facts.dn)
+                can_bridge_dn_step = (
+                    same_strand
+                    and (left_facts.material is None
+                         or right_facts.material is None
+                         or shares_material)
+                )
+                if dn_related or can_bridge_dn_step:
                     union.union(left_index, right_index)
 
         components: dict[int, list[NormalizedItem]] = defaultdict(list)

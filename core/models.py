@@ -74,6 +74,14 @@ class NormalizedItem:
         """Join key. Use this, never the list index (the 248/249 gap)."""
         return normalize_oz(self.oz)
 
+    @property
+    def display_oz(self) -> str:
+        """Return the human-readable hierarchy without changing the join key."""
+        if self.oz_parts:
+            return ".".join(self.oz_parts)
+        parts = self.oz.split()
+        return ".".join(parts) if len(parts) > 1 else self.oz.strip()
+
     def location(self, depth: int = 2) -> str:
         """The section this position sits in — the inconsistency engine's key.
 

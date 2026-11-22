@@ -32,12 +32,14 @@ printing. `price_boq` is re-run on every slider change, so it stays cheap.
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 from dataclasses import dataclass, field
 from typing import Iterable, Literal, Optional
 
 from core import constants
+from core.facts import PositionFacts, extract_facts
 from core.models import NormalizedItem
 
 PriceSource = Literal[
@@ -58,6 +60,7 @@ class PricedItem:
     bucket: str = ""
     distribution: Optional[dict] = field(default=None, repr=False)
     note: str = ""
+    similarity_score: float = 0.0
 
     @property
     def is_benchmarked(self) -> bool:
@@ -224,7 +227,9 @@ vorh vorhanden ausf ausführung
 """.split())
 
 
-def _reference_index(reference: dict) -> list[tuple[frozenset[str], str, float, str]]:
+def _reference_index(
+    reference: dict,
+) -> list[tuple[frozenset[str], str, float, str, PositionFacts]]:
     """Tokenized reference items, cached on the reference dict itself.
 
     `price_boq` re-runs on every slider change, so this is built once per
@@ -239,11 +244,52 @@ def _reference_index(reference: dict) -> list[tuple[frozenset[str], str, float, 
     for row in reference.get("items", []):
         if row.get("rental") or row.get("provisional"):
             continue
-        toks = tokens(row.get("text", ""))
+        text = row.get("text", "")
+        toks = tokens(text)
         if toks:
-            index.append((toks, row["unit"], row["ep"], row.get("text", "")))
+            reference_item = NormalizedItem(
+                oz=f"REF-{len(index)}",
+                quantity=1.0,
+                unit=row["unit"],
+                short_text=text,
+            )
+            index.append((
+                toks,
+                row["unit"],
+                row["ep"],
+                text,
+                extract_facts(reference_item),
+            ))
     reference["_index"] = index
     return index
+
+
+def _dimension_adjusted_similarity(
+    similarity: float,
+    item_facts: PositionFacts,
+    reference_facts: PositionFacts,
+) -> float:
+    """Reward matching technical dimensions and strongly penalize mismatches."""
+    adjusted = similarity
+    for name in ("dn", "pn", "thickness_cm", "depth_m"):
+        item_value = getattr(item_facts, name)
+        reference_value = getattr(reference_facts, name)
+        if item_value is None or reference_value is None:
+            continue
+        if math.isclose(
+            float(item_value),
+            float(reference_value),
+            rel_tol=0.05,
+            abs_tol=0.01,
+        ):
+            adjusted += 0.12
+            continue
+        smaller = min(abs(float(item_value)), abs(float(reference_value)))
+        larger = max(abs(float(item_value)), abs(float(reference_value)))
+        ratio = larger / smaller if smaller > 0 else float("inf")
+        penalty = min(0.9, 0.25 + 0.25 * math.log2(ratio))
+        adjusted -= penalty
+    return round(max(0.0, min(1.0, adjusted)), 3)
 
 
 def nearest_comparables(
@@ -269,14 +315,19 @@ def nearest_comparables(
     if not item_tokens:
         return []
 
+    item_facts = extract_facts(item)
     scored = []
-    for ref_tokens, ref_unit, ep, text in _reference_index(reference):
+    for ref_tokens, ref_unit, ep, text, ref_facts in _reference_index(reference):
         if ref_unit != unit:
             continue
         overlap = len(item_tokens & ref_tokens)
         if not overlap:
             continue
-        score = overlap / len(item_tokens | ref_tokens)
+        score = _dimension_adjusted_similarity(
+            overlap / len(item_tokens | ref_tokens),
+            item_facts,
+            ref_facts,
+        )
         if score >= constants.MIN_TEXT_SIMILARITY:
             scored.append((round(score, 3), ep, text))
 
@@ -329,7 +380,8 @@ def price_item(
                           "p75": round(percentile(eps, 0.75), 2),
                           "n": len(eps)},
             note=(f"matched {len(matches)} similar priced lines "
-                  f"({best_score:.0%} overlap), closest: {best_text[:60]}"),
+                  f"({best_score:.0%} similarity), closest: {best_text[:60]}"),
+            similarity_score=best_score,
         )
 
     dist, source = _distribution(reference, bucket, unit)
