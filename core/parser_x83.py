@@ -159,8 +159,16 @@ def parse(path: str) -> List[NormalizedItem]:
             continue
 
         description = _child(el, "Description")
-        outline = _find_descendant(description, "OutlineText") if description else None
-        complete = _find_descendant(description, "CompleteText") if description else None
+        outline = (
+            _find_descendant(description, "OutlineText")
+            if description is not None
+            else None
+        )
+        complete = (
+            _find_descendant(description, "CompleteText")
+            if description is not None
+            else None
+        )
 
         long = _text_of(complete)
         items.append(

@@ -31,11 +31,27 @@ with the input instead of distrusting the output.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Iterable, Optional
 
 from core.models import NormalizedItem
 from core.stammdaten import Company, Leistung, Stammdaten
+
+_UNIT_SCALES = (
+    {"mm": 0.001, "cm": 0.01, "dm": 0.1, "m": 1.0, "km": 1000.0},
+    {"mm2": 1e-6, "cm2": 1e-4, "dm2": 0.01, "m2": 1.0},
+    {
+        "mm3": 1e-9,
+        "cm3": 1e-6,
+        "ml": 1e-6,
+        "l": 1e-3,
+        "dm3": 1e-3,
+        "m3": 1.0,
+    },
+    {"g": 0.001, "kg": 1.0, "t": 1000.0},
+    {"s": 1 / 3600, "min": 1 / 60, "h": 1.0, "d": 24.0},
+)
 
 
 @dataclass
@@ -138,6 +154,57 @@ def unit_costs(leistung: Leistung, company: Company, data: Stammdaten,
     return breakdown
 
 
+def _unit_conversion_factor(
+    source_unit: str,
+    target_unit: str,
+    quantity: float,
+) -> float | None:
+    """Cost multiplier from one catalogue unit to one position unit."""
+    if source_unit == target_unit:
+        return 1.0
+    if {source_unit, target_unit} == {"st", "psch"} and math.isclose(
+        quantity,
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    ):
+        return 1.0
+    for scales in _UNIT_SCALES:
+        source_scale = scales.get(source_unit)
+        target_scale = scales.get(target_unit)
+        if source_scale is not None and target_scale is not None:
+            return target_scale / source_scale
+    return None
+
+
+def _scale_breakdown(breakdown: CostBreakdown, factor: float) -> CostBreakdown:
+    if factor == 1.0:
+        return breakdown
+    return CostBreakdown(
+        labour_hours=breakdown.labour_hours * factor,
+        labour_eur=breakdown.labour_eur * factor,
+        machine_hours=breakdown.machine_hours * factor,
+        machine_eur=breakdown.machine_eur * factor,
+        material_eur=breakdown.material_eur * factor,
+        material_detail=[
+            {
+                **entry,
+                "menge": entry["menge"] * factor,
+                "eur": round(entry["eur"] * factor, 2),
+            }
+            for entry in breakdown.material_detail
+        ],
+        machine_detail=[
+            {
+                **entry,
+                "hours": entry["hours"] * factor,
+                "eur": round(entry["eur"] * factor, 2),
+            }
+            for entry in breakdown.machine_detail
+        ],
+    )
+
+
 def calculate_item(
     item: NormalizedItem,
     leistung: Optional[Leistung],
@@ -154,7 +221,10 @@ def calculate_item(
     if leistung is None:
         return CalculatedItem(
             item=item, leistung=None, confidence=confidence,
-            note="keine Leistung zugeordnet — nicht kalkulierbar",
+            note=(
+                "keine Leistung zugeordnet — kein Kalkulationsansatz; "
+                "Fallback über pricer.py erforderlich"
+            ),
         )
 
     # The Aufwandswert is hours *per unit of the Leistung*. Multiplying a
@@ -169,11 +239,17 @@ def calculate_item(
     from core import constants
     position_unit = constants.normalize_unit(item.unit)
     leistung_unit = constants.normalize_unit(leistung.einheit)
-    if position_unit != leistung_unit:
+    conversion_factor = _unit_conversion_factor(
+        leistung_unit,
+        position_unit,
+        item.quantity,
+    )
+    if conversion_factor is None:
         return CalculatedItem(
             item=item, leistung=leistung, confidence=confidence,
             note=(f"{leistung.code} wird in {leistung.einheit} abgerechnet, "
-                  f"die Position in {item.unit} — nicht direkt kalkulierbar"),
+                  f"die Position in {item.unit} — keine sichere "
+                  "Einheitenbrücke; Fallback über pricer.py erforderlich"),
         )
 
     # AGK prorated over the build time, plus BGK and W&G. See
@@ -181,17 +257,26 @@ def calculate_item(
     # what, and AGK is an annual figure a ten-month job should only carry ten
     # twelfths of.
     markup = company.markup_factor()
-    mid = unit_costs(leistung, company, data, leistung.h_mittel)
+    mid = _scale_breakdown(
+        unit_costs(leistung, company, data, leistung.h_mittel),
+        conversion_factor,
+    )
     low = unit_costs(leistung, company, data, leistung.h_min)
     high = unit_costs(leistung, company, data, leistung.h_max)
+    unit_note = (
+        f"; Einheitenbrücke {leistung.einheit} → {item.unit} "
+        f"(Faktor {conversion_factor:g})"
+        if conversion_factor != 1.0
+        else ""
+    )
 
     return CalculatedItem(
         item=item,
         leistung=leistung,
         confidence=confidence,
-        ep_low=round(low.ekt * markup, 2),
+        ep_low=round(low.ekt * markup * conversion_factor, 2),
         ep_mid=round(mid.ekt * markup, 2),
-        ep_high=round(high.ekt * markup, 2),
+        ep_high=round(high.ekt * markup * conversion_factor, 2),
         breakdown=mid,
         note=(
             f"{leistung.code}: {mid.labour_hours:.3f} h x "
@@ -199,6 +284,7 @@ def calculate_item(
             + (f" + {mid.machine_eur:,.2f} € Gerät" if mid.machine_eur else "")
             + (f" + {mid.material_eur:,.2f} € Material" if mid.material_eur else "")
             + f", +{company.total_markup_pct:.1f}% Zuschlag"
+            + unit_note
         ),
     )
 

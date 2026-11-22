@@ -8,13 +8,9 @@
 
 Lead with that sentence. No vocabulary lesson, no file extensions.
 
-Wired: upload -> parse -> item table -> company sliders -> priced totals ->
-the reveal. Still stubbed, and owned by other people:
-
-  * the findings panel lights up when `core/detectors.py` (task 004) lands
-  * the export button lights up when `export_rfi.py` (task 006) lands
-
-Both are guarded, so an unfinished module shows a note instead of a traceback.
+Wired: upload -> parse -> item table, trade groups, bottom-up calculation,
+benchmark cross-check, risk/logic findings, reveal and RFI export. Optional AI
+checks are controlled separately from deterministic rules.
 
 Fallbacks, in order: live parse -> `data/golden/` fixture -> an honest
 "format not supported" with the sample loaded on a button. Degrade visibly
@@ -42,9 +38,22 @@ from views import reveal
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
 PAGES = ("Tender", "Gruppen & Angebot", "Logik", "Heikle Positionen")
+HYBRID_ANALYSIS_CACHE_VERSION = "item-rfi-v1"
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
+
+_SEVERITY_LABELS = {
+    "high": "hoch",
+    "medium": "mittel",
+    "low": "niedrig",
+}
+
+
+def _severity_label(value: str) -> str:
+    """Translate internal severity values for German UI display."""
+    return _SEVERITY_LABELS.get(value.lower(), value)
+
 
 st.set_page_config(
     page_title="Bid & Risk Assistant",
@@ -102,8 +111,9 @@ def analyze_hybrid_cached(
     calculated_payload: list[dict],
     priced_payload: list[dict],
     use_jev: bool,
+    analysis_version: str,
 ):
-    """Cache the serializable end-to-end hybrid analysis for UI reruns."""
+    """Cache hybrid analysis; version invalidates results from older pipelines."""
     from core.kalkulation import CalculatedItem
     from core.pricer import PricedItem
 
@@ -136,6 +146,7 @@ def analyze_hybrid_cached(
                 bucket=payload["bucket"],
                 distribution=payload["distribution"],
                 note=payload["note"],
+                similarity_score=payload.get("similarity_score", 0.0),
             ))
 
     return risk_engine.analyze_tender_hybrid(
@@ -159,10 +170,24 @@ def evaluate_cluster_deep_cached(
     model = adapter.name
     from types import SimpleNamespace
 
-    cluster_objects = [
-        SimpleNamespace(cluster_id=cluster_id)
-        for cluster_id in payloads
-    ]
+    cluster_objects = []
+    for cluster_id, payload in payloads.items():
+        try:
+            cluster_data = json.loads(payload)
+        except (TypeError, json.JSONDecodeError):
+            cluster_data = {}
+        if not isinstance(cluster_data, dict):
+            cluster_data = {}
+        try:
+            euro_exposure = float(cluster_data.get("euro_exposure") or 0.0)
+        except (TypeError, ValueError):
+            euro_exposure = 0.0
+        kind = cluster_data.get("kind", "")
+        cluster_objects.append(SimpleNamespace(
+            cluster_id=cluster_id,
+            kind=kind if isinstance(kind, str) else "",
+            euro_exposure=euro_exposure,
+        ))
     evaluations = deep_logic.evaluate_clusters(
         cluster_objects,
         payloads,
@@ -334,7 +359,7 @@ def section_items(items):
         "„Pauschalposition“ bezeichnet die Abrechnungsart, keinen Preis."
     )
     frame = pd.DataFrame([{
-        "OZ": i.key(),
+        "OZ": i.display_oz,
         "Position": i.short_text,
         "Menge": i.quantity,
         "Einheit": constants.normalize_unit(i.unit),
@@ -427,7 +452,7 @@ def tender_document_html(
                 f'{html.escape(section)}</th></tr>'
             )
 
-        short_text = item.short_text or f"Position {item.oz}"
+        short_text = item.short_text or f"Position {item.display_oz}"
         long_text = item.long_text or short_text
         if long_text.startswith(short_text):
             long_text = long_text[len(short_text):].lstrip(" ,;:-")
@@ -443,7 +468,7 @@ def tender_document_html(
         row_id = ' id="selected-position"' if selected else ""
         rows.append(
             f'<tr class="position{selected}"{row_id}>'
-            f'<td class="oz">{html.escape(item.oz)}</td>'
+            f'<td class="oz">{html.escape(item.display_oz)}</td>'
             f'<td class="description">{description}</td>'
             f'<td class="number">{item.quantity:g}</td>'
             f'<td>{html.escape(item.unit)}</td>'
@@ -533,7 +558,10 @@ def show_position_details(
     st.iframe(
         tender_document_html(items, remarks, item.key(), filename),
         height=600,
-        alt=f"Leistungsverzeichnis aus {filename}, Position {item.oz} markiert",
+        alt=(
+            f"Leistungsverzeichnis aus {filename}, "
+            f"Position {item.display_oz} markiert"
+        ),
     )
 
 
@@ -598,7 +626,7 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
     group_items = [item_by_key[key] for key in selected.positions if key in item_by_key]
     st.caption("Klicke auf eine Position, um alle Details und ihre Fundstelle zu öffnen.")
     event = st.dataframe(pd.DataFrame([{
-        "OZ": item.key(),
+        "OZ": item.display_oz,
         "Position": item.short_text,
         "Menge": item.quantity,
         "Einheit": constants.normalize_unit(item.unit),
@@ -679,7 +707,7 @@ def section_kalkulation(calculated, cov, data):
         )
 
     st.dataframe(pd.DataFrame([{
-        "OZ": c.item.key(),
+        "OZ": c.item.display_oz,
         "Position": c.item.short_text[:52],
         "Menge": c.item.quantity,
         "Einheit": constants.normalize_unit(c.item.unit),
@@ -698,9 +726,12 @@ def section_logic(
     findings,
     calculated=None,
     filename: str = "",
+    use_deep_logic: bool = False,
 ):
     """Cluster logic findings with deterministic and optional LLM evaluations."""
     del hybrid_results, findings
+    item_by_key = {item.key(): item for item in items}
+    item_by_display_oz = {item.display_oz: item for item in items}
     facts_by_key = {item.key(): facts.extract_facts(item) for item in items}
     cluster_list = clusters.build_clusters(
         items,
@@ -716,18 +747,78 @@ def section_logic(
         remarks=remarks,
     )
 
+    pre_prices = {
+        entry.item.key(): float(entry.ep_mid)
+        for entry in (calculated or [])
+        if entry.ep_mid is not None
+    }
+    position_results = logic.run_logic_engine(
+        items,
+        pre_prices=pre_prices,
+    )
+    position_rows = []
+    for item in items:
+        result = position_results[item.key()]
+        if not result.flags:
+            continue
+        position_rows.append({
+            "OZ": item.display_oz,
+            "Schweregrad": _severity_label(result.severity),
+            "Regeln": ", ".join(result.flags),
+            "Befund": " | ".join(result.details),
+        })
+
+    duplicate_findings = logic.check_duplicates(items, pre_prices)
+    st.subheader("Positionsregeln und mögliche Duplikate")
+    st.markdown("**Positionsbezogene Regeln**")
+    if position_rows:
+        st.dataframe(
+            pd.DataFrame(position_rows),
+            width="stretch",
+            hide_index=True,
+        )
+    else:
+        st.caption("Keine positionsbezogenen Regelbefunde.")
+
+    st.markdown("**Mögliche Duplikate**")
+    if duplicate_findings:
+        st.dataframe(
+            pd.DataFrame([{
+                "OZ": finding.item.display_oz,
+                "Vergleichspositionen": ", ".join(
+                    item_by_key[key].display_oz
+                    if key in item_by_key else key
+                    for key in finding.evidence.get("positions", [])
+                ),
+                "Schweregrad": _severity_label(finding.severity),
+                "EUR-Exposure": round(finding.euro_leverage, 2),
+                "Befund": finding.rationale,
+            } for finding in duplicate_findings]),
+            width="stretch",
+            hide_index=True,
+        )
+    else:
+        st.caption("Keine möglichen Duplikate gefunden.")
+
     payloads = {}
     cluster_by_id = {cluster.cluster_id: cluster for cluster in cluster_list}
-    item_by_key = {item.key(): item for item in items}
     for cluster in cluster_list:
         payload = {
             "cluster_id": cluster.cluster_id,
             "kind": cluster.kind,
             "title": cluster.title,
+            "euro_exposure": cluster.euro_exposure,
             "positions": [
                 {
-                    "oz": oz,
+                    "oz": (
+                        item_by_key[oz].display_oz
+                        if oz in item_by_key else oz
+                    ),
                     "short_text": item_by_key[oz].short_text if oz in item_by_key else "",
+                    "long_text": item_by_key[oz].long_text if oz in item_by_key else "",
+                    "quantity": item_by_key[oz].quantity if oz in item_by_key else None,
+                    "unit": item_by_key[oz].unit if oz in item_by_key else "",
+                    "remarks": list(remarks),
                     "facts": (
                         {
                             "object_tag": facts_by_key[oz].object_tag,
@@ -753,10 +844,14 @@ def section_logic(
             sort_keys=True,
         )
 
-    raw_evaluations = evaluate_cluster_deep_cached(
-        filename or "uploaded-tender",
-        logic.RULES_VERSION,
-        payloads,
+    raw_evaluations = (
+        evaluate_cluster_deep_cached(
+            filename or "uploaded-tender",
+            logic.RULES_VERSION,
+            payloads,
+        )
+        if use_deep_logic
+        else {}
     )
 
     rule_by_id = {rule.id: rule for rule in logic.RULES}
@@ -772,7 +867,10 @@ def section_logic(
             "confidence": 1.0,
             "model": None,
             "computed": dict(flag.computed),
-            "affected_ozs": list(flag.affected_positions),
+            "affected_ozs": [
+                item_by_key[oz].display_oz if oz in item_by_key else oz
+                for oz in flag.affected_positions
+            ],
             "euro_exposure_estimate": (
                 cluster.euro_exposure if cluster is not None else 0.0
             ),
@@ -787,7 +885,11 @@ def section_logic(
             continue
         cluster = cluster_by_id.get(cluster_id)
         affected = evaluation.get("affected_positions") or (
-            cluster.positions if cluster is not None else []
+            [
+                item_by_key[oz].display_oz if oz in item_by_key else oz
+                for oz in cluster.positions
+            ]
+            if cluster is not None else []
         )
         cards.append({
             "source": "llm",
@@ -818,17 +920,17 @@ def section_logic(
         1 for card in cards if card["source"] == "llm"
     )
 
-    calculated_by_key = {
-        calculated_item.item.key(): calculated_item
+    calculated_by_display_oz = {
+        calculated_item.item.display_oz: calculated_item
         for calculated_item in (calculated or [])
     }
     affected_ozs = {
         oz for card in cards for oz in card["affected_ozs"]
     }
     unique_position_exposure = sum(
-        float(calculated_by_key[oz].total or 0.0)
+        float(calculated_by_display_oz[oz].total or 0.0)
         for oz in affected_ozs
-        if oz in calculated_by_key
+        if oz in calculated_by_display_oz
     )
 
     a, b = st.columns(2)
@@ -900,17 +1002,17 @@ def section_logic(
 
                 affected_rows = []
                 for oz in card["affected_ozs"]:
-                    item = item_by_key.get(oz)
+                    item = item_by_key.get(oz) or item_by_display_oz.get(oz)
                     if item is None:
                         continue
-                    calculated_item = calculated_by_key.get(oz)
+                    calculated_item = calculated_by_display_oz.get(item.display_oz)
                     euro = (
                         float(calculated_item.total or 0.0)
                         if calculated_item is not None
                         else 0.0
                     )
                     affected_rows.append({
-                        "OZ": item.key(),
+                        "OZ": item.display_oz,
                         "Kurztext": item.short_text,
                         "Menge": item.quantity,
                         "Einheit": constants.normalize_unit(item.unit),
@@ -930,6 +1032,11 @@ def section_logic(
                 key=f"rfi_cluster_{card['cluster_id']}_{index}",
             ):
                 question = dict(card)
+                question.update({
+                    "contradiction_category": card["category"],
+                    "cluster_title": card["title"],
+                    "reason_de": card["analysis"],
+                })
                 question["affected_ozs"] = list(card["affected_ozs"])
                 existing_ids = {
                     entry.get("cluster_id")
@@ -959,20 +1066,20 @@ def section_hybrid_risky(items, hybrid_results, findings):
     )
 
     a, b, c, d = st.columns(4)
-    a.metric("High Risk Positionen", high_count)
-    b.metric("Medium Risk Positionen", medium_count)
+    a.metric("Positionen mit hohem Risiko", high_count)
+    b.metric("Positionen mit mittlerem Risiko", medium_count)
     c.metric("Top-10-%-Schwelle", f"€{threshold:,.2f}")
     d.metric("VOB/B-Nachtragskandidaten", speculation_count)
 
     filter_choice = st.segmented_control(
         "Filter",
-        options=["Alle", "High", "Medium", "VOB/B-Spekulation"],
+        options=["Alle", "Hohes Risiko", "Mittleres Risiko", "VOB/B-Spekulation"],
         default="Alle",
         key="hybrid_risk_filter",
     )
-    if filter_choice == "High":
+    if filter_choice == "Hohes Risiko":
         filtered = [r for r in filtered if r.risk_level == "high"]
-    elif filter_choice == "Medium":
+    elif filter_choice == "Mittleres Risiko":
         filtered = [r for r in filtered if r.risk_level == "medium"]
     elif filter_choice == "VOB/B-Spekulation":
         filtered = [r for r in filtered if r.action_type == "SPECULATE_UP"]
@@ -990,8 +1097,8 @@ def section_hybrid_risky(items, hybrid_results, findings):
         if result.judgments and result.judgments.reasons:
             reasons += " | KI: " + " | ".join(result.judgments.reasons.values())
         rows.append({
-            "Risiko": result.risk_level,
-            "OZ": item.key(),
+            "Risiko": _severity_label(result.risk_level),
+            "OZ": item.display_oz,
             "Position": item.short_text[:58],
             "EP vorl.": round(result.pre_unit_price, 2),
             "€-Exposure": round(result.euro_exposure, 2),
@@ -1031,7 +1138,7 @@ def section_tricky(calculated):
         if not reasons:
             continue
         rows.append({
-            "OZ": c.item.key(), "Position": c.item.short_text[:58],
+            "OZ": c.item.display_oz, "Position": c.item.short_text[:58],
             "Menge": c.item.quantity,
             "Einheit": constants.normalize_unit(c.item.unit),
             "€ unsicher": round(c.euro_at_stake, 2) if c.priced else None,
@@ -1057,7 +1164,7 @@ def section_tricky(calculated):
     )
 
 
-def section_pricing(items, company, reference):
+def section_pricing(items, company, reference, priced=None):
     """Comparable-price cross-check. Secondary to the calculation above."""
     st.subheader("7 · Quercheck gegen echte Angebotspreise")
     st.caption(
@@ -1066,7 +1173,8 @@ def section_pricing(items, company, reference):
         "where they diverge, look. Measured on its own (answer key held out) "
         "this engine is −50% on the total, so it is a cross-check, not a bid."
     )
-    priced = pricer.price_boq(items, reference, company)
+    if priced is None:
+        priced = pricer.price_boq(items, reference, company)
     stats = pricer.summarize(priced)
 
     a, b, c, d = st.columns(4)
@@ -1078,7 +1186,7 @@ def section_pricing(items, company, reference):
              help="Value resting on hand-authored rates, not observed prices.")
 
     frame = pd.DataFrame([{
-        "OZ": p.item.key(),
+        "OZ": p.item.display_oz,
         "Position": p.item.short_text[:60],
         "Menge": p.item.quantity,
         "Einheit": constants.normalize_unit(p.item.unit),
@@ -1126,10 +1234,10 @@ def section_findings(priced, remarks):
         return []
 
     st.dataframe(pd.DataFrame([{
-        "OZ": f.item.key(),
+        "OZ": f.item.display_oz,
         "Position": f.item.short_text[:60],
         "Detector": f.detector,
-        "Severity": f.severity,
+        "Schweregrad": _severity_label(f.severity),
         "€ leverage": round(f.euro_leverage, 2),
         "Why": f.rationale,
     } for f in findings]), width="stretch", hide_index=True)
@@ -1175,9 +1283,23 @@ def constants_sources() -> list[str]:
 
 
 def section_export(findings, cluster_evaluations=None):
-    """Bieterfragen-Katalog download. Lights up when task 006 lands."""
+    """Download a Bieterfragen catalogue from position or cluster findings."""
     st.subheader("10 · The letter")
-    if not findings:
+    cluster_evaluations = [
+        {
+            **entry,
+            "contradiction_category": (
+                entry.get("contradiction_category") or entry.get("category")
+            ),
+            "cluster_title": (
+                entry.get("cluster_title") or entry.get("title")
+            ),
+            "reason_de": entry.get("reason_de") or entry.get("analysis"),
+        }
+        for entry in (cluster_evaluations or [])
+        if isinstance(entry, dict)
+    ]
+    if not findings and not cluster_evaluations:
         st.button("Export clarification letter (.docx)", disabled=True)
         st.caption("No findings are available for export.")
         return
@@ -1185,7 +1307,7 @@ def section_export(findings, cluster_evaluations=None):
     import export_rfi
     project = {"title": "Bieterfragen-Katalog"}
     catalog = export_rfi.build_catalog(
-        findings,
+        findings or [],
         project,
         cluster_evaluations=cluster_evaluations,
     )
@@ -1263,16 +1385,27 @@ def main():
         [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] > * {
             flex-shrink: 0;
         }
-        /* ... while the one list/table on each page takes all the space
-           that is left and scrolls inside itself. Every wrapper between the
-           top block and that element has to grow along with it. */
-        [data-testid="stMainBlockContainer"] div:has(
-            .st-key-group_list, [data-testid="stDataFrame"]
-        ) {
+        /* Keep tab headers intrinsic; only their active panel takes leftover space. */
+        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] {
             flex: 1 1 0% !important;
             min-height: 8rem !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div {
             display: flex;
             flex-direction: column;
+            min-height: 0;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [role="tablist"] {
+            flex: 0 0 auto !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [data-testid="stTabPanel"][role="tabpanel"] {
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            overflow-y: auto;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTabs"] > div > [data-testid="stTabPanel"][role="tabpanel"] > [data-testid="stVerticalBlock"] {
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
         }
         [data-testid="stMainBlockContainer"] [data-testid="stDataFrame"] {
             flex: 1 1 0% !important;
@@ -1381,12 +1514,22 @@ def main():
         st.session_state["active_page"] = page
     st.title(page)
     use_jev = False
-    if page in ("Logik", "Heikle Positionen"):
-        use_jev = st.sidebar.checkbox(
-            "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
+    use_deep_logic = False
+    if page == "Logik":
+        use_deep_logic = st.sidebar.checkbox(
+            "Cluster-Tiefenprüfung (Gemma 4)",
             value=False,
-            help="Startet nur nach Aktivierung eine externe Modellprüfung. "
+            help="Prüft Cluster optional mit gemma-4-31B-it (deep_logic). "
                  "Deterministische Regeln laufen unabhängig davon.",
+            key="use_deep_logic",
+        )
+    elif page == "Heikle Positionen":
+        use_jev = st.sidebar.checkbox(
+            "Jev-Risikotriage (Top 60 Positionen)",
+            value=False,
+            help="Übergibt die priorisierten Positionen optional an Jev. "
+                 "Die Offline-Risikobewertung läuft unabhängig davon.",
+            key="use_jev",
         )
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
@@ -1425,6 +1568,7 @@ def main():
             "bucket": p.bucket,
             "distribution": p.distribution,
             "note": p.note,
+            "similarity_score": p.similarity_score,
         } for p in priced]
         hybrid_results, findings = analyze_hybrid_cached(
             [item.as_dict() for item in items],
@@ -1432,22 +1576,47 @@ def main():
             calculated_payload,
             priced_payload,
             bool(use_jev),
+            HYBRID_ANALYSIS_CACHE_VERSION,
         )
         if page == "Gruppen & Angebot":
-            cov = classify.coverage(assignments)
-            if cov["pct"] < 50:
-                st.warning(
-                    f"Nur {cov['pct']}% der Positionen konnten einer Leistung "
-                    "zugeordnet werden."
+            group_tab, calculation_tab, pricing_tab, reveal_tab = st.tabs([
+                "Gewerke & Positionen",
+                "Positionskalkulation",
+                "Benchmark-Quercheck",
+                "Angebots-Reveal",
+            ])
+            with group_tab:
+                cov = classify.coverage(assignments)
+                if cov["pct"] < 50:
+                    st.warning(
+                        f"Nur {cov['pct']}% der Positionen konnten einer "
+                        "Leistung zugeordnet werden."
+                    )
+                section_groups(
+                    items,
+                    assignments,
+                    data,
+                    label,
+                    remarks,
+                    calculated,
                 )
-            section_groups(
-                items,
-                assignments,
-                data,
-                label,
-                remarks,
-                calculated,
-            )
+            with calculation_tab:
+                section_kalkulation(calculated, cov, data)
+            pricing_company = {
+                "mittellohn_eur_h": company.mittellohn_eur_h,
+                "overhead_pct": company.total_markup_pct,
+                "profit_pct": company.wg_pct,
+            }
+            with pricing_tab:
+                section_pricing(
+                    items,
+                    pricing_company,
+                    reference,
+                    priced=priced,
+                )
+            with reveal_tab:
+                answer, _answer_label, source_label = answer_key_for(label)
+                section_reveal(priced, answer, source_label)
         elif page == "Logik":
             section_logic(
                 items,
@@ -1456,6 +1625,7 @@ def main():
                 findings,
                 calculated=calculated,
                 filename=label,
+                use_deep_logic=use_deep_logic,
             )
         elif page == "Heikle Positionen":
             section_hybrid_risky(items, hybrid_results, findings)

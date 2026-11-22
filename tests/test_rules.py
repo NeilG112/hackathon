@@ -7,6 +7,7 @@ from core.logic import (
     RULES,
     RULES_VERSION,
     UnitBridge,
+    _subject_suppressed,
     check_cluster_rules,
     suppressed_by_remarks,
 )
@@ -112,13 +113,14 @@ class ClusterRuleTests(unittest.TestCase):
 
     def test_backfill_positive_and_negative(self):
         positive = [
-            item("31", "Verfuellung", "A"), item("32", "Bodenaushub", "A")
+            item("31", "Verfüllung", "A"), item("32", "Bodenaushub", "A")
         ]
         positive[0].unit = "m3"
         positive[0].quantity = 10
         positive[1].unit = "m3"
         positive[1].quantity = 5
         facts = {i.key(): extract_facts(i) for i in positive}
+        self.assertEqual(facts[positive[0].key()].object_tag, "Verfüllung")
         flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
         self.assertTrue(any(f.rule_id == "BACKFILL_BALANCE" for f in flags))
 
@@ -166,6 +168,37 @@ class ClusterRuleTests(unittest.TestCase):
         )
         self.assertFalse(any(f.rule_id == "DIN4124_VERBAU" for f in flags))
 
+    def test_din4124_flags_are_attached_to_each_section(self):
+        items = [
+            item("44", "Leitungsgraben Tiefe bis 1,50 m", "Abschnitt A"),
+            item("45", "Leitungsgraben Tiefe bis 2,00 m", "Abschnitt B"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+        sections = {
+            cluster.title: cluster.cluster_id
+            for cluster in cluster_for(items, facts)
+            if cluster.kind == "SECTION"
+        }
+
+        flags = [
+            flag for flag in check_cluster_rules(
+                cluster_for(items, facts),
+                items,
+                facts,
+            )
+            if flag.rule_id == "DIN4124_VERBAU"
+        ]
+
+        self.assertEqual(len(flags), 2)
+        self.assertEqual(
+            {flag.cluster_id for flag in flags},
+            set(sections.values()),
+        )
+        self.assertEqual(
+            {tuple(flag.affected_positions) for flag in flags},
+            {(items[0].key(),), (items[1].key(),)},
+        )
+
     def test_pressure_positive_and_negative(self):
         positive = [
             item("51", "PE100 Trinkwasser Druckrohr DN63 verlegen"),
@@ -182,6 +215,21 @@ class ClusterRuleTests(unittest.TestCase):
         facts = {i.key(): extract_facts(i) for i in negative}
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
         self.assertFalse(any(f.rule_id == "PRESSURE_TEST" for f in flags))
+
+    def test_pressure_test_suppression_normalizes_umlauts(self):
+        position = item(
+            "54",
+            "PE100 Trinkwasser Druckrohr DN63 verlegen inkl. Druckprüfung",
+        )
+        position_facts = extract_facts(position)
+        rule = next(rule for rule in RULES if rule.id == "PRESSURE_TEST")
+
+        self.assertIn("druckprüfung", position_facts.inclusive_terms)
+        self.assertTrue(_subject_suppressed(
+            rule,
+            [position],
+            {position.key(): position_facts},
+        ))
 
     def test_surface_restore_positive_and_negative(self):
         positive = [item("61", "Asphalt abbruch")]
@@ -221,9 +269,9 @@ class ClusterRuleTests(unittest.TestCase):
 
     def test_dn_step_positive_and_negative(self):
         positive = [
-            item("81", "Druckrohr PE100 DN63"),
-            item("82", "Druckrohr PE100 DN100"),
-            item("83", "Druckrohr PE100 DN250"),
+            item("81", "Trinkwasser Druckrohr PE100 DN63"),
+            item("82", "Trinkwasser Druckrohr PE100 DN100"),
+            item("83", "Trinkwasser Druckrohr PE100 DN250"),
         ]
         facts = {i.key(): extract_facts(i) for i in positive}
         clusters = cluster_for(positive, facts)
@@ -231,9 +279,9 @@ class ClusterRuleTests(unittest.TestCase):
         self.assertTrue(any(f.rule_id == "DN_STEP" for f in flags))
 
         negative = [
-            item("84", "Druckrohr PE100 DN63"),
-            item("85", "Druckrohr PE100 DN100"),
-            item("86", "Druckrohr PE100 DN250 mit Uebergang"),
+            item("84", "Trinkwasser Druckrohr PE100 DN63"),
+            item("85", "Trinkwasser Druckrohr PE100 DN100"),
+            item("86", "Trinkwasser Druckrohr PE100 DN250 mit Uebergang"),
         ]
         facts = {i.key(): extract_facts(i) for i in negative}
         flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
@@ -254,6 +302,10 @@ class ClusterRuleTests(unittest.TestCase):
         rule = next(rule for rule in RULES if rule.id == "DIN4124_VERBAU")
         remarks = ["Grabenverbau ist bauseits als Nebenleistung einzubeziehen."]
         self.assertTrue(suppressed_by_remarks(remarks, rule))
+        self.assertTrue(suppressed_by_remarks(
+            ["Druckprüfung ist als Nebenleistung einzubeziehen."],
+            "PRESSURE_TEST",
+        ))
 
 
 if __name__ == "__main__":

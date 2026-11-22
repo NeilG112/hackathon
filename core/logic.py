@@ -141,7 +141,7 @@ RULES: tuple[RuleSpec, ...] = (
         "Bettungsmenge liegt oberhalb der enthaltenen Erd-/Grabenaushubmenge.",
     ),
     RuleSpec(
-        "BACKFILL_BALANCE", "containment", "Verfuellung", "Bodenaushub", "",
+        "BACKFILL_BALANCE", "containment", "Verfüllung", "Bodenaushub", "",
         "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
         "high",
         "Verfuellmenge liegt oberhalb der Bodenaushubmenge.",
@@ -196,6 +196,17 @@ def _item_text(item: NormalizedItem) -> str:
     return clean_item_text(f"{item.short_text} {item.long_text}".lower())
 
 
+def _normalize_german_text(text: str) -> str:
+    """Canonicalize umlaut and transliterated spellings for comparisons."""
+    return (
+        text.lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
+
+
 def _subject_suppressed(
     rule: RuleSpec,
     subject_items: Sequence[NormalizedItem],
@@ -231,7 +242,11 @@ def _subject_suppressed(
         if position_facts is None:
             raise KeyError(f"PositionFacts fehlen fuer Position {item.key()}")
         for inclusive in position_facts.inclusive_terms:
-            if any(term in inclusive for term in object_terms):
+            normalized_inclusive = _normalize_german_text(inclusive)
+            if any(
+                _normalize_german_text(term) in normalized_inclusive
+                for term in object_terms
+            ):
                 return True
     return False
 
@@ -264,11 +279,14 @@ def suppressed_by_remarks(remarks: Sequence[str] | None, rule: RuleSpec | str) -
     else:
         terms = tuple(term for term in spec.object.lower().replace("|", " ").split() if term)
 
-    markers = ("nebenleistung", "bauseits", "gesondert")
+    markers = tuple(
+        _normalize_german_text(marker)
+        for marker in ("nebenleistung", "bauseits", "gesondert")
+    )
     for remark in remarks:
-        text = clean_item_text(str(remark)).lower()
+        text = _normalize_german_text(clean_item_text(str(remark)))
         for term in terms:
-            start = text.find(term)
+            start = text.find(_normalize_german_text(term))
             if start < 0:
                 continue
             window = text[max(0, start - 80):start + 120]
@@ -415,7 +433,7 @@ def check_cluster_rules(
                 ))
 
         elif rule.id in ("BEDDING_IN_TRENCH", "BACKFILL_BALANCE"):
-            subject_tag = "Bettung" if rule.id == "BEDDING_IN_TRENCH" else "Verfuellung"
+            subject_tag = "Bettung" if rule.id == "BEDDING_IN_TRENCH" else "Verfüllung"
             for cluster in (c for c in clusters if c.kind == "SECTION"):
                 if not exposure_ok(cluster, rule):
                     continue
@@ -465,8 +483,6 @@ def check_cluster_rules(
                 ))
 
         elif rule.id == "DIN4124_VERBAU":
-            aggregate_subjects: list[NormalizedItem] = []
-            candidate_clusters = []
             for cluster in (c for c in clusters if c.kind == "SECTION"):
                 if not exposure_ok(cluster, rule):
                     continue
@@ -491,18 +507,13 @@ def check_cluster_rules(
                 )
                 if has_object:
                     continue
-                aggregate_subjects.extend(subject_items)
-                if cluster not in candidate_clusters:
-                    candidate_clusters.append(cluster)
-            if aggregate_subjects and not _subject_suppressed(
-                rule, aggregate_subjects, facts
-            ):
-                cluster = candidate_clusters[0]
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
                 computed = {
                     "depth_m_max": round(
                         max(
                             facts[item.key()].depth_m
-                            for item in aggregate_subjects
+                            for item in subject_items
                         ),
                         3,
                     ),
@@ -512,7 +523,7 @@ def check_cluster_rules(
                 reason = f"{rule.reason_de} ({rule.din_ref})."
                 flags.append(_make_flag(
                     rule, cluster, reason, computed,
-                    [item.key() for item in aggregate_subjects],
+                    [item.key() for item in subject_items],
                 ))
 
         elif rule.id == "PRESSURE_TEST":
