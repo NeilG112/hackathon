@@ -39,7 +39,7 @@ from views import reveal
 
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
-PAGES = ("Tender", "Gruppen & Angebot", "Logic", "Heikle Positionen")
+PAGES = ("Tender", "Preisstrategie", "Gruppen & Angebot", "Logic", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
@@ -300,6 +300,480 @@ def section_items(items):
         "Pauschal": "ja" if i.is_lump_sum else "",
     } for i in items])
     st.dataframe(frame, width="stretch", hide_index=True, height="stretch")
+
+
+def section_strategy3(items, calculated, company):
+    """Strategy 3 preview grouped by category, with per-position difficulty."""
+
+    st.subheader("Strategie 1 - produktivitätsbasierte Arbeitsstunden")
+    st.caption(
+        "Neue Stunden = Basisstunden × Schwierigkeitsfaktor. "
+        "Material, Gerät und Fremdleistungen werden unverändert übernommen."
+    )
+
+    factors = {
+        "easy": 0.93,
+        "normal": 1.00,
+        "difficult": 1.20,
+        "very difficult": 1.30,
+    }
+    labels = {
+        "easy": "Easy - 0.93",
+        "normal": "Normal - 1.00",
+        "difficult": "Difficult - 1.20",
+        "very difficult": "Very difficult - 1.30",
+    }
+
+    st.session_state.setdefault("pricing_strategy_default_class", "normal")
+    default_class = st.sidebar.selectbox(
+        "Standard-Schwierigkeitsgrad",
+        options=list(labels),
+        format_func=lambda key: labels[key],
+        key="pricing_strategy_default_class",
+    )
+
+    calculated_by_key = {row.item.key(): row for row in calculated}
+    category_positions = {}
+    for item in items:
+        category = constants.bucket_for_text(
+            item.short_text or item.long_text
+        )
+        category_positions.setdefault(category, []).append(item)
+
+    preview_rows = []
+    for category in sorted(category_positions):
+        category_items = category_positions[category]
+        with st.expander(
+            f"{category} ({len(category_items)} Positionen)",
+            expanded=False,
+        ):
+            for item in category_items:
+                oz = item.key()
+                row = calculated_by_key.get(oz)
+                old_ep = item.unit_price if item.unit_price is not None else (
+                    row.ep_mid if row is not None else None
+                )
+
+                if row is None or row.leistung is None or row.breakdown.labour_hours == 0:
+                    class_key = st.selectbox(
+                        f"{oz} · {item.short_text[:80]}",
+                        options=list(labels),
+                        format_func=lambda key: labels[key],
+                        index=list(labels).index(
+                            st.session_state.setdefault(
+                                f"pricing_class_{oz}", default_class
+                            )
+                        ),
+                        key=f"pricing_class_{oz}",
+                        disabled=True,
+                        help="Keine kalkulierbare Leistung oder keine Basisstunden vorhanden.",
+                    )
+                    preview_rows.append({
+                        "Kategorie": category,
+                        "OZ": oz,
+                        "Position": item.short_text,
+                        "Einheit": constants.normalize_unit(item.unit),
+                        "Menge": item.quantity,
+                        "Alte EP": round(old_ep, 2) if old_ep is not None else None,
+                        "Neue EP": None,
+                        "Aenderung EUR": None,
+                        "Aenderung %": None,
+                        "Faktor": factors[default_class],
+                        "Stunden alt": None,
+                        "Stunden neu": None,
+                        "Status": "BEIBEHALTEN - keine Leistung/Basisstunden",
+                    })
+                    continue
+
+                st.session_state.setdefault(f"pricing_class_{oz}", default_class)
+                class_key = st.selectbox(
+                    f"{oz} · {item.short_text[:80]}",
+                    options=list(labels),
+                    format_func=lambda key: labels[key],
+                    key=f"pricing_class_{oz}",
+                )
+                factor = factors[class_key]
+
+                base_hours = row.leistung.h_mittel
+                old_hours = row.breakdown.labour_hours
+                new_hours = base_hours * company.leistungsfaktor * factor
+                new_labour = new_hours * company.mittellohn_eur_h
+
+                direct_old = row.breakdown.ekt
+                non_labour = direct_old - row.breakdown.labour_eur
+                direct_new = non_labour + new_labour
+
+                if old_ep is not None and direct_old > 0:
+                    markup_proxy = old_ep / direct_old
+                    new_ep = direct_new * markup_proxy
+                else:
+                    new_ep = row.ep_mid
+
+                delta = None if old_ep is None else new_ep - old_ep
+                delta_pct = None if old_ep in (None, 0) else delta / old_ep * 100
+                status = "BERECHNET"
+
+                text = f"{item.short_text} {item.long_text}".lower()
+                hardship_terms = (
+                    "erschwern", "handlohn", "handschacht",
+                    "vorhandener leitung", "fremdleitung",
+                )
+                if factor != 1.00 and any(term in text for term in hardship_terms):
+                    status = "PRUEFEN - separate Erschwernisposition moeglich"
+
+                preview_rows.append({
+                    "Kategorie": category,
+                    "OZ": oz,
+                    "Position": item.short_text,
+                    "Einheit": constants.normalize_unit(item.unit),
+                    "Menge": item.quantity,
+                    "Alte EP": round(old_ep, 2) if old_ep is not None else None,
+                    "Neue EP": round(new_ep, 2),
+                    "Aenderung EUR": round(delta, 2) if delta is not None else None,
+                    "Aenderung %": round(delta_pct, 2) if delta_pct is not None else None,
+                    "Faktor": factor,
+                    "Stunden alt": round(old_hours, 4),
+                    "Stunden neu": round(new_hours, 4),
+                    "Status": status,
+                })
+
+    preview = pd.DataFrame(preview_rows)
+    if preview.empty:
+        st.info("Keine auswertbaren Positionen vorhanden.")
+        return preview
+
+    changed = preview["Aenderung EUR"].fillna(0)
+    valid_original = preview["Alte EP"].notna() & preview["Menge"].notna()
+    valid_new = preview["Neue EP"].notna() & preview["Menge"].notna()
+
+    original_total = (
+        preview.loc[valid_original, "Alte EP"]
+        * preview.loc[valid_original, "Menge"]
+    ).sum()
+    new_total = (
+        preview.loc[valid_new, "Neue EP"]
+        * preview.loc[valid_new, "Menge"]
+    ).sum()
+    total_change = new_total - original_total
+    total_change_pct = (
+        total_change / original_total * 100
+        if original_total != 0
+        else None
+    )
+
+    a, b, c = st.columns(3)
+    a.metric("Gesamt vor Strategie", f"€{original_total:,.2f}")
+    b.metric(
+        "Gesamt nach Strategie",
+        f"€{new_total:,.2f}",
+        f"{total_change:+,.2f} €",
+    )
+    c.metric(
+        "Gesamtveraenderung",
+        f"{total_change:+,.2f} €",
+        f"{total_change_pct:+.2f} %" if total_change_pct is not None else "n/a",
+    )
+
+    d, e, f = st.columns(3)
+    d.metric("Positionen", f"{len(preview)}")
+    e.metric(
+        "Geaendert",
+        f"{int((changed.abs() > 0.005).sum())}",
+    )
+    f.metric(
+        "LV-Wirkung",
+        f"€{sum((preview['Aenderung EUR'].fillna(0) * preview['Menge']).values):,.2f}",
+    )
+
+    st.warning(
+        "Die EP-Vorschau verwendet für bereits bepreiste LV-Positionen den "
+        "Original-EP als vorhandenen Gesamtpreis und den Bottom-up-Aufbau "
+        "nur für die Lohnverschiebung. Eine echte Kalkulationsaufschlüsselung "
+        "ist für eine belastbare Direktkostenprüfung erforderlich."
+    )
+    st.dataframe(
+        preview,
+        width="stretch",
+        hide_index=True,
+        height=520,
+    )
+
+    csv = preview.to_csv(index=False).encode("utf-8-sig")
+    st.download_button(
+        "Strategie 1 als CSV herunterladen",
+        data=csv,
+        file_name="strategie_1_positionen.csv",
+        mime="text/csv",
+    )
+    return preview
+
+
+def section_strategy2(items, calculated):
+    """Strategy 2: quantity-expectation unit-price pricing."""
+    st.subheader("Strategie 2 - Mengenerwartung")
+    st.caption(
+        "Die LV-Menge bleibt unverändert. EP oder Positionskosten können direkt bearbeitet werden."
+    )
+
+    calculated_by_key = {row.item.key(): row for row in calculated}
+    preview_rows = []
+    bidder_questions = []
+    shrinkage_notes = []
+    category_positions = {}
+
+    for item in items:
+        category = constants.bucket_for_text(item.short_text or item.long_text)
+        category_positions.setdefault(category, []).append(item)
+
+    first_category = sorted(category_positions)[0]
+    st.session_state.setdefault("pricing2_category", first_category)
+    selected_category = st.session_state["pricing2_category"]
+    if selected_category not in category_positions:
+        selected_category = first_category
+        st.session_state["pricing2_category"] = selected_category
+
+    category_nav, position_nav, detail = st.columns([2.2, 2.2, 5], gap="medium")
+
+    with category_nav:
+        category_options = sorted(category_positions)
+        category_label = st.selectbox(
+            "Kategorie",
+            options=category_options,
+            index=category_options.index(selected_category),
+            key="pricing2_category_select",
+        )
+        if category_label != selected_category:
+            st.session_state["pricing2_category"] = category_label
+            st.rerun()
+        selected_category = category_label
+
+    selected_category_items = category_positions[selected_category]
+    st.session_state.setdefault(
+        "pricing2_selected_oz",
+        selected_category_items[0].key(),
+    )
+    selected_oz = st.session_state["pricing2_selected_oz"]
+    if selected_oz not in {item.key() for item in selected_category_items}:
+        selected_oz = selected_category_items[0].key()
+        st.session_state["pricing2_selected_oz"] = selected_oz
+
+    with position_nav:
+        position_options = {
+            item.key(): f"{item.key()} · {item.short_text[:55]}"
+            for item in selected_category_items
+        }
+        position_label = st.selectbox(
+            "Position",
+            options=list(position_options),
+            format_func=lambda oz: position_options[oz],
+            index=list(position_options).index(selected_oz),
+            key="pricing2_position_select",
+        )
+        if position_label != selected_oz:
+            st.session_state["pricing2_selected_oz"] = position_label
+            st.rerun()
+
+    selected_item = next(
+        item for item in selected_category_items
+        if item.key() == selected_oz
+    )
+
+    for item in items:
+        oz = item.key()
+        category = constants.bucket_for_text(item.short_text or item.long_text)
+        lv_quantity = float(item.quantity)
+        unit = constants.normalize_unit(item.unit)
+        calculated_row = calculated_by_key.get(oz)
+        old_ep = item.unit_price
+        price_source = "Original-EP"
+        if old_ep is None and calculated_row is not None:
+            old_ep = calculated_row.ep_mid
+            price_source = "Kalkulierter EP"
+        if old_ep is None:
+            old_ep = 0.0
+            price_source = "Kein EP verfügbar"
+
+        forecast_key = f"pricing2_forecast_{oz}"
+        ep_key = f"pricing2_ep_{oz}"
+        st.session_state.setdefault(forecast_key, lv_quantity)
+        st.session_state.setdefault(ep_key, float(old_ep))
+
+        expected_quantity = st.session_state[forecast_key]
+        new_ep = st.session_state[ep_key]
+        ratio = expected_quantity / lv_quantity if lv_quantity != 0 else None
+        ratio_pct = ratio * 100 if ratio is not None else None
+        ep_was_edited = abs(new_ep - old_ep) > 0.005
+        status = "MANUELL ANPASSBAR"
+
+        if ratio is None:
+            status = "LV-Menge ist null"
+        elif ratio > 1.10:
+            status = "BIETERFRAGE - mehr als 110 %"
+            bidder_questions.append({
+                "OZ": oz,
+                "Kategorie": category,
+                "Position": item.short_text,
+                "LV-Menge": lv_quantity,
+                "Erwartete-Menge": expected_quantity,
+            })
+        elif ratio < 0.90:
+            status = "VOB/B-Hinweis - unter 90 %"
+            shrinkage_notes.append({
+                "OZ": oz,
+                "Kategorie": category,
+                "Position": item.short_text,
+                "LV-Menge": lv_quantity,
+                "Erwartete-Menge": expected_quantity,
+            })
+        elif ep_was_edited:
+            status = "MANUELL GEÄNDERT"
+
+        lv_old_total = old_ep * lv_quantity
+        lv_new_total = new_ep * lv_quantity
+        ep_change = new_ep - old_ep
+        ep_change_pct = ep_change / old_ep * 100 if old_ep else None
+        total_change = lv_new_total - lv_old_total
+
+        preview_rows.append({
+            "Kategorie": category,
+            "OZ": oz,
+            "Position": item.short_text,
+            "Einheit": unit,
+            "LV-Menge": lv_quantity,
+            "Erwartete-Menge": expected_quantity,
+            "Erwartung %": round(ratio_pct, 2) if ratio_pct is not None else None,
+            "Alter EP EUR": round(old_ep, 2),
+            "Neuer EP EUR": round(new_ep, 2),
+            "EP-Aenderung EUR": round(ep_change, 2),
+            "EP-Aenderung %": round(ep_change_pct, 2) if ep_change_pct is not None else None,
+            "LV-Gesamt alt EUR": round(lv_old_total, 2),
+            "LV-Gesamt neu EUR": round(lv_new_total, 2),
+            "LV-Aenderung EUR": round(total_change, 2),
+            "EP-Quelle": price_source,
+            "Status": status,
+        })
+
+    oz = selected_item.key()
+    lv_quantity = float(selected_item.quantity)
+    unit = constants.normalize_unit(selected_item.unit)
+    forecast_key = f"pricing2_forecast_{oz}"
+    ep_key = f"pricing2_ep_{oz}"
+    calculated_row = calculated_by_key.get(oz)
+    old_ep = selected_item.unit_price
+    price_source = "Original-EP"
+    if old_ep is None and calculated_row is not None:
+        old_ep = calculated_row.ep_mid
+        price_source = "Kalkulierter EP"
+    if old_ep is None:
+        old_ep = 0.0
+        price_source = "Kein EP verfügbar"
+
+    with detail:
+        st.markdown("**Positionsdetails**")
+        st.markdown(f"### {selected_item.short_text}")
+        st.caption(f"OZ {oz} · {unit}")
+        st.write(selected_item.long_text or "Keine Zusatzbeschreibung vorhanden.")
+
+        expected_quantity = st.number_input(
+            "Erwartete Menge",
+            min_value=0.0,
+            step=max(abs(lv_quantity) * 0.01, 0.01),
+            key=forecast_key,
+            help=f"LV-Menge: {lv_quantity:g} {unit}",
+        )
+        new_ep = st.number_input(
+            "EP bearbeiten",
+            min_value=0.0,
+            step=0.01,
+            key=ep_key,
+            format="%.2f",
+            help="Einheitspreis in Euro",
+        )
+
+        lv_old_total = old_ep * lv_quantity
+        lv_new_total = new_ep * lv_quantity
+        ep_change = new_ep - old_ep
+        ep_change_pct = ep_change / old_ep * 100 if old_ep else None
+        total_change = lv_new_total - lv_old_total
+
+        a, b = st.columns(2)
+        a.metric("LV-Menge", f"{lv_quantity:g} {unit}")
+        b.metric("Erwartete Menge", f"{expected_quantity:g} {unit}")
+        c, d = st.columns(2)
+        c.metric("Alter EP", f"€{old_ep:,.2f}", price_source)
+        d.metric("Neuer EP", f"€{new_ep:,.2f}", f"{ep_change:+,.2f} €")
+        e, f = st.columns(2)
+        e.metric("LV-Gesamt alt", f"€{lv_old_total:,.2f}")
+        f.metric(
+            "LV-Gesamt neu",
+            f"€{lv_new_total:,.2f}",
+            f"{total_change:+,.2f} €"
+            + (
+                f" / {ep_change_pct:+.2f} %"
+                if ep_change_pct is not None
+                else ""
+            ),
+        )
+
+    preview = pd.DataFrame(preview_rows)
+    if preview.empty:
+        st.info("Keine auswertbaren Positionen vorhanden.")
+        return preview
+
+    original_total = pd.to_numeric(preview["LV-Gesamt alt EUR"], errors="coerce").fillna(0).sum()
+    new_total = pd.to_numeric(preview["LV-Gesamt neu EUR"], errors="coerce").fillna(0).sum()
+    total_change = new_total - original_total
+    total_change_pct = total_change / original_total * 100 if original_total else None
+    changed_mask = preview["LV-Aenderung EUR"].fillna(0).abs() > 0.005
+
+    a, b, c = st.columns(3)
+    a.metric("Gesamt vor Strategie 2", f"€{original_total:,.2f}")
+    b.metric("Gesamt nach Strategie 2", f"€{new_total:,.2f}", f"{total_change:+,.2f} €")
+    c.metric(
+        "Gesamtänderung",
+        f"{total_change:+,.2f} €",
+        f"{total_change_pct:+.2f} %" if total_change_pct is not None else "n/a",
+    )
+
+    d, e = st.columns(2)
+    d.metric("Positionen", f"{len(preview)}")
+    e.metric("Geänderte Positionen", f"{int(changed_mask.sum())}")
+
+    st.dataframe(preview, width="stretch", hide_index=True, height=520)
+
+    if bidder_questions:
+        st.subheader("Bieterfragen")
+        st.dataframe(pd.DataFrame(bidder_questions), width="stretch", hide_index=True)
+    if shrinkage_notes:
+        st.subheader("VOB/B-Hinweis - Mindermenge unter 90 %")
+        st.dataframe(pd.DataFrame(shrinkage_notes), width="stretch", hide_index=True)
+
+    csv = preview.to_csv(index=False).encode("utf-8-sig")
+    st.download_button(
+        "Strategie 2 als CSV herunterladen",
+        data=csv,
+        file_name="strategie_2_positionen.csv",
+        mime="text/csv",
+    )
+    return preview
+
+
+def section_pricing_strategy(items, calculated, company):
+    """Strategy 3 and Strategy 2 previews."""
+    selected_strategy = st.radio(
+        "Strategie auswählen",
+        options=[
+            "Strategie 1 - Produktivität",
+            "Strategie 2 - Mengen",
+        ],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="pricing_strategy_selector",
+    )
+    if selected_strategy == "Strategie 1 - Produktivität":
+        section_strategy3(items, calculated, company)
+    else:
+        section_strategy2(items, calculated)
 
 
 def source_document(source):
@@ -1012,12 +1486,14 @@ def main():
         [data-testid="stAppViewContainer"] {
             height: 100dvh !important;
             max-height: 100dvh !important;
-            overflow: hidden !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
         }
         [data-testid="stMain"] {
             height: 100dvh !important;
             min-width: 0 !important;
-            overflow: hidden !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
         }
         /* Main area is a flex column exactly one viewport tall. The top
            padding clears Streamlit's fixed header (Deploy / menu). */
@@ -1029,7 +1505,8 @@ def main():
             max-width: 100% !important;
             height: 100dvh !important;
             min-height: 0 !important;
-            overflow: hidden !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             padding: 3.75rem clamp(0.75rem, 3vw, 3rem) 0.75rem !important;
         }
         [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
@@ -1180,6 +1657,9 @@ def main():
         # scores near zero on real wording — that is the 3% coverage bug.
         assignments = classify.classify(items, data)
         calculated = kalkulation.calculate(items, assignments, company, data)
+        if page == "Preisstrategie":
+            section_pricing_strategy(items, calculated, company)
+            return
         reference = load_reference()
         priced = pricer.price_boq(items, reference, {
             "mittellohn_eur_h": company.mittellohn_eur_h,
