@@ -10,8 +10,12 @@ app.py
 core/
   __init__.py
   classify.py
+  clusters.py
   constants.py
+  deep_logic.py
   detectors.py
+  facts.py
+  judgments.py
   kalkulation.py
   logic.py
   models.py
@@ -19,10 +23,12 @@ core/
   parser_gaeb90.py
   parser_x83.py
   pricer.py
+  risk_engine.py
   stammdaten.py
 data/
   .gitkeep
   classification_cache.json
+  deep_logic_cache.json
   golden/
     .gitkeep
     501-24-01_GAEB-XML_sas.x83.json
@@ -35,13 +41,14 @@ data/
     index.json
     StBALV23040.D84.json
     StBALV23040.D86.json
+  judgment_cache.json
   reference_prices.json
   rfi_templates.json
 Database/
   data/
     arbeitszeitrichtwerte.json
-    geraete.json
     materialien.json
+    pdf_leistungen.json
     testdb/
       testdatenbank.sqlite
   LUECKEN.md
@@ -102,8 +109,16 @@ requirements.txt
 scripts/
   build_reference_prices.py
   dump_golden.py
+  show_clusters.py
 skills-lock.json
 TASKS.md
+tests/
+  test_app_logic.py
+  test_clusters.py
+  test_deep_logic.py
+  test_export_rfi_clusters.py
+  test_facts.py
+  test_rules.py
 utils/
   __init__.py
   text_cleaning.py
@@ -507,6 +522,7 @@ rather than fabricating output.
 from __future__ import annotations
 
 import html
+import json
 import os
 import re
 import tempfile
@@ -516,13 +532,14 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
 
-from core import (classify, constants, detectors, kalkulation, logic, objects,
-                  parser_gaeb90, parser_x83, pricer, stammdaten)
+from core import (classify, clusters, constants, deep_logic, detectors, facts,
+                  kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
+                  risk_engine, stammdaten)
 from views import reveal
 
 SAMPLE = constants.REVEAL["blank_boq"]
 ANSWER_KEY = constants.REVEAL["answer_key"]
-PAGES = ("Tender", "Gruppen & Angebot", "Logic", "Heikle Positionen")
+PAGES = ("Tender", "Gruppen & Angebot", "Logik", "Heikle Positionen")
 
 XML_SUFFIXES = (".x83", ".x81", ".x84", ".x86")
 GAEB90_SUFFIXES = (".d83", ".d81", ".d84", ".d86")
@@ -576,22 +593,102 @@ def rehydrate(dicts: list[dict]):
     return [NormalizedItem.from_dict(d) for d in dicts]
 
 
+@st.cache_data(show_spinner=False)
+def analyze_hybrid_cached(
+    item_dicts: list[dict],
+    remarks: list[str],
+    calculated_payload: list[dict],
+    priced_payload: list[dict],
+    use_jev: bool,
+):
+    """Cache the serializable end-to-end hybrid analysis for UI reruns."""
+    from core.kalkulation import CalculatedItem
+    from core.pricer import PricedItem
+
+    items = rehydrate(item_dicts)
+    item_by_key = {item.key(): item for item in items}
+
+    calculated = []
+    for payload in calculated_payload:
+        item = item_by_key.get(payload["key"])
+        if item is not None:
+            calculated.append(CalculatedItem(
+                item=item,
+                leistung=None,
+                ep_low=payload["ep_low"],
+                ep_mid=payload["ep_mid"],
+                ep_high=payload["ep_high"],
+            ))
+
+    priced = []
+    for payload in priced_payload:
+        item = item_by_key.get(payload["key"])
+        if item is not None:
+            priced.append(PricedItem(
+                item=item,
+                unit_price=payload["unit_price"],
+                total=payload["total"],
+                source=payload["source"],
+                comparables=payload["comparables"],
+                spread=payload["spread"],
+                bucket=payload["bucket"],
+                distribution=payload["distribution"],
+                note=payload["note"],
+            ))
+
+    return risk_engine.analyze_tender_hybrid(
+        items,
+        remarks,
+        calculated,
+        priced,
+        use_jev=use_jev,
+    )
+
+
+@st.cache_data(show_spinner=False)
+def evaluate_cluster_deep_cached(
+    filename: str,
+    rules_version: str,
+    payloads: dict[str, str],
+) -> dict[str, dict]:
+    """Deep cluster cache key: filename + rule catalogue version + payload."""
+    del filename
+    adapter = deep_logic.get_adapter()
+    model = adapter.name
+    from types import SimpleNamespace
+
+    cluster_objects = [
+        SimpleNamespace(cluster_id=cluster_id)
+        for cluster_id in payloads
+    ]
+    evaluations = deep_logic.evaluate_clusters(
+        cluster_objects,
+        payloads,
+        use_llm=None,
+        max_clusters=12,
+        write_cache=True,
+    )
+    return {
+        cluster_id: {
+            **evaluation.as_dict(),
+            "model": model,
+        }
+        for cluster_id, evaluation in evaluations.items()
+    }
+
+
 # --- sections --------------------------------------------------------------
 
 def sidebar_kalkulation() -> stammdaten.Company:
-    """The cost base the bottom-up calculation uses.
-
-    These are the parameters the client said a contractor must bring himself:
-    *"Maschinenstundensätze hast du aus der Firma gegeben"*. Presets come from
-    the bidder profiles in the test database.
-    """
+    """The cost base the bottom-up calculation uses."""
     st.sidebar.header("Kalkulationsgrundlage")
-    presets = stammdaten.companies()
-    names = [c.name for c in presets]
-    chosen = presets[names.index(st.sidebar.selectbox("Profil", names))]
-
+    defaults = stammdaten.Company()
+    st.sidebar.caption(
+        "Neutrale Startwerte, keine Firmenprofile. Passe sie an deine "
+        "Kalkulationsgrundlage an."
+    )
     wage = st.sidebar.slider("Mittellohn (€/h)", 35.0, 95.0,
-                             float(chosen.mittellohn_eur_h), 0.5)
+                             float(defaults.mittellohn_eur_h), 0.5)
 
     # The markup, split into its three parts. Arithmetically a combined number
     # is identical — 15 + 5 is always 20 — but split, the estimator can see
@@ -600,22 +697,24 @@ def sidebar_kalkulation() -> stammdaten.Company:
     st.sidebar.markdown("**Zuschläge**")
     agk = st.sidebar.slider(
         "AGK — Allgemeine Geschäftskosten (%)", 0.0, 30.0,
-        float(chosen.agk_pct), 0.5,
+        float(defaults.agk_pct), 0.5,
         help="Kosten des Unternehmens außerhalb der Baustelle, auf ein "
              "ganzes Jahr gerechnet.")
-    bgk = st.sidebar.slider("BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
-                            float(chosen.bgk_pct), 0.5)
-    wg = st.sidebar.slider("W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
-                           float(chosen.wg_pct), 0.5)
+    bgk = st.sidebar.slider(
+        "BGK — Baustellengemeinkosten (%)", 0.0, 20.0,
+        float(defaults.bgk_pct), 0.5)
+    wg = st.sidebar.slider(
+        "W&G — Wagnis und Gewinn (%)", 0.0, 20.0,
+        float(defaults.wg_pct), 0.5)
 
     # AGK is an annual figure. A ten-month job carries ten twelfths of it.
     months = st.sidebar.slider(
-        "Bauzeit (Monate)", 1.0, 24.0, float(chosen.bauzeit_monate), 1.0,
+        "Bauzeit (Monate)", 1.0, 24.0, float(defaults.bauzeit_monate), 1.0,
         help="Nur die AGK werden anteilig umgelegt — BGK und W&G nicht.")
 
     company = stammdaten.Company(
-        chosen.name, wage, chosen.zuschlag_pct, chosen.leistungsfaktor,
-        chosen.materialfaktor, chosen.profil,
+        "Eigene Kalkulation", wage, defaults.zuschlag_pct,
+        defaults.leistungsfaktor, defaults.materialfaktor, "",
         agk_pct=agk, bgk_pct=bgk, wg_pct=wg, bauzeit_monate=months,
     )
     st.sidebar.metric("Zuschlag gesamt", f"{company.total_markup_pct:.1f} %")
@@ -626,14 +725,12 @@ def sidebar_kalkulation() -> stammdaten.Company:
         )
 
     perf = st.sidebar.slider("Leistungsfaktor", 0.6, 1.6,
-                             float(chosen.leistungsfaktor), 0.05,
+                             float(defaults.leistungsfaktor), 0.05,
                              help=">1 = langsamer als die Richtwerte")
     mat = st.sidebar.slider("Materialfaktor", 0.6, 1.6,
-                            float(chosen.materialfaktor), 0.05)
+                            float(defaults.materialfaktor), 0.05)
     company.leistungsfaktor = perf
     company.materialfaktor = mat
-    if chosen.profil:
-        st.sidebar.caption(chosen.profil)
     return company
 
 
@@ -723,14 +820,36 @@ def section_upload(show_controls: bool = True):
 def section_items(items):
     """The parsed bill of quantities."""
     st.subheader("Ausgelesene Positionen")
+    priced_in_lv = any(
+        item.unit_price is not None or item.total_price is not None
+        for item in items
+    )
+    st.caption(
+        "EP und Gesamt zeigen nur Preise, die bereits in der Datei stehen. "
+        "„Pauschalposition“ bezeichnet die Abrechnungsart, keinen Preis."
+        if priced_in_lv else
+        "Diese LV-Datei enthält noch keine Positionspreise. "
+        "„Pauschalposition“ bezeichnet die Abrechnungsart, keinen Preis."
+    )
     frame = pd.DataFrame([{
         "OZ": i.key(),
         "Position": i.short_text,
         "Menge": i.quantity,
         "Einheit": constants.normalize_unit(i.unit),
-        "Pauschal": "ja" if i.is_lump_sum else "",
+        "Abrechnung": "Pauschal" if i.is_lump_sum else "Menge × Einheit",
+        "EP (€)": i.unit_price,
+        "GP (€)": i.total_price,
     } for i in items])
-    st.dataframe(frame, width="stretch", hide_index=True, height="stretch")
+    st.dataframe(
+        frame,
+        column_config={
+            "EP (€)": st.column_config.NumberColumn(format="€ %.2f"),
+            "GP (€)": st.column_config.NumberColumn(format="€ %.2f"),
+        },
+        width="stretch",
+        hide_index=True,
+        height="stretch",
+    )
 
 
 def source_document(source):
@@ -1070,6 +1189,327 @@ def section_kalkulation(calculated, cov, data):
     return calculated
 
 
+def section_logic(
+    items,
+    remarks,
+    hybrid_results,
+    findings,
+    calculated=None,
+    filename: str = "",
+):
+    """Cluster logic findings with deterministic and optional LLM evaluations."""
+    del hybrid_results, findings
+    facts_by_key = {item.key(): facts.extract_facts(item) for item in items}
+    cluster_list = clusters.build_clusters(
+        items,
+        facts_by_key,
+        calculated=calculated,
+    )
+
+    cluster_flags = logic.check_cluster_rules(
+        cluster_list,
+        items,
+        facts_by_key,
+        calculated=calculated,
+        remarks=remarks,
+    )
+
+    payloads = {}
+    cluster_by_id = {cluster.cluster_id: cluster for cluster in cluster_list}
+    item_by_key = {item.key(): item for item in items}
+    for cluster in cluster_list:
+        payload = {
+            "cluster_id": cluster.cluster_id,
+            "kind": cluster.kind,
+            "title": cluster.title,
+            "positions": [
+                {
+                    "oz": oz,
+                    "short_text": item_by_key[oz].short_text if oz in item_by_key else "",
+                    "facts": (
+                        {
+                            "object_tag": facts_by_key[oz].object_tag,
+                            "phase": facts_by_key[oz].phase,
+                            "dn": facts_by_key[oz].dn,
+                            "pn": facts_by_key[oz].pn,
+                            "depth_m": facts_by_key[oz].depth_m,
+                            "thickness_cm": facts_by_key[oz].thickness_cm,
+                            "material": facts_by_key[oz].material,
+                            "inclusive_terms": facts_by_key[oz].inclusive_terms,
+                        }
+                        if oz in facts_by_key
+                        else {}
+                    ),
+                }
+                for oz in cluster.positions
+                if oz in item_by_key
+            ],
+        }
+        payloads[cluster.cluster_id] = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+    raw_evaluations = evaluate_cluster_deep_cached(
+        filename or "uploaded-tender",
+        logic.RULES_VERSION,
+        payloads,
+    )
+
+    rule_by_id = {rule.id: rule for rule in logic.RULES}
+    cards = []
+    for flag in cluster_flags:
+        cluster = cluster_by_id.get(flag.cluster_id)
+        rule = rule_by_id.get(flag.rule_id)
+        cards.append({
+            "source": "deterministic",
+            "category": flag.rule_id,
+            "title": flag.cluster_title,
+            "analysis": flag.reason_de,
+            "confidence": 1.0,
+            "model": None,
+            "computed": dict(flag.computed),
+            "affected_ozs": list(flag.affected_positions),
+            "euro_exposure_estimate": (
+                cluster.euro_exposure if cluster is not None else 0.0
+            ),
+            "din_ref": rule.din_ref if rule is not None else "",
+            "cluster_id": flag.cluster_id,
+        })
+
+    for cluster_id, evaluation in raw_evaluations.items():
+        if evaluation.get("offline") is True:
+            continue
+        if evaluation.get("contradiction_category") in (None, "", "NONE"):
+            continue
+        cluster = cluster_by_id.get(cluster_id)
+        affected = evaluation.get("affected_positions") or (
+            cluster.positions if cluster is not None else []
+        )
+        cards.append({
+            "source": "llm",
+            "category": evaluation.get("contradiction_category", "UNKNOWN"),
+            "title": cluster.title if cluster is not None else cluster_id,
+            "analysis": evaluation.get("reason_de") or "",
+            "confidence": float(evaluation.get("confidence") or 0.0),
+            "model": evaluation.get("model") or "LLM",
+            "computed": {},
+            "affected_ozs": list(affected),
+            "euro_exposure_estimate": (
+                cluster.euro_exposure if cluster is not None else 0.0
+            ),
+            "din_ref": "",
+            "cluster_id": cluster_id,
+        })
+
+    cards.sort(
+        key=lambda card: (
+            -float(card["euro_exposure_estimate"]),
+            card["title"],
+        )
+    )
+    deterministic_count = sum(
+        1 for card in cards if card["source"] == "deterministic"
+    )
+    llm_count = sum(
+        1 for card in cards if card["source"] == "llm"
+    )
+
+    calculated_by_key = {
+        calculated_item.item.key(): calculated_item
+        for calculated_item in (calculated or [])
+    }
+    affected_ozs = {
+        oz for card in cards for oz in card["affected_ozs"]
+    }
+    unique_position_exposure = sum(
+        float(calculated_by_key[oz].total or 0.0)
+        for oz in affected_ozs
+        if oz in calculated_by_key
+    )
+
+    a, b = st.columns(2)
+    a.metric("Cluster-Befunde", len(cards))
+    b.metric(
+        "Summe EUR",
+        f"€{unique_position_exposure:,.0f}",
+        help="Kalkulationswert der betroffenen Positionen; jede OZ wird nur "
+             "einmal gezählt.",
+    )
+    c, d = st.columns(2)
+    c.metric("Deterministisch vs. LLM", f"{deterministic_count} vs. {llm_count}")
+    d.metric("Geprüfte Cluster", len(cluster_list))
+
+    if not cards:
+        st.success(
+            f"Keine Cluster-Widersprueche gefunden. "
+            f"{len(cluster_list)} Cluster wurden geprueft."
+        )
+        return
+
+    if "rfi_cluster_questions" not in st.session_state:
+        st.session_state["rfi_cluster_questions"] = []
+
+    for index, card in enumerate(cards):
+        with st.container(border=True):
+            top_left, top_right = st.columns([5, 2])
+            top_left.markdown(f"**{card['title']}**")
+            top_right.caption(f"€ {card['euro_exposure_estimate']:,.2f}")
+            st.badge(card["category"], icon="⚠️")
+
+            if card["source"] == "deterministic":
+                st.caption("🔒 Deterministisch")
+            else:
+                confidence = card["confidence"]
+                st.caption(
+                    f"{card['model']} · Confidence {confidence:.0%}"
+                )
+
+            st.write(card["analysis"])
+            with st.expander("Analyse und betroffene Positionen"):
+                st.markdown("**Technische Einordnung**")
+                st.write(card["analysis"])
+
+                st.markdown("**Rechenweg**")
+                computed = card["computed"]
+                if computed:
+                    st.dataframe(
+                        pd.DataFrame([
+                            {"Kennzahl": str(key), "Wert": str(value)}
+                            for key, value in computed.items()
+                        ]),
+                        width="stretch",
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("Keine deterministische Zwischenrechnung vorhanden.")
+
+                st.markdown("**Kaufmännische Bedeutung**")
+                st.write(
+                    f"Geschätzter Wert des betroffenen Clusters: "
+                    f"€ {card['euro_exposure_estimate']:,.2f}"
+                    + (
+                        f" · {card['din_ref']}"
+                        if card["din_ref"]
+                        else ""
+                    )
+                )
+
+                affected_rows = []
+                for oz in card["affected_ozs"]:
+                    item = item_by_key.get(oz)
+                    if item is None:
+                        continue
+                    calculated_item = calculated_by_key.get(oz)
+                    euro = (
+                        float(calculated_item.total or 0.0)
+                        if calculated_item is not None
+                        else 0.0
+                    )
+                    affected_rows.append({
+                        "OZ": item.key(),
+                        "Kurztext": item.short_text,
+                        "Menge": item.quantity,
+                        "Einheit": constants.normalize_unit(item.unit),
+                        "EUR": round(euro, 2),
+                    })
+                if affected_rows:
+                    st.dataframe(
+                        pd.DataFrame(affected_rows),
+                        width="stretch",
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("Keine betroffenen OZ hinterlegt.")
+
+            if st.button(
+                "Als Bieterfrage uebernehmen",
+                key=f"rfi_cluster_{card['cluster_id']}_{index}",
+            ):
+                question = dict(card)
+                question["affected_ozs"] = list(card["affected_ozs"])
+                existing_ids = {
+                    entry.get("cluster_id")
+                    for entry in st.session_state["rfi_cluster_questions"]
+                }
+                if card["cluster_id"] not in existing_ids:
+                    st.session_state["rfi_cluster_questions"].append(question)
+
+
+def section_hybrid_risky(items, hybrid_results, findings):
+    """Hybrid prioritized risk table and RFI export."""
+    filtered = [
+        result for result in hybrid_results
+        if result.risk_level in ("high", "medium")
+    ]
+    high_count = sum(1 for r in filtered if r.risk_level == "high")
+    medium_count = sum(1 for r in filtered if r.risk_level == "medium")
+    positive = sorted(
+        r.euro_exposure for r in hybrid_results if r.euro_exposure > 0
+    )
+    threshold = (
+        pricer.percentile(positive, constants.HYBRID_EXPOSURE_PERCENTILE)
+        if positive else constants.SEVERITY_HIGH_EUR
+    )
+    speculation_count = sum(
+        1 for r in filtered if r.action_type == "SPECULATE_UP"
+    )
+
+    a, b, c, d = st.columns(4)
+    a.metric("High Risk Positionen", high_count)
+    b.metric("Medium Risk Positionen", medium_count)
+    c.metric("Top-10-%-Schwelle", f"€{threshold:,.2f}")
+    d.metric("VOB/B-Nachtragskandidaten", speculation_count)
+
+    filter_choice = st.segmented_control(
+        "Filter",
+        options=["Alle", "High", "Medium", "VOB/B-Spekulation"],
+        default="Alle",
+        key="hybrid_risk_filter",
+    )
+    if filter_choice == "High":
+        filtered = [r for r in filtered if r.risk_level == "high"]
+    elif filter_choice == "Medium":
+        filtered = [r for r in filtered if r.risk_level == "medium"]
+    elif filter_choice == "VOB/B-Spekulation":
+        filtered = [r for r in filtered if r.action_type == "SPECULATE_UP"]
+
+    filtered.sort(
+        key=lambda r: (0 if r.risk_level == "high" else 1, -r.euro_exposure)
+    )
+    item_by_key = {item.key(): item for item in items}
+    rows = []
+    for result in filtered:
+        item = item_by_key.get(result.key)
+        if item is None:
+            continue
+        reasons = " | ".join(result.reasons)
+        if result.judgments and result.judgments.reasons:
+            reasons += " | KI: " + " | ".join(result.judgments.reasons.values())
+        rows.append({
+            "Risiko": result.risk_level,
+            "OZ": item.key(),
+            "Position": item.short_text[:58],
+            "EP vorl.": round(result.pre_unit_price, 2),
+            "€-Exposure": round(result.euro_exposure, 2),
+            "Strategie": f"{result.action_type}: {result.strategy}",
+            "KI- & Regel-Begründung": reasons,
+        })
+
+    if rows:
+        st.dataframe(pd.DataFrame(rows), width="stretch",
+                     hide_index=True, height="stretch")
+    else:
+        st.success("Keine Position im gewählten Risiko-Filter.")
+
+    st.divider()
+    section_export(
+        findings,
+        cluster_evaluations=st.session_state.get("rfi_cluster_questions"),
+    )
+
+
 def section_tricky(calculated):
     """Show unpriced positions and material pricing risks."""
     st.caption(
@@ -1232,7 +1672,7 @@ def constants_sources() -> list[str]:
     return load_reference().get("meta", {}).get("sources", [])
 
 
-def section_export(findings):
+def section_export(findings, cluster_evaluations=None):
     """Bieterfragen-Katalog download. Lights up when task 006 lands."""
     st.subheader("10 · The letter")
     if not findings:
@@ -1242,7 +1682,11 @@ def section_export(findings):
 
     import export_rfi
     project = {"title": "Bieterfragen-Katalog"}
-    catalog = export_rfi.build_catalog(findings, project)
+    catalog = export_rfi.build_catalog(
+        findings,
+        project,
+        cluster_evaluations=cluster_evaluations,
+    )
     if not catalog:
         st.button("Export clarification letter (.docx)", disabled=True)
         st.caption("No findings are available for export.")
@@ -1430,7 +1874,18 @@ def main():
             st.rerun()
 
     page = st.session_state.get("active_page", PAGES[0])
-    st.title("Logik" if page == "Logic" else page)
+    if page == "Logic":
+        page = "Logik"
+        st.session_state["active_page"] = page
+    st.title(page)
+    use_jev = False
+    if page in ("Logik", "Heikle Positionen"):
+        use_jev = st.sidebar.checkbox(
+            "KI-Tiefenprüfung (Top 60 Risiko-Positionen)",
+            value=False,
+            help="Startet nur nach Aktivierung eine externe Modellprüfung. "
+                 "Deterministische Regeln laufen unabhängig davon.",
+        )
     loaded = section_upload(show_controls=page == "Tender")
     if not loaded:
         return
@@ -1438,8 +1893,6 @@ def main():
 
     if page == "Tender":
         section_items(items)
-    elif page == "Logic":
-        st.info("Die Logik-Prüfungen werden später ergänzt.")
     else:
         company = sidebar_kalkulation()
         data = stammdaten.load()
@@ -1448,6 +1901,36 @@ def main():
         # scores near zero on real wording — that is the 3% coverage bug.
         assignments = classify.classify(items, data)
         calculated = kalkulation.calculate(items, assignments, company, data)
+        reference = load_reference()
+        priced = pricer.price_boq(items, reference, {
+            "mittellohn_eur_h": company.mittellohn_eur_h,
+            "overhead_pct": company.total_markup_pct,
+            "profit_pct": company.wg_pct,
+        })
+        calculated_payload = [{
+            "key": c.item.key(),
+            "ep_low": c.ep_low,
+            "ep_mid": c.ep_mid,
+            "ep_high": c.ep_high,
+        } for c in calculated]
+        priced_payload = [{
+            "key": p.item.key(),
+            "unit_price": p.unit_price,
+            "total": p.total,
+            "source": p.source,
+            "comparables": p.comparables,
+            "spread": p.spread,
+            "bucket": p.bucket,
+            "distribution": p.distribution,
+            "note": p.note,
+        } for p in priced]
+        hybrid_results, findings = analyze_hybrid_cached(
+            [item.as_dict() for item in items],
+            list(remarks),
+            calculated_payload,
+            priced_payload,
+            bool(use_jev),
+        )
         if page == "Gruppen & Angebot":
             cov = classify.coverage(assignments)
             if cov["pct"] < 50:
@@ -1463,8 +1946,17 @@ def main():
                 remarks,
                 calculated,
             )
-        else:
-            section_tricky(calculated)
+        elif page == "Logik":
+            section_logic(
+                items,
+                remarks,
+                hybrid_results,
+                findings,
+                calculated=calculated,
+                filename=label,
+            )
+        elif page == "Heikle Positionen":
+            section_hybrid_risky(items, hybrid_results, findings)
 
 
 main()
@@ -1890,6 +2382,271 @@ def coverage(assignments: dict) -> dict:
 
 ````
 
+## `core/clusters.py`
+````py
+"""Clusteransichten fuer LV-Positionen.
+
+Eine Position darf bewusst in mehreren Clustern liegen: Abschnitt, System und
+projektweites Frame sind komplementaere Sichtachsen. Der Stand muss daher
+niemals spaeter durch Deduplication nach Position oder OZ verkleinert werden.
+"""
+
+from __future__ import annotations
+
+import hashlib
+from collections import defaultdict
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
+
+from core import objects
+from core.facts import PositionFacts
+from core.models import Cluster, NormalizedItem
+
+DN_SERIES = (50, 63, 80, 100, 125, 150, 200, 250, 300, 400, 500)
+
+FRAME_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Wasserhaltung", (
+        "wasserhaltung", "grundwasserabsenkung", "grundwasserbrunnen",
+    )),
+    ("Verkehrssicherung", (
+        "verkehrssicherung", "verkehrssicherungsdienst", "bauliche verkehrssicherung",
+    )),
+    ("Entsorgung", (
+        "entsorgung", "abfuhr", "entsorgen", "deponie",
+    )),
+    ("Dokumentation", (
+        "dokumentation", "bestandsplan", "aufmass", "aufma\u00df", "fotodokumentation",
+    )),
+)
+
+
+@dataclass
+class _UnionFind:
+    parent: dict[int, int]
+
+    @classmethod
+    def for_range(cls, size: int) -> "_UnionFind":
+        return cls({i: i for i in range(size)})
+
+    def find(self, value: int) -> int:
+        if self.parent[value] != value:
+            self.parent[value] = self.find(self.parent[value])
+        return self.parent[value]
+
+    def union(self, left: int, right: int) -> None:
+        left_root = self.find(left)
+        right_root = self.find(right)
+        if left_root != right_root:
+            self.parent[right_root] = left_root
+
+
+def _cluster_id(kind: str, title: str) -> str:
+    digest = hashlib.sha1(title.encode("utf-8")).hexdigest()[:8]
+    return f"{kind}:{digest}"
+
+
+def _dn_related(left: int | None, right: int | None) -> bool:
+    if left is None or right is None:
+        return False
+    if left == right:
+        return True
+    if left not in DN_SERIES or right not in DN_SERIES:
+        return False
+    return abs(DN_SERIES.index(left) - DN_SERIES.index(right)) <= 1
+
+
+def _material_key(material: str | None) -> str:
+    return (material or "").strip().lower()
+
+
+def _facts_for(items: Iterable[NormalizedItem], facts: dict[str, PositionFacts]) -> dict[str, PositionFacts]:
+    out: dict[str, PositionFacts] = {}
+    for item in items:
+        key = item.key()
+        if key not in facts:
+            raise KeyError(f"PositionFacts fehlen fuer Position {key}")
+        out[key] = facts[key]
+    return out
+
+
+def _exposure(
+    positions: Sequence[str],
+    value_by_oz: dict[str, float],
+) -> float:
+    return sum(value_by_oz.get(key, 0.0) for key in positions)
+
+
+def _metrics(
+    cluster_id: str,
+    kind: str,
+    title: str,
+    positions: Sequence[NormalizedItem],
+    facts_by_key: dict[str, PositionFacts],
+    value_by_oz: dict[str, float],
+) -> Cluster:
+    ozs = [item.key() for item in positions]
+    unknown_count = sum(
+        1
+        for item in positions
+        if facts_by_key[item.key()].object_tag == objects.UNKNOWN_TAG
+    )
+    return Cluster(
+        cluster_id=cluster_id,
+        kind=kind,
+        title=title,
+        positions=ozs,
+        euro_exposure=_exposure(ozs, value_by_oz),
+        unknown_share=unknown_count / len(ozs) if ozs else 0.0,
+    )
+
+
+def build_clusters(
+    items,
+    facts: dict[str, PositionFacts],
+    calculated=None,
+) -> list[Cluster]:
+    """Build section, system, and project frame clusters."""
+    item_list = list(items)
+    facts_by_key = _facts_for(item_list, facts)
+
+    value_by_oz: dict[str, float] = {}
+    if calculated:
+        for result in calculated:
+            key = result.item.key()
+            value_by_oz[key] = value_by_oz.get(key, 0.0) + (result.total or 0.0)
+
+    clusters: list[Cluster] = []
+
+    # Section clusters.
+    by_section: dict[str, list[NormalizedItem]] = defaultdict(list)
+    for item in item_list:
+        by_section[item.location(depth=2)].append(item)
+    for location, positions in by_section.items():
+        clusters.append(_metrics(
+            f"sec:{hashlib.sha1(location.encode('utf-8')).hexdigest()[:8]}",
+            "SECTION",
+            location,
+            positions,
+            facts_by_key,
+            value_by_oz,
+        ))
+
+    # System clusters. A functional edge is DN-adjacent/same or material-same.
+    by_top_section: dict[str, list[int]] = defaultdict(list)
+    for index, item in enumerate(item_list):
+        position_facts = facts_by_key[item.key()]
+        if position_facts.dn is not None or position_facts.material is not None:
+            by_top_section[item.location(depth=1)].append(index)
+
+    for top_section, indexes in by_top_section.items():
+        union = _UnionFind.for_range(len(item_list))
+        for left_pos, left_index in enumerate(indexes):
+            left_facts = facts_by_key[item_list[left_index].key()]
+            for right_index in indexes[left_pos + 1:]:
+                right_facts = facts_by_key[item_list[right_index].key()]
+                shares_material = (
+                    _material_key(left_facts.material) != ""
+                    and _material_key(left_facts.material)
+                    == _material_key(right_facts.material)
+                )
+                if _dn_related(left_facts.dn, right_facts.dn) or shares_material:
+                    union.union(left_index, right_index)
+
+        components: dict[int, list[NormalizedItem]] = defaultdict(list)
+        for index in indexes:
+            components[union.find(index)].append(item_list[index])
+
+        for positions in components.values():
+            if len(positions) < 3:
+                continue
+
+            dns = [
+                facts_by_key[item.key()].dn
+                for item in positions
+                if facts_by_key[item.key()].dn is not None
+            ]
+            materials = [
+                facts_by_key[item.key()].material
+                for item in positions
+                if facts_by_key[item.key()].material is not None
+            ]
+            distinct_materials = list(dict.fromkeys(
+                material for material in materials
+            ))
+            material = (
+                distinct_materials[0]
+                if len(distinct_materials) == 1
+                else None
+            )
+            dn_text = (
+                f"DN{min(dns)}-{max(dns)}"
+                if dns
+                else "DNunbenannt"
+            )
+            title = f"System {material or 'unbenannt'} {dn_text}"
+            cluster_seed = top_section + "|" + title + "|" + ",".join(sorted(
+                item.key() for item in positions
+            ))
+            clusters.append(_metrics(
+                _cluster_id("sys", cluster_seed),
+                "SYSTEM",
+                title,
+                positions,
+                facts_by_key,
+                value_by_oz,
+            ))
+
+    # Project-wide fixed frame catalog.
+    for title in (
+        "Baustelleneinrichtung",
+        "Wasserhaltung",
+        "Verkehrssicherung",
+        "Entsorgung",
+        "Dokumentation",
+    ):
+        positions: list[NormalizedItem] = []
+        for item in item_list:
+            position_facts = facts_by_key[item.key()]
+            text = f"{item.short_text} {item.long_text}".lower()
+            matched = False
+            if title == "Baustelleneinrichtung":
+                matched = (
+                    position_facts.object_tag == "Baustelle"
+                    or position_facts.phase == "vorhalten"
+                )
+            elif title == "Dokumentation":
+                matched = position_facts.object_tag == "Dokumentation"
+                if not matched:
+                    matched = any(term in text for term in dict(FRAME_RULES)[title])
+            else:
+                matched = any(term in text for term in dict(FRAME_RULES)[title])
+            if matched:
+                positions.append(item)
+        if positions:
+            clusters.append(_metrics(
+                _cluster_id("frame", title),
+                "FRAME",
+                title,
+                positions,
+                facts_by_key,
+                value_by_oz,
+            ))
+
+    return clusters
+
+
+def cluster_index(clusters: Iterable[Cluster]) -> dict[str, list[str]]:
+    """Map each OZ to all cluster IDs that contain its position."""
+    index: dict[str, list[str]] = {}
+    for cluster in clusters:
+        for oz in cluster.positions:
+            index.setdefault(oz, [])
+            if cluster.cluster_id not in index[oz]:
+                index[oz].append(cluster.cluster_id)
+    return index
+
+````
+
 ## `core/constants.py`
 ````py
 """Tunables, inline. No JSON, no load path, no KeyError on stage.
@@ -2092,6 +2849,69 @@ UNIT_RULE_MIN_SUPPORT = 0.70   # the bar a rule must clear to be worth keeping
 TOP_N_FINDINGS = 20         # PLAN.md: top 15-25 by euro leverage
 SEVERITY_ORDER = ("high", "medium", "low")
 
+# --- Hybrid risk and logic pipeline ---------------------------------------
+HYBRID_MAX_LLM_ITEMS = 60
+HYBRID_EXPOSURE_PERCENTILE = 0.90
+HYBRID_HIGH_SCORE_THRESH = 0.70
+HYBRID_MED_SCORE_THRESH = 0.50
+
+# Disagreement between the two pricing engines, as a usable risk signal.
+#
+# **Disabled on purpose.** It compares the bottom-up calculation against the
+# comparable-price engine, and that second engine is measured at -50 % on the
+# total with 91 % median per-position error. Comparing a calculation against
+# noise produces noise, and it showed: at 0.40 it fired on 154 of 248
+# positions (62 %) — the median divergence is 0.69, so the *typical* position
+# was already over the line — and it claimed 57 of the 60 LLM slots, leaving
+# three for everything else.
+#
+# Normalising out the systematic offset (median ratio 0.70) does not rescue
+# it: that only drops 80 % to 66 %, because the two engines disagree by 14.4x
+# between p10 and p90, so there is no stable baseline to normalise against.
+#
+# Re-enable by setting this to ~0.40 once the comparable engine is worth
+# comparing against — i.e. once it has a benchmark with real coverage of the
+# trades in the tender.
+HYBRID_DIVERGENCE_THRESH = float("inf")
+
+SPECIALIST_KEYWORDS: tuple[str, ...] = (
+    "bauseits",
+    "nach vorgabe",
+    "komplettanlage",
+    "komplett",
+    "raumsystem",
+    "pauschal",
+    "nach aufwand",
+    "o.ä.",
+    "o. ä.",
+    "ggf.",
+    "wie angeordnet",
+    "audio",
+    "medientechnik",
+    "sonderkonstruktion",
+    "nach beigefügter zeichnung",
+    "nach wahl des auftraggebers",
+)
+
+EVENTUAL_KEYWORDS: tuple[str, ...] = (
+    "eventual",
+    "bedarfsposition",
+    "alternativ",
+    "wahlposition",
+    "nur auf anordnung",
+)
+
+BLACKBOX_KEYWORDS: tuple[str, ...] = (
+    "anlage",
+    "system",
+    "komplett",
+    "sonder",
+    "bauwerk",
+    "schacht",
+    "steuerung",
+    "technik",
+)
+
 # --- The reveal (PLAN.md step 4, the whole pitch) -------------------------
 REVEAL = {
     "blank_boq": "Dataset/[NUMMER_001]_leer.X83",
@@ -2102,6 +2922,417 @@ REVEAL = {
 
 GOLDEN_DIR = "data/golden"
 REFERENCE_PRICES = "data/reference_prices.json"
+
+````
+
+## `core/deep_logic.py`
+````py
+"""Optional LLM-backed deep review for construction-cluster contradictions.
+
+The deep reviewer is advisory. Deterministic cluster rules remain the source
+of binding findings; network failures and offline mode produce marked
+ClusterEvaluation records rather than false "no contradiction" judgments.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from typing import Protocol, Sequence
+
+from core import classify
+from core.logic import RULES_VERSION
+
+
+DEEP_CACHE_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data",
+    "deep_logic_cache.json",
+)
+
+
+@dataclass
+class ClusterEvaluation:
+    """Structured deep review of one cluster."""
+
+    contradiction_category: str = "NONE"
+    severity: str = "low"
+    reason_de: str = ""
+    affected_positions: list[str] = field(default_factory=list)
+    confidence: float = 0.0
+    offline: bool = False
+
+    @property
+    def category(self) -> str:
+        return self.contradiction_category
+
+    @property
+    def rationale(self) -> str:
+        return self.reason_de
+
+    @property
+    def positions(self) -> list[str]:
+        return list(self.affected_positions)
+
+    def as_dict(self) -> dict:
+        return {
+            "contradiction_category": self.contradiction_category,
+            "severity": self.severity,
+            "reason_de": self.reason_de,
+            "affected_positions": list(self.affected_positions),
+            "confidence": self.confidence,
+            "offline": self.offline,
+        }
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "ClusterEvaluation":
+        data = dict(raw)
+        data["affected_positions"] = list(data.get("affected_positions") or ())
+        data["offline"] = bool(data.get("offline", False))
+        try:
+            data["confidence"] = float(data.get("confidence", 0.0))
+        except (TypeError, ValueError):
+            data["confidence"] = 0.0
+        return cls(
+            contradiction_category=str(data.get("contradiction_category", "NONE")),
+            severity=str(data.get("severity", "low")),
+            reason_de=str(data.get("reason_de", "")),
+            affected_positions=data["affected_positions"],
+            confidence=data["confidence"],
+            offline=data["offline"],
+        )
+
+
+class LogicLLM(Protocol):
+    name: str
+
+    def evaluate(self, payload: str, schema: dict) -> dict: ...
+
+
+def _load_env_once() -> None:
+    """Read repository .env once, analog to core.classify._load_env_once."""
+    classify._load_env_once()
+    if os.getenv("LOGIC_LLM_PROVIDER") and os.getenv("LOGIC_LLM_MODEL") and os.getenv("LOGIC_LLM_KEY"):
+        return
+    path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        ".env",
+    )
+    if not os.path.exists(path):
+        return
+    try:
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                name, value = line.split("=", 1)
+                os.environ.setdefault(name.strip(), value.strip())
+    except OSError:
+        pass
+
+
+class OpenAIAdapter:
+    name: str
+
+    def __init__(
+        self,
+        model: str | None = None,
+        key: str | None = None,
+        base_url: str | None = None,
+    ) -> None:
+        self.model = model or os.getenv("LOGIC_LLM_MODEL", "gpt-4.1-mini")
+        self.name = self.model
+        self.key = key or os.getenv("LOGIC_LLM_KEY")
+        self.base_url = (
+            base_url
+            or os.getenv("LOGIC_LLM_BASE_URL", "https://api.openai.com/v1")
+        ).rstrip("/")
+
+    def evaluate(self, payload: str, schema: dict) -> dict:
+        if not self.key:
+            raise RuntimeError("LOGIC_LLM_KEY is not set")
+        body = {
+            "model": self.model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Du bist ein vorsichtiger Bauingenieur. Antworte nur "
+                        "nachweisbar aus dem gelieferten Cluster-Payload."
+                    ),
+                },
+                {"role": "user", "content": payload},
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "cluster_evaluation",
+                    "strict": True,
+                    "schema": schema,
+                },
+            },
+        }
+        request = urllib.request.Request(
+            f"{self.base_url}/chat/completions",
+            data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.key}",
+            },
+        )
+        with urllib.request.urlopen(request, timeout=60.0) as response:
+            envelope = json.loads(response.read().decode("utf-8"))
+        try:
+            content = envelope["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise RuntimeError("OpenAI response contained no JSON content") from exc
+        parsed = json.loads(content)
+        if not isinstance(parsed, dict):
+            raise RuntimeError("OpenAI returned a non-object result")
+        return parsed
+
+
+class AnthropicAdapter:
+    name: str
+
+    def __init__(
+        self,
+        model: str | None = None,
+        key: str | None = None,
+        base_url: str | None = None,
+    ) -> None:
+        self.model = model or os.getenv(
+            "LOGIC_LLM_MODEL",
+            "claude-3-5-haiku-latest",
+        )
+        self.name = self.model
+        self.key = key or os.getenv("LOGIC_LLM_KEY")
+        self.base_url = (
+            base_url
+            or os.getenv("LOGIC_LLM_BASE_URL", "https://api.anthropic.com/v1")
+        ).rstrip("/")
+
+    def evaluate(self, payload: str, schema: dict) -> dict:
+        if not self.key:
+            raise RuntimeError("LOGIC_LLM_KEY is not set")
+        body = {
+            "model": self.model,
+            "max_tokens": 2048,
+            "messages": [{"role": "user", "content": payload}],
+            "tools": [
+                {
+                    "name": "cluster_evaluation",
+                    "description": "Strukturierte Bewertung eines LV-Clusters.",
+                    "input_schema": schema,
+                }
+            ],
+            "tool_choice": {
+                "type": "tool",
+                "name": "cluster_evaluation",
+            },
+        }
+        request = urllib.request.Request(
+            f"{self.base_url}/messages",
+            data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "x-api-key": self.key,
+                "anthropic-version": "2023-06-01",
+            },
+        )
+        with urllib.request.urlopen(request, timeout=60.0) as response:
+            envelope = json.loads(response.read().decode("utf-8"))
+        content = envelope.get("content", []) if isinstance(envelope, dict) else []
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "tool_use":
+                parsed = block.get("input")
+                if isinstance(parsed, dict):
+                    return parsed
+        raise RuntimeError("Anthropic response contained no tool input")
+
+
+class OfflineAdapter:
+    name = "offline"
+
+    def evaluate(self, payload: str, schema: dict) -> dict:
+        del payload, schema
+        return {
+            "contradiction_category": "NONE",
+            "severity": "low",
+            "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+            "affected_positions": [],
+            "confidence": 0.0,
+        }
+
+
+def get_adapter() -> LogicLLM:
+    _load_env_once()
+    provider = (os.getenv("LOGIC_LLM_PROVIDER") or "offline").strip().lower()
+    key = os.getenv("LOGIC_LLM_KEY")
+    model = os.getenv("LOGIC_LLM_MODEL")
+
+    if provider == "openai" and key:
+        return OpenAIAdapter(model=model, key=key)
+    if provider.startswith(("http://", "https://")) and key:
+        base_url = provider.rstrip("/")
+        if not base_url.endswith("/v1"):
+            base_url += "/v1"
+        return OpenAIAdapter(model=model, key=key, base_url=base_url)
+    if provider == "anthropic" and key:
+        return AnthropicAdapter(model=model, key=key)
+    return OfflineAdapter()
+
+
+def cache_fingerprint(payload: str, rules_version: str, model: str) -> str:
+    """Cache key covering input, rule catalogue version and model."""
+    raw = f"{payload}|{rules_version}|{model}"
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+
+
+def load_deep_cache() -> dict:
+    if not os.path.exists(DEEP_CACHE_PATH):
+        return {}
+    try:
+        with open(DEEP_CACHE_PATH, encoding="utf-8") as fh:
+            cache = json.load(fh)
+            return cache if isinstance(cache, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save_deep_cache(cache: dict) -> None:
+    os.makedirs(os.path.dirname(DEEP_CACHE_PATH), exist_ok=True)
+    with open(DEEP_CACHE_PATH, "w", encoding="utf-8") as fh:
+        json.dump(cache, fh, ensure_ascii=False, indent=1, sort_keys=True)
+
+
+CLUSTER_SCHEMA: dict = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "contradiction_category": {
+            "type": "string",
+            "enum": [
+                "NONE",
+                "SPEC_GAP",
+                "QUANTITY_CONFLICT",
+                "UNIT_CONFLICT",
+                "INTERFACE_CONFLICT",
+                "NORM_CONFLICT",
+                "INCLUSIVE_SCOPE",
+            ],
+        },
+        "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+        },
+        "reason_de": {"type": "string"},
+        "affected_positions": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+        "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+        },
+    },
+    "required": [
+        "contradiction_category",
+        "severity",
+        "reason_de",
+        "affected_positions",
+        "confidence",
+    ],
+}
+
+
+def evaluate_clusters(
+    clusters,
+    payloads: dict[str, str],
+    use_llm: bool | None = None,
+    max_clusters: int = 12,
+    write_cache: bool = True,
+) -> dict[str, ClusterEvaluation]:
+    """Evaluate at most max_clusters clusters, with cache and per-cluster errors."""
+    adapter = get_adapter()
+    offline_adapter = isinstance(adapter, OfflineAdapter)
+
+    if use_llm is None:
+        use_llm = not offline_adapter
+
+    cache = load_deep_cache()
+    model = adapter.name
+    output: dict[str, ClusterEvaluation] = {}
+    misses: list[tuple[str, str, str]] = []
+
+    for cluster in list(clusters)[:max(0, int(max_clusters))]:
+        cluster_id = cluster.cluster_id
+        payload = payloads.get(cluster_id)
+        if payload is None:
+            continue
+        fingerprint = cache_fingerprint(payload, RULES_VERSION, model)
+        cached = cache.get(fingerprint)
+        if isinstance(cached, dict):
+            cached_evaluation = ClusterEvaluation.from_dict(cached)
+            if not cached_evaluation.offline:
+                output[cluster_id] = cached_evaluation
+            else:
+                misses.append((cluster_id, payload, fingerprint))
+        else:
+            misses.append((cluster_id, payload, fingerprint))
+
+    def resolve(entry: tuple[str, str, str]) -> tuple[str, ClusterEvaluation | None, str]:
+        cluster_id, payload, fingerprint = entry
+        if not use_llm:
+            evaluation = ClusterEvaluation(
+                contradiction_category="NONE",
+                severity="low",
+                reason_de="Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+                affected_positions=[],
+                confidence=0.0,
+                offline=True,
+            )
+            return cluster_id, evaluation, fingerprint
+        try:
+            raw = adapter.evaluate(payload, CLUSTER_SCHEMA)
+            if not isinstance(raw, dict):
+                raise RuntimeError("LLM returned a non-object result")
+            raw["offline"] = False
+            return cluster_id, ClusterEvaluation.from_dict(raw), fingerprint
+        except Exception as exc:
+            detail = f"{type(exc).__name__}: {str(exc)[:180]}"
+            return (
+                cluster_id,
+                ClusterEvaluation(
+                    contradiction_category="NONE",
+                    severity="low",
+                    reason_de=f"LLM-Auswertung fehlgeschlagen; offline behandelt. {detail}",
+                    affected_positions=[],
+                    confidence=0.0,
+                    offline=True,
+                ),
+                fingerprint,
+            )
+
+    if misses:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            resolved = list(pool.map(resolve, misses))
+        for cluster_id, evaluation, fingerprint in resolved:
+            if evaluation is not None:
+                output[cluster_id] = evaluation
+                if not evaluation.offline:
+                    cache[fingerprint] = evaluation.as_dict()
+
+    if write_cache and misses:
+        save_deep_cache(cache)
+    return output
 
 ````
 
@@ -2449,6 +3680,602 @@ def run_all(
 
 ````
 
+## `core/facts.py`
+````py
+"""Deterministische technische Faktextraktion fuer LV-Positionen."""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from typing import Literal
+
+from core.models import NormalizedItem
+from core.objects import tag_of
+
+Phase = Literal[
+    "abbruch",
+    "aushub",
+    "vorbereitung",
+    "rohbau",
+    "montage",
+    "verfuellung",
+    "wiederherstellung",
+    "pruefung",
+    "vorhalten",
+    "sonstiges",
+]
+
+# Deutsche Fachbegriffe gehoeren hierhin, damit sie ohne Kenntnis der
+# Extraktionslogik erweitert werden koennen.
+PHASE_TERMS: tuple[tuple[Phase, tuple[str, ...]], ...] = (
+    ("pruefung", (
+        "pruefung", "dichtheit", "druckpruefung", "spuelen",
+        "desinfekt", "inbetriebnahme",
+    )),
+    ("vorhalten", ("vorhalten", "umsetzen", "miete")),
+    ("abbruch", ("abbruch", "aufbrechen", "rueckbau", "demontage")),
+    ("aushub", (
+        "aushub", "ausheben", "loesen", "baggern", "graben herstellen",
+    )),
+    ("vorbereitung", ("bettung", "planum", "verbau", "schalung", "grundierung")),
+    ("verfuellung", ("verfuell", "hinterfuell", "auffuell", "verdicht")),
+    ("wiederherstellung", ("wiederherstell", "instandsetz", "decke schliessen")),
+    ("montage", (
+        "verlegen", "montieren", "einbauen", "setzen", "anschliessen",
+        "verbaut", "verbauen",
+    )),
+    ("rohbau", ("beton", "mauerwerk", "bewehrung")),
+)
+
+MATERIAL_TERMS: tuple[str, ...] = (
+    "PE100",
+    "PE-HD",
+    "PVC",
+    "Guss",
+    "GGG",
+    "Stahl",
+    "Beton",
+    "Steinzeug",
+    r"C\d{2}/\d{2}",
+)
+
+INCLUSIVE_MARKERS: tuple[str, ...] = (
+    r"inkl\.",
+    r"einschl\.",
+    r"einschliesslich",
+    r"eingerechnet",
+    r"enthalten",
+    r"nebenleistung",
+)
+
+DN_PATTERN = re.compile(r"DN[/\s]?(?:OD)?\s*(\d{2,4})", re.IGNORECASE)
+PN_PATTERN = re.compile(r"PN\s*(\d{1,3})", re.IGNORECASE)
+BAR_PATTERN = re.compile(r"(\d{1,3})\s*bar", re.IGNORECASE)
+DEPTH_RANGE_PATTERN = re.compile(
+    r"T\s*(\d+[,\.]\d+)\s*-\s*(\d+[,\.]\d+)\s*m",
+    re.IGNORECASE,
+)
+DEPTH_SINGLE_PATTERN = re.compile(
+    r"Tiefe\s*(?:bis\s*)?(\d+[,\.]\d+)\s*m",
+    re.IGNORECASE,
+)
+DEPTH_H_PATTERN = re.compile(
+    r"H\s*(\d+(?:[,\.]\d+)?)-(\d+(?:[,\.]\d+)?)m",
+    re.IGNORECASE,
+)
+THICKNESS_PATTERN = re.compile(
+    r"[Dd]\s*=?\s*(\d{1,3})\s*-?\s*(\d{1,3})?\s*cm",
+    re.IGNORECASE,
+)
+MATERIAL_PATTERN = re.compile(
+    "|".join(f"(?:{term})" for term in MATERIAL_TERMS),
+    re.IGNORECASE,
+)
+INCLUSIVE_PATTERN = re.compile(
+    "|".join(INCLUSIVE_MARKERS),
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class PositionFacts:
+    """Technische, deterministisch extrahierte Merkmale einer Position."""
+
+    key: str
+    object_tag: str
+    phase: Phase
+    dn: int | None
+    pn: float | None
+    depth_m: float | None
+    thickness_cm: float | None
+    material: str | None
+    inclusive_terms: tuple[str, ...]
+    confidence: float
+    source: Literal["regex", "llm", "fallback"]
+
+    def as_dict(self) -> dict:
+        """JSON-safe Form der extrahierten Fakten."""
+        return {
+            "key": self.key,
+            "object_tag": self.object_tag,
+            "phase": self.phase,
+            "dn": self.dn,
+            "pn": self.pn,
+            "depth_m": self.depth_m,
+            "thickness_cm": self.thickness_cm,
+            "material": self.material,
+            "inclusive_terms": list(self.inclusive_terms),
+            "confidence": self.confidence,
+            "source": self.source,
+        }
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "PositionFacts":
+        data = dict(raw)
+        data["inclusive_terms"] = tuple(data.get("inclusive_terms") or ())
+        return cls(**data)
+
+
+def _decimal(raw: str) -> float:
+    return float(raw.replace(",", "."))
+
+
+def _extract_phase(text: str) -> Phase:
+    low = (
+        text.lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
+    for phase, terms in PHASE_TERMS:
+        for term in terms:
+            normalized_term = (
+                term.replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace("ß", "ss")
+            )
+            pattern = normalized_term.replace(" ", r"\s+")
+            if normalized_term == "verbau":
+                if re.search(rf"{pattern}(?!t|en)", low):
+                    return phase
+            elif re.search(rf"{pattern}", low):
+                return phase
+    return "sonstiges"
+
+
+def _extract_inclusive_terms(text: str) -> tuple[str, ...]:
+    terms: list[str] = []
+    for match in INCLUSIVE_PATTERN.finditer(text):
+        segment = text[match.end():match.end() + 60]
+        segment = segment.lstrip(" \t\r\n:;,-")
+        segment = re.sub(r"\s+", " ", segment).strip(" \t\r\n.,;:")
+        if segment:
+            normalized = segment.lower()
+            if normalized not in terms:
+                terms.append(normalized)
+    return tuple(terms)
+
+
+def extract_facts(item: NormalizedItem) -> PositionFacts:
+    """Extrahiert technische Merkmale aus Kurz- und Langtext."""
+    text = f"{item.short_text} {item.long_text}".strip()
+
+    dn: int | None = None
+    dn_match = DN_PATTERN.search(text)
+    if dn_match:
+        dn = int(dn_match.group(1))
+
+    pn: float | None = None
+    pn_match = PN_PATTERN.search(text)
+    if pn_match:
+        pn = float(pn_match.group(1))
+    else:
+        bar_match = BAR_PATTERN.search(text)
+        if bar_match:
+            pn = float(bar_match.group(1))
+
+    depth_m: float | None = None
+    depth_match = DEPTH_RANGE_PATTERN.search(text)
+    if depth_match:
+        first = _decimal(depth_match.group(1))
+        second = _decimal(depth_match.group(2))
+        depth_m = (first + second) / 2.0
+    else:
+        depth_match = DEPTH_SINGLE_PATTERN.search(text)
+        if depth_match:
+            depth_m = _decimal(depth_match.group(1))
+        else:
+            depth_match = DEPTH_H_PATTERN.search(text)
+            if depth_match:
+                low = text.lower()
+                bridge_context = any(
+                    term in low
+                    for term in ("bruecke", "brücke", "lichte höhe", "lichte hoehe")
+                )
+                trench_context = any(
+                    term in low
+                    for term in ("graben", "baugrube", "verbau")
+                )
+                if not bridge_context or trench_context:
+                    first = _decimal(depth_match.group(1))
+                    second = _decimal(depth_match.group(2))
+                    depth_m = (first + second) / 2.0
+
+    thickness_cm: float | None = None
+    thickness_match = THICKNESS_PATTERN.search(text)
+    if thickness_match:
+        thickness_cm = float(thickness_match.group(1))
+
+    material: str | None = None
+    material_match = MATERIAL_PATTERN.search(text)
+    if material_match:
+        material = material_match.group(0)
+
+    inclusive_terms = _extract_inclusive_terms(text)
+    technical_found = any(
+        value is not None
+        for value in (dn, pn, depth_m, thickness_cm, material)
+    )
+
+    return PositionFacts(
+        key=item.key(),
+        object_tag=tag_of(item),
+        phase=_extract_phase(text),
+        dn=dn,
+        pn=pn,
+        depth_m=depth_m,
+        thickness_cm=thickness_cm,
+        material=material,
+        inclusive_terms=inclusive_terms,
+        confidence=1.0 if technical_found else 0.5,
+        source="regex",
+    )
+
+````
+
+## `core/judgments.py`
+````py
+"""Selective TypeSafe/Jev judgments for hybrid risk triage.
+
+Jev supplies orthogonal atomic probabilities; application code turns them
+into reasons and decisions. This module is cacheable and fails per item rather
+than taking down the rest of the pipeline.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from typing import Sequence
+
+from core import classify, constants
+from core.models import AtomicLLMJudgments, HybridItemState, NormalizedItem
+
+
+JUDGMENT_CACHE_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data",
+    "judgment_cache.json",
+)
+
+
+def judgment_fingerprint(
+    item: NormalizedItem,
+    state: HybridItemState,
+) -> str:
+    raw = (
+        f"{item.short_text}"
+        f"|{item.long_text[:600]}"
+        f"|{constants.normalize_unit(item.unit)}"
+        f"|{round(item.quantity, 3)}"
+        f"|{round(state.pre_unit_price, 0)}"
+    ).lower()
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def load_judgment_cache() -> dict:
+    if not os.path.exists(JUDGMENT_CACHE_PATH):
+        return {}
+    try:
+        with open(JUDGMENT_CACHE_PATH, encoding="utf-8") as fh:
+            cache = json.load(fh)
+            return cache if isinstance(cache, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save_judgment_cache(cache: dict) -> None:
+    os.makedirs(os.path.dirname(JUDGMENT_CACHE_PATH), exist_ok=True)
+    with open(JUDGMENT_CACHE_PATH, "w", encoding="utf-8") as fh:
+        json.dump(cache, fh, ensure_ascii=False, indent=1, sort_keys=True)
+
+
+def _judgment_from_cache(raw: dict) -> AtomicLLMJudgments:
+    reasons = raw.get("reasons", {}) if isinstance(raw.get("reasons", {}), dict) else {}
+    return AtomicLLMJudgments(
+        unklar_beschrieben=float(raw.get("unklar_beschrieben", 0.0)),
+        menge_unplausibel=float(raw.get("menge_unplausibel", 0.0)),
+        preis_unplausibel=float(raw.get("preis_unplausibel", 0.0)),
+        spezialgewerk=float(raw.get("spezialgewerk", 0.0)),
+        nachtragspotenzial=float(raw.get("nachtragspotenzial", 0.0)),
+        mindermengen_risiko=float(raw.get("mindermengen_risiko", 0.0)),
+        reasons=dict(reasons),
+    )
+
+
+def _judgment_to_cache(judgments: AtomicLLMJudgments) -> dict:
+    return {
+        "unklar_beschrieben": judgments.unklar_beschrieben,
+        "menge_unplausibel": judgments.menge_unplausibel,
+        "preis_unplausibel": judgments.preis_unplausibel,
+        "spezialgewerk": judgments.spezialgewerk,
+        "nachtragspotenzial": judgments.nachtragspotenzial,
+        "mindermengen_risiko": judgments.mindermengen_risiko,
+        "reasons": dict(judgments.reasons),
+    }
+
+
+def _noul_answer(answers: dict, dimension: str) -> float:
+    answer = answers.get(dimension, {}) or {}
+    try:
+        value = float(answer.get("noul", 0.0))
+    except (TypeError, ValueError):
+        return 0.0
+    return max(0.0, min(1.0, value))
+
+
+def judge_item_jev(
+    item: NormalizedItem,
+    state: HybridItemState,
+    timeout: float = 25.0,
+) -> AtomicLLMJudgments:
+    classify._load_env_once()
+    key = os.getenv("JEV_KEY") or os.getenv("JEV_API_KEY")
+    if not key:
+        raise classify.JevError("JEV_KEY is not set")
+
+    payload = {
+        "model": classify.JEV_MODEL,
+        "state": {
+            "position": {
+                "oz": item.oz,
+                "kurztext": item.short_text,
+                "langtext": (item.long_text or "")[:1000],
+                "menge": item.quantity,
+                "einheit": constants.normalize_unit(item.unit),
+                "pauschal": bool(item.is_lump_sum),
+            },
+            "vorkalkulation": {
+                "ep_vorl": state.pre_unit_price,
+                "gesamt_exposure_eur": state.euro_exposure,
+                "preis_quelle": state.price_source,
+                "markt_spanne": state.benchmark_band,
+                "regel_hinweise": list(state.logic_details),
+            },
+        },
+        "questions": {
+            "unklar_beschrieben": {
+                "type": "noul",
+                "instructions": (
+                    "Ist der Leistungsumfang in `position` so mehrdeutig oder "
+                    "unvollständig, dass zwei Kalkulatoren zu stark "
+                    "unterschiedlichen Preisen kämen?"
+                ),
+                "criteria": {
+                    "true": "Es fehlt eine wesentliche Dimension, Norm, Schnittstelle "
+                            "oder Beschreibung, oder es liegt eine Black-Box-Leistung "
+                            "mit undefiniertem Umfang vor.",
+                    "false": "Der Leistungsumfang ist anhand der Position, der Menge "
+                             "und der Abrechnungseinheit ausreichend bestimmbar.",
+                },
+            },
+            "menge_unplausibel": {
+                "type": "noul",
+                "instructions": (
+                    "Wirkt die ausgeschriebene Menge in `position` für die "
+                    "beschriebene Bauleistung unplausibel?"
+                ),
+                "criteria": {
+                    "true": "Ein Komma-/Zehnerpotenzfehler, eine unrealistische "
+                            "Pauschale oder eine mengenmäßig technisch "
+                            "unwahrscheinliche Angabe ist wahrscheinlich.",
+                    "false": "Menge und Bauleistung sind mengenmäßig plausibel.",
+                },
+            },
+            "preis_unplausibel": {
+                "type": "noul",
+                "instructions": (
+                    "Weicht der vorkalkulierte EP in "
+                    "`vorkalkulation.ep_vorl` unplausibel von der technischen "
+                    "Komplexität in `position` oder der Marktspanne in "
+                    "`vorkalkulation.markt_spanne` ab?"
+                ),
+                "criteria": {
+                    "true": "Der Vorkalkulationspreis ist gegenüber Komplexität oder "
+                            "Marktspanne auffällig zu niedrig oder zu hoch.",
+                    "false": "Der Vorkalkulationspreis liegt technisch und gegenüber "
+                             "der verfügbaren Marktspanne in einem plausiblen Bereich.",
+                },
+            },
+            "spezialgewerk": {
+                "type": "noul",
+                "instructions": (
+                    "Erfordert die Leistung in `position` ein Spezialgewerk oder "
+                    "eine Nachunternehmervergabe?"
+                ),
+                "criteria": {
+                    "true": "Beispiele sind Medientechnik, Spezialtiefbau, "
+                            "Leitungsbau-Sonderarmaturen oder Mess-/Regeltechnik.",
+                    "false": "Die Leistung ist als übliches Standardgewerk ohne "
+                             "besondere Spezialfirma ausführbar.",
+                },
+            },
+            "nachtragspotenzial": {
+                "type": "noul",
+                "instructions": (
+                    "Besteht hohes Risiko, dass die ausgeschriebene Menge nach "
+                    "Zuschlag deutlich überschritten wird oder zusätzliche "
+                    "Nachträge entstehen?"
+                ),
+                "criteria": {
+                    "true": "Unklare Schnittstellen, Bedarfs-/Eventualanteile oder "
+                            "zu geringe Mengen deuten auf Mengenüberschreitung oder "
+                            "zusätzliche Nachträge hin.",
+                    "false": "Der Umfang ist fest abgegrenzt und ohne erkennbare "
+                             "Zusatzleistung oder Mengensteigerung kalkulierbar.",
+                },
+            },
+            "mindermengen_risiko": {
+                "type": "noul",
+                "instructions": (
+                    "Handelt es sich in `position` um eine unwahrscheinliche, "
+                    "optionale oder überhöhte Position, die voraussichtlich nicht "
+                    "oder deutlich geringer abgerufen wird?"
+                ),
+                "criteria": {
+                    "true": "Die Position ist bedarfs-, eventual-, wahl- oder "
+                            "alternativartig oder mengenmäßig auffällig überhöht.",
+                    "false": "Die Position ist verbindlich geplant und wahrscheinlich "
+                             "vollständig oder weitgehend abzurufen.",
+                },
+            },
+        },
+    }
+
+    request = urllib.request.Request(
+        classify.JEV_URL,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {key}",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        raise classify.JevError(f"{type(exc).__name__}: {exc}") from exc
+
+    answers = body.get("answers", {}) if isinstance(body, dict) else {}
+    if not isinstance(answers, dict):
+        answers = {}
+
+    values = {
+        "unklar_beschrieben": _noul_answer(answers, "unklar_beschrieben"),
+        "menge_unplausibel": _noul_answer(answers, "menge_unplausibel"),
+        "preis_unplausibel": _noul_answer(answers, "preis_unplausibel"),
+        "spezialgewerk": _noul_answer(answers, "spezialgewerk"),
+        "nachtragspotenzial": _noul_answer(answers, "nachtragspotenzial"),
+        "mindermengen_risiko": _noul_answer(answers, "mindermengen_risiko"),
+    }
+
+    reasons: dict[str, str] = {}
+    reason_text = {
+        "unklar_beschrieben": (
+            "Der Leistungsumfang ist zu offen oder unvollständig, sodass "
+            "Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+        ),
+        "menge_unplausibel": (
+            "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung "
+            "unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten."
+        ),
+        "preis_unplausibel": (
+            "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen "
+            "Komplexität oder der verfügbaren Marktspanne auffällig ab."
+        ),
+        "spezialgewerk": (
+            "Die Position deutet auf ein Spezialgewerk oder eine "
+            "Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin."
+        ),
+        "nachtragspotenzial": (
+            "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen "
+            "oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3."
+        ),
+        "mindermengen_risiko": (
+            "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte "
+            "in deutlich geringerem Umfang abgerufen werden."
+        ),
+    }
+    for dimension, probability in values.items():
+        if probability > 0.50:
+            reasons[dimension] = reason_text[dimension]
+
+    return AtomicLLMJudgments(
+        unklar_beschrieben=values["unklar_beschrieben"],
+        menge_unplausibel=values["menge_unplausibel"],
+        preis_unplausibel=values["preis_unplausibel"],
+        spezialgewerk=values["spezialgewerk"],
+        nachtragspotenzial=values["nachtragspotenzial"],
+        mindermengen_risiko=values["mindermengen_risiko"],
+        reasons=reasons,
+    )
+
+
+def judge_selected_items(
+    items: Sequence[NormalizedItem],
+    states: Sequence[HybridItemState],
+    selected_keys: set[str],
+    use_jev: bool | None = None,
+    write_cache: bool = True,
+    max_workers: int = 8,
+) -> dict[str, AtomicLLMJudgments]:
+    item_by_key = {item.key(): item for item in items}
+    state_by_key = {state.key: state for state in states}
+    cache = load_judgment_cache()
+
+    if use_jev is None:
+        use_jev = classify.jev_available()
+    if not use_jev:
+        return {}
+
+    misses: list[tuple[NormalizedItem, HybridItemState, str]] = []
+    output: dict[str, AtomicLLMJudgments] = {}
+
+    for key in sorted(selected_keys):
+        item = item_by_key.get(key)
+        state = state_by_key.get(key)
+        if item is None or state is None:
+            continue
+
+        fingerprint = judgment_fingerprint(item, state)
+        cached = cache.get(fingerprint)
+        if isinstance(cached, dict):
+            output[key] = _judgment_from_cache(cached)
+        else:
+            misses.append((item, state, fingerprint))
+
+    def resolve(
+        entry: tuple[NormalizedItem, HybridItemState, str],
+    ) -> tuple[str, AtomicLLMJudgments | None, str]:
+        item, state, fingerprint = entry
+        try:
+            return item.key(), judge_item_jev(item, state), fingerprint
+        except (classify.JevError, OSError, TimeoutError):
+            return item.key(), None, fingerprint
+        except Exception:
+            return item.key(), None, fingerprint
+
+    if misses:
+        with ThreadPoolExecutor(max_workers=max(1, int(max_workers))) as pool:
+            resolved = list(pool.map(resolve, misses))
+        for key, judgments, fingerprint in resolved:
+            if judgments is not None:
+                output[key] = judgments
+                cache[fingerprint] = _judgment_to_cache(judgments)
+
+    if write_cache and misses:
+        save_judgment_cache(cache)
+
+    return output
+
+````
+
 ## `core/kalkulation.py`
 ````py
 """Aufschlagskalkulation — the bottom-up price build-up.
@@ -2734,8 +4561,9 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from core import constants
-from core.models import Finding, NormalizedItem
-from core.objects import UNKNOWN_TAG, ObjectRow
+from core.models import ClusterFlag, Finding, LogicResult, NormalizedItem
+from core.objects import UNKNOWN_TAG, ObjectRow, build, tag_of
+from utils.text_cleaning import clean_item_text, compare_key
 
 # --- the rule table a civil engineer owns ---------------------------------
 #
@@ -2782,6 +4610,620 @@ MAX_PEER_SPREAD = 10.0      # p75/p25 above this -> group too heterogeneous
 DUPLICATE_MIN_VALUE = 500.0  # ignore trivial repeats
 
 
+@dataclass(frozen=True)
+class UnitBridge:
+    """A permitted conversion corridor between two normalized units."""
+
+    from_unit: str
+    to_unit: str
+    factor_min: float
+    factor_max: float
+    basis: str
+
+    def corridor(self, qty: float) -> tuple[float, float]:
+        """Return the lower and upper conversion corridor for a quantity."""
+        return (self.factor_min * qty, self.factor_max * qty)
+
+
+@dataclass(frozen=True)
+class RuleSpec:
+    """Editable definition of one cluster-level construction rule."""
+
+    id: str
+    kind: str
+    subject: str
+    object: str
+    phase_subject: str
+    scope: str
+    bounds: tuple[float, float]
+    bridge: UnitBridge | None
+    tolerance: float
+    min_exposure_eur: float
+    suppress_if_inclusive: bool
+    din_ref: str
+    severity: str
+    reason_de: str
+
+
+RULES_VERSION = "1"
+
+# Civil engineers may maintain this catalogue. Bounds are factor corridors,
+# bridges are explicit conversions, and every rule has an exposure threshold.
+TRENCH_BRIDGE = UnitBridge(
+    from_unit="m",
+    to_unit="m3",
+    factor_min=0.8,
+    factor_max=1.2,
+    basis="breite_m_x_tiefe_m",
+)
+RULES: tuple[RuleSpec, ...] = (
+    RuleSpec(
+        "TRENCH_VOLUME", "ratio", "Leitungsgraben", "Bodenaushub", "",
+        "section", (0.8, 1.2), TRENCH_BRIDGE, 0.20, 5000.0, True, "",
+        "high",
+        "Leitungsgraben und Bodenaushub weichen vom plausiblen Tiefen-Breiten-Korridor ab.",
+    ),
+    RuleSpec(
+        "BEDDING_IN_TRENCH", "containment", "Bettung", "Bodenaushub", "",
+        "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
+        "high",
+        "Bettungsmenge liegt oberhalb der enthaltenen Erd-/Grabenaushubmenge.",
+    ),
+    RuleSpec(
+        "BACKFILL_BALANCE", "containment", "Verfuellung", "Bodenaushub", "",
+        "section", (1.0, 1.0), None, 0.20, 2000.0, True, "",
+        "high",
+        "Verfuellmenge liegt oberhalb der Bodenaushubmenge.",
+    ),
+    RuleSpec(
+        "DIN4124_VERBAU", "requires", "Grabenverbau", "Aboeschung", "",
+        "section", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN 4124",
+        "high",
+        "Tiefe ueber 1,25 m verlangt Grabenverbau oder Aboeschung.",
+    ),
+    RuleSpec(
+        "PRESSURE_TEST", "requires", "phase pruefung", "montage_trinkwasser_druckrohr", "",
+        "system", (1.0, 1.0), None, 0.0, 2000.0, True, "DIN EN 805",
+        "high",
+        "Montiertes Trink-/Druckrohr aus PE, Guss oder Stahl benoetigt eine Pruefposition.",
+    ),
+    RuleSpec(
+        "SURFACE_RESTORE", "requires", "phase wiederherstellung", "abbruch_oberflaeche", "",
+        "section", (1.0, 1.0), None, 0.0, 2000.0, True, "",
+        "high",
+        "Abbruch von Asphalt, Pflaster oder Decke verlangt eine Wiederherstellung.",
+    ),
+    RuleSpec(
+        "SHAFT_COVER_CARD", "cardinality", "Schachtabdeckungen", "Schaechte", "",
+        "section", (0.8, 1.2), None, 0.20, 1000.0, True, "",
+        "medium",
+        "Anzahl der Schachtabdeckungen und Schaechte liegt ausserhalb 0,8 bis 1,2.",
+    ),
+    RuleSpec(
+        "DN_STEP", "spec_consistency", "DN-Sprung", "reduzier|uebergang|adapter", "",
+        "system", (2.0, 2.0), None, 0.0, 2000.0, True, "",
+        "medium",
+        "Im System liegt ein Sprung von mindestens zwei Normstufen ohne Ausgleichselement.",
+    ),
+    RuleSpec(
+        "SITE_SETUP", "presence", "Baustelleneinrichtung", "", "",
+        "frame", (1.0, 1.0), None, 0.0, 1000.0, True, "",
+        "medium",
+        "Im Projekt fehlt ein Frame-Cluster zur Baustelleneinrichtung.",
+    ),
+)
+
+
+def _rule_by_id(rule_id: str) -> RuleSpec:
+    for rule in RULES:
+        if rule.id == rule_id:
+            return rule
+    raise KeyError(f"Unbekannte Regel {rule_id}")
+
+
+def _item_text(item: NormalizedItem) -> str:
+    return clean_item_text(f"{item.short_text} {item.long_text}".lower())
+
+
+def _subject_suppressed(
+    rule: RuleSpec,
+    subject_items: Sequence[NormalizedItem],
+    facts: dict[str, object],
+) -> bool:
+    if not rule.suppress_if_inclusive:
+        return False
+
+    object_terms: tuple[str, ...]
+    if rule.id == "DIN4124_VERBAU":
+        object_terms = ("verbau", "aussteif", "aboeschung", "abschung")
+    elif rule.id == "PRESSURE_TEST":
+        object_terms = ("pruefung", "dichtheit", "druckpruefung")
+    elif rule.id == "SURFACE_RESTORE":
+        object_terms = ("wiederherstell", "instandsetz", "decke schliessen")
+    elif rule.id == "BEDDING_IN_TRENCH":
+        object_terms = ("bodenaushub", "aushub")
+    elif rule.id == "BACKFILL_BALANCE":
+        object_terms = ("bodenaushub", "aushub")
+    elif rule.id == "TRENCH_VOLUME":
+        object_terms = ("bodenaushub", "aushub")
+    else:
+        object_terms = tuple(
+            term.strip().lower()
+            for term in rule.object.replace("|", " ").split()
+            if term.strip()
+        )
+        if rule.id == "SHAFT_COVER_CARD":
+            object_terms = ("schachtabdeckung", "abdeckung", "deckel", "schacht")
+
+    for item in subject_items:
+        position_facts = facts.get(item.key())
+        if position_facts is None:
+            raise KeyError(f"PositionFacts fehlen fuer Position {item.key()}")
+        for inclusive in position_facts.inclusive_terms:
+            if any(term in inclusive for term in object_terms):
+                return True
+    return False
+
+
+def suppressed_by_remarks(remarks: Sequence[str] | None, rule: RuleSpec | str) -> bool:
+    """Project-wide remark suppression for a rule.
+
+    A remark suppresses only when an object term and one of
+    ``nebenleistung``, ``bauseits`` or ``gesondert`` occur near one another.
+    """
+    if not remarks:
+        return False
+    spec = _rule_by_id(rule) if isinstance(rule, str) else rule
+
+    terms: tuple[str, ...]
+    if spec.id == "DIN4124_VERBAU":
+        terms = ("verbau", "aussteifung", "aboeschung", "abschung")
+    elif spec.id == "PRESSURE_TEST":
+        terms = ("pruefung", "dichtheit", "druckpruefung")
+    elif spec.id == "SURFACE_RESTORE":
+        terms = ("wiederherstellung", "instandsetzung")
+    elif spec.id in ("BEDDING_IN_TRENCH", "BACKFILL_BALANCE", "TRENCH_VOLUME"):
+        terms = ("bodenaushub", "aushub", "graben")
+    elif spec.id == "SHAFT_COVER_CARD":
+        terms = ("schachtabdeckung", "abdeckung", "schacht")
+    elif spec.id == "DN_STEP":
+        terms = ("reduzier", "uebergang", "adapter")
+    elif spec.id == "SITE_SETUP":
+        terms = ("baustelleneinrichtung",)
+    else:
+        terms = tuple(term for term in spec.object.lower().replace("|", " ").split() if term)
+
+    markers = ("nebenleistung", "bauseits", "gesondert")
+    for remark in remarks:
+        text = clean_item_text(str(remark)).lower()
+        for term in terms:
+            start = text.find(term)
+            if start < 0:
+                continue
+            window = text[max(0, start - 80):start + 120]
+            if any(marker in window for marker in markers):
+                return True
+    return False
+
+
+def _sum_tag_quantities(
+    positions: Sequence[NormalizedItem],
+    facts: dict[str, object],
+    object_tag: str,
+    allowed_units: set[str] | None = None,
+) -> float:
+    total = 0.0
+    for item in positions:
+        position_facts = facts.get(item.key())
+        if position_facts is None:
+            raise KeyError(f"PositionFacts fehlen fuer Position {item.key()}")
+        if position_facts.object_tag != object_tag:
+            continue
+        unit = constants.normalize_unit(item.unit)
+        if allowed_units is not None and unit not in allowed_units:
+            continue
+        total += item.quantity
+    return total
+
+
+def _sum_text_quantities(
+    positions: Sequence[NormalizedItem],
+    unit: str,
+    terms: tuple[str, ...],
+) -> float:
+    normalized_unit = constants.normalize_unit(unit)
+    total = 0.0
+    for item in positions:
+        if constants.normalize_unit(item.unit) != normalized_unit:
+            continue
+        text = _item_text(item)
+        if any(term in text for term in terms):
+            total += item.quantity
+    return total
+
+
+def _make_flag(
+    rule: RuleSpec,
+    cluster,
+    reason: str,
+    computed: dict,
+    affected_positions: Sequence[str],
+) -> ClusterFlag:
+    return ClusterFlag(
+        rule_id=rule.id,
+        kind=rule.kind,
+        cluster_id=cluster.cluster_id,
+        cluster_title=cluster.title,
+        severity=rule.severity,
+        reason_de=reason,
+        computed=computed,
+        affected_positions=list(dict.fromkeys(affected_positions)),
+    )
+
+
+def check_cluster_rules(
+    clusters,
+    items,
+    facts,
+    calculated=None,
+    remarks=None,
+) -> list[ClusterFlag]:
+    """Evaluate catalogue rules across section, system and frame clusters."""
+    item_by_key = {item.key(): item for item in items}
+    by_cluster_positions: dict[str, list[NormalizedItem]] = {}
+    for cluster in clusters:
+        by_cluster_positions[cluster.cluster_id] = [
+            item_by_key[key]
+            for key in cluster.positions
+            if key in item_by_key
+        ]
+
+    flags: list[ClusterFlag] = []
+
+    def exposure_ok(cluster, rule: RuleSpec) -> bool:
+        return cluster.euro_exposure >= rule.min_exposure_eur
+
+    def remark_reason(rule: RuleSpec) -> str:
+        return f"{rule.reason_de} Projektweit durch Vorbemerkung ausgeschlossen."
+
+    for rule in RULES:
+        if suppressed_by_remarks(remarks, rule):
+            # Projektweite Vorbemerkung: keine Regel- und keine False-Positive-Findung.
+            continue
+
+        if rule.id == "TRENCH_VOLUME":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].object_tag == "Leitungsgraben"
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                trench_m = _sum_tag_quantities(
+                    positions, facts, "Leitungsgraben", {"m"},
+                )
+                excavation_m3 = _sum_tag_quantities(
+                    positions, facts, "Leitungsgraben", {"m3"},
+                )
+                if excavation_m3 <= 0:
+                    excavation_m3 = _sum_tag_quantities(
+                        positions, facts, "Bodenaushub", {"m3"},
+                    )
+                if trench_m <= 0 or excavation_m3 <= 0:
+                    continue
+
+                depths: list[tuple[float, float]] = []
+                for item in subject_items:
+                    if constants.normalize_unit(item.unit) == "m":
+                        depth = facts[item.key()].depth_m
+                        depths.append((item.quantity, depth if depth is not None else 1.5))
+                weighted_depth = (
+                    sum(qty * depth for qty, depth in depths) / sum(qty for qty, _ in depths)
+                    if depths and sum(qty for qty, _ in depths) > 0
+                    else 1.5
+                )
+                low_raw = TRENCH_BRIDGE.factor_min * weighted_depth
+                high_raw = TRENCH_BRIDGE.factor_max * weighted_depth
+                low = low_raw * (1.0 - rule.tolerance)
+                high = high_raw * (1.0 + rule.tolerance)
+                actual = excavation_m3 / trench_m
+                if low <= actual <= high:
+                    continue
+                computed = {
+                    "aushub_m3": round(excavation_m3, 3),
+                    "graben_m": round(trench_m, 3),
+                    "je_m": round(actual, 3),
+                    "korridor": [round(low, 3), round(high, 3)],
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id in ("BEDDING_IN_TRENCH", "BACKFILL_BALANCE"):
+            subject_tag = "Bettung" if rule.id == "BEDDING_IN_TRENCH" else "Verfuellung"
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].object_tag == subject_tag
+                    or (
+                        rule.id == "BACKFILL_BALANCE"
+                        and any(
+                            term in _item_text(item)
+                            for term in ("verfuell", "verfüll", "hinterfuell", "hinterfüll", "auffuell", "auffüll")
+                        )
+                    )
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                subject_units = {
+                    constants.normalize_unit(item.unit) for item in subject_items
+                }
+                if len(subject_units) != 1:
+                    continue
+                unit = next(iter(subject_units))
+                if unit != "m3":
+                    continue
+                subject_qty = sum(item.quantity for item in subject_items)
+                object_qty = sum(
+                    item.quantity for item in positions
+                    if facts[item.key()].object_tag == rule.object
+                    and constants.normalize_unit(item.unit) == unit
+                )
+                if object_qty <= 0:
+                    continue
+                if subject_qty <= object_qty * (1.0 + rule.tolerance):
+                    continue
+                ratio = subject_qty / object_qty
+                computed = {
+                    "subject_qty": round(subject_qty, 3),
+                    "object_qty": round(object_qty, 3),
+                    "unit": unit,
+                    "ratio": round(ratio, 3),
+                    "tolerance": rule.tolerance,
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "DIN4124_VERBAU":
+            aggregate_subjects: list[NormalizedItem] = []
+            candidate_clusters = []
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].depth_m is not None
+                    and facts[item.key()].depth_m > 1.25
+                    and facts[item.key()].object_tag != "Grabenverbau"
+                    and not any(
+                        term in _item_text(item)
+                        for term in ("verbau", "verbauen", "verbaut")
+                    )
+                ]
+                if not subject_items:
+                    continue
+                has_object = any(
+                    facts[item.key()].object_tag == "Grabenverbau"
+                    or "aboeschung" in _item_text(item)
+                    or "ab\u00f6schung" in _item_text(item)
+                    for item in positions
+                )
+                if has_object:
+                    continue
+                aggregate_subjects.extend(subject_items)
+                if cluster not in candidate_clusters:
+                    candidate_clusters.append(cluster)
+            if aggregate_subjects and not _subject_suppressed(
+                rule, aggregate_subjects, facts
+            ):
+                cluster = candidate_clusters[0]
+                computed = {
+                    "depth_m_max": round(
+                        max(
+                            facts[item.key()].depth_m
+                            for item in aggregate_subjects
+                        ),
+                        3,
+                    ),
+                    "schwelle_m": 1.25,
+                    "objekt": "Grabenverbau oder Aboeschung",
+                }
+                reason = f"{rule.reason_de} ({rule.din_ref})."
+                flags.append(_make_flag(
+                    rule, cluster, reason, computed,
+                    [item.key() for item in aggregate_subjects],
+                ))
+
+        elif rule.id == "PRESSURE_TEST":
+            for cluster in (c for c in clusters if c.kind == "SYSTEM"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = []
+                for item in positions:
+                    position_facts = facts[item.key()]
+                    text = _item_text(item)
+                    material = (position_facts.material or "").lower()
+                    is_pressure_material = any(
+                        term in material for term in ("pe", "guss", "ggg", "stahl")
+                    )
+                    if (
+                        is_pressure_material
+                        and position_facts.phase == "montage"
+                        and ("trinkwasser" in text or "druckrohr" in text)
+                    ):
+                        subject_items.append(item)
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                has_test = any(
+                    facts[item.key()].phase == "pruefung"
+                    for item in positions
+                )
+                if has_test:
+                    continue
+                computed = {
+                    "subject_count": len(subject_items),
+                    "material": sorted({
+                        facts[item.key()].material
+                        for item in subject_items
+                        if facts[item.key()].material
+                    }),
+                }
+                reason = f"{rule.reason_de} ({rule.din_ref})."
+                flags.append(_make_flag(
+                    rule, cluster, reason, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SURFACE_RESTORE":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].phase == "abbruch"
+                    and any(term in _item_text(item) for term in ("asphalt", "pflaster", "decke"))
+                ]
+                if not subject_items or _subject_suppressed(rule, subject_items, facts):
+                    continue
+                has_restore = any(
+                    facts[item.key()].phase == "wiederherstellung"
+                    for item in positions
+                )
+                if has_restore:
+                    continue
+                computed = {
+                    "abbruch_count": len(subject_items),
+                    "oberflaechen": sorted({
+                        term
+                        for item in subject_items
+                        for term in ("asphalt", "pflaster", "decke")
+                        if term in _item_text(item)
+                    }),
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SHAFT_COVER_CARD":
+            for cluster in (c for c in clusters if c.kind == "SECTION"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                shafts = _sum_text_quantities(
+                    positions, "St", ("schacht",),
+                )
+                covers = _sum_text_quantities(
+                    positions, "St", ("schachtabdeckung", "abdeckung", "deckel"),
+                )
+                if shafts <= 0 or covers <= 0:
+                    continue
+                low = rule.bounds[0] * (1.0 - rule.tolerance)
+                high = rule.bounds[1] * (1.0 + rule.tolerance)
+                if low <= covers / shafts <= high:
+                    continue
+                subject_items = [
+                    item for item in positions
+                    if "schacht" in _item_text(item)
+                    or "abdeckung" in _item_text(item)
+                    or "deckel" in _item_text(item)
+                ]
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
+                computed = {
+                    "abdeckungen": round(covers, 3),
+                    "schaechte": round(shafts, 3),
+                    "ratio": round(covers / shafts, 3),
+                    "korridor": [round(low, 3), round(high, 3)],
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "DN_STEP":
+            dn_norms = (
+                50, 63, 80, 100, 125, 150, 200, 250, 300, 400, 500,
+            )
+            for cluster in (c for c in clusters if c.kind == "SYSTEM"):
+                if not exposure_ok(cluster, rule):
+                    continue
+                positions = by_cluster_positions[cluster.cluster_id]
+                dns = [
+                    facts[item.key()].dn
+                    for item in positions
+                    if facts[item.key()].dn is not None
+                ]
+                if len(dns) < 2:
+                    continue
+                indexes = [
+                    dn_norms.index(dn) for dn in dns
+                    if dn in dn_norms
+                ]
+                if len(indexes) < 2 or max(indexes) - min(indexes) < 2:
+                    continue
+                if any(
+                    any(term in _item_text(item) for term in ("reduzier", "uebergang", "adapter"))
+                    for item in positions
+                ):
+                    continue
+                subject_items = [
+                    item for item in positions
+                    if facts[item.key()].dn is not None
+                ]
+                if _subject_suppressed(rule, subject_items, facts):
+                    continue
+                computed = {
+                    "dn_min": min(dns),
+                    "dn_max": max(dns),
+                    "normstufen_sprung": max(indexes) - min(indexes),
+                }
+                flags.append(_make_flag(
+                    rule, cluster, rule.reason_de, computed,
+                    [item.key() for item in subject_items],
+                ))
+
+        elif rule.id == "SITE_SETUP":
+            frame_present = False
+            for cluster in clusters:
+                if cluster.kind == "FRAME" and cluster.title == "Baustelleneinrichtung":
+                    frame_present = len(cluster.positions) > 0
+                    if frame_present:
+                        break
+            if not frame_present:
+                site_subject = [
+                    item for item in items
+                    if "baustelleneinrichtung" in _item_text(item)
+                ]
+                if _subject_suppressed(rule, site_subject, facts):
+                    continue
+                affected = [item.key() for item in site_subject]
+                dummy = next(
+                    (c for c in clusters if c.kind == "SECTION"),
+                    None,
+                )
+                if dummy is None:
+                    continue
+                if dummy.euro_exposure < rule.min_exposure_eur:
+                    continue
+                flags.append(_make_flag(
+                    rule, dummy, rule.reason_de,
+                    {"frame_present": False}, affected,
+                ))
+
+    return flags
 @dataclass
 class Relation:
     """One evaluated rule, kept so the UI can show the arithmetic."""
@@ -2886,15 +5328,31 @@ def check_relations(
     return findings
 
 
-def check_magnitude(items: Sequence[NormalizedItem]) -> list[Finding]:
+def _pre_unit_price(
+    item: NormalizedItem,
+    pre_prices: dict[str, float] | None,
+) -> float:
+    if pre_prices:
+        price = pre_prices.get(item.key())
+        if price is not None:
+            return float(price)
+    if item.unit_price is not None:
+        return float(item.unit_price)
+    if item.total_price is not None and item.quantity > 0:
+        return float(item.total_price) / float(item.quantity)
+    return 0.0
+
+
+def check_magnitude(
+    items: Sequence[NormalizedItem],
+    pre_prices: dict[str, float] | None = None,
+) -> list[Finding]:
     """Order-of-magnitude quantity outliers — the misplaced-zero check.
 
     Compares each position against its peers: the same object measured in the
     same unit elsewhere in the tender. Needs `MIN_PEERS` to say anything, and
     uses the median so one bad value cannot drag the baseline.
     """
-    from core.objects import tag_of
-
     groups: dict[tuple[str, str], list[NormalizedItem]] = defaultdict(list)
     for item in items:
         tag = tag_of(item)
@@ -2929,14 +5387,17 @@ def check_magnitude(items: Sequence[NormalizedItem]) -> list[Finding]:
                     f"{tag} positions ({median:,.0f} {unit}). A misplaced "
                     "decimal or a genuinely unusual position — worth one look."
                 ),
-                euro_leverage=abs((item.total_price or 0.0)),
+                euro_leverage=abs(item.quantity * _pre_unit_price(item, pre_prices)),
                 evidence={"tag": tag, "unit": unit, "median": median,
                           "ratio": round(ratio, 2), "peers": len(peers)},
             ))
     return findings
 
 
-def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
+def check_duplicates(
+    items: Sequence[NormalizedItem],
+    pre_prices: dict[str, float] | None = None,
+) -> list[Finding]:
     """Positions repeating the same work — *"summary and duplicate is a good thing"*.
 
     Same wording, same unit, different OZ. Often legitimate (the same work in
@@ -2944,8 +5405,6 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     locations are named: identical work in the *same* location is the
     suspicious case.
     """
-    from utils.text_cleaning import compare_key
-
     groups: dict[tuple[str, str], list[NormalizedItem]] = defaultdict(list)
     for item in items:
         signature = compare_key(item.short_text)
@@ -2956,7 +5415,12 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     for (_sig, unit), group in groups.items():
         if len(group) < 2:
             continue
-        exposure = sum(i.total_price or 0.0 for i in group)
+        exposure = sum(
+            i.quantity * _pre_unit_price(i, pre_prices)
+            if pre_prices or i.unit_price is not None or i.total_price is not None
+            else 0.0
+            for i in group
+        )
         locations = {i.location() for i in group}
         same_place = len(locations) == 1
         if not same_place and exposure < DUPLICATE_MIN_VALUE:
@@ -2982,17 +5446,187 @@ def check_duplicates(items: Sequence[NormalizedItem]) -> list[Finding]:
     return findings
 
 
+def _text(item: NormalizedItem) -> str:
+    return f"{clean_item_text(item.short_text)} {clean_item_text(item.long_text)}".lower()
+
+
+def _severity_rank(severity: str) -> int:
+    return {"low": 0, "medium": 1, "high": 2}.get(severity, 0)
+
+
+def run_logic_engine(
+    items: Sequence[NormalizedItem],
+    rows: Sequence[ObjectRow] | None = None,
+    pre_prices: dict[str, float] | None = None,
+    clusters=None,
+    facts=None,
+) -> dict[str, LogicResult]:
+    """Run deterministic, per-position rules for a tender of any practical size."""
+
+    if rows is None:
+        rows = build(items, depth=2)
+
+    results: dict[str, LogicResult] = {
+        item.key(): LogicResult([], "low", [], [])
+        for item in items
+    }
+
+    def add(item: NormalizedItem, flag: str, severity: str, detail: str) -> None:
+        result = results[item.key()]
+        if flag not in result.flags:
+            result.flags.append(flag)
+        if flag not in result.tags:
+            result.tags.append(flag)
+        if detail not in result.details:
+            result.details.append(detail)
+        if _severity_rank(severity) > _severity_rank(result.severity):
+            result.severity = severity
+
+    # Per-item textual and unit rules.
+    for item in items:
+        key = item.key()
+        unit = constants.normalize_unit(item.unit)
+        short_text = clean_item_text(item.short_text)
+        long_text = clean_item_text(item.long_text)
+        text = _text(item)
+
+        if (unit == "psch" or item.is_lump_sum) and item.quantity not in (0.0, 1.0):
+            add(item, "META_MISMATCH", "high",
+                f"Pauschale Einheit {item.unit!r} hat Menge {item.quantity:g}, "
+                "erwartet 0 oder 1.")
+
+        if item.quantity <= 0 and not any(
+            keyword in text for keyword in constants.EVENTUAL_KEYWORDS
+        ):
+            add(item, "ZERO_QTY", "high",
+                f"Menge ist {item.quantity:g}; keine Eventualposition erkannt.")
+
+        short_norm = compare_key(short_text)
+        long_norm = compare_key(long_text)
+        if any(keyword in short_norm for keyword in constants.BLACKBOX_KEYWORDS):
+            if not long_norm or len(long_text) < 25 or long_norm == short_norm:
+                add(item, "MISSING_SPEC", "medium",
+                    "Komplexer/Black-Box-Text hat keine eigenständig ausreichende "
+                    "Langbeschreibung.")
+
+        if any(keyword in text for keyword in ("lieferung", "liefern")):
+            montage_words = ("montage", "einbau", "verlegen", "versetzen", "anschließen")
+            has_montage = any(word in text for word in montage_words)
+            if not has_montage:
+                own_tag = tag_of(item)
+                location = item.location(depth=2)
+                has_peer = own_tag != UNKNOWN_TAG and any(
+                    peer.location(depth=2) == location
+                    and tag_of(peer) == own_tag
+                    and any(word in _text(peer) for word in montage_words)
+                    for peer in items
+                )
+                if not has_peer:
+                    add(item, "SCOPE_GAP", "medium",
+                        "Lieferleistung genannt, aber Montage-/Einbauumfang nicht "
+                        "sichtbar und keine passende Peer-Position in diesem Abschnitt.")
+
+        # Unit and peer-magnitude outliers are separate signals combined here.
+        qty_outlier_details: list[str] = []
+        normalized_text = compare_key(f"{short_text} {long_text}")
+        for keyword, expected_unit in constants.UNIT_EXPECTED_BY_KEYWORD.items():
+            if keyword in normalized_text and unit != constants.normalize_unit(expected_unit):
+                qty_outlier_details.append(
+                    f"Einheit {item.unit!r} passt nicht zur erwarteten Einheit "
+                    f"{expected_unit!r} für Schlüsselwort {keyword!r}."
+                )
+                break
+        if qty_outlier_details:
+            add(item, "QTY_OUTLIER", "medium", " | ".join(qty_outlier_details))
+
+    # Attach peer-magnitude findings to the same per-key results.
+    for finding in check_magnitude(items, pre_prices):
+        key = finding.item.key()
+        if key in results:
+            add(finding.item, "QTY_OUTLIER", "medium", finding.rationale)
+
+    # Relation findings identify category and quantity conflicts.
+    relation_findings = check_relations(rows, items, include_companions=False)
+    for finding in relation_findings:
+        positions = finding.evidence.get("positions", [])
+        if finding.item.key() in positions:
+            positions = [finding.item.key()]
+        for position_key in positions:
+            if position_key not in results:
+                continue
+            representative = next(
+                (item for item in items if item.key() == position_key),
+                finding.item,
+            )
+            add(representative, "CATEGORY_MISMATCH", "high", finding.rationale)
+
+    # Explicit companion-quantity gaps within the location.
+    for item in items:
+        location = item.location(depth=2)
+        location_items = [peer for peer in items if peer.location(depth=2) == location]
+
+        is_concrete = tag_of(item) == "Beton"
+        has_concrete = is_concrete and item.quantity >= 10.0
+        if has_concrete:
+            concrete_qty = sum(
+                peer.quantity for peer in location_items if tag_of(peer) == "Beton"
+            )
+            own_long = clean_item_text(item.long_text).lower()
+            own_suppressed = any(
+                marker in own_long for marker in ("inkl.", "einschl.", "schalung", "bewehr")
+            )
+            has_companion = any(
+                "schalung" in _text(peer) or "bewehr" in _text(peer)
+                for peer in location_items
+            )
+            if concrete_qty >= 10.0 and not has_companion and not own_suppressed:
+                add(item, "MISSING_FOLLOW_UP", "medium",
+                    f"Beton in Abschnitt {location!r}: mindestens "
+                    f"{concrete_qty:g} m³, aber keine Schalungs-/Bewehrungsposition gefunden.")
+
+        is_excavation = tag_of(item) == "Bodenaushub"
+        if is_excavation:
+            own_long = clean_item_text(item.long_text).lower()
+            own_suppressed = any(
+                marker in own_long for marker in ("inkl.", "einschl.", "schalung", "verfüll")
+            )
+            has_backfill = any(tag_of(peer) == "Verfüllung" for peer in location_items)
+            if not has_backfill and not own_suppressed:
+                add(item, "MISSING_FOLLOW_UP", "medium",
+                    f"Bodenaushub in Abschnitt {location!r}, aber keine "
+                    "Verfüllungsposition gefunden.")
+
+    if clusters is not None and facts is not None:
+        for cluster_flag in check_cluster_rules(clusters, items, facts):
+            for position_key in cluster_flag.affected_positions:
+                if position_key not in results:
+                    continue
+                detail = (
+                    f"{cluster_flag.rule_id}: {cluster_flag.reason_de} "
+                    f"Rechnung={cluster_flag.computed}"
+                )
+                add(
+                    next(item for item in items if item.key() == position_key),
+                    cluster_flag.rule_id,
+                    cluster_flag.severity,
+                    detail,
+                )
+
+    return results
+
+
 def run_all(
     rows: Sequence[ObjectRow],
     items: Sequence[NormalizedItem],
     top_n: int | None = None,
     include_companions: bool = False,
+    pre_prices: dict[str, float] | None = None,
 ) -> list[Finding]:
     """Every cross-position check, ranked by euro exposure."""
     findings = (
         check_relations(rows, items, include_companions)
-        + check_magnitude(items)
-        + check_duplicates(items)
+        + check_magnitude(items, pre_prices)
+        + check_duplicates(items, pre_prices)
     )
     findings.sort(key=lambda f: (-f.euro_leverage,
                                  constants.SEVERITY_ORDER.index(f.severity)))
@@ -3150,6 +5784,57 @@ class NormalizedItem:
 
 
 @dataclass
+class Cluster:
+    """A cross-cutting or section-level set of tender positions."""
+
+    cluster_id: str
+    kind: str
+    title: str
+    positions: list[str] = field(default_factory=list)
+    euro_exposure: float = 0.0
+    unknown_share: float = 0.0
+
+    def as_dict(self) -> dict:
+        """JSON-safe form of the cluster and its OZ back-pointers."""
+        return {
+            "cluster_id": self.cluster_id,
+            "kind": self.kind,
+            "title": self.title,
+            "positions": list(self.positions),
+            "euro_exposure": self.euro_exposure,
+            "unknown_share": self.unknown_share,
+        }
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "Cluster":
+        data = dict(raw)
+        data["positions"] = list(data.get("positions") or ())
+        return cls(**data)
+
+
+@dataclass
+class ClusterFlag:
+    """One rule finding attached to an overlapping cluster."""
+
+    rule_id: str
+    kind: str
+    cluster_id: str
+    cluster_title: str
+    severity: str
+    reason_de: str
+    computed: dict = field(default_factory=dict)
+    affected_positions: list[str] = field(default_factory=list)
+
+    @property
+    def id(self) -> str:
+        return self.rule_id
+
+    @property
+    def title(self) -> str:
+        return self.cluster_title
+
+
+@dataclass
 class Finding:
     """One detector hit, as rendered in the UI and the RFI export."""
 
@@ -3159,6 +5844,93 @@ class Finding:
     rationale: str         # plain-English why, shown next to the row
     euro_leverage: float = 0.0   # quantity x price exposure; the ranking value
     evidence: dict = field(default_factory=dict)
+
+
+@dataclass
+class LogicResult:
+    """Deterministic logic findings for one tender position."""
+
+    flags: list[str]
+    severity: str
+    tags: list[str]
+    details: list[str] = field(default_factory=list)
+
+
+@dataclass
+class HybridItemState:
+    """Combined deterministic state of one position for hybrid risk scoring."""
+
+    key: str
+    oz: str
+    qty: float
+    unit: str
+    logic_flags: list[str]
+    logic_severity: str
+    logic_details: list[str]
+    is_specialist: bool
+    specialist_hits: list[str]
+    pre_unit_price: float
+    price_source: str
+    euro_exposure: float
+    engine_divergence: float = 0.0
+    benchmark_band: str = ""
+
+
+@dataclass
+class AtomicLLMJudgments:
+    """Atomic hybrid-pipeline judgments produced by the LLM specialist."""
+
+    unklar_beschrieben: float
+    menge_unplausibel: float
+    preis_unplausibel: float
+    spezialgewerk: float
+    nachtragspotenzial: float
+    mindermengen_risiko: float = 0.0
+    reasons: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class HybridRiskResult:
+    """Final hybrid risk result for one tender position."""
+
+    key: str
+    risk_level: str
+    euro_exposure: float
+    pre_unit_price: float
+    reasons: list[str]
+    strategy: str
+    action_type: str
+    speculation_candidate: bool
+    judgments: Optional[AtomicLLMJudgments] = None
+
+    def to_finding(self, item: NormalizedItem) -> Finding:
+        evidence = {
+            "key": self.key,
+            "risk_level": self.risk_level,
+            "pre_unit_price": self.pre_unit_price,
+            "reasons": list(self.reasons),
+            "strategy": self.strategy,
+            "action_type": self.action_type,
+            "speculation_candidate": self.speculation_candidate,
+        }
+        if self.judgments is not None:
+            evidence["judgments"] = {
+                "unklar_beschrieben": self.judgments.unklar_beschrieben,
+                "menge_unplausibel": self.judgments.menge_unplausibel,
+                "preis_unplausibel": self.judgments.preis_unplausibel,
+                "spezialgewerk": self.judgments.spezialgewerk,
+                "nachtragspotenzial": self.judgments.nachtragspotenzial,
+                "mindermengen_risiko": self.judgments.mindermengen_risiko,
+                "reasons": dict(self.judgments.reasons),
+            }
+        return Finding(
+            item=item,
+            detector="hybrid_risk",
+            severity=self.risk_level,
+            rationale=" | ".join(self.reasons),
+            euro_leverage=self.euro_exposure,
+            evidence=evidence,
+        )
 
 ````
 
@@ -4448,6 +7220,448 @@ def summarize(priced: Iterable[PricedItem]) -> dict:
             sum(p.total or 0.0 for p in rows if p.source == "fallback_rate"), 2
         ),
     }
+
+````
+
+## `core/risk_engine.py`
+````py
+"""Price-first triage for the hybrid risk pipeline.
+
+Deterministic pre-calculation and candidate ranking happen here, before any
+LLM call. The module has no external dependencies and does not modify item or
+calculation objects.
+"""
+
+from __future__ import annotations
+
+import math
+from typing import Sequence
+
+from core import constants
+from core.kalkulation import CalculatedItem
+from core.models import (
+    AtomicLLMJudgments,
+    Finding,
+    HybridItemState,
+    HybridRiskResult,
+    LogicResult,
+    NormalizedItem,
+)
+from core.pricer import PricedItem
+
+
+def _text(item: NormalizedItem) -> str:
+    return f"{item.short_text} {item.long_text}".lower()
+
+
+def _format_benchmark_band(distribution: dict | None) -> str:
+    if not distribution:
+        return ""
+
+    low = distribution.get("min")
+    if low is None:
+        low = distribution.get("p25")
+    high = distribution.get("max")
+    if high is None:
+        high = distribution.get("p75")
+
+    n = distribution.get("n")
+    if low is not None and high is not None:
+        band = f"{float(low):.2f} - {float(high):.2f} EUR"
+    elif low is not None:
+        band = f"{float(low):.2f} EUR"
+    elif high is not None:
+        band = f"{float(high):.2f} EUR"
+    elif distribution.get("median") is not None:
+        band = f"{float(distribution['median']):.2f} EUR"
+    else:
+        return ""
+
+    if n is not None:
+        band += f" (n={int(n)})"
+    return band
+
+
+def build_item_states(
+    items: Sequence[NormalizedItem],
+    calculated: Sequence[CalculatedItem],
+    priced: Sequence[PricedItem],
+    logic_results: dict[str, LogicResult],
+) -> list[HybridItemState]:
+    """Combine logic, bottom-up, and benchmark prices into triage states."""
+
+    calculated_by_key = {entry.item.key(): entry for entry in calculated}
+    priced_by_key = {entry.item.key(): entry for entry in priced}
+    states: list[HybridItemState] = []
+
+    for item in items:
+        key = item.key()
+        calculated_item = calculated_by_key.get(key)
+        priced_item = priced_by_key.get(key)
+        logic = logic_results.get(
+            key,
+            LogicResult(flags=[], severity="low", tags=[]),
+        )
+
+        ep_mid: float | None = None
+        if (
+            calculated_item is not None
+            and calculated_item.priced
+            and calculated_item.ep_mid is not None
+        ):
+            ep_mid = float(calculated_item.ep_mid)
+            pre_unit_price = ep_mid
+            price_source = "kalkulation"
+        elif priced_item is not None and priced_item.unit_price is not None:
+            pre_unit_price = float(priced_item.unit_price)
+            price_source = priced_item.source
+        else:
+            pre_unit_price = 0.0
+            price_source = "none"
+
+        engine_divergence = 0.0
+        if (
+            ep_mid is not None
+            and priced_item is not None
+            and priced_item.unit_price is not None
+            and ep_mid > 0.0
+            and float(priced_item.unit_price) > 0.0
+        ):
+            engine_divergence = abs(
+                ep_mid - float(priced_item.unit_price)
+            ) / float(priced_item.unit_price)
+
+        text = _text(item)
+        specialist_hits = [
+            keyword
+            for keyword in constants.SPECIALIST_KEYWORDS
+            if keyword in text
+        ]
+        is_specialist = bool(specialist_hits or item.is_lump_sum)
+
+        distribution = (
+            priced_item.distribution
+            if priced_item is not None
+            else None
+        )
+        benchmark_band = _format_benchmark_band(distribution)
+
+        states.append(HybridItemState(
+            key=key,
+            oz=item.oz,
+            qty=float(item.quantity),
+            unit=item.unit,
+            logic_flags=list(logic.flags),
+            logic_severity=logic.severity,
+            logic_details=list(logic.details),
+            is_specialist=is_specialist,
+            specialist_hits=specialist_hits,
+            pre_unit_price=pre_unit_price,
+            price_source=price_source,
+            euro_exposure=abs(float(item.quantity) * pre_unit_price),
+            engine_divergence=engine_divergence,
+            benchmark_band=benchmark_band,
+        ))
+
+    return states
+
+
+def compute_priority_weight(
+    state: HybridItemState,
+    max_exposure: float,
+) -> float:
+    """Compute a deterministic ranking weight for one hybrid item state."""
+
+    base_weight = {
+        "high": 100.0,
+        "medium": 35.0,
+        "low": 0.0,
+    }.get(state.logic_severity, 0.0)
+
+    score = (
+        base_weight
+        + 15.0 * len(state.logic_flags)
+        + 20.0 * len(state.specialist_hits)
+    )
+
+    if state.engine_divergence >= constants.HYBRID_DIVERGENCE_THRESH:
+        score += 25.0
+
+    if max_exposure > 0:
+        score += 50.0 * (
+            math.log1p(state.euro_exposure)
+            / math.log1p(max_exposure)
+        )
+
+    return score
+
+
+def _percentile(values: Sequence[float], percentile: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    if len(ordered) == 1:
+        return float(ordered[0])
+
+    position = percentile * (len(ordered) - 1)
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    fraction = position - lower
+    return float(
+        ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
+    )
+
+
+def select_top_llm_keys(
+    states: Sequence[HybridItemState],
+    max_llm_items: int = constants.HYBRID_MAX_LLM_ITEMS,
+) -> tuple[set[str], float]:
+    """Select the bounded, highest-priority candidates for an LLM pass."""
+
+    positive_exposures = [
+        state.euro_exposure
+        for state in states
+        if state.euro_exposure > 0
+    ]
+    if positive_exposures:
+        top_threshold = _percentile(
+            positive_exposures,
+            constants.HYBRID_EXPOSURE_PERCENTILE,
+        )
+    else:
+        top_threshold = constants.SEVERITY_HIGH_EUR
+
+    candidates = [
+        state
+        for state in states
+        if (
+            state.logic_severity == "high"
+            or state.is_specialist
+            or state.engine_divergence >= constants.HYBRID_DIVERGENCE_THRESH
+            or state.euro_exposure >= top_threshold
+        )
+    ]
+
+    max_exposure = max(
+        (state.euro_exposure for state in states),
+        default=0.0,
+    )
+    ranked = sorted(
+        candidates,
+        key=lambda state: (
+            -compute_priority_weight(state, max_exposure),
+            -state.euro_exposure,
+            state.key,
+        ),
+    )
+
+    limit = max(0, int(max_llm_items))
+    selected = {state.key for state in ranked[:limit]}
+    return selected, top_threshold
+
+
+def classify_hybrid_risk(
+    state: HybridItemState,
+    judgments: AtomicLLMJudgments | None,
+    top_10_pct_exposure_threshold: float,
+    high_thresh: float = constants.HYBRID_HIGH_SCORE_THRESH,
+    med_thresh: float = constants.HYBRID_MED_SCORE_THRESH,
+) -> HybridRiskResult:
+    """Combine deterministic hard signals with orthogonal atomic judgments."""
+
+    hard_high = state.logic_severity == "high"
+    exposure_high = (
+        state.euro_exposure > 0
+        and state.euro_exposure >= top_10_pct_exposure_threshold
+    )
+
+    scores: list[float] = []
+    if judgments is not None:
+        scores = [
+            float(judgments.unklar_beschrieben),
+            float(judgments.menge_unplausibel),
+            float(judgments.preis_unplausibel),
+            float(judgments.spezialgewerk),
+            float(judgments.nachtragspotenzial),
+            float(judgments.mindermengen_risiko),
+        ]
+
+    reasons: list[str] = []
+    for detail in state.logic_details:
+        if detail and detail not in reasons:
+            reasons.append(detail)
+    if judgments is not None:
+        for dimension, reason in judgments.reasons.items():
+            score = getattr(judgments, dimension, None)
+            if (
+                isinstance(score, (int, float))
+                and float(score) > med_thresh
+                and reason
+                and reason not in reasons
+            ):
+                reasons.append(reason)
+
+    if (
+        hard_high
+        or exposure_high
+        or any(score > high_thresh for score in scores)
+        or sum(1 for score in scores if score > med_thresh) >= 2
+    ):
+        risk_level = "high"
+    elif (
+        state.logic_severity == "medium"
+        or state.is_specialist
+        or state.engine_divergence >= constants.HYBRID_DIVERGENCE_THRESH
+        or any(score > med_thresh for score in scores)
+    ):
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+
+    action_type: str
+    strategy: str
+    speculation_candidate = False
+
+    if judgments is not None and judgments.nachtragspotenzial > high_thresh:
+        action_type = "SPECULATE_UP"
+        strategy = "EP erhöhen (VOB/B § 2 Abs. 3 Mehrmengen-Hebel >10 %)"
+        speculation_candidate = True
+    elif (
+        judgments is not None
+        and judgments.mindermengen_risiko > high_thresh
+    ) or "ZERO_QTY" in state.logic_flags:
+        action_type = "SPECULATE_DOWN"
+        strategy = "EP senken (Unwahrscheinlicher Abruf / Wettbewerbshebel)"
+        speculation_candidate = True
+    elif judgments is not None and judgments.spezialgewerk > high_thresh:
+        action_type = "RFQ"
+        strategy = "Nachunternehmer-Anfrage (RFQ) vor Angebotsabgabe einholen"
+    elif (
+        judgments is not None
+        and judgments.unklar_beschrieben > med_thresh
+    ) or any(
+        flag in state.logic_flags
+        for flag in (
+            "META_MISMATCH",
+            "MISSING_SPEC",
+            "SCOPE_GAP",
+            "CATEGORY_MISMATCH",
+        )
+    ):
+        action_type = "RFI"
+        strategy = "Bieterfrage (RFI) an Auftraggeber/Planer stellen"
+    else:
+        action_type = "CHECK"
+        strategy = "Kalkulationsansatz und Mengenansatz intern gegenprüfen"
+
+    if not reasons:
+        # A position can reach "high" on euro exposure alone, with no rule and
+        # no judgment firing. Reporting "nothing found" there is misleading:
+        # the finding IS the money. Name it, so the estimator knows why it is
+        # on his list and can decide in one read.
+        if exposure_high:
+            reasons = [
+                f"Gehört mit {state.euro_exposure:,.0f} € zu den wertvollsten "
+                f"{(1 - constants.HYBRID_EXPOSURE_PERCENTILE) * 100:.0f} % der "
+                "Positionen. Kein konkreter Mangel gefunden — aber hier kostet "
+                "ein Fehler am meisten."
+            ]
+        else:
+            reasons = ["Keine Auffälligkeit über den Grenzwerten."]
+
+    return HybridRiskResult(
+        key=state.key,
+        risk_level=risk_level,
+        euro_exposure=state.euro_exposure,
+        pre_unit_price=state.pre_unit_price,
+        reasons=reasons,
+        strategy=strategy,
+        action_type=action_type,
+        speculation_candidate=speculation_candidate,
+        judgments=judgments,
+    )
+
+
+def analyze_tender_hybrid(
+    items: Sequence[NormalizedItem],
+    remarks: Sequence[str],
+    calculated: Sequence[CalculatedItem],
+    priced: Sequence[PricedItem],
+    use_jev: bool | None = None,
+) -> tuple[list[HybridRiskResult], list[Finding]]:
+    """Run the complete deterministic/LLM hybrid tender analysis."""
+
+    from core import judgments, logic, objects
+    from core import detectors
+
+    items = list(items)
+    calculated = list(calculated)
+    priced = list(priced)
+
+    pre_prices: dict[str, float] = {}
+    calculated_by_key = {entry.item.key(): entry for entry in calculated}
+    priced_by_key = {entry.item.key(): entry for entry in priced}
+    for item in items:
+        key = item.key()
+        calculated_item = calculated_by_key.get(key)
+        if (
+            calculated_item is not None
+            and calculated_item.priced
+            and calculated_item.ep_mid is not None
+        ):
+            pre_prices[key] = float(calculated_item.ep_mid)
+        else:
+            priced_item = priced_by_key.get(key)
+            if priced_item is not None and priced_item.unit_price is not None:
+                pre_prices[key] = float(priced_item.unit_price)
+
+    rows = objects.build(items, depth=2)
+    logic_results = logic.run_logic_engine(
+        items,
+        rows=rows,
+        pre_prices=pre_prices,
+    )
+    states = build_item_states(
+        items,
+        calculated,
+        priced,
+        logic_results,
+    )
+    selected_keys, top_threshold = select_top_llm_keys(states)
+    judgments_by_key = judgments.judge_selected_items(
+        items,
+        states,
+        selected_keys,
+        use_jev=use_jev,
+    )
+
+    item_by_key = {item.key(): item for item in items}
+    hybrid_results: list[HybridRiskResult] = []
+    findings: list[Finding] = []
+
+    for state in states:
+        result = classify_hybrid_risk(
+            state,
+            judgments_by_key.get(state.key),
+            top_threshold,
+        )
+        hybrid_results.append(result)
+        item = item_by_key.get(state.key)
+        if item is not None and result.risk_level in ("high", "medium"):
+            findings.append(result.to_finding(item))
+
+    findings.extend(detectors.vague_scope(priced, remarks))
+    severity_index = {
+        severity: index
+        for index, severity in enumerate(constants.SEVERITY_ORDER)
+    }
+    findings.sort(
+        key=lambda finding: (
+            severity_index.get(finding.severity, len(severity_index)),
+            -finding.euro_leverage,
+        )
+    )
+    return hybrid_results, findings
 
 ````
 
@@ -9919,6 +13133,849 @@ def companies() -> list[Company]:
   "confidence": 1.0,
   "source": "jev",
   "text": "Schweißnahtprüfung"
+ }
+}
+````
+
+## `data/deep_logic_cache.json`
+````json
+{
+ "015da67f1b2a35b0e26542813dad784935c46478": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "02f3066a27e6338e2ef7ba439ae6ea6fafdd66c3": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "054bc5a465700081cbc8abe9fa05dffbbf47e87a": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "09191861110088972ffc2616395ed91841f4bde9": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "0922830e490e74f6ec2ff5f455842d146034f785": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Der angeforderte Text wurde nicht bereitgestellt. Bitte stellen Sie eine Frage zu den bereitgestellten Daten.",
+  "severity": "low"
+ },
+ "0b45c46f7677f324482262b28bf0e556c8c8a369": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Daten basieren ausschließlich auf dem bereitgestellten Cluster-Payload.",
+  "severity": "low"
+ },
+ "0c897ced599827e33b16e92c1839f245ff075bbc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "0ccbad4f3ece950f7cdbc5a5b6ccd9316bff31c7": {
+  "affected_positions": [
+   "03010001",
+   "03010002"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "In dem vorliegenden Cluster-Payload sind zwei Positionen aufgeführt: 'Baustelle einrichten' (OZ 03010001) und 'Baustelle räumen' (OZ 03010002). Bei der Baustelleneinrichtung umfasst die Pauschale unter anderem das Beseitigen von Aufwuchs und die erforderlichen festen Arbeiten; Mieten, Pacht und Gebühren sind nicht enthalten.",
+  "severity": "low"
+ },
+ "10e6f443d95868abeb2bb3ebfcd63cee3425ba95": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Informationen zu den Kosten oder Mengen in den bereitgestellten Daten vorhanden.",
+  "severity": "low"
+ },
+ "122a93c75e88e9173d3e80581f2fc026d72d5c14": {
+  "affected_positions": [
+   "811",
+   "813",
+   "814",
+   "815",
+   "816",
+   "817"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Basierend auf dem bereitgestellten Payload wird ein Druckrohr aus PE100 mit einer Nennweite (dn) von 63 in einem Leitungsgraben mit einer Tiefe von 1,5 m verbaut (oz 811). Weitere Formstücke wie Muffen, Winkel (45° und 90°), Kappen und T-Stücke für PE DN/OD63 SDR11 sind ebenfalls aufgeführt (oz 813-817).",
+  "severity": "low"
+ },
+ "14a465fd27dfafa17264665375f2adf7f13e6191": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "160c5c672204bc334619f9073f93e45a61c3a9c5": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "174e7076b12c64b5624b1b0d9594bb104c59f91f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "198088ef425597c0587d1f314a48c238b9182cae": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Widersprüche gefunden.",
+  "severity": "low"
+ },
+ "1d31f9a848cc9ad2d9bd48045cdcac218e8efdd7": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "1e5df39b16917ea0f6b085fbb79d477ab01b9775": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "2b77d67bac4a59e0f23f9fc10b9ac7b69b9339a1": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Stundenlöhnen (Baufacharbeiter/-in, Bauwerker/-in), Pumpen (aufstellen, räumen, vorhalten, betreiben), einem Pumpensumpf aus Beton (DN1000), einer Kontrollprüfung des Unterbaus/Planums sowie Rammsondierungen DPH.",
+  "severity": "low"
+ },
+ "2c9afb1d0fb62bd1421dbc2a382374066e498cfd": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "31748153482b40344ef8ed8a690a487cb0275ede": {
+  "affected_positions": [
+   "02040001",
+   "02040002",
+   "02040003",
+   "02040004",
+   "02040005",
+   "02040006",
+   "02040007",
+   "02040008",
+   "02040009",
+   "02040010",
+   "02040011",
+   "02040012"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Wasserhaltungsarbeiten, einschließlich eines Pumpensumpfs mit einem Filterrohr DN400, dem Ein- und Ausbau von Pumpen mit Elektromotoren, Absetzbecken-Containern bis 5m3 sowie der Herstellung einer Sickermulde.",
+  "severity": "low"
+ },
+ "32baea3d9950497f02c9f195a18e41bde609dc69": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "34ffe04f3e923250175a6168010cb9802c01e32f": {
+  "affected_positions": [
+   "211",
+   "212",
+   "213",
+   "214",
+   "215",
+   "216"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zur Erstellung und Lieferung von Foto- und Bestands-Dokumentationen.",
+  "severity": "low"
+ },
+ "36e4f58e6ec2299d221014d4a46971ae89448a55": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "36fb975da109acf30391897cfa6fe83fb48ee49f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "3b1d356ac4025ac8c93d729b158f37a30ef79b23": {
+  "affected_positions": [
+   "421",
+   "422"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Basierend auf dem Payload gibt es zwei Positionen: Eine höhenverstellbare Straßenkappe für eine Wasserltg Absperrarmatur Gr.2 (oz 421) sowie eine höhenverstellbare Straßenkappe für eine Wasserltg Unterflurhydrant DN80 (oz 422). Beide bestehen aus Guss.",
+  "severity": "low"
+ },
+ "3c0851e183988905d2b1eec07c48ef93d724aed9": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu verschiedenen Bauteilen und Materialien (z. B. Beton, Schotterrasen, Verfüllmaterialien für Leitungsgräben) sowie deren Dicken und Phasen, jedoch keine widersprüchlichen Angaben innerhalb des Datensatzes.",
+  "severity": "low"
+ },
+ "46000e9c46f8749840136a47499af4b6cbb71cec": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4689c65eb5389687d8dde4fcf2e91da55c77ac3f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4a6cad57ab384eab35d386a4c0a627239445aa05": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "4ccf8a297021b6baeb0e610c5d6b90b730cc536f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "4dae8915d5abd57c740b5d194cb28355318e521c": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "4e8eff6be7b0e7358d3fe80141c55f1832155d6a": {
+  "affected_positions": [
+   "511",
+   "512",
+   "513",
+   "514",
+   "515",
+   "516"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu verschiedenen Abbruch- und Rückbauarbeiten (Bordstein Beton, Asphaltbelag, Befestigung), aber keine Informationen zu spezifischen statischen Berechnungen oder Lasten, die eine bauingenieurtechnische Bewertung über die reine Auflistung der Positionen hinaus zulassen.",
+  "severity": "low"
+ },
+ "4fb3312efc2aeffba80444630a73ff262bbcda0b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5027ddd99e9ef2d8982bc9c0710514896ab1dff0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "51f94dbdee1bf01282f83e955cbf11c6fbf25168": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "521c919f7ef1ea7b7a2c2e5a48e03aaa4a23fe32": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "586fde127be3b932b0455a9292ade63b5ae963ff": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5b5f2015f33b2c9c8454625f192bd8c4f99a7e89": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "5b6f8ade6e73986e5976a02e5a2f3d2787ae099e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "5bc70cf184a07599399c59ad60f274abffc71dfb": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "60de3689c1088044b0aecce7acc84d346aed572b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "6169836d5e01aee3789c15bc8a8a387284b02aba": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "6a73c01d31990943361c95e1fa9fb48bba165de4": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "6e0dde1f83a6aabee4a962911c18ca120b3c035d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "713ff3dfef9760ade994bda57ab7fd2b1d813d46": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "73645837dfcbb257b31ffeee28a79ecfc0a46160": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "7a255ec9487e29ce1b2779f679b902e933547663": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine widersprüchlichen Angaben im Payload gefunden.",
+  "severity": "low"
+ },
+ "7e218169ee90f6540118ed1076dee20aebff2f91": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7ef8fea760c1e2cd2cb7323700fa2a6abb0b0032": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7f7056ba6419c900e6bc9e00b82c00cf2c997694": {
+  "affected_positions": [
+   "341",
+   "342"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu zwei Arten von Rasansaaten: Landschaftsrasen RSM7.1.2 (5g/m2) und Parkplatzrasen RSM5.1 (25g/m2). Weitere technische Details wie Material oder Tiefe sind nicht spezifiziert.",
+  "severity": "low"
+ },
+ "7f9dd5efc785de6a4c5b3d500bef2649bd8ef26c": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "7fb045e0fd274e54e38892e283336a0483366402": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "8068c5f5a21f6f2eaf8331ef269123c2e6127aee": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "812df2ae514f40e06c7a44481c31e7634018d9e0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "81870536ad78b8656d0fd9e9152b0e6f84420f25": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "87c633c3c9e6a2bf9783317199ddce063efef6a6": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Daten aus dem Payload wurden präzise wiedergegeben.",
+  "severity": "low"
+ },
+ "8ee0632ba5d1f80218de5e22d674feccc911d4cd": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "906268fe135f19a450b198038be21f22b5a8dc23": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "955e2ceb998b4ccd7808fc61271de30fc158dcd8": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "984f9d49cac3a8f39765ff9ace9fbb9df7e12dbe": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "9c18c1331f3f2fe4953a46e8940e37b734bd8f7e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "9db9e12fd0a624569afe0f8ff992e05752a472d0": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "9e8c93a7a993ab12eb3d8322a5bbe482b609dec5": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "9f9e49a90371b062f3dc3c5482d22bd3f1ef55fc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "a11a1e724524ac67afaa8469a764c082ff47209d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "a1f667a33b4cbad73606440412d4f6c94669004b": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "a33b666c2a137b6ef40ff45a942c03ff3fb7474d": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ad28e06796ead4ca559e289f620d3a6f6377735f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "b25f100bcbe1bfd0e0ced7278377d0500ba35ef3": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "babc277f47c380ec827f9bc0a7cdd191b63e7fa9": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "c360309470b43eb3c98318438f493a82b40312ca": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "c650a2da0d7b38d529ccb1381827c6ca759b756e": {
+  "affected_positions": [
+   "01010001",
+   "01010002",
+   "01010003",
+   "01010004",
+   "01010005",
+   "01010006"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine spezifischen Mengenangaben, Maße (außer der Bauzaunhöhe von 2,0 m) oder Zeiträume für die genannten Positionen.",
+  "severity": "low"
+ },
+ "c70a1b9c419db2274913b529c49a314f3c07ad8d": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine Informationen zu einem konkreten Baufortschritt oder einer Abweichung, sondern eine Liste von Leistungspositionen für den Rohrleitungsbau (DN 300/DA 355) aus GGG/Guss und PE100, einschließlich Zulagen und Formstücken.",
+  "severity": "low"
+ },
+ "c886f98486cd6513ea4a914aeed10cf9993b3505": {
+  "affected_positions": [
+   "02020001",
+   "02020002",
+   "02020003"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die verfügbaren Daten enthalten keine technischen Spezifikationen zu Material, Nennweite (dn), Tiefe oder Wandstärke, sondern beschränken sich auf vermessungstechnische Leistungen (Absteckung und Bestand).",
+  "severity": "low"
+ },
+ "cb83f99ca22b0f367c12cf7b08bd07cb51dfc3cc": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "cbb16f017b653efaa86f875887830fa4e00ad550": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "d0508db1efcd2241b6b9c3f1b5ecf3adb18ad76b": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Aushubarbeiten (Baugrube, Gräben), Sandeinbettung und Rohrleitungsmarkierung.",
+  "severity": "low"
+ },
+ "d47fac0c108d09de02b96112ad38724516050e87": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "d4895afc1c2b33f5a4990882ca57bb180e611752": {
+  "affected_positions": [
+   "02010001",
+   "02010002"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten Informationen zur Baustelleneinrichtung (OZ 02010001), einschließlich des Beseitigens von Aufwuchs, sowie zum Räumen der Baustelle (OZ 02010002). Weitere technische Details wie Tiefen oder Materialien sind nicht im Payload enthalten.",
+  "severity": "low"
+ },
+ "d83b8799fe6b69c462f94acef5c03c7d0c862365": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "d88189b76a87112ec403d12d493430078dc08ceb": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "dacb23519c896ed75905711397eb71768d0c9396": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "e182f3d6edf7569cbfe41e6a15933d0a3f111963": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
+  "severity": "low"
+ },
+ "e19504cc2097adc8a5241e95ae12ac3012ac7350": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine Informationen zu spezifischen Sicherheitsabständen oder statischen Berechnungen, sondern eine Liste von Leistungspositionen für Erdarbeiten, Grabenverbau und Sicherungsmaßnahmen.",
+  "severity": "low"
+ },
+ "e4bb821412ad4e8e8f881202e96f311c341bf51b": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die bereitgestellten Daten enthalten keine spezifischen Informationen zu einem konkreten Bauvorhaben außer dem Titel \"Tiefbau-[PERSON_132] [PERSON_151]. Ost - Haupttrasse 2023 > Herrichten und Erschließen\". Es werden lediglich verschiedene Abbruch- und sonstigen Leistungen (z.B. Bordstein Beton abbrechen, Betonpflaster ausbauen, Oberboden abtragen) mit entsprechenden Positionsnummern (oz) aufgelistet.",
+  "severity": "low"
+ },
+ "e672e2753216dcfb0cadfe490cd641f5187d5ed7": {
+  "affected_positions": [],
+  "confidence": 0.45,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Alle drei Positionen sind sachlich konsistent und beschreiben unterschiedliche Leistungstypen (Aufstellen/Räumen, Umsetzen, Vorhalten) desselben Bauzauns H 2m. Die Positionsmenge für das Vorhalten (500 m × 20 Wochen) ist explizit angegeben und widerspricht nicht den anderen Positionen.",
+  "severity": "low"
+ },
+ "e7208cf219fe61e0c536d73cf27901ee93932a71": {
+  "affected_positions": [
+   "121",
+   "122",
+   "123"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Im bereitgestellten Cluster-Payload sind folgende Positionen für den Bauzaun (H 2m) aufgeführt: das Aufstellen und Räumen (oz 121), das Umsetzen (oz 122) sowie das Vorhalten (oz 123).",
+  "severity": "low"
+ },
+ "e781281c27d90160d17f0837a538b189e978a7f1": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ea3f84b290c86f62819c4221f58b960959302f9f": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "edd81f89cd6fcedb5801f3d5b16bd55482b05d92": {
+  "affected_positions": [],
+  "confidence": 0.95,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Beide Positionen (421 und 422) beschreiben höhenverstellbare Straßenkappen aus Gusseisen gemäß DIN 4055/4056 für unterschiedliche Einsatzzwecke (Absperrarmatur bzw. Unterflurhydrant DN 80). Es liegen keine widersprüchlichen Angaben vor. Die Confidence ist jeweils 1.0. Keine Material- oder Maßkonflikte erkennbar.",
+  "severity": "low"
+ },
+ "f5127ff2173d5210da9a1b976410cd1afd4a0b71": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "f88c764a4f9a4a45c5e9b44ffdcc9045ad60938e": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "f925a32c62c747d131caad1439fa626b3ad63428": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "fbaf1bf5491fb748a3cd279cd7e6722c32e25eed": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Antwort basiert ausschließlich auf den bereitgestellten Daten des Cluster-Payloads.",
+  "severity": "low"
+ },
+ "fbf0dc3a1e38a2a115368e8aaef9ad2974d5626d": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Die Anfrage enthält keine spezifische Frage zu den Daten. Basierend auf dem Cluster-Payload sind folgende Informationen verfügbar: Es handelt sich um Liefer- und Verlegeleistungen für eine Wasserleitung (Schachtinstallationen, Armaturen, Formstücke). Es sind verschiedene Komponenten mit DN-Nennweiten von 40 bis 300 aufgeführt, unter anderem aus den Materialien Stahl, Guss, PE100 und PVC, wobei viele Komponenten die Druckstufe PN 16 aufweisen.",
+  "severity": "low"
+ },
+ "fcd37974cae7b30730678151f683bd5df83130ea": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "ff084fcde98a32624725675be0f93b8e4665a93e": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Keine Widersprüche gefunden.",
+  "severity": "low"
+ },
+ "ff65ccb47b3616a72087cc9a0da1319b0d9925ae": {
+  "affected_positions": [],
+  "confidence": 0.0,
+  "contradiction_category": "NONE",
+  "offline": true,
+  "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
  }
 }
 ````
@@ -25074,6 +29131,416 @@ def companies() -> list[Company]:
 }
 ````
 
+## `data/judgment_cache.json`
+````json
+{
+ "07336d1a7d83482a": {
+  "menge_unplausibel": 0.66,
+  "mindermengen_risiko": 0.3,
+  "nachtragspotenzial": 0.52,
+  "preis_unplausibel": 0.38,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.26,
+  "unklar_beschrieben": 0.75
+ },
+ "1274c073c0dc410f": {
+  "menge_unplausibel": 0.29,
+  "mindermengen_risiko": 0.12,
+  "nachtragspotenzial": 0.55,
+  "preis_unplausibel": 0.22,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.32,
+  "unklar_beschrieben": 0.74
+ },
+ "161083c35a23c8aa": {
+  "menge_unplausibel": 0.27,
+  "mindermengen_risiko": 0.13,
+  "nachtragspotenzial": 0.6,
+  "preis_unplausibel": 0.87,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.55,
+  "unklar_beschrieben": 0.6
+ },
+ "1b7a30ace1e35044": {
+  "menge_unplausibel": 0.19,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.5,
+  "preis_unplausibel": 0.75,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.37,
+  "unklar_beschrieben": 0.69
+ },
+ "1cf35eda5853ac6a": {
+  "menge_unplausibel": 0.2,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.62,
+  "preis_unplausibel": 0.12,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.63,
+  "unklar_beschrieben": 0.59
+ },
+ "2825b2ab461981b3": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.12,
+  "nachtragspotenzial": 0.47,
+  "preis_unplausibel": 0.15,
+  "reasons": {
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin."
+  },
+  "spezialgewerk": 0.82,
+  "unklar_beschrieben": 0.33
+ },
+ "2ccfabf2ca01363d": {
+  "menge_unplausibel": 0.35,
+  "mindermengen_risiko": 0.47,
+  "nachtragspotenzial": 0.38,
+  "preis_unplausibel": 0.27,
+  "reasons": {
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.15,
+  "unklar_beschrieben": 0.56
+ },
+ "2d5c36474305305f": {
+  "menge_unplausibel": 0.09,
+  "mindermengen_risiko": 0.17,
+  "nachtragspotenzial": 0.22,
+  "preis_unplausibel": 0.18,
+  "reasons": {},
+  "spezialgewerk": 0.18,
+  "unklar_beschrieben": 0.5
+ },
+ "2debdbd7172c5cd7": {
+  "menge_unplausibel": 0.3,
+  "mindermengen_risiko": 0.2,
+  "nachtragspotenzial": 0.46,
+  "preis_unplausibel": 0.27,
+  "reasons": {},
+  "spezialgewerk": 0.34,
+  "unklar_beschrieben": 0.44
+ },
+ "3b0cebeaf065ddeb": {
+  "menge_unplausibel": 0.29,
+  "mindermengen_risiko": 0.21,
+  "nachtragspotenzial": 0.4,
+  "preis_unplausibel": 0.48,
+  "reasons": {
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.4,
+  "unklar_beschrieben": 0.54
+ },
+ "4612cff54ddda151": {
+  "menge_unplausibel": 0.24,
+  "mindermengen_risiko": 0.17,
+  "nachtragspotenzial": 0.42,
+  "preis_unplausibel": 0.4,
+  "reasons": {},
+  "spezialgewerk": 0.12,
+  "unklar_beschrieben": 0.42
+ },
+ "46634ce61ab14ed0": {
+  "menge_unplausibel": 0.3,
+  "mindermengen_risiko": 0.2,
+  "nachtragspotenzial": 0.49,
+  "preis_unplausibel": 0.86,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.26,
+  "unklar_beschrieben": 0.69
+ },
+ "47230bbd357f63c7": {
+  "menge_unplausibel": 0.23,
+  "mindermengen_risiko": 0.18,
+  "nachtragspotenzial": 0.64,
+  "preis_unplausibel": 0.87,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.16,
+  "unklar_beschrieben": 0.51
+ },
+ "483ee55b11fc4d50": {
+  "menge_unplausibel": 0.09,
+  "mindermengen_risiko": 0.16,
+  "nachtragspotenzial": 0.28,
+  "preis_unplausibel": 0.58,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.46,
+  "unklar_beschrieben": 0.47
+ },
+ "48ef527337451130": {
+  "menge_unplausibel": 0.3,
+  "mindermengen_risiko": 0.34,
+  "nachtragspotenzial": 0.42,
+  "preis_unplausibel": 0.63,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.36,
+  "unklar_beschrieben": 0.58
+ },
+ "5d3a369e8dbd5cd6": {
+  "menge_unplausibel": 0.2,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.5,
+  "preis_unplausibel": 0.63,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.11,
+  "unklar_beschrieben": 0.57
+ },
+ "5d68b26b6a78f1da": {
+  "menge_unplausibel": 0.51,
+  "mindermengen_risiko": 0.5,
+  "nachtragspotenzial": 0.58,
+  "preis_unplausibel": 0.73,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.59,
+  "unklar_beschrieben": 0.72
+ },
+ "744cb3ab4a9ba812": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.13,
+  "nachtragspotenzial": 0.48,
+  "preis_unplausibel": 0.15,
+  "reasons": {
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin."
+  },
+  "spezialgewerk": 0.83,
+  "unklar_beschrieben": 0.36
+ },
+ "8a769f12baded8b7": {
+  "menge_unplausibel": 0.33,
+  "mindermengen_risiko": 0.39,
+  "nachtragspotenzial": 0.41,
+  "preis_unplausibel": 0.33,
+  "reasons": {},
+  "spezialgewerk": 0.33,
+  "unklar_beschrieben": 0.43
+ },
+ "962f8bc550229da8": {
+  "menge_unplausibel": 0.36,
+  "mindermengen_risiko": 0.34,
+  "nachtragspotenzial": 0.49,
+  "preis_unplausibel": 0.35,
+  "reasons": {},
+  "spezialgewerk": 0.26,
+  "unklar_beschrieben": 0.41
+ },
+ "9704c6a633adee12": {
+  "menge_unplausibel": 0.79,
+  "mindermengen_risiko": 0.82,
+  "nachtragspotenzial": 0.47,
+  "preis_unplausibel": 0.58,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin."
+  },
+  "spezialgewerk": 0.6,
+  "unklar_beschrieben": 0.28
+ },
+ "a638eee8cd6901b1": {
+  "menge_unplausibel": 0.21,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.45,
+  "preis_unplausibel": 0.77,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.19,
+  "unklar_beschrieben": 0.35
+ },
+ "a88c062c058c8bb6": {
+  "menge_unplausibel": 0.28,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.54,
+  "preis_unplausibel": 0.54,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin."
+  },
+  "spezialgewerk": 0.93,
+  "unklar_beschrieben": 0.5
+ },
+ "a9b6ffd36dac4d5b": {
+  "menge_unplausibel": 0.23,
+  "mindermengen_risiko": 0.15,
+  "nachtragspotenzial": 0.43,
+  "preis_unplausibel": 0.27,
+  "reasons": {},
+  "spezialgewerk": 0.11,
+  "unklar_beschrieben": 0.31
+ },
+ "a9ddb93bde40892d": {
+  "menge_unplausibel": 0.21,
+  "mindermengen_risiko": 0.2,
+  "nachtragspotenzial": 0.48,
+  "preis_unplausibel": 0.85,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.1,
+  "unklar_beschrieben": 0.7
+ },
+ "c36584c31351777a": {
+  "menge_unplausibel": 0.3,
+  "mindermengen_risiko": 0.22,
+  "nachtragspotenzial": 0.63,
+  "preis_unplausibel": 0.82,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.2,
+  "unklar_beschrieben": 0.45
+ },
+ "d66c555e55990871": {
+  "menge_unplausibel": 0.82,
+  "mindermengen_risiko": 0.87,
+  "nachtragspotenzial": 0.55,
+  "preis_unplausibel": 0.44,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.21,
+  "unklar_beschrieben": 0.65
+ },
+ "d81795ffd97f66d4": {
+  "menge_unplausibel": 0.35,
+  "mindermengen_risiko": 0.24,
+  "nachtragspotenzial": 0.45,
+  "preis_unplausibel": 0.26,
+  "reasons": {
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.26,
+  "unklar_beschrieben": 0.56
+ },
+ "e340c6e5c8e2f1ae": {
+  "menge_unplausibel": 0.51,
+  "mindermengen_risiko": 0.56,
+  "nachtragspotenzial": 0.48,
+  "preis_unplausibel": 0.32,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.38,
+  "unklar_beschrieben": 0.61
+ },
+ "e8987d1a2db89166": {
+  "menge_unplausibel": 0.28,
+  "mindermengen_risiko": 0.22,
+  "nachtragspotenzial": 0.47,
+  "preis_unplausibel": 0.79,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.15,
+  "unklar_beschrieben": 0.69
+ },
+ "efb34c5714b28ded": {
+  "menge_unplausibel": 0.26,
+  "mindermengen_risiko": 0.13,
+  "nachtragspotenzial": 0.43,
+  "preis_unplausibel": 0.84,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.24,
+  "unklar_beschrieben": 0.39
+ },
+ "f1aee81cc0e075cc": {
+  "menge_unplausibel": 0.21,
+  "mindermengen_risiko": 0.13,
+  "nachtragspotenzial": 0.39,
+  "preis_unplausibel": 0.12,
+  "reasons": {},
+  "spezialgewerk": 0.2,
+  "unklar_beschrieben": 0.38
+ },
+ "f1ff59adcd5aeb11": {
+  "menge_unplausibel": 0.18,
+  "mindermengen_risiko": 0.12,
+  "nachtragspotenzial": 0.42,
+  "preis_unplausibel": 0.81,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.13,
+  "unklar_beschrieben": 0.34
+ },
+ "fb1c5be63e8c643f": {
+  "menge_unplausibel": 0.23,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.5,
+  "preis_unplausibel": 0.27,
+  "reasons": {
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.52,
+  "unklar_beschrieben": 0.7
+ },
+ "fd5c5d690ba7f186": {
+  "menge_unplausibel": 0.24,
+  "mindermengen_risiko": 0.17,
+  "nachtragspotenzial": 0.64,
+  "preis_unplausibel": 0.87,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.23,
+  "unklar_beschrieben": 0.45
+ }
+}
+````
+
 ## `data/reference_prices.json`
 ````json
 {
@@ -34138,3741 +38605,7 @@ def companies() -> list[Company]:
 ````
 
 ## `Database/data/arbeitszeitrichtwerte.json`
-````json
-{
- "meta": {
-  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
-  "seed": 2026,
-  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage.",
-  "leistungen": 134,
-  "katalog_hinweis": "status: abgeleitet = aus Basisleistung des Katalogs gerechnet; geschaetzt = eigene Schätzung; unsicher = breite reale Streuung. Annahme je Zeile in 'annahme'."
- },
- "leistungen": {
-  "E01": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Oberboden abtragen und seitlich lagern",
-   "einheit": "m2",
-   "h_min": 0.0195,
-   "h_mittel": 0.0229,
-   "h_max": 0.0263,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0191
-    }
-   ],
-   "bemerkung": "Oberboden d = 20 cm abtragen, im Baufeld lagern, gegen Vernässung schützen.",
-   "stichworte": [
-    "oberboden",
-    "bodendecke",
-    "abräumen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 3.20 €): E01-M3 × 0,20 m (Abtragsdicke laut Katalogtext E01)"
-  },
-  "E02": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden Homogenbereich B2 lösen, laden, abfahren",
-   "einheit": "m3",
-   "h_min": 0.1211,
-   "h_mittel": 0.1425,
-   "h_max": 0.1639,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 1.8
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.1188
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.1188
-    }
-   ],
-   "bemerkung": "Grabenaushub maschinell, Boden laden, zur Deponie fahren, Gebühr nach Wiegeschein.",
-   "stichworte": [
-    "boden",
-    "graben",
-    "gerät",
-    "laden",
-    "fördern",
-    "abfahren",
-    "aushub",
-    "transp",
-    "baugrube",
-    "-hand",
-    "-fels",
-    "-lagern"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 69.00 €): Kostenberechnung Biblis 04.06.2025: Leitungsgraben ausheben, laden 30–35 €/m³ (6.2.11, 5.2.11) + Boden entsorgen BM-0 34 €/m³ (3.12)"
-  },
-  "E03": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden von Hand lösen im Bereich vorhandener Leitungen",
-   "einheit": "m3",
-   "h_min": 0.5463,
-   "h_mittel": 0.8114,
-   "h_max": 1.0765,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 0.6639
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.7376
-    }
-   ],
-   "bemerkung": "Handschachtung im Kreuzungsbereich von Fremdleitungen.",
-   "stichworte": [
-    "hand",
-    "handschachtung",
-    "aushubkontrolle",
-    "-fels"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 75.00 €): Kostenberechnung Biblis 04.06.2025: Handaushub an Bebauung 75 €/m³ (5.2.13); Zulage Handaushub 60 €/m³ (4.1.16)"
-  },
-  "E04": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Graben mit Fremdmaterial verfüllen und lagenweise verdichten",
-   "einheit": "m3",
-   "h_min": 0.1152,
-   "h_mittel": 0.1392,
-   "h_max": 0.1632,
-   "material": [
-    {
-     "code": "SAND",
-     "menge_je_einheit": 1.4691
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0619
-    },
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.116
-    }
-   ],
-   "bemerkung": "Einbau in Lagen ≤ 30 cm, Dpr ≥ 97 %.",
-   "stichworte": [
-    "verfüllen",
-    "verdichten",
-    "gemisch",
-    "-gelagert",
-    "-lagern"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 55.00 €): Kostenberechnung Biblis 04.06.2025: Bodenaustausch Schotter 58, Kiessand 64, gelagert 45; Verfüllung Vorsiebmaterial 48 €/m³"
-  },
-  "E05": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Leitungszone mit Sand 0/2 herstellen",
-   "einheit": "m3",
-   "h_min": 0.213,
-   "h_mittel": 0.2506,
-   "h_max": 0.2882,
-   "material": [
-    {
-     "code": "SAND",
-     "menge_je_einheit": 1.8
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.167
-    }
-   ],
-   "bemerkung": "Bettung und Abdeckung 30 cm über Rohrscheitel.",
-   "stichworte": [
-    "leitungszone",
-    "sand",
-    "einbettung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 67.00 €): Kostenberechnung Biblis 04.06.2025: Leitungszone/Rohrauflager 64 €/m³ (4.1.26), Sand 70 €/m³ (6.2.18)"
-  },
-  "E06": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Planum herstellen und verdichten",
-   "einheit": "m2",
-   "h_min": 0.019,
-   "h_mittel": 0.0224,
-   "h_max": 0.0258,
-   "material": [],
-   "geraet": [
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.0112
-    }
-   ],
-   "bemerkung": "Planum Ev2 ≥ 45 MN/m², Höhentoleranz ± 2 cm.",
-   "stichworte": [
-    "planum",
-    "feinplanum"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2.00 €): Kostenberechnung Biblis 04.06.2025: Planum herstellen, Ev2 45 MN/m² 2 €/m² (4.1.32)"
-  },
-  "E07": {
-   "gewerk": "Oberbau",
-   "taetigkeit": "Frostschutzschicht 0/45 einbauen, d = 30 cm",
-   "einheit": "m2",
-   "h_min": 0.0213,
-   "h_mittel": 0.025,
-   "h_max": 0.0287,
-   "material": [
-    {
-     "code": "FSS",
-     "menge_je_einheit": 0.6
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RLD",
-     "stunden_je_einheit": 0.01
-    },
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.01
-    }
-   ],
-   "bemerkung": "Ev2 ≥ 120 MN/m² auf der Oberfläche.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 17.40 €): E07-M3 × 0,30 m (Schichtdicke laut Katalogtext E07)"
-  },
-  "V01": {
-   "gewerk": "Verbau",
-   "taetigkeit": "Grabenverbau einbauen, vorhalten, rückbauen, Tiefe ≤ 3,0 m",
-   "einheit": "m2",
-   "h_min": 0.3107,
-   "h_mittel": 0.4143,
-   "h_max": 0.5179,
-   "material": [],
-   "geraet": [
-    {
-     "code": "VBG",
-     "stunden_je_einheit": 0.7103
-    },
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0947
-    }
-   ],
-   "bemerkung": "Abrechnung nach verbauter Grabenwandfläche.",
-   "stichworte": [
-    "grabenverbau",
-    "grabenverbaugerät",
-    "verbau",
-    "stirnverbau"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "V02": {
-   "gewerk": "Verbau",
-   "taetigkeit": "Zulage Grabenverbau für Tiefe > 3,0 bis 4,0 m",
-   "einheit": "m2",
-   "h_min": 0.1066,
-   "h_mittel": 0.1421,
-   "h_max": 0.1776,
-   "material": [],
-   "geraet": [
-    {
-     "code": "VBG",
-     "stunden_je_einheit": 0.3551
-    }
-   ],
-   "bemerkung": "Zulage zur Position Grabenverbau.",
-   "stichworte": [
-    "grabenverbau",
-    "grabenverbaugerät",
-    "verbau",
-    "zulage",
-    "-herstellen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "K01": {
-   "gewerk": "Kanal",
-   "taetigkeit": "PVC-KG-Rohr DN 150 verlegen",
-   "einheit": "m",
-   "h_min": 0.2275,
-   "h_mittel": 0.2677,
-   "h_max": 0.3079,
-   "material": [
-    {
-     "code": "KG150",
-     "menge_je_einheit": 1.02
-    },
-    {
-     "code": "ANSCH",
-     "menge_je_einheit": 0.05
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.2434
-    }
-   ],
-   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: PVC-U-Rohre DN/OD 160 40 €/m (4.2.10, 5.3.10)"
-  },
-  "K02": {
-   "gewerk": "Kanal",
-   "taetigkeit": "PVC-KG-Rohr DN 200 verlegen",
-   "einheit": "m",
-   "h_min": 0.3188,
-   "h_mittel": 0.4251,
-   "h_max": 0.5314,
-   "material": [
-    {
-     "code": "KG200",
-     "menge_je_einheit": 1.02
-    },
-    {
-     "code": "ANSCH",
-     "menge_je_einheit": 0.05
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.3795
-    }
-   ],
-   "bemerkung": "Einschl. Formstücke, Gefälle nach Plan.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "K03": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Stahlbetonrohr DN 300 verlegen",
-   "einheit": "m",
-   "h_min": 0.5833,
-   "h_mittel": 0.7777,
-   "h_max": 0.9721,
-   "material": [
-    {
-     "code": "SB300",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.3535
-    }
-   ],
-   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "K04": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Stahlbetonrohr DN 500 verlegen",
-   "einheit": "m",
-   "h_min": 0.9231,
-   "h_mittel": 1.2308,
-   "h_max": 1.5385,
-   "material": [
-    {
-     "code": "SB500",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG25",
-     "stunden_je_einheit": 0.5068
-    }
-   ],
-   "bemerkung": "Rohre mit Glockenmuffe, Dichtung nach DIN EN 1916.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "K05": {
-   "gewerk": "Wasser",
-   "taetigkeit": "PE-HD-Rohr da 110 verlegen, einschl. Schweißverbindungen",
-   "einheit": "m",
-   "h_min": 0.0524,
-   "h_mittel": 0.131,
-   "h_max": 0.2096,
-   "material": [
-    {
-     "code": "PE110",
-     "menge_je_einheit": 0.4455
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.131
-    }
-   ],
-   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert.",
-   "stichworte": [
-    "druckrohr",
-    "trinkwasser",
-    "wasserleitung",
-    "pe",
-    "-markieren",
-    "-spülen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 15.00 €): Kostenberechnung Biblis 04.06.2025: PE DA 40 10 €/m (6.3.11); Tarif Freiberg 2025 Hausanschluss bis DN 50 30,91 €/m"
-  },
-  "K06": {
-   "gewerk": "Wasser",
-   "taetigkeit": "PE-HD-Rohr da 160 verlegen, einschl. Schweißverbindungen",
-   "einheit": "m",
-   "h_min": 0.4182,
-   "h_mittel": 0.5576,
-   "h_max": 0.697,
-   "material": [
-    {
-     "code": "PE160",
-     "menge_je_einheit": 1.02
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.4647
-    }
-   ],
-   "bemerkung": "Heizwendelschweißung, Druckprüfung gesondert.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "K07": {
-   "gewerk": "Kabel",
-   "taetigkeit": "Kabelschutzrohr DN 110 verlegen",
-   "einheit": "m",
-   "h_min": 0.118,
-   "h_mittel": 0.1646,
-   "h_max": 0.2112,
-   "material": [
-    {
-     "code": "KSR",
-     "menge_je_einheit": 1.03
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "In vorbereiteten Graben, Muffen gesteckt.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 15.00 €): Kostenberechnung Biblis 04.06.2025: Kabelschutzrohr DN 110 15 €/m (6.3.13), DA 63 6,50 €/m"
-  },
-  "K08": {
-   "gewerk": "Kabel",
-   "taetigkeit": "Trassenwarnband verlegen",
-   "einheit": "m",
-   "h_min": 0.0096,
-   "h_mittel": 0.0113,
-   "h_max": 0.013,
-   "material": [
-    {
-     "code": "WARN",
-     "menge_je_einheit": 1.05
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "30 cm über Leitung.",
-   "stichworte": [
-    "markieren",
-    "ortungsdraht",
-    "warnband",
-    "rohr"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 1.00 €): Kostenberechnung Biblis 04.06.2025: Trassenwarnband 1 €/m (6.3.16, 4.6.13)"
-  },
-  "K09": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Dichtheitsprüfung je Haltung",
-   "einheit": "St",
-   "h_min": 1.696,
-   "h_mittel": 2.0352,
-   "h_max": 2.3744,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 1.3568
-    }
-   ],
-   "bemerkung": "Prüfung mit Luft nach DIN EN 1610, Protokoll.",
-   "stichworte": [
-    "dichtheitsprüfung",
-    "haltung",
-    "dichtheit"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 150.00 €): Kostenberechnung Biblis 04.06.2025: Dichtheitsprüfung Revisionsschächte 150 €/St (5.5.22)"
-  },
-  "K10": {
-   "gewerk": "Kanal",
-   "taetigkeit": "TV-Inspektion des neuen Kanals",
-   "einheit": "m",
-   "h_min": 0.0863,
-   "h_mittel": 0.1195,
-   "h_max": 0.1527,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.1195
-    }
-   ],
-   "bemerkung": "Befahrung, Video und Bericht.",
-   "stichworte": [
-    "inspektion"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 9.00 €): Kostenberechnung Biblis 04.06.2025: TV-Untersuchung 4–9 €/m (5.5.15/16)"
-  },
-  "K11": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Hausanschluss herstellen, einschl. Abzweig",
-   "einheit": "St",
-   "h_min": 6.4524,
-   "h_mittel": 8.6032,
-   "h_max": 10.754,
-   "material": [
-    {
-     "code": "ANSCH",
-     "menge_je_einheit": 2.5
-    },
-    {
-     "code": "KG150",
-     "menge_je_einheit": 3.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 1.9854
-    }
-   ],
-   "bemerkung": "Anschluss bis Grundstücksgrenze.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "S01": {
-   "gewerk": "Schacht",
-   "taetigkeit": "Schacht DN 1000 aus Fertigteilen setzen, Tiefe bis 3,0 m",
-   "einheit": "St",
-   "h_min": 9.2347,
-   "h_mittel": 11.2869,
-   "h_max": 13.3391,
-   "material": [
-    {
-     "code": "SCH1000",
-     "menge_je_einheit": 1.0
-    },
-    {
-     "code": "MAG",
-     "menge_je_einheit": 0.4
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG25",
-     "stunden_je_einheit": 3.7623
-    }
-   ],
-   "bemerkung": "Fertigteile nach DIN 4034-1.",
-   "stichworte": [
-    "schacht",
-    "-garnitur",
-    "-pumpensumpf"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2750.00 €): Kostenberechnung Biblis 04.06.2025: Schacht DN 1000 2.750 €/St (5.4.14), DN 800 2.000 €/St"
-  },
-  "S02": {
-   "gewerk": "Schacht",
-   "taetigkeit": "Zulage Schachttiefe je angefangene 0,5 m über 3,0 m",
-   "einheit": "St",
-   "h_min": 1.4018,
-   "h_mittel": 1.869,
-   "h_max": 2.3363,
-   "material": [
-    {
-     "code": "SCH1000",
-     "menge_je_einheit": 0.18
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG25",
-     "stunden_je_einheit": 0.4673
-    }
-   ],
-   "bemerkung": "Zulage zur Position Schacht.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Schacht Markt/Modell 2025 = 1.06 skaliert"
-  },
-  "S03": {
-   "gewerk": "Schacht",
-   "taetigkeit": "Schachtabdeckung D 400 setzen und regulieren",
-   "einheit": "St",
-   "h_min": 1.5244,
-   "h_mittel": 1.7934,
-   "h_max": 2.0624,
-   "material": [
-    {
-     "code": "ABD",
-     "menge_je_einheit": 1.0
-    },
-    {
-     "code": "BET",
-     "menge_je_einheit": 0.05
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.8152
-    }
-   ],
-   "bemerkung": "Auf Höhe der fertigen Oberfläche.",
-   "stichworte": [
-    "schachtabdeckung",
-    "abdeckung",
-    "-straßenkappe",
-    "-schieberkappe",
-    "-hahnkasten"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 550.00 €): Kostenberechnung Biblis 04.06.2025: Schachtabdeckung Kl. D 400 550 €/St (5.4.19)"
-  },
-  "S04": {
-   "gewerk": "Schacht",
-   "taetigkeit": "Gerinne herstellen",
-   "einheit": "St",
-   "h_min": 2.8119,
-   "h_mittel": 3.7492,
-   "h_max": 4.6865,
-   "material": [
-    {
-     "code": "BET",
-     "menge_je_einheit": 0.15
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 2.1424
-    }
-   ],
-   "bemerkung": "Gerinne in Beton, Berme mit Gefälle.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Schacht Markt/Modell 2025 = 1.06 skaliert"
-  },
-  "T01": {
-   "gewerk": "Straße",
-   "taetigkeit": "Asphalt schneiden",
-   "einheit": "m",
-   "h_min": 0.0699,
-   "h_mittel": 0.0822,
-   "h_max": 0.0945,
-   "material": [],
-   "geraet": [
-    {
-     "code": "SAEG",
-     "stunden_je_einheit": 0.0822
-    }
-   ],
-   "bemerkung": "Schnitttiefe bis 20 cm.",
-   "stichworte": [
-    "schneiden",
-    "fugenschneider"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 7.00 €): Kostenberechnung Biblis 04.06.2025: Asphaltbefestigung trennen 5–15 cm 7 €/m (4.4.10)"
-  },
-  "T02": {
-   "gewerk": "Straße",
-   "taetigkeit": "Asphalt aufbrechen, laden, entsorgen",
-   "einheit": "m2",
-   "h_min": 0.0538,
-   "h_mittel": 0.0861,
-   "h_max": 0.1184,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 0.25
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0574
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.043
-    }
-   ],
-   "bemerkung": "Dicke bis 15 cm, teerfrei lt. Gutachten.",
-   "stichworte": [
-    "asphalt",
-    "aufbrechen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 20.00 €): Kostenberechnung Biblis 04.06.2025: aufreißen/fräsen Kleinflächen 30 €/m² (4.4.11) — für Großflächen niedriger angesetzt"
-  },
-  "T03": {
-   "gewerk": "Straße",
-   "taetigkeit": "Asphalttragschicht AC 22 TS einbauen, d = 10 cm",
-   "einheit": "m2",
-   "h_min": 0.041,
-   "h_mittel": 0.0482,
-   "h_max": 0.0554,
-   "material": [
-    {
-     "code": "ACT",
-     "menge_je_einheit": 0.245
-    }
-   ],
-   "geraet": [
-    {
-     "code": "FER",
-     "stunden_je_einheit": 0.0096
-    },
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.0161
-    }
-   ],
-   "bemerkung": "Maschineller Einbau.",
-   "stichworte": [
-    "asphalttragschicht",
-    "-vegetationstragschicht"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 27.50 €): Kostenberechnung Biblis 04.06.2025: Asphalttragschicht AC 32 TN 12 cm 30 €/m² (4.4.13) → 10 cm"
-  },
-  "T04": {
-   "gewerk": "Straße",
-   "taetigkeit": "Asphaltdeckschicht AC 11 DS einbauen, d = 4 cm",
-   "einheit": "m2",
-   "h_min": 0.0745,
-   "h_mittel": 0.0876,
-   "h_max": 0.1007,
-   "material": [
-    {
-     "code": "ACD",
-     "menge_je_einheit": 0.1
-    }
-   ],
-   "geraet": [
-    {
-     "code": "FER",
-     "stunden_je_einheit": 0.0175
-    },
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.035
-    }
-   ],
-   "bemerkung": "Maschineller Einbau.",
-   "stichworte": [],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 22.00 €): Kostenberechnung Biblis 04.06.2025: Asphaltdeckschicht AC 8 DN 20 €/m² + Emulsion 2 €/m² (4.4.17/18)"
-  },
-  "T05": {
-   "gewerk": "Straße",
-   "taetigkeit": "Betonsteinpflaster 8 cm verlegen, einschl. Bettung",
-   "einheit": "m2",
-   "h_min": 0.6381,
-   "h_mittel": 0.7507,
-   "h_max": 0.8633,
-   "material": [
-    {
-     "code": "PFL",
-     "menge_je_einheit": 1.02
-    },
-    {
-     "code": "SAND",
-     "menge_je_einheit": 0.08
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.0988
-    }
-   ],
-   "bemerkung": "Läuferverband, Fugen mit Sand.",
-   "stichworte": [
-    "pflaster",
-    "pflasterdecke",
-    "betonpflaster",
-    "-gebraucht"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 78.00 €): Kostenberechnung Biblis 04.06.2025: Betonpflaster liefern und verlegen 8 cm 78 €/m² (4.5.21)"
-  },
-  "T06": {
-   "gewerk": "Straße",
-   "taetigkeit": "Hochbordstein 15/30 in Beton setzen",
-   "einheit": "m",
-   "h_min": 0.2335,
-   "h_mittel": 0.2994,
-   "h_max": 0.3653,
-   "material": [
-    {
-     "code": "BORD",
-     "menge_je_einheit": 1.0
-    },
-    {
-     "code": "BET",
-     "menge_je_einheit": 0.06
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.3207
-    }
-   ],
-   "bemerkung": "Rückenstütze in Beton C20/25.",
-   "stichworte": [
-    "bordstein",
-    "betonbord",
-    "rückenstütze",
-    "-abbrechen",
-    "-rückbau",
-    "-gebraucht"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 50.00 €): Kostenberechnung Biblis 04.06.2025: Tiefbord 8/25 38 €/m, 10/30 40 €/m, Rundbord 15/22 60 €/m — Hochbord 15/30 dazwischen"
-  },
-  "B01": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Baustelleneinrichtung einrichten, vorhalten, räumen",
-   "einheit": "psch",
-   "h_min": 0.0,
-   "h_mittel": 0.0,
-   "h_max": 0.0,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Kalkuliert als Anteil der Einzelkosten aller übrigen Positionen.",
-   "stichworte": [
-    "baustelleneinrichtung",
-    "baustelle"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog"
-  },
-  "B02": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrssicherung vorhalten",
-   "einheit": "Wo",
-   "h_min": 0.8939,
-   "h_mittel": 1.1918,
-   "h_max": 1.4897,
-   "material": [
-    {
-     "code": "BAKE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Absperrung und Beschilderung nach RSA, je Woche.",
-   "stichworte": [
-    "verkehrssicherung",
-    "absperrung",
-    "beschilderung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B03": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Stundenlohnarbeiten Facharbeiter",
-   "einheit": "h",
-   "h_min": 0.8366,
-   "h_mittel": 1.1155,
-   "h_max": 1.3944,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Nur auf Anordnung der Bauleitung.",
-   "stichworte": [
-    "stundenlohnarbeiten",
-    "stundenlohn",
-    "facharbeiter",
-    "bauwerker"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B04": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bestandsdokumentation und Aufmaß",
-   "einheit": "psch",
-   "h_min": 10.2928,
-   "h_mittel": 15.6167,
-   "h_max": 20.9406,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Digitale Bestandspläne nach Vorgabe des Netzbetreibers.",
-   "stichworte": [
-    "bestandsdokumentation",
-    "aufmaß",
-    "dokumentation",
-    "einmessen",
-    "georeferenzierung",
-    "montageplanung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Basiskatalog | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 1100.00 €): Kostenberechnung Biblis 04.06.2025: Bestandsaufnahme 750 €, Zustandserfassung+Doku 1.500 € psch (1.12, 1.17–1.19)"
-  },
-  "B04-ST": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Dokumentation erstellen bzw. liefern, je Stück",
-   "einheit": "St",
-   "h_min": 1.6732,
-   "h_mittel": 3.3464,
-   "h_max": 5.0196,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Foto-, Bestands- oder Anlagendokumentation, Revisionsunterlagen, je Exemplar.",
-   "stichworte": [
-    "dokumentation",
-    "fotodokumentation",
-    "bestandsdokumentation",
-    "anlagendokumentation",
-    "revisionsunterlagen",
-    "datenträger",
-    "verdrahtungsplan",
-    "foto",
-    "-knotenpunkt",
-    "-knotenpunkte"
-   ],
-   "basis": "B04",
-   "status": "geschaetzt",
-   "annahme": "B04 psch = 14 h je Projekt; ein einzelnes Dokument bzw. Exemplar angesetzt mit ca. 1,5–4,5 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B04-M2": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Leitungen orten, markieren und aufmessen, je m² Fläche",
-   "einheit": "m2",
-   "h_min": 0.0168,
-   "h_mittel": 0.0335,
-   "h_max": 0.0503,
-   "material": [],
-   "geraet": [
-    {
-     "code": "ORT",
-     "stunden_je_einheit": 0.0335
-    }
-   ],
-   "bemerkung": "Ortung von Kabeln und Leitungen mit Markierung.",
-   "stichworte": [
-    "kabelortung",
-    "ortung",
-    "orten",
-    "markierung",
-    "aufmaß",
-    "aufmessen"
-   ],
-   "basis": "B04",
-   "status": "geschaetzt",
-   "annahme": "Begehung mit Ortungsgerät, ca. 30–35 m² je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B02-STWO": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrssicherung vorhalten, je Stück und Woche",
-   "einheit": "StWo",
-   "h_min": 0.0304,
-   "h_mittel": 0.0608,
-   "h_max": 0.0912,
-   "material": [
-    {
-     "code": "VZ_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Absperrgerät vorhalten, Kontrolle nach RSA.",
-   "stichworte": [
-    "verkehrssicherung",
-    "absperrung",
-    "vorhalten",
-    "absperrgerät"
-   ],
-   "basis": "B02",
-   "status": "geschaetzt",
-   "annahme": "Kontrolle ca. 3 min je Stück und Woche; Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B02-ST": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrssicherung aufstellen und abbauen, je Stück",
-   "einheit": "St",
-   "h_min": 0.2677,
-   "h_mittel": 0.4462,
-   "h_max": 0.6247,
-   "material": [],
-   "geraet": [
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.0558
-    }
-   ],
-   "bemerkung": "Absperrgerät antransportieren, aufstellen, abbauen.",
-   "stichworte": [
-    "verkehrssicherung",
-    "absperrung",
-    "aufstellen",
-    "abbauen",
-    "absperrgerät"
-   ],
-   "basis": "B02",
-   "status": "geschaetzt",
-   "annahme": "Vergleichbar mit B02 (1 h je Woche für die ganze Absperrung); Einzelgerät 0,25–0,55 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "E03-ST": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden von Hand lösen an einer Leitungskreuzung, je Kreuzung",
-   "einheit": "St",
-   "h_min": 3.0553,
-   "h_mittel": 6.1107,
-   "h_max": 9.166,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 2.7
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 4.583
-    }
-   ],
-   "bemerkung": "Handschachtung zum Freilegen und Sichern einer kreuzenden Leitung.",
-   "stichworte": [
-    "kabelkreuzung",
-    "kreuzung",
-    "freilegen",
-    "handschachtung",
-    "spannung",
-    "sichern",
-    "-kreuzungsschale"
-   ],
-   "basis": "E03",
-   "status": "abgeleitet",
-   "annahme": "E03 = 2,2 h/m³; je Kreuzung ca. 1,5 m³ Handaushub plus Sicherungsarbeit, ergibt ca. 3–5 h. | Mit Gewerk-Median Erdbau Markt/Modell 2025 = 1.44 skaliert"
-  },
-  "K09-M": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Druck- bzw. Dichtheitsprüfung einer Leitung, je m",
-   "einheit": "m",
-   "h_min": 0.0265,
-   "h_mittel": 0.0398,
-   "h_max": 0.0531,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.0398
-    }
-   ],
-   "bemerkung": "Druckprobe in Teilabschnitten mit Protokoll.",
-   "stichworte": [
-    "druckprobe",
-    "druckprüfung",
-    "dichtheitsprüfung",
-    "prüfung",
-    "teilabschnitten"
-   ],
-   "basis": "K09",
-   "status": "abgeleitet",
-   "annahme": "K09 = 3 h je Haltung; Haltung ca. 45 m (Schachtabstand im Katalog) bzw. Prüfabschnitt 75–100 m, ergibt 0,03–0,07 h/m; untere Hälfte angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 3.00 €): Kostenberechnung Biblis 04.06.2025: Muffendruckprüfung 2–4 €/m (5.5.20/21)"
-  },
-  "E01-M3": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Oberboden abtragen und seitlich lagern, je m³",
-   "einheit": "m3",
-   "h_min": 0.0972,
-   "h_mittel": 0.1144,
-   "h_max": 0.1316,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0953
-    }
-   ],
-   "bemerkung": "Abrechnung nach Volumen.",
-   "stichworte": [
-    "oberboden",
-    "abtragen",
-    "lagern",
-    "mutterboden"
-   ],
-   "basis": "E01",
-   "status": "abgeleitet",
-   "annahme": "E01 = 0,012 h/m² bei d = 20 cm (Katalogtext) → 0,06 h/m³. Die Schichtdicke stammt aus der Katalogzeile selbst, nicht aus dem LV. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 16.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden abtragen, fördern, lagern 16 €/m³ (4.1.11)"
-  },
-  "E08": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Oberboden auftragen bzw. andecken",
-   "einheit": "m3",
-   "h_min": 0.0539,
-   "h_mittel": 0.1232,
-   "h_max": 0.1925,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0616
-    },
-    {
-     "code": "RLD",
-     "stunden_je_einheit": 0.0308
-    }
-   ],
-   "bemerkung": "Oberboden aus Lager auftragen und planieren.",
-   "stichworte": [
-    "oberboden",
-    "auftragen",
-    "andecken",
-    "mutterboden"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Etwas aufwendiger als E01-M3 (Planieren), 0,056–0,104 h/m³. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 16.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden gelagert andecken 16 €/m³; geliefert 32 €/m³ (4.1.12/13)"
-  },
-  "E07-M3": {
-   "gewerk": "Oberbau",
-   "taetigkeit": "Frostschutzschicht 0/45 einbauen, je m³",
-   "einheit": "m3",
-   "h_min": 0.0706,
-   "h_mittel": 0.0831,
-   "h_max": 0.0956,
-   "material": [
-    {
-     "code": "FSS",
-     "menge_je_einheit": 2.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RLD",
-     "stunden_je_einheit": 0.0333
-    },
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.0333
-    }
-   ],
-   "bemerkung": "Abrechnung nach Volumen.",
-   "stichworte": [
-    "frostschutzschicht",
-    "frostschutz",
-    "fss"
-   ],
-   "basis": "E07",
-   "status": "abgeleitet",
-   "annahme": "E07 = 0,05 h/m² bei d = 30 cm (Katalogtext) → 0,167 h/m³; Material und Gerät ebenso durch 0,30 m geteilt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 58.00 €): Kostenberechnung Biblis 04.06.2025: Schottertragschicht herstellen 58 €/m³ (4.3.10–12)"
-  },
-  "T07": {
-   "gewerk": "Oberbau",
-   "taetigkeit": "Schottertragschicht 0/32 einbauen",
-   "einheit": "m3",
-   "h_min": 0.1091,
-   "h_mittel": 0.1284,
-   "h_max": 0.1477,
-   "material": [
-    {
-     "code": "SCHO",
-     "menge_je_einheit": 1.5381
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RLD",
-     "stunden_je_einheit": 0.0515
-    },
-    {
-     "code": "WAL",
-     "stunden_je_einheit": 0.0515
-    }
-   ],
-   "bemerkung": "Tragschicht ohne Bindemittel.",
-   "stichworte": [
-    "schottertragschicht",
-    "tragschicht",
-    "schotter",
-    "sts"
-   ],
-   "basis": "E07-M3",
-   "status": "geschaetzt",
-   "annahme": "Einbau wie Frostschutzschicht je m³ (E07-M3) angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 58.00 €): Kostenberechnung Biblis 04.06.2025: Schottertragschicht herstellen 58 €/m³"
-  },
-  "T02-M3": {
-   "gewerk": "Straße",
-   "taetigkeit": "Asphalt aufbrechen, laden, entsorgen, je m³",
-   "einheit": "m3",
-   "h_min": 0.6001,
-   "h_mittel": 0.8573,
-   "h_max": 1.1145,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 2.4
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.5715
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.4286
-    }
-   ],
-   "bemerkung": "Abrechnung nach Volumen.",
-   "stichworte": [
-    "asphalt",
-    "asphaltschicht",
-    "aufbrechen"
-   ],
-   "basis": "T02",
-   "status": "abgeleitet",
-   "annahme": "T02 = 0,06 h/m² bei ca. 10 cm → 0,6 h/m³; Entsorgung mit 2,4 t/m³ Rohdichte Asphalt (allgemeiner Wert, keine LV-Angabe). | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
-  },
-  "T08": {
-   "gewerk": "Straße",
-   "taetigkeit": "Ungebundene Befestigung aufnehmen, laden, entsorgen",
-   "einheit": "m3",
-   "h_min": 0.3697,
-   "h_mittel": 0.5282,
-   "h_max": 0.6867,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 2.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.3018
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.2264
-    }
-   ],
-   "bemerkung": "Schotter-, Splitt- oder Kiesbefestigung.",
-   "stichworte": [
-    "befestigung",
-    "schotter",
-    "splitt",
-    "brechsand",
-    "schotterrasen",
-    "aufnehmen",
-    "abbrechen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Leichter zu lösen als Asphalt (T02-M3), etwa 60 % davon. | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
-  },
-  "T09": {
-   "gewerk": "Straße",
-   "taetigkeit": "Pflaster aufnehmen zur Wiederverwendung, reinigen, seitlich lagern",
-   "einheit": "m2",
-   "h_min": 0.2935,
-   "h_mittel": 0.3453,
-   "h_max": 0.3971,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.1381
-    }
-   ],
-   "bemerkung": "Steine schonend ausbauen und stapeln.",
-   "stichworte": [
-    "pflaster",
-    "betonpflaster",
-    "pflasterdecke",
-    "ausbauen",
-    "aufnehmen",
-    "wiederverwendung",
-    "-gebraucht"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Etwa zwei Drittel des Verlegeaufwands T05 (0,38 h/m²). | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Pflaster ausbauen, säubern, seitlich lagern 25 €/m² (4.5.24/26)"
-  },
-  "T10": {
-   "gewerk": "Straße",
-   "taetigkeit": "Bordstein aufnehmen bzw. abbrechen, laden",
-   "einheit": "m",
-   "h_min": 0.1379,
-   "h_mittel": 0.1839,
-   "h_max": 0.2299,
-   "material": [
-    {
-     "code": "DEP",
-     "menge_je_einheit": 0.1
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0589
-    }
-   ],
-   "bemerkung": "Rückbau mit oder ohne Wiederverwendung.",
-   "stichworte": [
-    "bordstein",
-    "betonbord",
-    "abbrechen",
-    "rückbau",
-    "aufnehmen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Gut die Hälfte des Setzaufwands T06 (0,28 h/m) plus Laden. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 20.00 €): Kostenberechnung Biblis 04.06.2025: Bordsteine aufnehmen und entsorgen 20 €/m (4.5.10)"
-  },
-  "T11": {
-   "gewerk": "Straße",
-   "taetigkeit": "Pflaster aus Bestand wieder verlegen, einschl. Bettung",
-   "einheit": "m2",
-   "h_min": 0.3885,
-   "h_mittel": 0.457,
-   "h_max": 0.5255,
-   "material": [
-    {
-     "code": "SAND",
-     "menge_je_einheit": 0.08
-    }
-   ],
-   "geraet": [
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.0601
-    }
-   ],
-   "bemerkung": "Gelagerte, gebrauchte Steine; kein Neumaterial.",
-   "stichworte": [
-    "pflaster",
-    "pflasterdecke",
-    "betonpflaster",
-    "gebraucht",
-    "lagernd"
-   ],
-   "basis": "T05",
-   "status": "abgeleitet",
-   "annahme": "Verlegeaufwand wie T05 (0,38 h/m²); Steinmaterial entfällt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 35.00 €): Kostenberechnung Biblis 04.06.2025: Pflaster gelagert verlegen 35 €/m² (4.5.25/27), Naturstein 45 €/m²"
-  },
-  "T12": {
-   "gewerk": "Straße",
-   "taetigkeit": "Bordstein aus Bestand wieder setzen, in Beton",
-   "einheit": "m",
-   "h_min": 0.2813,
-   "h_mittel": 0.4019,
-   "h_max": 0.5225,
-   "material": [
-    {
-     "code": "BET",
-     "menge_je_einheit": 0.06
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.4306
-    }
-   ],
-   "bemerkung": "Gelagerte, gebrauchte Bordsteine; kein Neumaterial.",
-   "stichworte": [
-    "bordstein",
-    "betonbord",
-    "rückenstütze",
-    "gebraucht",
-    "lagernd"
-   ],
-   "basis": "T06",
-   "status": "abgeleitet",
-   "annahme": "Setzaufwand wie T06 (0,28 h/m); Bordsteinmaterial entfällt. | Mit Gewerk-Median Straße Markt/Modell 2025 = 1.29 skaliert"
-  },
-  "V01-M2D": {
-   "gewerk": "Verbau",
-   "taetigkeit": "Grabenverbaugerät vorhalten, Tiefe ≤ 3,0 m, je m² und Tag",
-   "einheit": "m2d",
-   "h_min": 0.0012,
-   "h_mittel": 0.0024,
-   "h_max": 0.0036,
-   "material": [],
-   "geraet": [
-    {
-     "code": "VBG",
-     "stunden_je_einheit": 0.0355
-    }
-   ],
-   "bemerkung": "Vorhaltung je Verbaufläche und Kalendertag.",
-   "stichworte": [
-    "grabenverbaugerät",
-    "verbau",
-    "stirnverbau",
-    "vorhalten"
-   ],
-   "basis": "V01",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle. Gerät: V01 enthält 0,6 h VBG je m² für die gesamte Standzeit; bei ca. 20 Tagen ergeben sich 0,03 h je m² und Tag. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "V02-M2D": {
-   "gewerk": "Verbau",
-   "taetigkeit": "Grabenverbaugerät vorhalten, Tiefe > 3,0 m, je m² und Tag",
-   "einheit": "m2d",
-   "h_min": 0.0018,
-   "h_mittel": 0.0036,
-   "h_max": 0.0054,
-   "material": [],
-   "geraet": [
-    {
-     "code": "VBG",
-     "stunden_je_einheit": 0.0474
-    }
-   ],
-   "bemerkung": "Vorhaltung je Verbaufläche und Kalendertag.",
-   "stichworte": [
-    "grabenverbaugerät",
-    "verbau",
-    "stirnverbau",
-    "vorhalten",
-    "tiefe"
-   ],
-   "basis": "V02",
-   "status": "geschaetzt",
-   "annahme": "Wie V01-M2D, schwereres Gerät: +33 % Gerätezeit. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "B05": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Sanitär- und Versorgungseinrichtungen warten, betreiben, reinigen",
-   "einheit": "Wo",
-   "h_min": 1.1155,
-   "h_mittel": 2.231,
-   "h_max": 3.3465,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Je Woche Standzeit.",
-   "stichworte": [
-    "warten",
-    "betreiben",
-    "reinigen",
-    "heizung",
-    "entsorgungseinr",
-    "versorgung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Reinigungen je Woche à ca. 1 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B06": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Container (Sanitär, Büro) aufstellen und räumen",
-   "einheit": "St",
-   "h_min": 2.2309,
-   "h_mittel": 4.4619,
-   "h_max": 6.6928,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KRAN",
-     "stunden_je_einheit": 1.1155
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 2.231
-    }
-   ],
-   "bemerkung": "Anlieferung, Aufstellen, Anschluss, Abholung.",
-   "stichworte": [
-    "container",
-    "sanitärcontainer",
-    "bürocontainer",
-    "aufstellen",
-    "räumen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Personen je 2 h; Kran-Einsatz 1 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B10": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauwasseranschluss einrichten und räumen",
-   "einheit": "St",
-   "h_min": 3.5114,
-   "h_mittel": 7.0228,
-   "h_max": 10.5342,
-   "material": [
-    {
-     "code": "ANSCH",
-     "menge_je_einheit": 2.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 3.5114
-    }
-   ],
-   "bemerkung": "Standrohr bzw. Anschluss an das Netz.",
-   "stichworte": [
-    "bauwasseranschluss",
-    "bauwasser",
-    "wasseranschluss",
-    "einrichten",
-    "räumen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Einrichten und Rückbau je ca. 3 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B11": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauwasseranschluss vorhalten, je Stück und Woche",
-   "einheit": "StWo",
-   "h_min": 0.1176,
-   "h_mittel": 0.2351,
-   "h_max": 0.3527,
-   "material": [
-    {
-     "code": "ZAEHL_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Miete Standrohr bzw. Zähler, Kontrolle.",
-   "stichworte": [
-    "bauwasseranschluss",
-    "bauwasser",
-    "vorhalten"
-   ],
-   "basis": "B10",
-   "status": "geschaetzt",
-   "annahme": "Kontrolle ca. 12 min je Woche. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B12": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Schlauch- bzw. Anschlussleitung einrichten und räumen",
-   "einheit": "m",
-   "h_min": 0.0279,
-   "h_mittel": 0.0558,
-   "h_max": 0.0837,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Bauwasser- oder Entwässerungsleitung provisorisch.",
-   "stichworte": [
-    "schlauchleitung",
-    "anschlussleitung",
-    "anschlussltg",
-    "schlauch",
-    "einrichten",
-    "räumen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Auslegen und Einholen ca. 20 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B13": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Schlauch- bzw. Anschlussleitung vorhalten, je m und Woche",
-   "einheit": "mWo",
-   "h_min": 0.0009,
-   "h_mittel": 0.0023,
-   "h_max": 0.0037,
-   "material": [
-    {
-     "code": "SCHL_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Provisorische Leitung für Wasser oder Entwässerung.",
-   "stichworte": [
-    "schlauchleitung",
-    "anschlussleitung",
-    "anschlussltg",
-    "entwässerung",
-    "vorhalten"
-   ],
-   "basis": "B12",
-   "status": "geschaetzt",
-   "annahme": "Kontrolle vernachlässigbar; Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B14": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Baustromkabel verlegen, einrichten und räumen",
-   "einheit": "m",
-   "h_min": 0.0223,
-   "h_mittel": 0.0446,
-   "h_max": 0.0669,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Provisorische Stromversorgung.",
-   "stichworte": [
-    "baustrom",
-    "stromkabel",
-    "kabel",
-    "einrichten",
-    "räumen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Auslegen und Einholen ca. 25 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B15": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Baustromkabel vorhalten, je m und Woche",
-   "einheit": "mWo",
-   "h_min": 0.0005,
-   "h_mittel": 0.0012,
-   "h_max": 0.0019,
-   "material": [
-    {
-     "code": "KAB_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Provisorische Stromversorgung.",
-   "stichworte": [
-    "baustrom",
-    "stromkabel",
-    "vorhalten"
-   ],
-   "basis": "B14",
-   "status": "geschaetzt",
-   "annahme": "Preis überwiegend Miete. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "B16": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Baustromanschluss bzw. Verteiler einrichten und räumen",
-   "einheit": "St",
-   "h_min": 3.3464,
-   "h_mittel": 6.6929,
-   "h_max": 10.0393,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 2.231
-    }
-   ],
-   "bemerkung": "Anschluss an das Netz durch Elektrofachkraft.",
-   "stichworte": [
-    "baustrom",
-    "baustromanschluss",
-    "verteiler",
-    "stromanschluss"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Wie Bauwasseranschluss (B10) angesetzt. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A01-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauzaun H 2 m aufstellen bzw. herstellen und räumen",
-   "einheit": "m",
-   "h_min": 0.142,
-   "h_mittel": 0.1704,
-   "h_max": 0.1988,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Bauzaun H 2 m: Auf- und Abbau.",
-   "stichworte": [
-    "bauzaun",
-    "zaun",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Aufstellen und Räumen ca. 8 m je Stunde. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 12.00 €): Kostenberechnung Biblis 04.06.2025: Bauzaun aufstellen und entfernen 2,0 m 12 €/m (1.14)"
-  },
-  "A01-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauzaun H 2 m vorhalten",
-   "einheit": "mWo",
-   "h_min": 0.0016,
-   "h_mittel": 0.004,
-   "h_max": 0.0064,
-   "material": [
-    {
-     "code": "BZ_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Bauzaun H 2 m: Standzeit, Kontrolle.",
-   "stichworte": [
-    "bauzaun",
-    "zaun",
-    "vorhalten"
-   ],
-   "basis": "A01-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A01-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauzaun H 2 m umsetzen",
-   "einheit": "m",
-   "h_min": 0.0335,
-   "h_mittel": 0.0669,
-   "h_max": 0.1003,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Bauzaun H 2 m: an neuen Standort versetzen.",
-   "stichworte": [
-    "bauzaun",
-    "zaun",
-    "umsetzen"
-   ],
-   "basis": "A01-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A01-VD": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Bauzaun H 2 m vorhalten, je m und Tag",
-   "einheit": "md",
-   "h_min": 0.0003,
-   "h_mittel": 0.0007,
-   "h_max": 0.0011,
-   "material": [
-    {
-     "code": "BZ_MIETE_TAG",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Standzeit je Kalendertag.",
-   "stichworte": [
-    "bauzaun",
-    "zaun",
-    "vorhalten"
-   ],
-   "basis": "A01-H",
-   "status": "geschaetzt",
-   "annahme": "Eigene Zeile für die LV-Einheit md, Miete je Tag als eigener Materialpreis — keine Umrechnung aus der Wochenmiete im Kalkulationspfad. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A02-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Laufsteg mit Schutzwand aufstellen bzw. herstellen und räumen",
-   "einheit": "St",
-   "h_min": 1.6732,
-   "h_mittel": 3.3464,
-   "h_max": 5.0196,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Laufsteg mit Schutzwand: Auf- und Abbau.",
-   "stichworte": [
-    "laufsteg",
-    "schutzwand",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Laufsteg 2–4 m: zwei Personen je ca. 1,5 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A02-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Laufsteg mit Schutzwand vorhalten",
-   "einheit": "StWo",
-   "h_min": 0.0542,
-   "h_mittel": 0.1356,
-   "h_max": 0.217,
-   "material": [
-    {
-     "code": "LS_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Laufsteg mit Schutzwand: Standzeit, Kontrolle.",
-   "stichworte": [
-    "laufsteg",
-    "schutzwand",
-    "vorhalten"
-   ],
-   "basis": "A02-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A02-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Laufsteg mit Schutzwand umsetzen",
-   "einheit": "St",
-   "h_min": 0.8366,
-   "h_mittel": 1.6732,
-   "h_max": 2.5098,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Laufsteg mit Schutzwand: an neuen Standort versetzen.",
-   "stichworte": [
-    "laufsteg",
-    "schutzwand",
-    "umsetzen"
-   ],
-   "basis": "A02-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A03-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Witterungsschutz-Zelt aufstellen bzw. herstellen und räumen",
-   "einheit": "St",
-   "h_min": 2.2309,
-   "h_mittel": 4.4619,
-   "h_max": 6.6928,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Witterungsschutz-Zelt: Auf- und Abbau.",
-   "stichworte": [
-    "witterungsschutz",
-    "zelt",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zelt über Schweißstelle: zwei Personen je ca. 2 h. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A03-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Witterungsschutz-Zelt vorhalten",
-   "einheit": "StWo",
-   "h_min": 0.2592,
-   "h_mittel": 0.6481,
-   "h_max": 1.037,
-   "material": [
-    {
-     "code": "ZELT_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Witterungsschutz-Zelt: Standzeit, Kontrolle.",
-   "stichworte": [
-    "witterungsschutz",
-    "zelt",
-    "vorhalten"
-   ],
-   "basis": "A03-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A03-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Witterungsschutz-Zelt umsetzen",
-   "einheit": "St",
-   "h_min": 1.1155,
-   "h_mittel": 2.231,
-   "h_max": 3.3465,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Witterungsschutz-Zelt: an neuen Standort versetzen.",
-   "stichworte": [
-    "witterungsschutz",
-    "zelt",
-    "umsetzen"
-   ],
-   "basis": "A03-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A04-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Behelfsüberfahrt Stahlbeton aufstellen bzw. herstellen und räumen",
-   "einheit": "St",
-   "h_min": 0.7078,
-   "h_mittel": 1.4156,
-   "h_max": 2.1234,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.3539
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.2359
-    }
-   ],
-   "bemerkung": "Behelfsüberfahrt Stahlbeton: Auf- und Abbau.",
-   "stichworte": [
-    "behelfsüberfahrt",
-    "überfahrt",
-    "stahlbeton",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Platten mit Bagger verlegen und aufnehmen. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 150.00 €): Kostenberechnung Biblis 04.06.2025: Notbrücke PKW/LKW herstellen 150 €/St (2.13)"
-  },
-  "A04-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Behelfsüberfahrt Stahlbeton vorhalten",
-   "einheit": "StWo",
-   "h_min": 0.1374,
-   "h_mittel": 0.3436,
-   "h_max": 0.5498,
-   "material": [
-    {
-     "code": "UEB_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Behelfsüberfahrt Stahlbeton: Standzeit, Kontrolle.",
-   "stichworte": [
-    "behelfsüberfahrt",
-    "überfahrt",
-    "stahlbeton",
-    "vorhalten"
-   ],
-   "basis": "A04-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A04-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Behelfsüberfahrt Stahlbeton umsetzen",
-   "einheit": "St",
-   "h_min": 1.6732,
-   "h_mittel": 3.3464,
-   "h_max": 5.0196,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 1.6732
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 1.1155
-    }
-   ],
-   "bemerkung": "Behelfsüberfahrt Stahlbeton: an neuen Standort versetzen.",
-   "stichworte": [
-    "behelfsüberfahrt",
-    "überfahrt",
-    "stahlbeton",
-    "umsetzen"
-   ],
-   "basis": "A04-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A05-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Leitungsbehelfsbrücke aufstellen bzw. herstellen und räumen",
-   "einheit": "m",
-   "h_min": 5.3543,
-   "h_mittel": 13.3857,
-   "h_max": 21.4171,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KRAN",
-     "stunden_je_einheit": 1.6732
-    }
-   ],
-   "bemerkung": "Leitungsbehelfsbrücke: Auf- und Abbau.",
-   "stichworte": [
-    "leitungsbehelfsbrücke",
-    "behelfsbrücke",
-    "brücke",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "UNSICHER: Brücke 10–15 m mit Kran; Aufwand je m stark von der Konstruktion abhängig, deshalb breite Spanne. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A05-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Leitungsbehelfsbrücke vorhalten",
-   "einheit": "mWo",
-   "h_min": 0.0234,
-   "h_mittel": 0.0585,
-   "h_max": 0.0936,
-   "material": [
-    {
-     "code": "BRU_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Leitungsbehelfsbrücke: Standzeit, Kontrolle.",
-   "stichworte": [
-    "leitungsbehelfsbrücke",
-    "behelfsbrücke",
-    "brücke",
-    "vorhalten"
-   ],
-   "basis": "A05-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A05-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Leitungsbehelfsbrücke umsetzen",
-   "einheit": "m",
-   "h_min": 2.6772,
-   "h_mittel": 6.6929,
-   "h_max": 10.7086,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KRAN",
-     "stunden_je_einheit": 1.6732
-    }
-   ],
-   "bemerkung": "Leitungsbehelfsbrücke: an neuen Standort versetzen.",
-   "stichworte": [
-    "leitungsbehelfsbrücke",
-    "behelfsbrücke",
-    "brücke",
-    "umsetzen"
-   ],
-   "basis": "A05-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A06-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrszeichen aufstellen bzw. herstellen und räumen",
-   "einheit": "St",
-   "h_min": 0.1816,
-   "h_mittel": 0.4541,
-   "h_max": 0.7266,
-   "material": [],
-   "geraet": [
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.0908
-    }
-   ],
-   "bemerkung": "Verkehrszeichen: Auf- und Abbau.",
-   "stichworte": [
-    "verkehrszeichen",
-    "vorschriftzeichen",
-    "richtzeichen",
-    "zusatzzeichen",
-    "zeichen",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Aufstellen mit Fußplatte ca. 30 min je Zeichen. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Verkehrszeichen aufstellen 40 €/St (2.11), Größe 2 100 €/St"
-  },
-  "A06-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrszeichen vorhalten",
-   "einheit": "StWo",
-   "h_min": 0.0154,
-   "h_mittel": 0.0385,
-   "h_max": 0.0616,
-   "material": [
-    {
-     "code": "VZ_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Verkehrszeichen: Standzeit, Kontrolle.",
-   "stichworte": [
-    "verkehrszeichen",
-    "vorschriftzeichen",
-    "richtzeichen",
-    "zusatzzeichen",
-    "zeichen",
-    "vorhalten"
-   ],
-   "basis": "A06-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A06-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Verkehrszeichen umsetzen",
-   "einheit": "St",
-   "h_min": 0.1673,
-   "h_mittel": 0.3346,
-   "h_max": 0.5019,
-   "material": [],
-   "geraet": [
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.1115
-    }
-   ],
-   "bemerkung": "Verkehrszeichen: an neuen Standort versetzen.",
-   "stichworte": [
-    "verkehrszeichen",
-    "vorschriftzeichen",
-    "richtzeichen",
-    "zusatzzeichen",
-    "zeichen",
-    "umsetzen"
-   ],
-   "basis": "A06-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A07-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Warnleuchte aufstellen bzw. herstellen und räumen",
-   "einheit": "St",
-   "h_min": 0.4827,
-   "h_mittel": 0.5679,
-   "h_max": 0.6531,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Warnleuchte: Auf- und Abbau.",
-   "stichworte": [
-    "warnleuchte",
-    "leuchte",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Anbringen an Absperrung ca. 15 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Absperr-/Warneinrichtung aufstellen 40 €/St (2.12)"
-  },
-  "A07-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Warnleuchte vorhalten",
-   "einheit": "StWo",
-   "h_min": 0.0099,
-   "h_mittel": 0.0247,
-   "h_max": 0.0395,
-   "material": [
-    {
-     "code": "WL_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Warnleuchte: Standzeit, Kontrolle.",
-   "stichworte": [
-    "warnleuchte",
-    "leuchte",
-    "vorhalten"
-   ],
-   "basis": "A07-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A07-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Warnleuchte umsetzen",
-   "einheit": "St",
-   "h_min": 0.0837,
-   "h_mittel": 0.1673,
-   "h_max": 0.251,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Warnleuchte: an neuen Standort versetzen.",
-   "stichworte": [
-    "warnleuchte",
-    "leuchte",
-    "umsetzen"
-   ],
-   "basis": "A07-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A08-H": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Schutzwand aufstellen bzw. herstellen und räumen",
-   "einheit": "m",
-   "h_min": 0.1673,
-   "h_mittel": 0.3346,
-   "h_max": 0.5019,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Schutzwand: Auf- und Abbau.",
-   "stichworte": [
-    "schutzwand",
-    "aufstellen",
-    "aufbauen",
-    "abbauen",
-    "herstellen",
-    "räumen",
-    "entfernen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Schutzwand aufstellen ca. 3 m je Stunde. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A08-V": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Schutzwand vorhalten",
-   "einheit": "mWo",
-   "h_min": 0.0024,
-   "h_mittel": 0.0061,
-   "h_max": 0.0098,
-   "material": [
-    {
-     "code": "SW_MIETE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Schutzwand: Standzeit, Kontrolle.",
-   "stichworte": [
-    "schutzwand",
-    "vorhalten"
-   ],
-   "basis": "A08-H",
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Kontrolle; Preis überwiegend Miete je Zeiteinheit. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "A08-U": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Schutzwand umsetzen",
-   "einheit": "m",
-   "h_min": 0.0837,
-   "h_mittel": 0.1673,
-   "h_max": 0.251,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Schutzwand: an neuen Standort versetzen.",
-   "stichworte": [
-    "schutzwand",
-    "umsetzen"
-   ],
-   "basis": "A08-H",
-   "status": "geschaetzt",
-   "annahme": "Umsetzen ca. halber Aufwand von Auf- plus Abbau. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  },
-  "K12": {
-   "gewerk": "Wasser",
-   "taetigkeit": "Kunststoffmantelrohr DN 250 verlegen und schweißen",
-   "einheit": "m",
-   "h_min": 1.1799,
-   "h_mittel": 1.8153,
-   "h_max": 2.4507,
-   "material": [
-    {
-     "code": "KMR250",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG25",
-     "stunden_je_einheit": 0.3026
-    },
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.9077
-    }
-   ],
-   "bemerkung": "Stahlmediumrohr, PUR, PE-Mantel.",
-   "stichworte": [
-    "kunststoffmantelrohr",
-    "mantelrohr",
-    "geschweißt",
-    "kmr"
-   ],
-   "basis": "K04",
-   "status": "geschaetzt",
-   "annahme": "Schwerer als Stahlbetonrohr DN 500 (K04 = 0,85 h/m) wegen Schweißnähten. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "F01": {
-   "gewerk": "Formteile",
-   "taetigkeit": "PE-Bogen bzw. -Winkel einbauen, bis da 160",
-   "einheit": "St",
-   "h_min": 0.132,
-   "h_mittel": 0.1886,
-   "h_max": 0.2452,
-   "material": [
-    {
-     "code": "FT_PE_BOGEN",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.0943
-    }
-   ],
-   "bemerkung": "Heizwendel- oder Stumpfschweißung.",
-   "stichworte": [
-    "bogen",
-    "winkel",
-    "pe",
-    "-ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Schweißverbindungen je ca. 15–20 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Formstücke DA 40 25 €/St (6.3.12); PVC-Bögen DN 160 40 €/St"
-  },
-  "F02": {
-   "gewerk": "Formteile",
-   "taetigkeit": "PE-T-Stück einbauen, bis da 160",
-   "einheit": "St",
-   "h_min": 0.2331,
-   "h_mittel": 0.3885,
-   "h_max": 0.5439,
-   "material": [
-    {
-     "code": "FT_PE_T",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.1942
-    }
-   ],
-   "bemerkung": "Drei Schweißverbindungen.",
-   "stichworte": [
-    "tstück",
-    "pe",
-    "-ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Wie F01, drei statt zwei Verbindungen. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F03": {
-   "gewerk": "Formteile",
-   "taetigkeit": "PE-Muffe (Verbindungs- bzw. Elektroschweißmuffe) einbauen",
-   "einheit": "St",
-   "h_min": 0.1436,
-   "h_mittel": 0.2051,
-   "h_max": 0.2666,
-   "material": [
-    {
-     "code": "FT_PE_MUFFE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.1025
-    }
-   ],
-   "bemerkung": "Bis da 160.",
-   "stichworte": [
-    "muffe",
-    "verbindungsmuffe",
-    "schweißmuffe",
-    "pe",
-    "-ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Schweißzonen in einem Formteil. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Formstücke/Klemmfittings DA 40 25 €/St (6.3.12)"
-  },
-  "F04": {
-   "gewerk": "Formteile",
-   "taetigkeit": "PE-Kappe bzw. Verschlussmuffe setzen",
-   "einheit": "St",
-   "h_min": 0.1884,
-   "h_mittel": 0.2216,
-   "h_max": 0.2548,
-   "material": [
-    {
-     "code": "FT_PE_KAPPE",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.1108
-    }
-   ],
-   "bemerkung": "Rohrende verschließen, bis da 160.",
-   "stichworte": [
-    "kappe",
-    "verschlußmuffe",
-    "verschlußmuffen",
-    "verschlussmuffe",
-    "pe",
-    "-straßenkappe",
-    "-ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Eine Schweißverbindung. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 25.00 €): Kostenberechnung Biblis 04.06.2025: Endkappen 25 €/St (6.3.14)"
-  },
-  "F11": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Stahl- bzw. KMR-Bogen DN 250 einschweißen",
-   "einheit": "St",
-   "h_min": 1.4792,
-   "h_mittel": 2.4654,
-   "h_max": 3.4516,
-   "material": [
-    {
-     "code": "FT_ST_BOGEN",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 1.6436
-    },
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.2739
-    }
-   ],
-   "bemerkung": "Zwei Rundnähte, Nachdämmung.",
-   "stichworte": [
-    "bogen",
-    "kohlenstoffstahl",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Stahlrundnähte DN 250 je ca. 1,5 h plus Muffenmontage. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F12": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Stahl- bzw. KMR-T-Stück DN 250 einschweißen",
-   "einheit": "St",
-   "h_min": 2.3011,
-   "h_mittel": 3.8351,
-   "h_max": 5.3691,
-   "material": [
-    {
-     "code": "FT_ST_T",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 2.4654
-    },
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.2739
-    }
-   ],
-   "bemerkung": "Drei Rundnähte, Nachdämmung.",
-   "stichworte": [
-    "tstück",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Wie F11, drei statt zwei Nähte. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F13": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Mantelrohr-Verbindungs- bzw. Reduziermuffe herstellen, bis AD 450",
-   "einheit": "St",
-   "h_min": 0.9862,
-   "h_mittel": 1.6436,
-   "h_max": 2.301,
-   "material": [
-    {
-     "code": "FT_MUFFE_AD400",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.8218
-    }
-   ],
-   "bemerkung": "Muffe schrumpfen bzw. schweißen, ausschäumen.",
-   "stichworte": [
-    "verbindungsmuffe",
-    "reduziermuffe",
-    "mantelrohr",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Muffenmontage KMR inkl. Ausschäumen ca. 2–4 h. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F14": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Abschluss-, Abschrumpf- bzw. Endmuffe herstellen",
-   "einheit": "St",
-   "h_min": 0.6575,
-   "h_mittel": 1.0958,
-   "h_max": 1.5341,
-   "material": [
-    {
-     "code": "FT_ENDMUFFE",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.4383
-    }
-   ],
-   "bemerkung": "Rohrende abdichten.",
-   "stichworte": [
-    "abschlussmuffe",
-    "abschrumpfmuffe",
-    "endmuffe",
-    "schrumpfmuffe",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Kleiner als Verbindungsmuffe (F13), ca. zwei Drittel. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F16": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Klöpperboden bzw. Rohrabschluss DN 250 einschweißen",
-   "einheit": "St",
-   "h_min": 0.9862,
-   "h_mittel": 1.6436,
-   "h_max": 2.301,
-   "material": [
-    {
-     "code": "FT_BODEN",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.8218
-    }
-   ],
-   "bemerkung": "Gewölbter Boden.",
-   "stichworte": [
-    "klöpperform",
-    "boden",
-    "gewölbter"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Eine Rundnaht DN 250. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F17": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Vorschweißflansch DN 250 einschweißen",
-   "einheit": "St",
-   "h_min": 0.4222,
-   "h_mittel": 0.7037,
-   "h_max": 0.9852,
-   "material": [
-    {
-     "code": "FT_FLANSCH",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.4222
-    }
-   ],
-   "bemerkung": "Bis PN 16.",
-   "stichworte": [
-    "vorschweißflansch",
-    "flansch"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Eine Rundnaht DN 250. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F18": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Mantelrohr ablängen bzw. Segmentschnitt, DN 250",
-   "einheit": "St",
-   "h_min": 0.4931,
-   "h_mittel": 0.8218,
-   "h_max": 1.1505,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.8218
-    }
-   ],
-   "bemerkung": "Maschineller Schnitt, Nahtvorbereitung.",
-   "stichworte": [
-    "segmentschnitte",
-    "segmentschnitt",
-    "ablängung",
-    "ablängen",
-    "schnitt"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Schnitt plus Nahtvorbereitung ca. 1–2 h. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F21": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Absperrarmatur DN 50–100 einbauen",
-   "einheit": "St",
-   "h_min": 1.0887,
-   "h_mittel": 1.8145,
-   "h_max": 2.5403,
-   "material": [
-    {
-     "code": "ARM_KLEIN",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.7258
-    }
-   ],
-   "bemerkung": "Schieber oder Klappe mit Rohrstutzen.",
-   "stichworte": [
-    "absperrschieber",
-    "absperrarmatur",
-    "schieber",
-    "armatur",
-    "pe",
-    "-straßenkappe"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Einbau mit zwei Verbindungen ca. 2–3 h. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
-  },
-  "F22": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Absperrarmatur DN 200–300 einbauen",
-   "einheit": "St",
-   "h_min": 2.1359,
-   "h_mittel": 3.5599,
-   "h_max": 4.9839,
-   "material": [
-    {
-     "code": "ARM_GROSS",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.5933
-    },
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 1.1866
-    }
-   ],
-   "bemerkung": "Klappe oder Schieber, Endarmatur.",
-   "stichworte": [
-    "absperrklappe",
-    "absperrarmatur",
-    "endarmatur",
-    "armatur",
-    "ad",
-    "-straßenkappe"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Schwere Armatur mit Bagger, zwei Anschlüsse. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
-  },
-  "F23": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Anbohrarmatur setzen bzw. Rohr anbohren",
-   "einheit": "St",
-   "h_min": 1.2878,
-   "h_mittel": 1.5151,
-   "h_max": 1.7424,
-   "material": [
-    {
-     "code": "ANBOHR",
-     "menge_je_einheit": 0.606
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.303
-    }
-   ],
-   "bemerkung": "Druckanbohrung an Bestandsleitung.",
-   "stichworte": [
-    "anbohrarmatur",
-    "druckanbohrarmatur",
-    "anbohrung",
-    "anbohren"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Anbohren unter Druck ca. 2–3 h. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 250.00 €): Kostenberechnung Biblis 04.06.2025: Einbindung herstellen inkl. Material 250 €/St (6.3.10)"
-  },
-  "F24": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Einbaugarnitur für Armatur setzen",
-   "einheit": "St",
-   "h_min": 0.5332,
-   "h_mittel": 0.8887,
-   "h_max": 1.2442,
-   "material": [
-    {
-     "code": "GARNITUR",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Teleskopgarnitur mit Straßenkappe.",
-   "stichworte": [
-    "einbaugarnitur",
-    "garnitur",
-    "teleskopisch",
-    "-hydrant"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Setzen und Einregulieren ca. 1 h. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
-  },
-  "F28": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Straßenkappe für Armatur bzw. Hydrant setzen und regulieren",
-   "einheit": "St",
-   "h_min": 1.2599,
-   "h_mittel": 1.4822,
-   "h_max": 1.7045,
-   "material": [
-    {
-     "code": "KAPPE",
-     "menge_je_einheit": 1.0
-    },
-    {
-     "code": "BET",
-     "menge_je_einheit": 0.02
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Höhenverstellbar, auf Tragplatte.",
-   "stichworte": [
-    "straßenkappe",
-    "schieberkappe",
-    "hydrantenkappe",
-    "tragplatte",
-    "hahnkasten"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Wie Schachtabdeckung setzen (S03, 2,2 h), aber kleines Bauteil: ca. die Hälfte. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 200.00 €): Kostenberechnung Biblis 04.06.2025: Schieber/Kappen auf Höhe setzen 200 €/St (5.2.21)"
-  },
-  "F25": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Übergangsstück einbauen",
-   "einheit": "St",
-   "h_min": 0.4931,
-   "h_mittel": 0.8218,
-   "h_max": 1.1505,
-   "material": [
-    {
-     "code": "UEBERGANG",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 0.2739
-    }
-   ],
-   "bemerkung": "Werkstoff- oder Dimensionsübergang.",
-   "stichworte": [
-    "übergangsstück",
-    "übergang"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwei Verbindungen. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F26": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Hydrant DN 50–80 setzen",
-   "einheit": "St",
-   "h_min": 1.6131,
-   "h_mittel": 2.6885,
-   "h_max": 3.7639,
-   "material": [
-    {
-     "code": "HYDRANT",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.3361
-    }
-   ],
-   "bemerkung": "Unterflur- oder Gartenhydrant mit Garnitur.",
-   "stichworte": [
-    "hydrant",
-    "gartenhydrant",
-    "-spülen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Setzen, anschließen, spülen. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
-  },
-  "F27": {
-   "gewerk": "Armaturen",
-   "taetigkeit": "Hinweisschild mit Pfosten setzen",
-   "einheit": "St",
-   "h_min": 0.2427,
-   "h_mittel": 0.4855,
-   "h_max": 0.7282,
-   "material": [
-    {
-     "code": "SCHILD",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Schild für Armatur oder Hydrant.",
-   "stichworte": [
-    "hinweisschild",
-    "schild",
-    "rohrpfosten",
-    "pfosten"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Pfosten setzen, Schild montieren. | Mit Gewerk-Median Armaturen Markt/Modell 2025 = 0.91 skaliert"
-  },
-  "X01": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Kernbohrung in Beton bzw. Mauerwerk, DN 300–500",
-   "einheit": "St",
-   "h_min": 1.8191,
-   "h_mittel": 3.0318,
-   "h_max": 4.2445,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KERNB",
-     "stunden_je_einheit": 3.0318
-    }
-   ],
-   "bemerkung": "Für Hausdurchführung.",
-   "stichworte": [
-    "kernbohrung",
-    "bohrung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Bohrleistung ca. 10–15 cm je Stunde bei 25–30 cm Wanddicke. | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "X02": {
-   "gewerk": "Kanal",
-   "taetigkeit": "Mediendurchführung bzw. Wanddichtung einbauen",
-   "einheit": "St",
-   "h_min": 2.1656,
-   "h_mittel": 3.6093,
-   "h_max": 5.053,
-   "material": [
-    {
-     "code": "WANDDURCHF",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Druckwasserdicht.",
-   "stichworte": [
-    "mediendurchführung",
-    "durchführung",
-    "wanddichtung"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Einsetzen und Verpressen ca. 2 h. | Mit Gewerk-Median Kanal Markt/Modell 2025 = 1.21 skaliert"
-  },
-  "P01": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Lastplattendruckversuch bzw. Verformungsmodul, je Versuch",
-   "einheit": "St",
-   "h_min": 1.7227,
-   "h_mittel": 2.0267,
-   "h_max": 2.3307,
-   "material": [],
-   "geraet": [
-    {
-     "code": "PLATTE",
-     "stunden_je_einheit": 2.0267
-    }
-   ],
-   "bemerkung": "Dynamischer oder statischer Plattendruckversuch.",
-   "stichworte": [
-    "lastplatte",
-    "lastplatt",
-    "verformungsmodul",
-    "kontrollprüfung",
-    "plattendruck"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Versuch mit Auswertung ca. 45–75 min. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 180.00 €): Kostenberechnung Biblis 04.06.2025: Lastplattendruckversuch 180 €/St (1.13)"
-  },
-  "P02": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Abfalldeklaration Boden: Probenahme und Analyse",
-   "einheit": "St",
-   "h_min": 3.9883,
-   "h_mittel": 4.6921,
-   "h_max": 5.3959,
-   "material": [
-    {
-     "code": "LABOR",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Mischprobe, Laboranalyse, Deklaration.",
-   "stichworte": [
-    "abfalldeklaration",
-    "deklaration",
-    "probenahme"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Probenahme ca. 1 h; Laborpreis als Material angesetzt. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 600.00 €): Kostenberechnung Biblis 04.06.2025: Beprobung Boden/Aufbruch bzw. Asphalt 600 €/St (3.11, 3.15)"
-  },
-  "P03": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Druckprüfung einer Druckleitung, je Prüfabschnitt",
-   "einheit": "St",
-   "h_min": 2.9865,
-   "h_mittel": 5.9731,
-   "h_max": 8.9596,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 3.9821
-    }
-   ],
-   "bemerkung": "Eigenständige Prüfleistung mit Protokoll.",
-   "stichworte": [
-    "druckprüfung",
-    "druckprobe",
-    "dichtheitsprüfung",
-    "prüfabschnitt"
-   ],
-   "basis": "K09",
-   "status": "abgeleitet",
-   "annahme": "Wie K09 (Dichtheitsprüfung je Haltung, 3 h). | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
-  },
-  "P04": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Rammsondierung DPH, je m Sondiertiefe",
-   "einheit": "m",
-   "h_min": 0.2987,
-   "h_mittel": 0.4978,
-   "h_max": 0.6969,
-   "material": [],
-   "geraet": [
-    {
-     "code": "RAMM",
-     "stunden_je_einheit": 0.4978
-    }
-   ],
-   "bemerkung": "Schwere Rammsonde.",
-   "stichworte": [
-    "rammsondierung",
-    "sondierung",
-    "dph"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Ca. 3–5 m Sondierung je Stunde. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
-  },
-  "P05": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Rohrleitung spülen, je m",
-   "einheit": "m",
-   "h_min": 0.0299,
-   "h_mittel": 0.0398,
-   "h_max": 0.0498,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.0398
-    }
-   ],
-   "bemerkung": "Spülen bis Trinkwasserqualität bzw. Klarlauf.",
-   "stichworte": [
-    "spülen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Ca. 50 m je Stunde inkl. Anschluss. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 3.00 €): Kostenberechnung Biblis 04.06.2025: Desinfektion Wasserleitung 3 €/m (6.3.17)"
-  },
-  "P06": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Schweißnahtprüfung, zerstörungsfrei, je Naht",
-   "einheit": "St",
-   "h_min": 1.2733,
-   "h_mittel": 2.5467,
-   "h_max": 3.8201,
-   "material": [
-    {
-     "code": "NDT",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Prüfung durch Prüfstelle, Protokoll.",
-   "stichworte": [
-    "schweißnahtprüfung",
-    "schweißnähte",
-    "zerstörungsfreie"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Lohn nur Begleitung; Prüfkosten als Fremdleistung im Material angesetzt. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
-  },
-  "P05-ST": {
-   "gewerk": "Prüfung",
-   "taetigkeit": "Rohrleitung spülen, je Abschnitt",
-   "einheit": "St",
-   "h_min": 2.9865,
-   "h_mittel": 5.9731,
-   "h_max": 8.9596,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 3.9821
-    }
-   ],
-   "bemerkung": "Spülen eines Leitungsabschnitts bzw. einer Armatur.",
-   "stichworte": [
-    "spülen",
-    "rohrleitungen"
-   ],
-   "basis": "P05",
-   "status": "geschaetzt",
-   "annahme": "P05 = 0,02 h/m; ein Abschnitt von 100–200 m bzw. eine Armatur ca. 2–4 h. | Mit Gewerk-Median Prüfung Markt/Modell 2025 = 1.99 skaliert"
-  },
-  "L04": {
-   "gewerk": "Landschaftsbau",
-   "taetigkeit": "Vegetationstragschicht lockern, Bodenverbesserung einarbeiten",
-   "einheit": "m2",
-   "h_min": 0.0142,
-   "h_mittel": 0.0237,
-   "h_max": 0.0332,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.0237
-    }
-   ],
-   "bemerkung": "Fräsen bzw. Lockern, Zuschlagstoffe einarbeiten.",
-   "stichworte": [
-    "vegetationstragschicht",
-    "lockern",
-    "bodenverbess",
-    "einarbeiten"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Doppelter Aufwand von Rasen ansäen (L01, 0,01 h/m²). | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "S10": {
-   "gewerk": "Schutz",
-   "taetigkeit": "Kabel bzw. Kabelbündel unter Spannung im Graben sichern, je m",
-   "einheit": "m",
-   "h_min": 0.4736,
-   "h_mittel": 0.9471,
-   "h_max": 1.4207,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.5919
-    }
-   ],
-   "bemerkung": "Aufhängen, Schutzschalen, Abstützen.",
-   "stichworte": [
-    "kabelbündel",
-    "kabel",
-    "spannung",
-    "sichern",
-    "niederspannungskabel",
-    "fernmeldekabel",
-    "mittelspannungskabel"
-   ],
-   "basis": null,
-   "status": "unsicher",
-   "annahme": "UNSICHER: stark abhängig von Anzahl und Lage der Kabel. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "S11": {
-   "gewerk": "Schutz",
-   "taetigkeit": "Schutzrohr bzw. Bestandsleitung im Graben sichern, je m",
-   "einheit": "m",
-   "h_min": 0.3552,
-   "h_mittel": 0.7103,
-   "h_max": 1.0655,
-   "material": [],
-   "geraet": [
-    {
-     "code": "KLG",
-     "stunden_je_einheit": 0.4735
-    }
-   ],
-   "bemerkung": "Aufhängen und Abstützen.",
-   "stichworte": [
-    "schutzrohr",
-    "rohr",
-    "abwasserführend",
-    "sichern",
-    "-kabelschutzrohr"
-   ],
-   "basis": null,
-   "status": "unsicher",
-   "annahme": "UNSICHER: wie S10, etwas leichter. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "S12": {
-   "gewerk": "Schutz",
-   "taetigkeit": "Bestandsobjekt schützen bzw. ummanteln (Mastleuchte, Stamm)",
-   "einheit": "St",
-   "h_min": 1.2317,
-   "h_mittel": 2.4635,
-   "h_max": 3.6952,
-   "material": [
-    {
-     "code": "BOHLEN",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Bohlenummantelung mit Polsterung, Rückbau.",
-   "stichworte": [
-    "mastleuchte",
-    "stammschutz",
-    "ummantelung",
-    "schutz",
-    "bohlen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Herstellen und Rückbau ca. 1–3 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "W01": {
-   "gewerk": "Wasserhaltung",
-   "taetigkeit": "Pumpe aufstellen und räumen, einschl. Schlauchleitung",
-   "einheit": "St",
-   "h_min": 2.3676,
-   "h_mittel": 4.7353,
-   "h_max": 7.1029,
-   "material": [],
-   "geraet": [
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.5919
-    }
-   ],
-   "bemerkung": "Tauchpumpe 10–30 m³/h.",
-   "stichworte": [
-    "pumpe",
-    "wasserhaltung",
-    "aufstellen",
-    "räumen",
-    "-pumpensumpf"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Aufstellen, anschließen, Rückbau ca. 3–5 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "W02": {
-   "gewerk": "Wasserhaltung",
-   "taetigkeit": "Pumpe vorhalten und betreiben, je Tag",
-   "einheit": "d",
-   "h_min": 0.4735,
-   "h_mittel": 1.1838,
-   "h_max": 1.8941,
-   "material": [],
-   "geraet": [
-    {
-     "code": "PUMPE",
-     "stunden_je_einheit": 28.4116
-    }
-   ],
-   "bemerkung": "Kontrolle, Energie über Gerätesatz.",
-   "stichworte": [
-    "pumpe",
-    "wasserhaltung",
-    "vorhalten",
-    "betreiben"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Kontrolle ca. 1 h je Tag; Gerät 24 h je Tag. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "L01": {
-   "gewerk": "Landschaftsbau",
-   "taetigkeit": "Rasen ansäen",
-   "einheit": "m2",
-   "h_min": 0.0219,
-   "h_mittel": 0.0258,
-   "h_max": 0.0297,
-   "material": [
-    {
-     "code": "SAAT",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Saatgut 5–25 g/m², einarbeiten.",
-   "stichworte": [
-    "rasen",
-    "ansäen",
-    "landschaftsrasen",
-    "parkplatzrasen"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Ca. 100 m² je Stunde. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 2.00 €): Kostenberechnung Biblis 04.06.2025: Oberboden ansäen RSM Regio 2 €/m² (4.1.14)"
-  },
-  "L02": {
-   "gewerk": "Landschaftsbau",
-   "taetigkeit": "Dünger ausbringen, je kg",
-   "einheit": "kg",
-   "h_min": 0.0336,
-   "h_mittel": 0.0672,
-   "h_max": 0.1008,
-   "material": [
-    {
-     "code": "DUENGER",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Organischer Langzeitdünger.",
-   "stichworte": [
-    "düngen",
-    "grunddüngen",
-    "dünger"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Ca. 20 kg je Stunde. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "L03": {
-   "gewerk": "Landschaftsbau",
-   "taetigkeit": "Wurzelbehandlung: Wurzeln nachschneiden, je Stück",
-   "einheit": "St",
-   "h_min": 0.1776,
-   "h_mittel": 0.3551,
-   "h_max": 0.5327,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Schnitt und Wundbehandlung.",
-   "stichworte": [
-    "wurzelbeh",
-    "wurzelbehandlung",
-    "wurzeln",
-    "nachschneiden"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Ca. 10–25 min je Wurzel. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "E09": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden aus Zwischenlager laden, fördern, einbauen und verdichten",
-   "einheit": "m3",
-   "h_min": 0.2249,
-   "h_mittel": 0.2646,
-   "h_max": 0.3043,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.1587
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.0661
-    },
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.1984
-    }
-   ],
-   "bemerkung": "Eigener, gelagerter Boden; kein Fremdmaterial, keine Deponie.",
-   "stichworte": [
-    "boden",
-    "gelagert",
-    "lager",
-    "einbauen",
-    "verdichten"
-   ],
-   "basis": null,
-   "status": "abgeleitet",
-   "annahme": "E04 ohne Fremdmaterial (0,18 h/m³, BAG14 0,08, RUE 0,15) plus Laden und Transport wie E02 (BAG14 0,04, LKW 0,05). | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: Hauptverfüllung mit Aushubmaterial 35 €/m³ (5.2.20); mit gelagertem Material 45 €/m³ (4.1.28)"
-  },
-  "E10": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden lösen, seitlich lagern, wieder verfüllen und verdichten",
-   "einheit": "m3",
-   "h_min": 0.4071,
-   "h_mittel": 0.5699,
-   "h_max": 0.7327,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.3087
-    },
-    {
-     "code": "RUE",
-     "stunden_je_einheit": 0.3562
-    }
-   ],
-   "bemerkung": "Aushub und Wiedereinbau des eigenen Bodens; keine Deponie, kein Fremdmaterial.",
-   "stichworte": [
-    "boden",
-    "lösen",
-    "lagern",
-    "verfüllen",
-    "verdichten",
-    "-gelagert"
-   ],
-   "basis": null,
-   "status": "abgeleitet",
-   "annahme": "Summe aus E02 ohne Abfuhr und Deponie (0,06 h/m³) und E04 ohne Material (0,18 h/m³). | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 70.00 €): Kostenberechnung Biblis 04.06.2025: ausheben 35 + Hauptverfüllung Aushub 35 €/m³; Suchgraben ausheben+verfüllen 100 €/m³ (1.23)"
-  },
-  "E11": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Boden lösen, laden, fördern und zwischenlagern (ohne Deponie)",
-   "einheit": "m3",
-   "h_min": 0.1594,
-   "h_mittel": 0.1875,
-   "h_max": 0.2156,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.1562
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.1562
-    }
-   ],
-   "bemerkung": "Förderung zum Zwischenlager; Deponiegebühr fällt nicht an.",
-   "stichworte": [
-    "boden",
-    "graben",
-    "lösen",
-    "laden",
-    "fördern",
-    "lagern",
-    "gerät",
-    "-hand",
-    "-fels",
-    "-verfüllen"
-   ],
-   "basis": "E02",
-   "status": "abgeleitet",
-   "annahme": "E02 ohne Deponiegebühr (1,8 t × 17,50 €). | Marktkalibriert 2025 (Vertrauen B, Ziel-EP 40.00 €): Kostenberechnung Biblis 04.06.2025: ausheben, laden 30–35 €/m³ + Zulage Zwischenlagerung 5 €/m³ (3.10)"
-  },
-  "E12": {
-   "gewerk": "Erdbau",
-   "taetigkeit": "Fels lösen, laden, fördern und lagern",
-   "einheit": "m3",
-   "h_min": 0.2812,
-   "h_mittel": 0.4178,
-   "h_max": 0.5544,
-   "material": [],
-   "geraet": [
-    {
-     "code": "BAG25",
-     "stunden_je_einheit": 0.585
-    },
-    {
-     "code": "MEISSEL",
-     "stunden_je_einheit": 0.5014
-    },
-    {
-     "code": "LKW",
-     "stunden_je_einheit": 0.1003
-    }
-   ],
-   "bemerkung": "Homogenbereich Fels, mit Meißel.",
-   "stichworte": [
-    "fels",
-    "lösen",
-    "laden",
-    "fördern",
-    "lagern"
-   ],
-   "basis": null,
-   "status": "unsicher",
-   "annahme": "UNSICHER: rund das Vierfache von E11 an Lohn plus Hydraulikhammer; Felsfestigkeit unbekannt, deshalb breite Spanne. | Marktkalibriert 2025 (Vertrauen C, Ziel-EP 130.00 €): Tiefbau-Anbieter Wien, schwierige Böden 95–180 €/m³ (Datum unklar)"
-  },
-  "V03": {
-   "gewerk": "Verbau",
-   "taetigkeit": "Grabenverbau einbauen, vorhalten, rückbauen, Tiefe > 3,0 bis 4,0 m",
-   "einheit": "m2",
-   "h_min": 0.3895,
-   "h_mittel": 0.5564,
-   "h_max": 0.7233,
-   "material": [],
-   "geraet": [
-    {
-     "code": "VBG",
-     "stunden_je_einheit": 1.0654
-    },
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 0.0947
-    }
-   ],
-   "bemerkung": "Vollständige Verbauleistung für größere Tiefe (nicht nur die Zulage).",
-   "stichworte": [
-    "grabenverbau",
-    "grabenverbaugerät",
-    "verbau",
-    "stirnverbau",
-    "tiefe",
-    "herstellen",
-    "-vorhalten",
-    "-zulage"
-   ],
-   "basis": null,
-   "status": "abgeleitet",
-   "annahme": "V01 + Zulage V02 (0,35 + 0,12 h/m²; VBG 0,6 + 0,3 h/m²). | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "W03": {
-   "gewerk": "Wasserhaltung",
-   "taetigkeit": "Pumpensumpf herstellen und räumen",
-   "einheit": "St",
-   "h_min": 3.6625,
-   "h_mittel": 7.325,
-   "h_max": 10.9875,
-   "material": [
-    {
-     "code": "BRUNNENRING",
-     "menge_je_einheit": 1.0
-    }
-   ],
-   "geraet": [
-    {
-     "code": "BAG14",
-     "stunden_je_einheit": 1.8312
-    }
-   ],
-   "bemerkung": "Brunnenring mit Kiesfilter in der Baugrube.",
-   "stichworte": [
-    "pumpensumpf",
-    "brunnenring",
-    "betonbrunnenring"
-   ],
-   "basis": null,
-   "status": "unsicher",
-   "annahme": "UNSICHER: Ring setzen, Kiesfilter, Rückbau ca. 4–9 h. | Mit Gesamt-Median Markt/Modell 2025 = 1.18 skaliert"
-  },
-  "F15": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Be- bzw. Entlüftungsabzweig am Mantelrohr herstellen, DN 250",
-   "einheit": "St",
-   "h_min": 1.6436,
-   "h_mittel": 2.7394,
-   "h_max": 3.8352,
-   "material": [
-    {
-     "code": "FT_ENTL",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 1.6436
-    }
-   ],
-   "bemerkung": "Senkrecht-Abzweig mit eingeschäumtem Kugelhahn und Endkappe.",
-   "stichworte": [
-    "entlüftung",
-    "belüftung",
-    "abzweig",
-    "kugelhahn",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Zwischen Bogen F11 (4,5 h) und T-Stück F12 (7 h): ein Abzweig mit kleiner Dimension. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "F19": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Anschluss an bestehende Mantelrohrleitung herstellen, DN 250",
-   "einheit": "St",
-   "h_min": 2.8673,
-   "h_mittel": 3.3733,
-   "h_max": 3.8793,
-   "material": [],
-   "geraet": [
-    {
-     "code": "SCHW",
-     "stunden_je_einheit": 1.6866
-    }
-   ],
-   "bemerkung": "Dämmung entfernen, anschweißen; Formteile gesondert.",
-   "stichworte": [
-    "anschluss",
-    "rohrltg",
-    "bestehende",
-    "ad"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Eine Rundnaht DN 250 (wie F16, 3 h) plus Freilegen und Dämmarbeiten an der Bestandsleitung. | Marktkalibriert 2025 (Vertrauen A, Ziel-EP 250.00 €): Kostenberechnung Biblis 04.06.2025: Anschluss an bestehende Leitung 250 €/St (6.3.15)"
-  },
-  "F29": {
-   "gewerk": "Formteile",
-   "taetigkeit": "Kreuzungsschale bzw. Zwischenlage an Leitungskreuzung einbauen",
-   "einheit": "St",
-   "h_min": 0.0822,
-   "h_mittel": 0.137,
-   "h_max": 0.1918,
-   "material": [
-    {
-     "code": "KREUZ",
-     "menge_je_einheit": 0.5479
-    }
-   ],
-   "geraet": [],
-   "bemerkung": "Elektrisch nichtleitende Trennung kreuzender Leitungen.",
-   "stichworte": [
-    "kreuzungsschale",
-    "zwischenlage"
-   ],
-   "basis": null,
-   "status": "geschaetzt",
-   "annahme": "Einlegen ca. 10–20 min. | Mit Gewerk-Median Formteile Markt/Modell 2025 = 0.55 skaliert"
-  },
-  "B04-KP": {
-   "gewerk": "Baustelle",
-   "taetigkeit": "Fotodokumentation je Knotenpunkt",
-   "einheit": "St",
-   "h_min": 0.1673,
-   "h_mittel": 0.3346,
-   "h_max": 0.5019,
-   "material": [],
-   "geraet": [],
-   "bemerkung": "Digitale Fotos je Knotenpunkt, benannt nach Lageplan.",
-   "stichworte": [
-    "knotenpunkt",
-    "knotenpunkte",
-    "fotodokumentation",
-    "dokumentation"
-   ],
-   "basis": "B04",
-   "status": "geschaetzt",
-   "annahme": "Je Knotenpunkt Fotos aufnehmen und benennen, ca. 10–30 min. | Mit Gewerk-Median Baustelle Markt/Modell 2025 = 1.12 skaliert"
-  }
- }
-}
-````
-
-## `Database/data/geraete.json`
-````json
-{
- "meta": {
-  "herkunft": "synthetisch, Größenordnung angelehnt an ARH Tiefbau — nicht aus dem Tabellenwerk",
-  "seed": 2026,
-  "hinweis": "Synthetisch. Keine ARH-Originalwerte, keine Marktpreisabfrage."
- },
- "geraete": {
-  "BAG14": {
-   "bezeichnung": "Mobilbagger 14 t",
-   "kosten_eur_h": 68.0
-  },
-  "BAG25": {
-   "bezeichnung": "Kettenbagger 25 t",
-   "kosten_eur_h": 98.0
-  },
-  "RLD": {
-   "bezeichnung": "Radlader 2 m³",
-   "kosten_eur_h": 58.0
-  },
-  "LKW": {
-   "bezeichnung": "LKW 3-Achs-Kipper",
-   "kosten_eur_h": 72.0
-  },
-  "RUE": {
-   "bezeichnung": "Rüttelplatte 400 kg",
-   "kosten_eur_h": 9.5
-  },
-  "WAL": {
-   "bezeichnung": "Tandemwalze 3 t",
-   "kosten_eur_h": 31.0
-  },
-  "FER": {
-   "bezeichnung": "Asphaltfertiger",
-   "kosten_eur_h": 185.0
-  },
-  "VBG": {
-   "bezeichnung": "Grabenverbaugerät (Vorhaltung)",
-   "kosten_eur_h": 14.0
-  },
-  "KLG": {
-   "bezeichnung": "Kleingerät / Handwerkzeug",
-   "kosten_eur_h": 4.0
-  },
-  "SAEG": {
-   "bezeichnung": "Fugenschneider",
-   "kosten_eur_h": 12.0
-  },
-  "KRAN": {
-   "bezeichnung": "Autokran 40 t",
-   "kosten_eur_h": 120.0
-  },
-  "ORT": {
-   "bezeichnung": "Kabelortungsgerät",
-   "kosten_eur_h": 8.0
-  },
-  "PLATTE": {
-   "bezeichnung": "Lastplattengerät dynamisch",
-   "kosten_eur_h": 15.0
-  },
-  "RAMM": {
-   "bezeichnung": "Rammsonde DPH",
-   "kosten_eur_h": 18.0
-  },
-  "PUMPE": {
-   "bezeichnung": "Tauchpumpe E-Motor 10–30 m³/h",
-   "kosten_eur_h": 1.5
-  },
-  "KERNB": {
-   "bezeichnung": "Kernbohrgerät bis DN 500",
-   "kosten_eur_h": 25.0
-  },
-  "SCHW": {
-   "bezeichnung": "Schweißgerät / Heizwendelschweißgerät",
-   "kosten_eur_h": 6.0
-  },
-  "MEISSEL": {
-   "bezeichnung": "Hydraulikhammer am Bagger",
-   "kosten_eur_h": 35.0
-  }
- }
-}
-````
+*(?bersprungen: Datei gr??er als 200 KB)*
 
 ## `Database/data/materialien.json`
 ````json
@@ -38192,10 +38925,18 @@ def companies() -> list[Company]:
    "bezeichnung": "Bohlen und Polstermaterial (Schutzummantelung)",
    "einheit": "St",
    "preis_eur": 30.0
+  },
+  "ZMAT": {
+   "bezeichnung": "Material- und Fremdleistungsanteil (1 EUR je Einheit)",
+   "einheit": "EUR",
+   "preis_eur": 1.0
   }
  }
 }
 ````
+
+## `Database/data/pdf_leistungen.json`
+*(?bersprungen: Datei gr??er als 200 KB)*
 
 ## `Database/data/testdb/testdatenbank.sqlite`
 *(?bersprungen: Datei gr??er als 200 KB)*
@@ -40223,9 +40964,87 @@ def question_for(finding: Finding) -> str:
     return template["question"].format(**values)
 
 
-def build_catalog(findings: Sequence[Finding], project: dict) -> list[dict]:
-    """Ordered, de-duplicated question list with OZ references."""
+def questions_from_clusters(evaluations) -> list[dict]:
+    """Convert cluster evaluations into RFI catalogue entries."""
+    entries = evaluations.items() if hasattr(evaluations, "items") else ()
+    if isinstance(evaluations, (list, tuple)):
+        entries = enumerate(evaluations)
+
     catalog = []
+    for key, evaluation in entries:
+        if hasattr(evaluation, "as_dict"):
+            raw = evaluation.as_dict()
+        elif isinstance(evaluation, dict):
+            raw = dict(evaluation)
+        else:
+            continue
+
+        if raw.get("contradiction_category") in (None, "", "NONE"):
+            continue
+        if raw.get("offline") is True:
+            continue
+
+        cluster_id = str(key)
+        cluster_title = str(
+            raw.get("cluster_title")
+            or raw.get("title")
+            or cluster_id
+        )
+        affected = raw.get("affected_ozs")
+        if affected is None:
+            affected = raw.get("affected_positions")
+        if affected is None:
+            affected = raw.get("positions")
+        affected = list(affected or [])
+        oz_text = ", ".join(affected) if affected else "Cluster"
+        category = str(raw.get("contradiction_category") or "CLUSTER")
+        reason = str(
+            raw.get("reason_de")
+            or raw.get("engineering_analysis")
+            or raw.get("rationale")
+            or "Der Cluster-Widerspruch ist zu klaeren."
+        )
+        exposure = float(
+            raw.get("euro_exposure_estimate")
+            or raw.get("euro_exposure")
+            or raw.get("euro_leverage")
+            or 0.0
+        )
+        din_ref = str(raw.get("din_ref") or "")
+
+        catalog.append({
+            "nr": 0,
+            "oz": oz_text,
+            "kurztext": cluster_title,
+            "menge": "",
+            "einheit": "Cluster",
+            "detector": f"cluster_{category.lower()}",
+            "severity": str(raw.get("severity") or "high"),
+            "euro_leverage": round(exposure, 2),
+            "frage": reason,
+            "cluster_title": cluster_title,
+            "din_ref": din_ref,
+            "affected_ozs": affected,
+            "group": "cluster",
+        })
+
+    catalog.sort(key=lambda entry: (-entry["euro_leverage"], entry["cluster_title"]))
+    for index, entry in enumerate(catalog, start=1):
+        entry["nr"] = index
+    return catalog
+
+
+def build_catalog(
+    findings: Sequence[Finding],
+    project: dict,
+    cluster_evaluations=None,
+) -> list[dict]:
+    """Ordered, de-duplicated question list with cluster questions first."""
+    catalog = []
+    if cluster_evaluations:
+        cluster_catalog = questions_from_clusters(cluster_evaluations)
+        catalog.extend(cluster_catalog)
+
     seen: set[tuple[str, str]] = set()
     for finding in findings:
         oz = finding.item.key() or "ohne OZ"
@@ -40243,7 +41062,13 @@ def build_catalog(findings: Sequence[Finding], project: dict) -> list[dict]:
             "severity": finding.severity,
             "euro_leverage": round(finding.euro_leverage, 2),
             "frage": question_for(finding),
+            "cluster_title": "",
+            "din_ref": "",
+            "affected_ozs": [oz],
+            "group": "position",
         })
+    for index, entry in enumerate(catalog, start=1):
+        entry["nr"] = index
     return catalog
 
 
@@ -40266,28 +41091,43 @@ def to_docx(catalog: Sequence[dict], out_path: str, project: dict) -> str:
         "ausgewiesenen Leistungspositionen zusammengestellt."
     )
 
-    table = document.add_table(rows=1, cols=6)
-    table.style = "Table Grid"
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    cluster_entries = [
+        entry for entry in catalog
+        if entry.get("group") == "cluster"
+    ]
+    position_entries = [
+        entry for entry in catalog
+        if entry.get("group") != "cluster"
+    ]
     widths = (Cm(1.0), Cm(2.5), Cm(7.0), Cm(2.0), Cm(1.8), Cm(5.0))
     headers = ("Nr.", "OZ", "Kurztext", "Menge", "Einheit", "Bieterfrage")
-    for cell, header, width in zip(table.rows[0].cells, headers, widths):
-        cell.text = header
-        cell.width = width
 
-    for entry in catalog:
-        cells = table.add_row().cells
-        values = (
-            str(entry["nr"]),
-            entry["oz"],
-            entry["kurztext"],
-            entry["menge"],
-            entry["einheit"],
-            entry["frage"],
-        )
-        for cell, value, width in zip(cells, values, widths):
-            cell.text = str(value)
+    def render_group(group_title: str, entries: Sequence[dict]) -> None:
+        if not entries:
+            return
+        document.add_heading(group_title, level=2)
+        table = document.add_table(rows=1, cols=6)
+        table.style = "Table Grid"
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        for cell, header, width in zip(table.rows[0].cells, headers, widths):
+            cell.text = header
             cell.width = width
+        for entry in entries:
+            cells = table.add_row().cells
+            values = (
+                str(entry["nr"]),
+                entry["oz"],
+                entry["kurztext"],
+                entry["menge"],
+                entry["einheit"],
+                entry["frage"],
+            )
+            for cell, value, width in zip(cells, values, widths):
+                cell.text = str(value)
+                cell.width = width
+
+    render_group("Fragen zu Bauabschnitten", cluster_entries)
+    render_group("Fragen zu Einzelpositionen", position_entries)
 
     document.save(out_path)
     return out_path
@@ -40302,23 +41142,43 @@ def to_markdown(catalog: Sequence[dict], project: dict) -> str:
         "Im nachstehenden Bieterfragen-Katalog werden Rückfragen zu den "
         "ausgewiesenen Leistungspositionen zusammengestellt.",
         "",
-        "| Nr. | OZ | Kurztext | Menge | Einheit | Bieterfrage |",
-        "|---:|:---|:---|---:|:---|:---|",
     ]
-    for entry in catalog:
-        def clean(value) -> str:
-            return str(value).replace("|", "\\|").replace("\n", " ")
+    cluster_entries = [
+        entry for entry in catalog
+        if entry.get("group") == "cluster"
+    ]
+    position_entries = [
+        entry for entry in catalog
+        if entry.get("group") != "cluster"
+    ]
 
-        lines.append(
-            "| {nr} | {oz} | {kurztext} | {menge} | {einheit} | {frage} |".format(
-                nr=clean(entry["nr"]),
-                oz=clean(entry["oz"]),
-                kurztext=clean(entry["kurztext"]),
-                menge=clean(entry["menge"]),
-                einheit=clean(entry["einheit"]),
-                frage=clean(entry["frage"]),
+    def render_group(group_title: str, entries: Sequence[dict]) -> None:
+        if not entries:
+            return
+        lines.extend([
+            f"## {group_title}",
+            "",
+            "| Nr. | OZ | Kurztext | Menge | Einheit | Bieterfrage |",
+            "|---:|:---|:---|---:|:---|:---|",
+        ])
+        for entry in entries:
+            def clean(value) -> str:
+                return str(value).replace("|", "\\|").replace("\n", " ")
+
+            lines.append(
+                "| {nr} | {oz} | {kurztext} | {menge} | {einheit} | {frage} |".format(
+                    nr=clean(entry["nr"]),
+                    oz=clean(entry["oz"]),
+                    kurztext=clean(entry["kurztext"]),
+                    menge=clean(entry["menge"]),
+                    einheit=clean(entry["einheit"]),
+                    frage=clean(entry["frage"]),
+                )
             )
-        )
+        lines.append("")
+
+    render_group("Fragen zu Bauabschnitten", cluster_entries)
+    render_group("Fragen zu Einzelpositionen", position_entries)
     return "\n".join(lines) + "\n"
 
 ````
@@ -40963,6 +41823,47 @@ if __name__ == "__main__":
 
 ````
 
+## `scripts/show_clusters.py`
+````py
+#!/usr/bin/env python3
+"""Show clusters for the demo tender."""
+
+from __future__ import annotations
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.clusters import build_clusters
+from core.facts import extract_facts
+from core.parser_x83 import parse
+
+
+def main() -> int:
+    path = "Dataset/[NUMMER_001]_leer.X83"
+    items = parse(path)
+    facts = {item.key(): extract_facts(item) for item in items}
+    clusters = build_clusters(items, facts)
+
+    for cluster in sorted(
+        clusters,
+        key=lambda value: (-value.euro_exposure, value.kind, value.title),
+    ):
+        print(
+            f"{cluster.kind}, {cluster.title}, "
+            f"{len(cluster.positions)} Positionen, "
+            f"{cluster.euro_exposure:.2f} EUR, "
+            f"{cluster.unknown_share:.3f}"
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+````
+
 ## `skills-lock.json`
 ````json
 {
@@ -41086,6 +41987,626 @@ Was wird bewertet? Wie lang ist der Demo-Slot? Zehn Minuten mit einem Organisato
 
 ````
 
+## `tests/test_app_logic.py`
+````py
+import os
+import unittest
+from unittest.mock import patch
+
+from streamlit.testing.v1 import AppTest
+
+
+X83_FILES = (
+    "Dataset/501-24-01_GAEB-XML_sas.x83",
+    "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+    "Dataset/[NUMMER_001]_leer.X83",
+    "Dataset/GAEB-[PROJEKT_004].X83",
+)
+
+
+class AppLogicTests(unittest.TestCase):
+    def test_logic_tab_renders_for_all_x83_samples(self):
+        for relative_path in X83_FILES:
+            with self.subTest(file=relative_path):
+                path = os.path.abspath(relative_path)
+                with patch.dict(os.environ, {
+                    "LOGIC_LLM_PROVIDER": "offline",
+                    "LOGIC_LLM_MODEL": "offline",
+                }, clear=False):
+                    app = AppTest.from_file(
+                        os.path.abspath("app.py"),
+                        default_timeout=120,
+                    )
+                    app.session_state["source"] = ("disk", path)
+                    app.session_state["active_page"] = "Logik"
+                    app.run()
+
+                    self.assertFalse(app.exception)
+                    titles = [title.value for title in app.title]
+                    self.assertIn("Logik", titles)
+                    sidebar_buttons = [button.label for button in app.sidebar.button]
+                    self.assertIn("Logik", sidebar_buttons)
+                    self.assertFalse(app.selectbox)
+
+    def test_blank_tender_labels_missing_prices_and_lump_sum_type(self):
+        app = AppTest.from_file(
+            os.path.abspath("app.py"),
+            default_timeout=120,
+        )
+        app.session_state["source"] = (
+            "disk",
+            os.path.abspath("Dataset/[NUMMER_001]_leer.X83"),
+        )
+        app.session_state["active_page"] = "Tender"
+        app.run()
+
+        self.assertFalse(app.exception)
+        captions = [element.value for element in app.caption]
+        self.assertTrue(any("noch keine Positionspreise" in value for value in captions))
+        self.assertTrue(any("keinen Preis" in value for value in captions))
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
+## `tests/test_clusters.py`
+````py
+import unittest
+from types import SimpleNamespace
+
+from core.clusters import build_clusters, cluster_index
+from core.facts import extract_facts
+from core.models import Cluster, NormalizedItem
+
+
+def item(oz: str, text: str, section: str = "Haupttrasse") -> NormalizedItem:
+    return NormalizedItem(
+        oz=oz,
+        quantity=1,
+        unit="m",
+        section_path=(section, "Bereich A"),
+        short_text=text,
+    )
+
+
+class ClusterTests(unittest.TestCase):
+    def test_section_system_frame_and_index(self):
+        items = [
+            item("0101", "Druckrohr PE100 DN63"),
+            item("0102", "Druckrohr PE100 DN80"),
+            item("0103", "Druckrohr PE100 DN100"),
+            item("0104", "Baustelleneinrichtung umsetzen"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        calculated = [
+            SimpleNamespace(item=items[0], total=100.0),
+            SimpleNamespace(item=items[1], total=200.0),
+            SimpleNamespace(item=items[2], total=300.0),
+        ]
+        clusters = build_clusters(items, facts, calculated)
+
+        sections = [cluster for cluster in clusters if cluster.kind == "SECTION"]
+        systems = [cluster for cluster in clusters if cluster.kind == "SYSTEM"]
+        frames = [cluster for cluster in clusters if cluster.kind == "FRAME"]
+
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0].title, "Haupttrasse > Bereich A")
+        self.assertEqual(sections[0].euro_exposure, 600.0)
+        self.assertEqual(len(systems), 1)
+        self.assertEqual(systems[0].title, "System PE100 DN63-100")
+        self.assertEqual(len(systems[0].positions), 3)
+        self.assertTrue(any(cluster.title == "Baustelleneinrichtung" for cluster in frames))
+
+        index = cluster_index(clusters)
+        self.assertGreaterEqual(len(index["0101"]), 2)
+        self.assertIn(systems[0].cluster_id, index["0101"])
+
+    def test_no_system_below_three_positions(self):
+        items = [
+            item("0201", "Rohr DN63"),
+            item("0202", "Rohr DN80"),
+        ]
+        facts = {position.key(): extract_facts(position) for position in items}
+
+        systems = [
+            cluster
+            for cluster in build_clusters(items, facts)
+            if cluster.kind == "SYSTEM"
+        ]
+        self.assertEqual(systems, [])
+
+    def test_cluster_serialization_round_trip(self):
+        cluster = Cluster(
+            cluster_id="sec:12345678",
+            kind="SECTION",
+            title="Test",
+            positions=["0101"],
+            euro_exposure=12.5,
+            unknown_share=0.25,
+        )
+        restored = Cluster.from_dict(cluster.as_dict())
+        self.assertEqual(restored, cluster)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
+## `tests/test_deep_logic.py`
+````py
+import os
+import unittest
+from unittest.mock import patch
+
+from core.deep_logic import (
+    OfflineAdapter,
+    cache_fingerprint,
+    evaluate_clusters,
+    get_adapter,
+)
+from core.models import Cluster
+
+
+class DeepLogicTests(unittest.TestCase):
+    def test_fingerprint_includes_rules_version_and_model(self):
+        one = cache_fingerprint("payload", "1", "model-a")
+        two = cache_fingerprint("payload", "2", "model-a")
+        three = cache_fingerprint("payload", "1", "model-b")
+
+        self.assertEqual(len(one), 40)
+        self.assertNotEqual(one, two)
+        self.assertNotEqual(one, three)
+
+    def test_missing_key_returns_offline_adapter(self):
+        with patch("core.deep_logic._load_env_once"):
+            with patch.dict(os.environ, {
+                "LOGIC_LLM_PROVIDER": "openai",
+                "LOGIC_LLM_MODEL": "test-model",
+            }, clear=False):
+                os.environ.pop("LOGIC_LLM_KEY", None)
+                adapter = get_adapter()
+                self.assertIsInstance(adapter, OfflineAdapter)
+
+    def test_offline_evaluation_is_marked_and_capped(self):
+        clusters = [
+            Cluster("sec:1", "SECTION", "One", ["01"]),
+            Cluster("sec:2", "SECTION", "Two", ["02"]),
+        ]
+        payloads = {
+            "sec:1": "payload one",
+            "sec:2": "payload two",
+        }
+        with patch("core.deep_logic.load_deep_cache", return_value={}):
+            with patch("core.deep_logic.save_deep_cache"):
+                output = evaluate_clusters(
+                    clusters,
+                    payloads,
+                    use_llm=False,
+                    max_clusters=1,
+                    write_cache=False,
+                )
+
+        self.assertEqual(set(output), {"sec:1"})
+        self.assertTrue(output["sec:1"].offline)
+        self.assertEqual(output["sec:1"].contradiction_category, "NONE")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
+## `tests/test_export_rfi_clusters.py`
+````py
+import unittest
+
+import export_rfi
+from core.models import Finding, NormalizedItem
+
+
+class ExportRfiClusterTests(unittest.TestCase):
+    def test_cluster_questions_precede_position_questions(self):
+        item = NormalizedItem(
+            oz="0101",
+            quantity=10,
+            unit="m",
+            short_text="Rohr verlegen",
+        )
+        finding = Finding(
+            item=item,
+            detector="qty_sanity",
+            severity="medium",
+            rationale="Menge pruefen",
+            euro_leverage=500.0,
+        )
+        evaluations = {
+            "sec:12345678": {
+                "contradiction_category": "QUANTITY_CONFLICT",
+                "severity": "high",
+                "reason_de": "Mengen widersprechen sich.",
+                "affected_positions": ["0101"],
+                "offline": False,
+                "cluster_title": "Haupttrasse",
+                "euro_exposure_estimate": 9000.0,
+                "din_ref": "DIN 4124",
+            }
+        }
+
+        catalog = export_rfi.build_catalog(
+            [finding],
+            {"title": "Test"},
+            cluster_evaluations=evaluations,
+        )
+
+        self.assertEqual(catalog[0]["group"], "cluster")
+        self.assertEqual(catalog[0]["cluster_title"], "Haupttrasse")
+        self.assertEqual(catalog[0]["affected_ozs"], ["0101"])
+
+        markdown = export_rfi.to_markdown(catalog, {"title": "Test"})
+        self.assertIn("Fragen zu Bauabschnitten", markdown)
+        self.assertIn("Fragen zu Einzelpositionen", markdown)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
+## `tests/test_facts.py`
+````py
+import unittest
+
+from core.facts import extract_facts
+from core.models import NormalizedItem
+
+
+def item(text: str) -> NormalizedItem:
+    return NormalizedItem(
+        oz="01.02",
+        quantity=1,
+        unit="m",
+        short_text=text,
+    )
+
+
+class PositionFactsTests(unittest.TestCase):
+    def test_extract_pipe_facts(self):
+        facts = extract_facts(item(
+            "Druckrohr PE100 TW DN/OD63 SDR11 Graben verbaut T 1,25-1,75m"
+        ))
+
+        self.assertEqual(facts.dn, 63)
+        self.assertEqual(facts.material, "PE100")
+        self.assertEqual(facts.depth_m, 1.5)
+        self.assertEqual(facts.phase, "montage")
+        self.assertEqual(facts.confidence, 1.0)
+        self.assertEqual(facts.source, "regex")
+
+    def test_extract_shoring_depth(self):
+        facts = extract_facts(item(
+            "Grabenverbaugeraet H 3-3,5m Sohlen-/Stirnverbau"
+        ))
+
+        self.assertEqual(facts.depth_m, 3.25)
+        self.assertEqual(facts.phase, "vorbereitung")
+
+    def test_extract_bedding_facts(self):
+        facts = extract_facts(item(
+            "Kies-Sand-Gemisch Einbettung Rohr DN300-400 einbauen verdichten D 15-20cm"
+        ))
+
+        self.assertEqual(facts.dn, 300)
+        self.assertEqual(facts.thickness_cm, 15.0)
+        self.assertEqual(facts.phase, "vorbereitung")
+
+    def test_pn_depth_and_inclusive_terms(self):
+        facts = extract_facts(item(
+            "PE-HD Leitung PN16 Tiefe bis 2,50 m, einschl. Muffen und Formteile"
+        ))
+
+        self.assertEqual(facts.pn, 16.0)
+        self.assertEqual(facts.depth_m, 2.5)
+        self.assertEqual(facts.material, "PE-HD")
+        self.assertTrue(facts.inclusive_terms)
+        self.assertTrue(facts.inclusive_terms[0].startswith("muffen"))
+
+    def test_h_height_is_not_graben_depth_on_bridge(self):
+        facts = extract_facts(item(
+            "Leitungsbehelfsbruecke L 10-15m H 4,5-5m"
+        ))
+        self.assertIsNone(facts.depth_m)
+
+    def test_h_height_is_graben_depth_for_shoring(self):
+        facts = extract_facts(item(
+            "Grabenverbaugeraet H 3-3,5m Sohlen-/Stirnverbau"
+        ))
+        self.assertEqual(facts.depth_m, 3.25)
+
+    def test_facts_serialization_round_trip(self):
+        facts = extract_facts(item("Betonfundament einschliesslich Bewehrung"))
+        restored = type(facts).from_dict(facts.as_dict())
+
+        self.assertEqual(restored, facts)
+        self.assertEqual(
+            restored.as_dict()["inclusive_terms"],
+            list(facts.inclusive_terms),
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
+## `tests/test_rules.py`
+````py
+import unittest
+from types import SimpleNamespace
+
+from core.clusters import build_clusters
+from core.facts import extract_facts
+from core.logic import (
+    RULES,
+    RULES_VERSION,
+    UnitBridge,
+    check_cluster_rules,
+    suppressed_by_remarks,
+)
+from core.models import NormalizedItem
+
+
+def item(oz: str, text: str, section: str = "Trasse") -> NormalizedItem:
+    return NormalizedItem(
+        oz=oz,
+        quantity=1,
+        unit="m",
+        section_path=(section, "Bereich"),
+        short_text=text,
+    )
+
+
+def cluster_for(items, facts, extra=None):
+    from core.clusters import build_clusters
+    calculated = extra
+    clusters = build_clusters(items, facts, calculated)
+    for cluster in clusters:
+        if cluster.kind == "SECTION" and cluster.euro_exposure == 0.0:
+            cluster.euro_exposure = 10000.0
+        if cluster.kind == "SYSTEM" and cluster.euro_exposure == 0.0:
+            cluster.euro_exposure = 10000.0
+    return clusters
+
+
+class ClusterRuleTests(unittest.TestCase):
+    def test_unit_bridge_corridor(self):
+        bridge = UnitBridge("m", "m3", 0.8, 1.2, "breite_m_x_tiefe_m")
+        self.assertEqual(bridge.corridor(10.0), (8.0, 12.0))
+
+    def test_rules_catalogue_and_version(self):
+        ids = {rule.id for rule in RULES}
+        self.assertIn("TRENCH_VOLUME", ids)
+        self.assertIn("DIN4124_VERBAU", ids)
+        self.assertEqual(RULES_VERSION, "1")
+
+    def test_trench_positive_and_inclusive_negative(self):
+        positive = [
+            item("01", "Leitungsgraben DN63 T 1,25-1,75m", "Trasse"),
+            item("02", "Bodenaushub", "Trasse"),
+        ]
+        positive[0].unit = "m"
+        positive[0].quantity = 100
+        positive[1].unit = "m3"
+        positive[1].quantity = 500
+        facts = {i.key(): extract_facts(i) for i in positive}
+        clusters = cluster_for(positive, facts)
+        flags = check_cluster_rules(clusters, positive, facts)
+        self.assertTrue(any(flag.rule_id == "TRENCH_VOLUME" for flag in flags))
+
+        negative = [
+            item("11", "Leitungsgraben inkl. Bodenaushub T 1,25-1,75m", "Trasse"),
+            item("12", "Bodenaushub", "Trasse"),
+        ]
+        negative[0].quantity = 100
+        negative[0].unit = "m"
+        negative[1].quantity = 500
+        negative[1].unit = "m3"
+        facts = {i.key(): extract_facts(i) for i in negative}
+        clusters = cluster_for(negative, facts)
+        flags = check_cluster_rules(clusters, negative, facts)
+        self.assertFalse(any(flag.rule_id == "TRENCH_VOLUME" for flag in flags))
+
+        same_tag = [
+            item("13", "Leitungsgraben herstellen", "Trasse"),
+            item("14", "Leitungsgraben ausheben", "Trasse"),
+        ]
+        same_tag[0].unit = "m"
+        same_tag[0].quantity = 100
+        same_tag[1].unit = "m3"
+        same_tag[1].quantity = 500
+        facts = {i.key(): extract_facts(i) for i in same_tag}
+        clusters = cluster_for(same_tag, facts)
+        flags = check_cluster_rules(clusters, same_tag, facts)
+        self.assertTrue(any(flag.rule_id == "TRENCH_VOLUME" for flag in flags))
+
+    def test_bedding_positive_and_negative(self):
+        positive = [
+            item("21", "Bettung", "A"), item("22", "Bodenaushub", "A")
+        ]
+        positive[0].unit = "m3"
+        positive[0].quantity = 10
+        positive[1].unit = "m3"
+        positive[1].quantity = 5
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "BEDDING_IN_TRENCH" for f in flags))
+
+        negative = [
+            item("23", "Bettung einschliesslich Bodenaushub", "A"),
+            item("24", "Bodenaushub", "A"),
+        ]
+        negative[0].unit = "m3"
+        negative[0].quantity = 10
+        negative[1].unit = "m3"
+        negative[1].quantity = 5
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "BEDDING_IN_TRENCH" for f in flags))
+
+    def test_backfill_positive_and_negative(self):
+        positive = [
+            item("31", "Verfuellung", "A"), item("32", "Bodenaushub", "A")
+        ]
+        positive[0].unit = "m3"
+        positive[0].quantity = 10
+        positive[1].unit = "m3"
+        positive[1].quantity = 5
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "BACKFILL_BALANCE" for f in flags))
+
+        negative = [
+            item("33", "Verfuellung einschl. Bodenaushub", "A"),
+            item("34", "Bodenaushub", "A"),
+        ]
+        negative[0].unit = "m3"
+        negative[0].quantity = 10
+        negative[1].unit = "m3"
+        negative[1].quantity = 5
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "BACKFILL_BALANCE" for f in flags))
+
+        piece_units = [
+            item("35", "Verfuellung", "A"),
+            item("36", "Bodenaushub", "A"),
+        ]
+        piece_units[0].unit = "St"
+        piece_units[0].quantity = 10
+        piece_units[1].unit = "St"
+        piece_units[1].quantity = 1
+        facts = {i.key(): extract_facts(i) for i in piece_units}
+        flags = check_cluster_rules(cluster_for(piece_units, facts), piece_units, facts)
+        self.assertFalse(any(f.rule_id == "BACKFILL_BALANCE" for f in flags))
+
+    def test_din4124_positive_and_negative(self):
+        positive = [item("41", "Leitungsgraben T 2,00-2,50m")]
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "DIN4124_VERBAU" for f in flags))
+
+        negative = [item("42", "Leitungsgraben inkl. Verbau T 2,00-2,50m")]
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "DIN4124_VERBAU" for f in flags))
+
+        verbau_position = [item("43", "Grabenverbaugeraet H 3-3,5m")]
+        facts = {i.key(): extract_facts(i) for i in verbau_position}
+        flags = check_cluster_rules(
+            cluster_for(verbau_position, facts),
+            verbau_position,
+            facts,
+        )
+        self.assertFalse(any(f.rule_id == "DIN4124_VERBAU" for f in flags))
+
+    def test_pressure_positive_and_negative(self):
+        positive = [
+            item("51", "PE100 Trinkwasser Druckrohr DN63 verlegen"),
+            item("52", "PE100 Trinkwasser Druckrohr DN80 verlegen"),
+            item("53", "PE100 Trinkwasser Druckrohr DN100 verlegen"),
+        ]
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "PRESSURE_TEST" for f in flags))
+
+        negative = [
+            item("52", "PE100 Trinkwasser Druckrohr DN63 verlegen einschl. Druckpruefung")
+        ]
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "PRESSURE_TEST" for f in flags))
+
+    def test_surface_restore_positive_and_negative(self):
+        positive = [item("61", "Asphalt abbruch")]
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "SURFACE_RESTORE" for f in flags))
+
+        negative = [item("62", "Asphalt Abbruch einschl. Wiederherstellung")]
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "SURFACE_RESTORE" for f in flags))
+
+    def test_shaft_cardinality_positive_and_negative(self):
+        positive = [
+            item("71", "Schacht", "A"),
+            item("72", "Schachtabdeckung", "A"),
+        ]
+        positive[0].unit = "St"
+        positive[0].quantity = 10
+        positive[1].unit = "St"
+        positive[1].quantity = 1
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "SHAFT_COVER_CARD" for f in flags))
+
+        negative = [
+            item("73", "Schacht", "A"),
+            item("74", "Schachtabdeckung einschl. Schacht", "A"),
+        ]
+        negative[0].unit = "St"
+        negative[0].quantity = 10
+        negative[1].unit = "St"
+        negative[1].quantity = 1
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "SHAFT_COVER_CARD" for f in flags))
+
+    def test_dn_step_positive_and_negative(self):
+        positive = [
+            item("81", "Druckrohr PE100 DN63"),
+            item("82", "Druckrohr PE100 DN100"),
+            item("83", "Druckrohr PE100 DN250"),
+        ]
+        facts = {i.key(): extract_facts(i) for i in positive}
+        clusters = cluster_for(positive, facts)
+        flags = check_cluster_rules(clusters, positive, facts)
+        self.assertTrue(any(f.rule_id == "DN_STEP" for f in flags))
+
+        negative = [
+            item("84", "Druckrohr PE100 DN63"),
+            item("85", "Druckrohr PE100 DN100"),
+            item("86", "Druckrohr PE100 DN250 mit Uebergang"),
+        ]
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "DN_STEP" for f in flags))
+
+    def test_site_setup_positive_and_negative(self):
+        positive = [item("91", "Rohr DN63")]
+        facts = {i.key(): extract_facts(i) for i in positive}
+        flags = check_cluster_rules(cluster_for(positive, facts), positive, facts)
+        self.assertTrue(any(f.rule_id == "SITE_SETUP" for f in flags))
+
+        negative = [item("92", "Baustelleneinrichtung aufstellen")]
+        facts = {i.key(): extract_facts(i) for i in negative}
+        flags = check_cluster_rules(cluster_for(negative, facts), negative, facts)
+        self.assertFalse(any(f.rule_id == "SITE_SETUP" for f in flags))
+
+    def test_remark_suppression(self):
+        rule = next(rule for rule in RULES if rule.id == "DIN4124_VERBAU")
+        remarks = ["Grabenverbau ist bauseits als Nebenleistung einzubeziehen."]
+        self.assertTrue(suppressed_by_remarks(remarks, rule))
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+````
+
 ## `utils/__init__.py`
 ````py
 
@@ -41206,9 +42727,19 @@ a EUR 90,000 line is the conversation.
 from __future__ import annotations
 
 import sys
+import os
 from typing import Dict, List
 
-from core import constants, parser_gaeb90, parser_x83, pricer
+from core import (
+    classify,
+    constants,
+    kalkulation,
+    parser_gaeb90,
+    parser_x83,
+    pricer,
+    risk_engine,
+)
+import export_rfi
 from core.models import NormalizedItem
 
 BLANK = constants.REVEAL["blank_boq"]
@@ -41220,6 +42751,56 @@ THRESHOLD = constants.REVEAL["disagreement_threshold_pct"]
 JOIN_WIDTHS = (2, 2, 4)
 MIN_JOIN_RATE = 0.90      # below this the join is broken, not the pricing
 TOP_DEVIATIONS = 12
+
+
+def validate_hybrid_pipeline() -> int:
+    """Offline smoke/regression check for the complete hybrid pipeline."""
+    paths = [
+        BLANK,
+        "Dataset/8209.003_Leistungsverzeichnis_leer.X83",
+    ]
+    reference = pricer.load_reference_prices()
+    data = None
+
+    for path in paths:
+        if not os.path.exists(path):
+            continue
+        items = parser_x83.parse(path)
+        remarks = parser_x83.parse_remarks(path)
+
+        from core import stammdaten
+        data = data or stammdaten.load()
+        assignments = classify.classify(items, data, use_jev=False)
+        company = stammdaten.companies()[0]
+        calculated = kalkulation.calculate(items, assignments, company, data)
+        priced = pricer.price_boq(items, reference)
+
+        hybrid_results, findings = risk_engine.analyze_tender_hybrid(
+            items,
+            remarks,
+            calculated,
+            priced,
+            use_jev=False,
+        )
+        if not hybrid_results:
+            raise AssertionError(f"Hybrid pipeline returned no positions: {path}")
+        if not any(result.euro_exposure > 0 for result in hybrid_results):
+            raise AssertionError(
+                f"Hybrid pipeline computed no positive euro_exposure: {path}"
+            )
+        if not findings:
+            raise AssertionError(f"Hybrid pipeline returned no findings: {path}")
+
+        catalog = export_rfi.build_catalog(findings, {"title": "Test"})
+        if not isinstance(catalog, list) or not catalog:
+            raise AssertionError(f"Bieterfragen-Katalog invalid: {path}")
+
+        print(
+            f"hybrid smoke {os.path.basename(path)}: "
+            f"{len(hybrid_results)} results, {len(findings)} findings, "
+            f"{len(catalog)} catalog entries"
+        )
+    return 0
 
 
 def euro(value: float) -> str:
@@ -41390,6 +42971,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    hybrid_status = validate_hybrid_pipeline()
+    if hybrid_status:
+        sys.exit(hybrid_status)
     sys.exit(main())
 
 ````
