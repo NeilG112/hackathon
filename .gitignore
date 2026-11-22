@@ -28,6 +28,9 @@ out/
 output/
 .cache/
 
+# Local Streamlit session state
+data/persisted_session.json
+
 # OS / editor
 .DS_Store
 Thumbs.db

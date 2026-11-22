@@ -89,6 +89,14 @@
   "reason_de": "Basierend auf dem bereitgestellten Payload wird ein Druckrohr aus PE100 mit einer Nennweite (dn) von 63 in einem Leitungsgraben mit einer Tiefe von 1,5 m verbaut (oz 811). Weitere Formstücke wie Muffen, Winkel (45° und 90°), Kappen und T-Stücke für PE DN/OD63 SDR11 sind ebenfalls aufgeführt (oz 813-817).",
   "severity": "low"
  },
+ "125f44447570843cf94321c00be1c58f8e80f214": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine belegbaren Widersprüche innerhalb der bereitgestellten Daten vor.",
+  "severity": "low"
+ },
  "14a465fd27dfafa17264665375f2adf7f13e6191": {
   "affected_positions": [],
   "confidence": 0.0,
@@ -137,6 +145,14 @@
   "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
   "severity": "low"
  },
+ "248b48522b84bc5f9bd3c1d19becfa800fc75d08": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine widersprüchlichen Informationen innerhalb des bereitgestellten Datensatzes vor.",
+  "severity": "low"
+ },
  "2b77d67bac4a59e0f23f9fc10b9ac7b69b9339a1": {
   "affected_positions": [],
   "confidence": 1.0,
@@ -173,6 +189,18 @@
   "offline": false,
   "reason_de": "Die bereitgestellten Daten enthalten Informationen zu Wasserhaltungsarbeiten, einschließlich eines Pumpensumpfs mit einem Filterrohr DN400, dem Ein- und Ausbau von Pumpen mit Elektromotoren, Absetzbecken-Containern bis 5m3 sowie der Herstellung einer Sickermulde.",
   "severity": "low"
+ },
+ "31f57b18eb32ce858c8f623cb37ceb552d95cfb6": {
+  "affected_positions": [
+   "030001",
+   "030002",
+   "030005"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NORM_CONFLICT",
+  "offline": false,
+  "reason_de": "Es liegt ein massiver Widerspruch zwischen den Materialangaben in den Fakten und den Kurztexten vor: Die Positionen 030001, 030002 und 030005 sind in den Fakten als 'Stahl' definiert, werden im Kurztext jedoch explizit als 'UHPC-Stahlbetonrohre' bzw. 'FBS' (Fertigbetonsystem) bezeichnet.",
+  "severity": "high"
  },
  "32baea3d9950497f02c9f195a18e41bde609dc69": {
   "affected_positions": [],
@@ -287,6 +315,14 @@
   "reason_de": "Die bereitgestellten Daten enthalten Informationen zu verschiedenen Abbruch- und Rückbauarbeiten (Bordstein Beton, Asphaltbelag, Befestigung), aber keine Informationen zu spezifischen statischen Berechnungen oder Lasten, die eine bauingenieurtechnische Bewertung über die reine Auflistung der Positionen hinaus zulassen.",
   "severity": "low"
  },
+ "4ede59b6c1136a6e20fc905255deb85449d623d9": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine belegbaren Widersprüche innerhalb der bereitgestellten Daten vor.",
+  "severity": "low"
+ },
  "4fb3312efc2aeffba80444630a73ff262bbcda0b": {
   "affected_positions": [],
   "confidence": 0.0,
@@ -327,6 +363,14 @@
   "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
   "severity": "low"
  },
+ "5ab29f593b24e6eb1c1ec18e4667b0fdcb927c54": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine belegbaren Widersprüche innerhalb der bereitgestellten Daten vor.",
+  "severity": "low"
+ },
  "5b5f2015f33b2c9c8454625f192bd8c4f99a7e89": {
   "affected_positions": [],
   "confidence": 0.0,
@@ -365,6 +409,14 @@
   "contradiction_category": "NONE",
   "offline": true,
   "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "6175ed6fa996ffa6f68b5caf8c315a67eb5e6274": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine widersprüchlichen Angaben innerhalb des bereitgestellten Datensatzes vor.",
   "severity": "low"
  },
  "6a73c01d31990943361c95e1fa9fb48bba165de4": {
@@ -570,6 +622,14 @@
   "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
   "severity": "low"
  },
+ "a80aa8c1967d638e41a1230d749d4332a43caf4e": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine belegbaren Widersprüche innerhalb der bereitgestellten Daten vor.",
+  "severity": "low"
+ },
  "ad28e06796ead4ca559e289f620d3a6f6377735f": {
   "affected_positions": [],
   "confidence": 0.0,
@@ -592,6 +652,14 @@
   "contradiction_category": "NONE",
   "offline": true,
   "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "be3dd24475abaf05f2d46d8e30702451e29e2c2c": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Kein belegbarer Widerspruch im bereitgestellten Cluster-Payload gefunden.",
   "severity": "low"
  },
  "c360309470b43eb3c98318438f493a82b40312ca": {
@@ -703,6 +771,20 @@
   "offline": true,
   "reason_de": "LLM-Auswertung fuer dieses Cluster fehlgeschlagen; offline behandelt.",
   "severity": "low"
+ },
+ "dc54229e7a51e87de48ed3461cb33c310267c25c": {
+  "affected_positions": [
+   "030001",
+   "030002",
+   "030003",
+   "030005",
+   "030013"
+  ],
+  "confidence": 1.0,
+  "contradiction_category": "NORM_CONFLICT",
+  "offline": false,
+  "reason_de": "Es liegt ein massiver Widerspruch zwischen den Kurztexten und den extrahierten Materialfakten vor: Die Positionen 030001 und 030002 beschreiben 'UHPC-Stahlbetonrohre', in den Fakten ist jedoch lediglich 'Stahl' hinterlegt. Stahlbeton und Stahl sind technisch grundverschiedene Werkstoffe mit unterschiedlichen Normen und statischen Eigenschaften.",
+  "severity": "high"
  },
  "e182f3d6edf7569cbfe41e6a15933d0a3f111963": {
   "affected_positions": [],
@@ -818,6 +900,14 @@
   "contradiction_category": "NONE",
   "offline": true,
   "reason_de": "Offline-Modus: Keine LLM-Bewertung durchgefuehrt.",
+  "severity": "low"
+ },
+ "fd9e587c0941d570a49908924435f96c4cf94da7": {
+  "affected_positions": [],
+  "confidence": 1.0,
+  "contradiction_category": "NONE",
+  "offline": false,
+  "reason_de": "Es liegen keine widersprüchlichen Informationen innerhalb des bereitgestellten Datensatzes vor.",
   "severity": "low"
  },
  "ff084fcde98a32624725675be0f93b8e4665a93e": {

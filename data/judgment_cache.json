@@ -12,6 +12,19 @@
   "spezialgewerk": 0.61,
   "unklar_beschrieben": 0.62
  },
+ "01ddfe5eb97aeb8d": {
+  "menge_unplausibel": 0.41,
+  "mindermengen_risiko": 0.24,
+  "nachtragspotenzial": 0.72,
+  "preis_unplausibel": 0.51,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.17,
+  "unklar_beschrieben": 0.85
+ },
  "07336d1a7d83482a": {
   "menge_unplausibel": 0.66,
   "mindermengen_risiko": 0.3,
@@ -115,6 +128,19 @@
   "spezialgewerk": 0.63,
   "unklar_beschrieben": 0.59
  },
+ "215cb88ac4a0f10b": {
+  "menge_unplausibel": 0.16,
+  "mindermengen_risiko": 0.1,
+  "nachtragspotenzial": 0.54,
+  "preis_unplausibel": 0.67,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.44,
+  "unklar_beschrieben": 0.59
+ },
  "219f2d12446d3051": {
   "menge_unplausibel": 0.3,
   "mindermengen_risiko": 0.16,
@@ -126,6 +152,21 @@
   },
   "spezialgewerk": 0.36,
   "unklar_beschrieben": 0.51
+ },
+ "23e29c86e23a1653": {
+  "menge_unplausibel": 0.78,
+  "mindermengen_risiko": 0.8,
+  "nachtragspotenzial": 0.54,
+  "preis_unplausibel": 0.36,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.56,
+  "unklar_beschrieben": 0.52
  },
  "2509705082466bd2": {
   "menge_unplausibel": 0.35,
@@ -139,6 +180,19 @@
   },
   "spezialgewerk": 0.78,
   "unklar_beschrieben": 0.7
+ },
+ "253f758befecd3f3": {
+  "menge_unplausibel": 0.15,
+  "mindermengen_risiko": 0.09,
+  "nachtragspotenzial": 0.35,
+  "preis_unplausibel": 0.66,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.79,
+  "unklar_beschrieben": 0.53
  },
  "2613388b1cfaca4e": {
   "menge_unplausibel": 0.2,
@@ -162,6 +216,21 @@
   },
   "spezialgewerk": 0.82,
   "unklar_beschrieben": 0.33
+ },
+ "2cb28026247406b8": {
+  "menge_unplausibel": 0.81,
+  "mindermengen_risiko": 0.83,
+  "nachtragspotenzial": 0.66,
+  "preis_unplausibel": 0.44,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.66,
+  "unklar_beschrieben": 0.75
  },
  "2ccfabf2ca01363d": {
   "menge_unplausibel": 0.35,
@@ -215,6 +284,19 @@
   "spezialgewerk": 0.29,
   "unklar_beschrieben": 0.49
  },
+ "3179bbbdc87b228a": {
+  "menge_unplausibel": 0.64,
+  "mindermengen_risiko": 0.77,
+  "nachtragspotenzial": 0.48,
+  "preis_unplausibel": 0.3,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.2,
+  "unklar_beschrieben": 0.52
+ },
  "3262d5968b75a10a": {
   "menge_unplausibel": 0.2,
   "mindermengen_risiko": 0.13,
@@ -223,6 +305,19 @@
   "reasons": {},
   "spezialgewerk": 0.28,
   "unklar_beschrieben": 0.2
+ },
+ "357eebb964072c4f": {
+  "menge_unplausibel": 0.67,
+  "mindermengen_risiko": 0.79,
+  "nachtragspotenzial": 0.61,
+  "preis_unplausibel": 0.32,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3."
+  },
+  "spezialgewerk": 0.24,
+  "unklar_beschrieben": 0.4
  },
  "3854e86b861f604e": {
   "menge_unplausibel": 0.26,
@@ -235,6 +330,17 @@
   "spezialgewerk": 0.13,
   "unklar_beschrieben": 0.45
  },
+ "3879f0784336a905": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.43,
+  "preis_unplausibel": 0.55,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.43,
+  "unklar_beschrieben": 0.44
+ },
  "39ab13520b7faf89": {
   "menge_unplausibel": 0.16,
   "mindermengen_risiko": 0.12,
@@ -246,6 +352,18 @@
   "spezialgewerk": 0.44,
   "unklar_beschrieben": 0.56
  },
+ "3a28c992e4dd4879": {
+  "menge_unplausibel": 0.25,
+  "mindermengen_risiko": 0.26,
+  "nachtragspotenzial": 0.56,
+  "preis_unplausibel": 0.49,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.33,
+  "unklar_beschrieben": 0.75
+ },
  "3b0cebeaf065ddeb": {
   "menge_unplausibel": 0.29,
   "mindermengen_risiko": 0.21,
@@ -256,6 +374,66 @@
   },
   "spezialgewerk": 0.4,
   "unklar_beschrieben": 0.54
+ },
+ "3bd7b673e0c9df83": {
+  "menge_unplausibel": 0.25,
+  "mindermengen_risiko": 0.29,
+  "nachtragspotenzial": 0.66,
+  "preis_unplausibel": 0.23,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.32,
+  "unklar_beschrieben": 0.65
+ },
+ "3df5437c65b32786": {
+  "menge_unplausibel": 0.16,
+  "mindermengen_risiko": 0.1,
+  "nachtragspotenzial": 0.37,
+  "preis_unplausibel": 0.36,
+  "reasons": {
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.29,
+  "unklar_beschrieben": 0.6
+ },
+ "3ee5617a8e5d86ac": {
+  "menge_unplausibel": 0.15,
+  "mindermengen_risiko": 0.1,
+  "nachtragspotenzial": 0.56,
+  "preis_unplausibel": 0.64,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.47,
+  "unklar_beschrieben": 0.66
+ },
+ "41f4e431810d58fb": {
+  "menge_unplausibel": 0.33,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.78,
+  "preis_unplausibel": 0.4,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.28,
+  "unklar_beschrieben": 0.68
+ },
+ "43654409e65358a6": {
+  "menge_unplausibel": 0.32,
+  "mindermengen_risiko": 0.22,
+  "nachtragspotenzial": 0.73,
+  "preis_unplausibel": 0.49,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.21,
+  "unklar_beschrieben": 0.76
  },
  "4612cff54ddda151": {
   "menge_unplausibel": 0.24,
@@ -290,6 +468,15 @@
   },
   "spezialgewerk": 0.16,
   "unklar_beschrieben": 0.51
+ },
+ "47268427dd760fe2": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.45,
+  "preis_unplausibel": 0.19,
+  "reasons": {},
+  "spezialgewerk": 0.41,
+  "unklar_beschrieben": 0.5
  },
  "47ac6d3c92f5c585": {
   "menge_unplausibel": 0.1,
@@ -337,6 +524,19 @@
   },
   "spezialgewerk": 0.44,
   "unklar_beschrieben": 0.51
+ },
+ "4c1e2df7c2d2350a": {
+  "menge_unplausibel": 0.44,
+  "mindermengen_risiko": 0.32,
+  "nachtragspotenzial": 0.69,
+  "preis_unplausibel": 0.65,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.21,
+  "unklar_beschrieben": 0.79
  },
  "4cfcdbff0e406727": {
   "menge_unplausibel": 0.31,
@@ -416,6 +616,31 @@
   "spezialgewerk": 0.59,
   "unklar_beschrieben": 0.72
  },
+ "5e02c3005c648ae4": {
+  "menge_unplausibel": 0.12,
+  "mindermengen_risiko": 0.09,
+  "nachtragspotenzial": 0.46,
+  "preis_unplausibel": 0.71,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.51,
+  "unklar_beschrieben": 0.52
+ },
+ "5e241a475126a895": {
+  "menge_unplausibel": 0.2,
+  "mindermengen_risiko": 0.29,
+  "nachtragspotenzial": 0.62,
+  "preis_unplausibel": 0.31,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.17,
+  "unklar_beschrieben": 0.51
+ },
  "60bf9ac1d824bc0a": {
   "menge_unplausibel": 0.23,
   "mindermengen_risiko": 0.31,
@@ -452,6 +677,20 @@
   },
   "spezialgewerk": 0.27,
   "unklar_beschrieben": 0.68
+ },
+ "6c18167b47e8455b": {
+  "menge_unplausibel": 0.33,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.56,
+  "preis_unplausibel": 0.58,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.79,
+  "unklar_beschrieben": 0.7
  },
  "6e41c86aaf0060f2": {
   "menge_unplausibel": 0.12,
@@ -516,6 +755,18 @@
   "spezialgewerk": 0.79,
   "unklar_beschrieben": 0.63
  },
+ "8146d7dd820dcea1": {
+  "menge_unplausibel": 0.25,
+  "mindermengen_risiko": 0.29,
+  "nachtragspotenzial": 0.68,
+  "preis_unplausibel": 0.34,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.21,
+  "unklar_beschrieben": 0.62
+ },
  "818bd69ab27f2ea8": {
   "menge_unplausibel": 0.38,
   "mindermengen_risiko": 0.78,
@@ -576,6 +827,29 @@
   "reasons": {},
   "spezialgewerk": 0.33,
   "unklar_beschrieben": 0.43
+ },
+ "8b62198a06a79f36": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.17,
+  "nachtragspotenzial": 0.45,
+  "preis_unplausibel": 0.38,
+  "reasons": {
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.1,
+  "unklar_beschrieben": 0.75
+ },
+ "8c5e6c2e5112a9da": {
+  "menge_unplausibel": 0.17,
+  "mindermengen_risiko": 0.26,
+  "nachtragspotenzial": 0.54,
+  "preis_unplausibel": 0.13,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.44,
+  "unklar_beschrieben": 0.59
  },
  "8d32734b3931252c": {
   "menge_unplausibel": 0.09,
@@ -645,6 +919,43 @@
   "spezialgewerk": 0.6,
   "unklar_beschrieben": 0.28
  },
+ "98497da17942d59e": {
+  "menge_unplausibel": 0.27,
+  "mindermengen_risiko": 0.21,
+  "nachtragspotenzial": 0.61,
+  "preis_unplausibel": 0.58,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.5,
+  "unklar_beschrieben": 0.81
+ },
+ "989b55e4b25b014d": {
+  "menge_unplausibel": 0.24,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.52,
+  "preis_unplausibel": 0.12,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.33,
+  "unklar_beschrieben": 0.67
+ },
+ "9b7960c18db2ab8a": {
+  "menge_unplausibel": 0.15,
+  "mindermengen_risiko": 0.35,
+  "nachtragspotenzial": 0.46,
+  "preis_unplausibel": 0.31,
+  "reasons": {
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.82,
+  "unklar_beschrieben": 0.84
+ },
  "9f8043d59b3d12e7": {
   "menge_unplausibel": 0.14,
   "mindermengen_risiko": 0.1,
@@ -698,6 +1009,18 @@
   "spezialgewerk": 0.22,
   "unklar_beschrieben": 0.79
  },
+ "a2db324cb1a3b022": {
+  "menge_unplausibel": 0.18,
+  "mindermengen_risiko": 0.16,
+  "nachtragspotenzial": 0.38,
+  "preis_unplausibel": 0.71,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.47,
+  "unklar_beschrieben": 0.62
+ },
  "a638eee8cd6901b1": {
   "menge_unplausibel": 0.21,
   "mindermengen_risiko": 0.15,
@@ -708,6 +1031,35 @@
   },
   "spezialgewerk": 0.19,
   "unklar_beschrieben": 0.35
+ },
+ "a6f25c32fb724661": {
+  "menge_unplausibel": 0.69,
+  "mindermengen_risiko": 0.71,
+  "nachtragspotenzial": 0.51,
+  "preis_unplausibel": 0.58,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.74,
+  "unklar_beschrieben": 0.77
+ },
+ "a7de3e63fc3fc795": {
+  "menge_unplausibel": 0.27,
+  "mindermengen_risiko": 0.13,
+  "nachtragspotenzial": 0.7,
+  "preis_unplausibel": 0.56,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.39,
+  "unklar_beschrieben": 0.83
  },
  "a88c062c058c8bb6": {
   "menge_unplausibel": 0.28,
@@ -894,6 +1246,29 @@
   "spezialgewerk": 0.24,
   "unklar_beschrieben": 0.64
  },
+ "c46bf5afc8ac3fc1": {
+  "menge_unplausibel": 0.36,
+  "mindermengen_risiko": 0.31,
+  "nachtragspotenzial": 0.64,
+  "preis_unplausibel": 0.24,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.17,
+  "unklar_beschrieben": 0.92
+ },
+ "c6fe9ee97180f1c7": {
+  "menge_unplausibel": 0.15,
+  "mindermengen_risiko": 0.14,
+  "nachtragspotenzial": 0.44,
+  "preis_unplausibel": 0.52,
+  "reasons": {
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab."
+  },
+  "spezialgewerk": 0.43,
+  "unklar_beschrieben": 0.45
+ },
  "cef604572d4347fa": {
   "menge_unplausibel": 0.18,
   "mindermengen_risiko": 0.14,
@@ -917,6 +1292,18 @@
   },
   "spezialgewerk": 0.36,
   "unklar_beschrieben": 0.62
+ },
+ "d30b55d3bd14cbaf": {
+  "menge_unplausibel": 0.39,
+  "mindermengen_risiko": 0.29,
+  "nachtragspotenzial": 0.64,
+  "preis_unplausibel": 0.35,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.29,
+  "unklar_beschrieben": 0.67
  },
  "d66c555e55990871": {
   "menge_unplausibel": 0.82,
@@ -957,6 +1344,19 @@
   "spezialgewerk": 0.64,
   "unklar_beschrieben": 0.76
  },
+ "e2d73fc9be3e81a6": {
+  "menge_unplausibel": 0.45,
+  "mindermengen_risiko": 0.3,
+  "nachtragspotenzial": 0.73,
+  "preis_unplausibel": 0.19,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "spezialgewerk": "Die Position deutet auf ein Spezialgewerk oder eine Nachunternehmerleistung mit fachlich begrenztem Wettbewerb hin.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.59,
+  "unklar_beschrieben": 0.73
+ },
  "e340c6e5c8e2f1ae": {
   "menge_unplausibel": 0.51,
   "mindermengen_risiko": 0.56,
@@ -980,6 +1380,19 @@
   },
   "spezialgewerk": 0.45,
   "unklar_beschrieben": 0.47
+ },
+ "e6537063b79a4508": {
+  "menge_unplausibel": 0.34,
+  "mindermengen_risiko": 0.77,
+  "nachtragspotenzial": 0.71,
+  "preis_unplausibel": 0.36,
+  "reasons": {
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.39,
+  "unklar_beschrieben": 0.73
  },
  "e8987d1a2db89166": {
   "menge_unplausibel": 0.28,
@@ -1048,6 +1461,19 @@
   "spezialgewerk": 0.22,
   "unklar_beschrieben": 0.57
  },
+ "f331879da3559169": {
+  "menge_unplausibel": 0.24,
+  "mindermengen_risiko": 0.42,
+  "nachtragspotenzial": 0.6,
+  "preis_unplausibel": 0.68,
+  "reasons": {
+   "nachtragspotenzial": "Der beschriebene Umfang birgt ein erhöhtes Risiko für Mengenmehrungen oder zusätzliche Nachträge nach VOB/B § 2 Abs. 3.",
+   "preis_unplausibel": "Der vorkalkulierte Einheitspreis weicht gegenüber der technischen Komplexität oder der verfügbaren Marktspanne auffällig ab.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.24,
+  "unklar_beschrieben": 0.61
+ },
  "fb19a033d13bac6e": {
   "menge_unplausibel": 0.29,
   "mindermengen_risiko": 0.37,
@@ -1083,6 +1509,19 @@
   },
   "spezialgewerk": 0.36,
   "unklar_beschrieben": 0.84
+ },
+ "fba3355669fcd8dc": {
+  "menge_unplausibel": 0.71,
+  "mindermengen_risiko": 0.8,
+  "nachtragspotenzial": 0.49,
+  "preis_unplausibel": 0.3,
+  "reasons": {
+   "menge_unplausibel": "Die ausgeschriebene Menge wirkt für die beschriebene Bauleistung unplausibel und kann einen Komma- oder Zehnerpotenzfehler enthalten.",
+   "mindermengen_risiko": "Die Position wirkt optional, bedarfsabhängig oder überhöht und könnte in deutlich geringerem Umfang abgerufen werden.",
+   "unklar_beschrieben": "Der Leistungsumfang ist zu offen oder unvollständig, sodass Maßnahmen, Schnittstellen oder Normen die Kalkulation verändern können."
+  },
+  "spezialgewerk": 0.23,
+  "unklar_beschrieben": 0.54
  },
  "fc2fc687ce9a6c13": {
   "menge_unplausibel": 0.24,

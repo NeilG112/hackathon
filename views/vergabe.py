@@ -22,6 +22,7 @@ from typing import Callable, Mapping, Optional
 
 import streamlit as st
 
+from core import session_store
 from core.vergabe import (DEFAULT_AUFSCHLAG_PCT, MODUS_LABEL,
                           GewerkEntscheidung, GewerkZeile, Modus,
                           VergabeErgebnis)
@@ -48,6 +49,7 @@ def gespeicherte_entscheidungen(scope: str) -> dict[str, GewerkEntscheidung]:
 def _speichern(scope: str, entscheidungen: Mapping[str, GewerkEntscheidung]) -> None:
     store = st.session_state.get(STORE_KEY, {})
     st.session_state[STORE_KEY] = {**store, scope: dict(entscheidungen)}
+    session_store.persist(st.session_state)
 
 
 def _keys(scope: str, gewerk: str) -> tuple[str, str, str]:

@@ -36,7 +36,7 @@ import streamlit as st
 
 from core import (classify, clusters, constants, deep_logic, detectors, facts,
                   kalkulation, logic, objects, parser_gaeb90, parser_x83, pricer,
-                  risk_engine, stammdaten, vergabe)
+                  risk_engine, session_store, stammdaten, vergabe)
 from views import reveal
 from views import vergabe as vergabe_view
 
@@ -822,7 +822,6 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
             "EP (€)": unit_price,
             "GP (€)": total_price,
             "Bearbeitet": "●" if override else "",
-            "Pauschal": "Ja" if item.is_lump_sum else "Nein",
         })
 
     event = st.dataframe(
@@ -846,7 +845,6 @@ def section_groups(items, assignments, data, filename: str, remarks: list[str],
             "Bearbeitet": st.column_config.TextColumn(
                 "Bearbeitet", width="small"
             ),
-            "Pauschal": st.column_config.TextColumn("Pauschal", width="small"),
         },
         key="group_positions",
         on_select="rerun",
@@ -1453,6 +1451,10 @@ def section_export(findings, cluster_evaluations=None):
 
 
 def main():
+    if "_persisted_session_restored" not in st.session_state:
+        session_store.restore(st.session_state)
+        st.session_state["_persisted_session_restored"] = True
+
     st.markdown(
         """
         <style>
@@ -1702,6 +1704,8 @@ def main():
             )
         elif page == "Heikle Positionen":
             section_hybrid_risky(items, hybrid_results, findings)
+
+    session_store.persist(st.session_state)
 
 
 main()
